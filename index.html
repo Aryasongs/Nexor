@@ -460,6 +460,14 @@ img{display:block;}
 #feed-col{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
 .feed-loader{padding:24px;text-align:center;color:var(--text3);font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px;}
 .empty-feed{padding:40px 24px;text-align:center;color:var(--text3);}
+.crisis-row{display:flex;align-items:center;gap:14px;padding:16px 2px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .12s;}
+.crisis-row:last-child{border-bottom:none;}
+.crisis-row:hover{background:var(--cyan-dim);}
+.crisis-row-icon{width:38px;height:38px;flex-shrink:0;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--surface2);border:1px solid var(--border2);font-size:17px;color:var(--text);}
+.crisis-row-text{flex:1;min-width:0;}
+.crisis-row-title{font-size:15px;font-weight:700;color:var(--text);}
+.crisis-row-sub{font-size:13px;color:var(--text2);margin-top:2px;}
+.crisis-row-chevron{font-size:16px;color:var(--text3);flex-shrink:0;}
 .empty-feed i{font-size:48px;display:block;margin-bottom:12px;color:var(--surface3);}
 .empty-feed p{font-size:15px;font-weight:500;}
 
@@ -2259,17 +2267,28 @@ function isCrisisSearch(q){
   return CRISIS_SEARCH_TERMS.some(t=>norm.includes(t));
 }
 function crisisSupportBannerHtml(){
-  return `<div class="empty-feed" style="text-align:left;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:20px;margin-bottom:14px;">
-    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-      <i class="ph ph-heart" style="font-size:20px;color:var(--like);"></i>
-      <strong style="color:var(--text);font-size:15px;">We're here with you</strong>
-    </div>
-    <p style="color:var(--text2);font-size:14px;line-height:1.5;margin:0 0 14px;">
-      If you're having thoughts like this, please know you're not alone — reach out to a family member, a friend you trust, or a crisis helpline in your area right now. It can help to talk to someone.
+  return `<div class="empty-feed" style="text-align:center;padding:28px 20px 6px;color:var(--text);">
+    <h2 style="font-size:25px;font-weight:800;color:var(--text);margin:0 0 10px;letter-spacing:-0.3px;">Help is available</h2>
+    <p style="color:var(--text2);font-size:14px;line-height:1.5;max-width:320px;margin:0 auto 20px;">
+      If you or someone you know may be struggling, there are ways to get help.
     </p>
-    <div style="display:flex;flex-direction:column;gap:8px;">
-      <button class="btn-sheet primary" style="margin:0;" onclick="event.stopPropagation();crisisReachFriends()"><i class="ph ph-chats-circle"></i> Reach Friends</button>
-      <button class="btn-sheet outline" style="margin:0;" onclick="event.stopPropagation();openHelplineModal()"><i class="ph ph-phone-call"></i> Contact a helpline</button>
+    <div style="text-align:left;border-top:1px solid var(--border2);">
+      <div class="crisis-row" onclick="event.stopPropagation();openHelplineModal()">
+        <div class="crisis-row-icon"><i class="ph ph-phone"></i></div>
+        <div class="crisis-row-text">
+          <div class="crisis-row-title">Contact a helpline</div>
+          <div class="crisis-row-sub">Call or text for support.</div>
+        </div>
+        <i class="ph ph-caret-right crisis-row-chevron"></i>
+      </div>
+      <div class="crisis-row" onclick="event.stopPropagation();crisisReachFriends()">
+        <div class="crisis-row-icon"><i class="ph ph-paper-plane-tilt"></i></div>
+        <div class="crisis-row-text">
+          <div class="crisis-row-title">Reach out to a friend</div>
+          <div class="crisis-row-sub">Message someone you trust.</div>
+        </div>
+        <i class="ph ph-caret-right crisis-row-chevron"></i>
+      </div>
     </div>
   </div>`;
 }
