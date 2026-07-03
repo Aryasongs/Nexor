@@ -5041,8 +5041,14 @@ async function openDetail(pulseId){
     let repliesHtml='';
     if(replyIds.length){
       const replyPulses=await Promise.all(replyIds.map(id=>db.ref('pulses/'+id).once('value').then(s=>({id,...(s.val()||{})}))));
-      replyPulses.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-      repliesHtml='<div class="replies-section">'+replyPulses.filter(r=>!blockedSet.has(r.uid)&&!mutedSet.has(r.uid)).map(r=>buildPulseCard(r)).join('')+'</div>';
+      // A reply id can be left behind in the index after its pulse was deleted
+      // (e.g. from data created before this cleanup was added). Drop those instead
+      // of rendering an empty "ghost" card, and quietly tidy up the stale index entry.
+      const validReplies=[], orphanIds=[];
+      replyPulses.forEach(r=>{ if(r.uid) validReplies.push(r); else orphanIds.push(r.id); });
+      orphanIds.forEach(id=>{ db.ref('replies/'+pulseId+'/'+id).remove().catch(()=>{}); });
+      validReplies.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+      repliesHtml='<div class="replies-section">'+validReplies.filter(r=>!blockedSet.has(r.uid)&&!mutedSet.has(r.uid)).map(r=>buildPulseCard(r)).join('')+'</div>';
     }
     el.innerHTML=`
       <div style="padding:16px 18px 0;">
@@ -5722,8 +5728,13 @@ async function loadBookmarksScreen(){
   if(!bookmarkSet.size){el.innerHTML='<div class="empty-feed"><i class="ph ph-bookmark-simple"></i><p>No bookmarks yet</p></div>';return;}
   try{
     const pulses=await Promise.all([...bookmarkSet].map(id=>db.ref('pulses/'+id).once('value').then(s=>({id,...(s.val()||{})}))));
-    pulses.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-    el.innerHTML=pulses.map(p=>buildPulseCard(p)).join('');
+    // A bookmarked pulse may have since been deleted by its author — drop those
+    // instead of showing a blank "ghost" card, and clean up the stale bookmark.
+    const livePulses=pulses.filter(p=>p.uid);
+    pulses.filter(p=>!p.uid).forEach(p=>{ bookmarkSet.delete(p.id); db.ref('bookmarks/'+me.uid+'/'+p.id).remove().catch(()=>{}); });
+    if(!livePulses.length){el.innerHTML='<div class="empty-feed"><i class="ph ph-bookmark-simple"></i><p>No bookmarks yet</p></div>';return;}
+    livePulses.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    el.innerHTML=livePulses.map(p=>buildPulseCard(p)).join('');
   } catch(e){el.innerHTML='<div class="empty-feed"><p>Could not load bookmarks</p></div>';}
 }
 
@@ -6081,15 +6092,31 @@ async function saveEditPulse(){
 // DELETE PULSE
 // ============================================================
 async function deletePulse(pulseId){
-  const ok=await showConfirm({title:'Delete Pulse?',message:'This cannot be undone.',okLabel:'Delete',icon:'ph-trash'});
+  // Fetch first so we know whether this is a reply/comment (and who its parent is) —
+  // needed to clean up the replies/ index on the parent. Without this, a deleted
+  // comment's id stays behind in replies/{parentId}/ and later renders as an empty
+  // "ghost" card (blank name, "@user") when the parent pulse is reopened.
+  let p={};
+  try{ const snap=await db.ref('pulses/'+pulseId).once('value'); p=snap.val()||{}; }catch(e){}
+  const isReplyDelete = !!(p.isReply && p.parentId);
+  const ok=await showConfirm({title:isReplyDelete?'Delete Comment?':'Delete Pulse?',message:'This cannot be undone.',okLabel:'Delete',icon:'ph-trash'});
   if(!ok)return;
   try{
     await db.ref('pulses/'+pulseId).remove();
     await db.ref('userPulses/'+me.uid+'/'+pulseId).remove();
-    await db.ref('users/'+me.uid+'/pulsesCount').transaction(c=>Math.max(0,(c||0)-1));
+    if(isReplyDelete){
+      await db.ref('replies/'+p.parentId+'/'+pulseId).remove();
+      await db.ref('pulses/'+p.parentId+'/replies').transaction(c=>Math.max(0,(c||0)-1));
+    } else {
+      // pulsesCount is only ever incremented for top-level pulses (never for replies/comments),
+      // so only decrement it here when deleting a top-level pulse.
+      await db.ref('users/'+me.uid+'/pulsesCount').transaction(c=>Math.max(0,(c||0)-1));
+    }
     document.getElementById('pc-'+pulseId)?.remove();
-    showToast('Pulse deleted');
-    if(document.getElementById('detail-screen').classList.contains('active')) navBack();
+    showToast(isReplyDelete?'Comment deleted':'Pulse deleted');
+    if(document.getElementById('detail-screen').classList.contains('active')){
+      if(isReplyDelete) openDetail(p.parentId); else navBack();
+    }
   } catch(e){showToast('Could not delete');}
 }
 
@@ -7263,8 +7290,12 @@ async function renderReelComments(pulseId){
       return;
     }
     const replies=await Promise.all(replyIds.map(id=>db.ref('pulses/'+id).once('value').then(s=>({id,...(s.val()||{})}))));
-    replies.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-    const visible=replies.filter(r=>!blockedSet.has(r.uid)&&!mutedSet.has(r.uid));
+    // Drop stale reply ids whose pulse was already deleted, instead of showing a blank
+    // "ghost" comment, and tidy up the leftover index entry while we're here.
+    const liveReplies=replies.filter(r=>r.uid);
+    replies.filter(r=>!r.uid).forEach(r=>{ db.ref('replies/'+pulseId+'/'+r.id).remove().catch(()=>{}); });
+    liveReplies.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    const visible=liveReplies.filter(r=>!blockedSet.has(r.uid)&&!mutedSet.has(r.uid));
     if(!visible.length){
       list.innerHTML='<div class="reel-comments-empty"><i class="ph ph-chat-circle-dots" style="font-size:28px;"></i><div style="margin-top:8px;">No comments yet. Be the first!</div></div>';
       return;
