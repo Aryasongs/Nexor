@@ -2107,6 +2107,79 @@ function sendNotification(receiverUid, data, senderOverride){
     if(err.code==='PERMISSION_DENIED') showToast('Could not send notification — check Firebase rules');
   });
 }
+
+// ============================================================
+// CONTENT MODERATION
+// Blocks Pulses/comments/replies/captions containing slurs, hate
+// speech, or explicit sexual content before they're ever saved.
+// Add/remove entries in BANNED_TERMS to tune the filter — this list
+// is the single source of truth used everywhere content is posted.
+// Matching is whole-word/whole-phrase and case-insensitive (so it
+// won't flag things like "Sussex" or "essex" just because they
+// contain "sex"). It does NOT catch spacing/leetspeak tricks
+// (e.g. "n1gga", "s.e.x") — extend moderateText() if you need that.
+// ============================================================
+const BANNED_TERMS = [
+  'fuck you',
+  'porn',
+  'naked',
+  'pajeet',
+  'pojeet',
+  'dirty indian',
+  'nigga',
+  'nigger', // hard variant, in case only the soft form was intended to be listed
+  'sex'
+];
+function moderateText(text){
+  if(!text) return null;
+  const norm=String(text).toLowerCase().replace(/\s+/g,' ').trim();
+  for(const term of BANNED_TERMS){
+    const escaped=term.split(' ').map(w=>w.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')).join('\\s+');
+    if(new RegExp('\\b'+escaped+'\\b','i').test(norm)) return term;
+  }
+  return null;
+}
+// Pushes a system notification into the CURRENT user's own inbox (unlike
+// sendNotification, which refuses to notify yourself — this is intentional
+// here since we're telling someone about their own content being removed).
+function sendModerationAlert(kindLabel){
+  if(!me) return Promise.resolve();
+  return db.ref('notifications/'+me.uid).push({
+    type:'moderation',
+    message:`Your ${kindLabel} was deleted because it violated our community guidelines.`,
+    fromUid:'system', fromName:'Nexor Sparks',
+    read:false, createdAt:firebase.database.ServerValue.TIMESTAMP
+  }).catch(()=>{});
+}
+// Call at the top of any submit handler. Returns true (and blocks the post)
+// if the text violates guidelines; false if it's clear to proceed.
+function blockIfViolatesGuidelines(text, kindLabel){
+  const hit=moderateText(text);
+  if(!hit) return false;
+  sendModerationAlert(kindLabel);
+  showToast(`Your ${kindLabel} was removed — violates community guidelines`);
+  return true;
+}
+// ============================================================
+// CRISIS SUPPORT — shown when someone searches self-harm/suicide-related terms
+// ============================================================
+const CRISIS_SEARCH_TERMS=['suicide','suicidal','kill myself','end my life','want to die','self harm','self-harm','hurt myself'];
+function isCrisisSearch(q){
+  const norm=String(q||'').toLowerCase();
+  return CRISIS_SEARCH_TERMS.some(t=>norm.includes(t));
+}
+function crisisSupportBannerHtml(){
+  return `<div class="empty-feed" style="text-align:left;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:20px;margin-bottom:14px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <i class="ph ph-heart" style="font-size:20px;color:var(--like);"></i>
+      <strong style="color:var(--text);font-size:15px;">We're here with you</strong>
+    </div>
+    <p style="color:var(--text2);font-size:14px;line-height:1.5;margin:0;">
+      If you're having thoughts like this, please know you're not alone — reach out to a family member, a friend you trust, or a crisis helpline in your area right now. It can help to talk to someone.
+    </p>
+  </div>`;
+}
+
 // Turn #hashtags and @mentions inside (already-escaped-safe) text into colored, clickable spans
 function linkifyText(raw){
   raw = String(raw||'');
@@ -4190,6 +4263,7 @@ async function publishPulse(source){
   const isQuote=source==='modal'&&!!quoteTargetId&&!!quoteOrigPulse;
   const pollPayload=getValidPollPayload(source);
   if(!text&&!imgs.length&&!vid&&!gifUrl&&!isQuote&&!pollPayload)return;
+  if(blockIfViolatesGuidelines(text,'Pulse')) return;
   const btn=document.getElementById(source+'-post-btn');
   btn.disabled=true;
   // Lightweight progress indicator so the user can see something is
@@ -4791,6 +4865,7 @@ function openReply(pulseId, handle){
 async function postReply(){
   const text=document.getElementById('reply-text').value.trim();
   if((!text&&!replyGifUrl)||!replyToId)return;
+  if(blockIfViolatesGuidelines(text,'comment')) return;
   const btn=document.getElementById('reply-post-btn'); btn.disabled=true;
   try{
     const replyData={uid:me.uid,creatorName:myData.name||'User',creatorHandle:myData.handle||'user',
@@ -5645,7 +5720,7 @@ function loadNotifs(){
     if(badgeM){badgeM.textContent=unread>99?'99+':unread;badgeM.classList.toggle('hidden',unread===0);}
     const el=document.getElementById('notif-list'); if(!el)return;
     if(!items.length){el.innerHTML='<div class="empty-feed"><i class="ph ph-bell"></i><p>No alerts yet</p></div>';return;}
-    const icons={like:'ph-fill ph-heart',follow:'ph ph-user-plus',follow_request:'ph ph-user-plus',follow_accept:'ph ph-user-check',repost:'ph ph-repeat',reply:'ph ph-chat-circle-dots',mention:'ph ph-at',collab_request:'ph ph-users-three',collab_accept:'ph ph-users-three'};
+    const icons={like:'ph-fill ph-heart',follow:'ph ph-user-plus',follow_request:'ph ph-user-plus',follow_accept:'ph ph-user-check',repost:'ph ph-repeat',reply:'ph ph-chat-circle-dots',mention:'ph ph-at',collab_request:'ph ph-users-three',collab_accept:'ph ph-users-three',moderation:'ph ph-shield-warning'};
     const msgs={
       like:`<strong>${'%n'}</strong> liked your Pulse`,
       follow:`<strong>${'%n'}</strong> started following you`,
@@ -5659,7 +5734,8 @@ function loadNotifs(){
     };
     try{
       el.innerHTML=items.map(n=>{
-        const msg=(msgs[n.type]||'New notification').replace('%n',ESC(n.fromName));
+        // Moderation alerts carry their own literal message (no fromName to fill in)
+        const msg=n.type==='moderation'?ESC(n.message||'Your content was removed for violating our community guidelines.'):(msgs[n.type]||'New notification').replace('%n',ESC(n.fromName));
         if(n.type==='follow_request'){
           return `<div class="notif-item notif-${n.type} ${n.read?'':'unread'}">
             <div class="notif-icon"><i class="${icons[n.type]||'ph ph-bell'}"></i></div>
@@ -5959,6 +6035,7 @@ async function doExploreSearch(){
   if(raw.startsWith('#')){ await openHashtag(q); return; }
   const el=document.getElementById('explore-results');
   el.innerHTML='<div class="feed-loader"><i class="ph ph-spinner-gap spin"></i></div>';
+  const crisisBanner=isCrisisSearch(q)?crisisSupportBannerHtml():'';
 
   // Search people
   const usersSnap=await db.ref('users').limitToLast(300).once('value');
@@ -5984,9 +6061,9 @@ async function doExploreSearch(){
       results.unshift({id:c.key,...d});
   });
 
-  if(!peopleTop.length && !results.length){el.innerHTML='<div class="empty-feed"><p>No results for "'+ESC(raw)+'"</p></div>';return;}
+  if(!peopleTop.length && !results.length){el.innerHTML=crisisBanner+'<div class="empty-feed"><p>No results for "'+ESC(raw)+'"</p></div>';return;}
 
-  let html='';
+  let html=crisisBanner;
   if(peopleTop.length){
     html+='<div class="search-section-title">People</div><div class="search-people-row">'+peopleTop.map(u=>`
     <div class="who-item" onclick="openProfile('${ESC(u.id)}')">
@@ -6065,6 +6142,7 @@ async function saveEditPulse(){
   const ta=document.getElementById('edit-pulse-text');
   const text=ta.value.trim();
   if(!text){ showToast('Pulse cannot be empty'); return; }
+  if(blockIfViolatesGuidelines(text,'Pulse')) return;
   const btn=document.getElementById('edit-pulse-save-btn');
   btn.disabled=true;
   try{
@@ -7354,6 +7432,7 @@ async function postReelComment(){
   const text=input.value.trim();
   const pulseId=reelCommentsPulseId;
   if(!text||!pulseId) return;
+  if(blockIfViolatesGuidelines(text,'comment')) return;
   const btn=document.getElementById('reel-comment-post-btn'); btn.disabled=true;
   try{
     const replyData={uid:me.uid,creatorName:myData.name||'User',creatorHandle:myData.handle||'user',
