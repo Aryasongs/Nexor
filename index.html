@@ -1781,6 +1781,18 @@ img{display:block;}
   </div>
 </div>
 
+<!-- Crisis support: contact a helpline -->
+<div class="modal-overlay" id="helpline-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="display:flex;align-items:center;gap:6px;"><i class="ph ph-phone-call" style="color:var(--like);"></i> Contact a helpline</div>
+    <div id="helpline-modal-content" style="padding:4px 0 8px;">
+      <div class="feed-loader"><i class="ph ph-spinner-gap spin"></i></div>
+    </div>
+    <button class="btn-sheet outline" onclick="closeModal('helpline-modal')">Close</button>
+  </div>
+</div>
+
 <!-- Date of birth editor -->
 <div class="modal-overlay" id="dob-edit-modal">
   <div class="modal-sheet">
@@ -2252,10 +2264,83 @@ function crisisSupportBannerHtml(){
       <i class="ph ph-heart" style="font-size:20px;color:var(--like);"></i>
       <strong style="color:var(--text);font-size:15px;">We're here with you</strong>
     </div>
-    <p style="color:var(--text2);font-size:14px;line-height:1.5;margin:0;">
+    <p style="color:var(--text2);font-size:14px;line-height:1.5;margin:0 0 14px;">
       If you're having thoughts like this, please know you're not alone — reach out to a family member, a friend you trust, or a crisis helpline in your area right now. It can help to talk to someone.
     </p>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button class="btn-sheet primary" style="margin:0;" onclick="event.stopPropagation();crisisReachFriends()"><i class="ph ph-chats-circle"></i> Reach Friends</button>
+      <button class="btn-sheet outline" style="margin:0;" onclick="event.stopPropagation();openHelplineModal()"><i class="ph ph-phone-call"></i> Contact a helpline</button>
+    </div>
   </div>`;
+}
+
+// "Reach Friends" — jump straight into the message inbox so the person can message someone they trust
+function crisisReachFriends(){
+  navShow('messages-screen');
+}
+
+// Best-effort, no-network heuristic for whether the person is likely in India,
+// so we can surface India-specific helplines by default. Falls back to the
+// IP-based lookup already used elsewhere in the app if the timezone is ambiguous.
+async function guessIsIndia(){
+  try{
+    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
+    if(/Kolkata|Calcutta/i.test(tz)) return true;
+    const langs = [navigator.language, ...(navigator.languages||[])].filter(Boolean);
+    if(langs.some(l=>/-IN$/i.test(l))) return true;
+  } catch(e){}
+  try{
+    const country = await guessLocationFromIP();
+    if(country) return /india/i.test(country);
+  } catch(e){}
+  return false;
+}
+
+async function openHelplineModal(){
+  const el = document.getElementById('helpline-modal-content');
+  el.innerHTML = '<div class="feed-loader"><i class="ph ph-spinner-gap spin"></i></div>';
+  openModal('helpline-modal');
+  const isIndia = await guessIsIndia();
+  el.innerHTML = isIndia ? helplineIndiaHtml() : helplineIntlHtml();
+}
+
+function helplineIndiaHtml(){
+  return `
+    <p style="color:var(--text2);font-size:13px;line-height:1.5;margin-bottom:16px;">Call or text someone who can listen and support you.</p>
+    <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px;">
+      <strong style="font-size:14px;color:var(--text);">Fortis Mental Health</strong>
+      <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px;">
+        <a href="tel:+918376804102" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);"><i class="ph ph-phone"></i> +91 83768 04102</a>
+        <a href="mailto:mentalhealth@fortishealthcare.com" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);word-break:break-all;"><i class="ph ph-envelope-simple"></i> mentalhealth@fortishealthcare.com</a>
+        <a href="https://www.fortishealthcare.com/india/clinical-speciality/mental-health-and-behavioural-sciences-268" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);"><i class="ph ph-globe"></i> Visit their website</a>
+      </div>
+    </div>
+    <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:14px;">
+      <strong style="font-size:14px;color:var(--text);">iCall Psychosocial Helpline</strong>
+      <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px;">
+        <a href="tel:9372048501" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);"><i class="ph ph-phone"></i> 9372048501</a>
+        <a href="tel:9920241248" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);"><i class="ph ph-phone"></i> 9920241248</a>
+        <a href="tel:8369799513" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);"><i class="ph ph-phone"></i> 8369799513</a>
+        <a href="mailto:icall@tiss.edu" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);"><i class="ph ph-envelope-simple"></i> icall@tiss.edu</a>
+      </div>
+    </div>
+    <p style="color:var(--text3);font-size:12px;line-height:1.5;margin-top:14px;">Outside India? In the US or Canada you can call or text <a href="tel:988" style="color:var(--cyan);">988</a>.</p>
+  `;
+}
+
+function helplineIntlHtml(){
+  return `
+    <p style="color:var(--text2);font-size:13px;line-height:1.5;margin-bottom:16px;">Call or text someone who can listen and support you.</p>
+    <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px;">
+      <strong style="font-size:14px;color:var(--text);">United States &amp; Canada</strong>
+      <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px;">
+        <a href="tel:988" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);"><i class="ph ph-phone"></i> Call 988</a>
+        <a href="sms:988" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);"><i class="ph ph-chat-text"></i> Text 988</a>
+      </div>
+    </div>
+    <p style="color:var(--text3);font-size:12px;line-height:1.5;margin-top:14px;">In India? Tap below to see local helplines instead.</p>
+    <button class="btn-sheet outline" style="margin-top:8px;" onclick="document.getElementById('helpline-modal-content').innerHTML=helplineIndiaHtml()"><i class="ph ph-map-pin"></i> Show India helplines</button>
+  `;
 }
 
 // Turn #hashtags and @mentions inside (already-escaped-safe) text into colored, clickable spans
