@@ -460,14 +460,6 @@ img{display:block;}
 #feed-col{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;}
 .feed-loader{padding:24px;text-align:center;color:var(--text3);font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px;}
 .empty-feed{padding:40px 24px;text-align:center;color:var(--text3);}
-.crisis-row{display:flex;align-items:center;gap:14px;padding:16px 2px;border-bottom:1px solid var(--border2);cursor:pointer;transition:background .12s;}
-.crisis-row:last-child{border-bottom:none;}
-.crisis-row:hover{background:var(--cyan-dim);}
-.crisis-row-icon{width:38px;height:38px;flex-shrink:0;border-radius:50%;display:flex;align-items:center;justify-content:center;background:var(--surface2);border:1px solid var(--border2);font-size:17px;color:var(--text);}
-.crisis-row-text{flex:1;min-width:0;}
-.crisis-row-title{font-size:15px;font-weight:700;color:var(--text);}
-.crisis-row-sub{font-size:13px;color:var(--text2);margin-top:2px;}
-.crisis-row-chevron{font-size:16px;color:var(--text3);flex-shrink:0;}
 .empty-feed i{font-size:48px;display:block;margin-bottom:12px;color:var(--surface3);}
 .empty-feed p{font-size:15px;font-weight:500;}
 
@@ -1789,18 +1781,6 @@ img{display:block;}
   </div>
 </div>
 
-<!-- Crisis support: contact a helpline -->
-<div class="modal-overlay" id="helpline-modal">
-  <div class="modal-sheet">
-    <div class="modal-handle"></div>
-    <div class="modal-title" style="display:flex;align-items:center;gap:6px;"><i class="ph ph-phone-call" style="color:var(--like);"></i> Contact a helpline</div>
-    <div id="helpline-modal-content" style="padding:4px 0 8px;">
-      <div class="feed-loader"><i class="ph ph-spinner-gap spin"></i></div>
-    </div>
-    <button class="btn-sheet outline" onclick="closeModal('helpline-modal')">Close</button>
-  </div>
-</div>
-
 <!-- Date of birth editor -->
 <div class="modal-overlay" id="dob-edit-modal">
   <div class="modal-sheet">
@@ -2267,99 +2247,15 @@ function isCrisisSearch(q){
   return CRISIS_SEARCH_TERMS.some(t=>norm.includes(t));
 }
 function crisisSupportBannerHtml(){
-  return `<div class="empty-feed" style="text-align:center;padding:28px 20px 6px;color:var(--text);">
-    <h2 style="font-size:25px;font-weight:800;color:var(--text);margin:0 0 10px;letter-spacing:-0.3px;">Help is available</h2>
-    <p style="color:var(--text2);font-size:14px;line-height:1.5;max-width:320px;margin:0 auto 20px;">
-      If you or someone you know may be struggling, there are ways to get help.
+  return `<div class="empty-feed" style="text-align:left;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);padding:20px;margin-bottom:14px;">
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+      <i class="ph ph-heart" style="font-size:20px;color:var(--like);"></i>
+      <strong style="color:var(--text);font-size:15px;">We're here with you</strong>
+    </div>
+    <p style="color:var(--text2);font-size:14px;line-height:1.5;margin:0;">
+      If you're having thoughts like this, please know you're not alone — reach out to a family member, a friend you trust, or a crisis helpline in your area right now. It can help to talk to someone.
     </p>
-    <div style="text-align:left;border-top:1px solid var(--border2);">
-      <div class="crisis-row" onclick="event.stopPropagation();openHelplineModal()">
-        <div class="crisis-row-icon"><i class="ph ph-phone"></i></div>
-        <div class="crisis-row-text">
-          <div class="crisis-row-title">Contact a helpline</div>
-          <div class="crisis-row-sub">Call or text for support.</div>
-        </div>
-        <i class="ph ph-caret-right crisis-row-chevron"></i>
-      </div>
-      <div class="crisis-row" onclick="event.stopPropagation();crisisReachFriends()">
-        <div class="crisis-row-icon"><i class="ph ph-paper-plane-tilt"></i></div>
-        <div class="crisis-row-text">
-          <div class="crisis-row-title">Reach out to a friend</div>
-          <div class="crisis-row-sub">Message someone you trust.</div>
-        </div>
-        <i class="ph ph-caret-right crisis-row-chevron"></i>
-      </div>
-    </div>
   </div>`;
-}
-
-// "Reach Friends" — jump straight into the message inbox so the person can message someone they trust
-function crisisReachFriends(){
-  navShow('messages-screen');
-}
-
-// Best-effort, no-network heuristic for whether the person is likely in India,
-// so we can surface India-specific helplines by default. Falls back to the
-// IP-based lookup already used elsewhere in the app if the timezone is ambiguous.
-async function guessIsIndia(){
-  try{
-    const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || '';
-    if(/Kolkata|Calcutta/i.test(tz)) return true;
-    const langs = [navigator.language, ...(navigator.languages||[])].filter(Boolean);
-    if(langs.some(l=>/-IN$/i.test(l))) return true;
-  } catch(e){}
-  try{
-    const country = await guessLocationFromIP();
-    if(country) return /india/i.test(country);
-  } catch(e){}
-  return false;
-}
-
-async function openHelplineModal(){
-  const el = document.getElementById('helpline-modal-content');
-  el.innerHTML = '<div class="feed-loader"><i class="ph ph-spinner-gap spin"></i></div>';
-  openModal('helpline-modal');
-  const isIndia = await guessIsIndia();
-  el.innerHTML = isIndia ? helplineIndiaHtml() : helplineIntlHtml();
-}
-
-function helplineIndiaHtml(){
-  return `
-    <p style="color:var(--text2);font-size:13px;line-height:1.5;margin-bottom:16px;">Call or text someone who can listen and support you.</p>
-    <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px;">
-      <strong style="font-size:14px;color:var(--text);">Fortis Mental Health</strong>
-      <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px;">
-        <a href="tel:+918376804102" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);"><i class="ph ph-phone"></i> +91 83768 04102</a>
-        <a href="mailto:mentalhealth@fortishealthcare.com" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);word-break:break-all;"><i class="ph ph-envelope-simple"></i> mentalhealth@fortishealthcare.com</a>
-        <a href="https://www.fortishealthcare.com/india/clinical-speciality/mental-health-and-behavioural-sciences-268" target="_blank" rel="noopener" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);"><i class="ph ph-globe"></i> Visit their website</a>
-      </div>
-    </div>
-    <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:14px;">
-      <strong style="font-size:14px;color:var(--text);">iCall Psychosocial Helpline</strong>
-      <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px;">
-        <a href="tel:9372048501" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);"><i class="ph ph-phone"></i> 9372048501</a>
-        <a href="tel:9920241248" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);"><i class="ph ph-phone"></i> 9920241248</a>
-        <a href="tel:8369799513" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);"><i class="ph ph-phone"></i> 8369799513</a>
-        <a href="mailto:icall@tiss.edu" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);"><i class="ph ph-envelope-simple"></i> icall@tiss.edu</a>
-      </div>
-    </div>
-    <p style="color:var(--text3);font-size:12px;line-height:1.5;margin-top:14px;">Outside India? In the US or Canada you can call or text <a href="tel:988" style="color:var(--cyan);">988</a>.</p>
-  `;
-}
-
-function helplineIntlHtml(){
-  return `
-    <p style="color:var(--text2);font-size:13px;line-height:1.5;margin-bottom:16px;">Call or text someone who can listen and support you.</p>
-    <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:14px;margin-bottom:12px;">
-      <strong style="font-size:14px;color:var(--text);">United States &amp; Canada</strong>
-      <div style="margin-top:8px;display:flex;flex-direction:column;gap:6px;">
-        <a href="tel:988" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);"><i class="ph ph-phone"></i> Call 988</a>
-        <a href="sms:988" style="display:flex;align-items:center;gap:8px;font-size:13px;color:var(--cyan);"><i class="ph ph-chat-text"></i> Text 988</a>
-      </div>
-    </div>
-    <p style="color:var(--text3);font-size:12px;line-height:1.5;margin-top:14px;">In India? Tap below to see local helplines instead.</p>
-    <button class="btn-sheet outline" style="margin-top:8px;" onclick="document.getElementById('helpline-modal-content').innerHTML=helplineIndiaHtml()"><i class="ph ph-map-pin"></i> Show India helplines</button>
-  `;
 }
 
 // Turn #hashtags and @mentions inside (already-escaped-safe) text into colored, clickable spans
@@ -2439,6 +2335,17 @@ async function openAboutAccount(uid){
     html += affiliateHtml;
     html += row('Profile name', ESC(u.name||'User'));
     html += row('Username', '@'+ESC(u.handle||'user'));
+    // Username change history — shows "Username change 1", "Username change 2"…
+    // one row per time this account has ever changed its handle.
+    if(u.usernameHistory){
+      const changes=Object.values(u.usernameHistory).sort((a,b)=>(a.at||0)-(b.at||0));
+      if(changes.length){
+        html += `<div style="padding:11px 0 4px;font-size:12px;color:var(--text3);font-weight:600;">Username changes (${changes.length})</div>`;
+        changes.forEach((c,i)=>{
+          html += row(`Username change ${i+1}`, `@${ESC(c.from||'—')} → @${ESC(c.to||'—')}`);
+        });
+      }
+    }
     html += row('Date joined', u.createdAt ? joinDate(u.createdAt) : 'Not available');
     const isSelf = uid===me.uid;
     if(u.locationHidden===true && !isSelf){
@@ -2903,6 +2810,7 @@ let lastFeedPulses = null; // cached raw pulses from the live listener, used by 
 function listenFeed(){
   if(feedUnsub){ feedUnsub(); feedUnsub=null; }
   lastFeedPulses = null;
+  feedOrderCache = null; // fresh load — don't reuse a ranking computed for a previous session/account
   const el = document.getElementById('feed-list');
   el.innerHTML='';
   document.getElementById('feed-loader').classList.remove('hidden');
@@ -2928,6 +2836,7 @@ function listenFeed(){
 // by the live listener and whenever background data (interests, likes,
 // follows…) finishes loading so the feed gets more personalized over time
 // without ever reloading from scratch.
+let feedOrderCache = null; // {tab, key, ids} — see note below
 function renderFeed(){
   if(!lastFeedPulses) return;
   const el = document.getElementById('feed-list');
@@ -2942,13 +2851,34 @@ function renderFeed(){
       if(p.uid===me.uid || followingSet.has(p.uid)) return true;
       return extractTags(p.text).some(t=>myInterests[t]);
     });
-    visible = visible.slice().sort((a,b)=>pulseRankScore(b)-pulseRankScore(a));
+    // Stable ranking: only recompute the sort order when the actual SET of
+    // visible Pulse ids changes (a Pulse was added/removed/filtered out).
+    // Re-ranking on every tiny stat change — e.g. someone's like count
+    // ticking up — used to reshuffle the whole feed and make it jump up
+    // and down right after you liked something. Now the order only moves
+    // when there's genuinely something new to show.
+    const idsKey = feedTab+'|'+visible.map(p=>p.id).sort().join(',');
+    if(feedOrderCache && feedOrderCache.key===idsKey){
+      const byId=new Map(visible.map(p=>[p.id,p]));
+      visible = feedOrderCache.ids.map(id=>byId.get(id)).filter(Boolean);
+    } else {
+      visible = visible.slice().sort((a,b)=>pulseRankScore(b)-pulseRankScore(a));
+      feedOrderCache = {key:idsKey, ids:visible.map(p=>p.id)};
+    }
   }
   if(!visible.length){ document.getElementById('feed-empty').classList.remove('hidden'); el.innerHTML=''; return; }
   document.getElementById('feed-empty').classList.add('hidden');
   // Only re-render if content actually changed (avoid flicker)
   const newHtml = visible.map(p=>buildPulseCard(p)).join('');
-  if(el.innerHTML !== newHtml) el.innerHTML = newHtml;
+  if(el.innerHTML !== newHtml){
+    // Preserve scroll position across the rebuild — without this, replacing
+    // feed-list's innerHTML (e.g. right after liking a Pulse) visibly snaps
+    // the feed back to a different scroll offset.
+    const scroller=document.getElementById('feed-col');
+    const scrollTop=scroller?scroller.scrollTop:0;
+    el.innerHTML = newHtml;
+    if(scroller) scroller.scrollTop = scrollTop;
+  }
 }
 function switchFeedTab(tab){
   feedTab=tab;
@@ -4103,60 +4033,6 @@ function nexorImagePromptIsUnsafe(prompt){
 }
 const NEXOR_UNSAFE_IMAGE_REPLY = "I can't generate that. Creating nude, sexual, or exploitative images is a violation of community guidelines, so I'm not able to help with this request. I'm happy to generate other images for you — just describe what you'd like to see instead.";
 
-// ------------------------------------------------------------------
-// DAILY IMAGE QUOTA — every user gets NEXOR_DAILY_IMAGE_LIMIT AI-generated
-// (or AI-edited) images per day. Tracked server-side in
-// nexorImageUsage/{uid} = {count, resetAt} so the limit holds across
-// devices/sessions. resetAt is always the next local midnight after the
-// count was last bumped from 0, so the window rolls over automatically —
-// no cron job or cleanup needed.
-// ------------------------------------------------------------------
-const NEXOR_DAILY_IMAGE_LIMIT = 4;
-
-function nexorNextMidnightTs(){
-  const d=new Date();
-  d.setHours(24,0,0,0); // rolls forward to the next local midnight
-  return d.getTime();
-}
-
-function formatNexorResetTime(resetAt){
-  try{
-    const d=new Date(resetAt);
-    const time=d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
-    const date=d.toLocaleDateString([], {month:'short', day:'numeric'});
-    return `${time} on ${date}`;
-  }catch(e){ return 'midnight tomorrow'; }
-}
-
-function nexorLimitReachedMessage(resetAt){
-  return `You've used all ${NEXOR_DAILY_IMAGE_LIMIT} of your AI images for today. Your limit renews at ${formatNexorResetTime(resetAt)} — come back then and I'll make you more!`;
-}
-
-// Atomically checks + consumes one unit of a user's daily image quota.
-// Returns {allowed:true} and bumps the counter if they're under the limit,
-// or {allowed:false, resetAt} (counter left untouched) if they've hit it.
-async function checkAndConsumeNexorImageQuota(uid){
-  try{
-    const ref=db.ref('nexorImageUsage/'+uid);
-    const result=await ref.transaction(current=>{
-      if(!current || !current.resetAt || Date.now()>=current.resetAt){
-        return { count:1, resetAt:nexorNextMidnightTs() }; // fresh day/window
-      }
-      if(current.count>=NEXOR_DAILY_IMAGE_LIMIT){
-        return; // returning undefined aborts the write — quota stays as-is
-      }
-      current.count=(current.count||0)+1;
-      return current;
-    });
-    if(result.committed) return { allowed:true };
-    const val=(result.snapshot&&result.snapshot.val())||{};
-    return { allowed:false, resetAt: val.resetAt || nexorNextMidnightTs() };
-  }catch(e){
-    console.error('Nexor image quota check failed, allowing by default:', e);
-    return { allowed:true }; // fail open — a quota glitch shouldn't block normal use
-  }
-}
-
 // Real AI image generation via a Cloudflare Worker (Workers AI,
 // @cf/black-forest-labs/flux-1-schnell model) — free tier, no API key
 // needed in this client since the Worker itself holds the AI binding.
@@ -4439,13 +4315,8 @@ async function triggerNexorAIReply(rawText, pulseId, nexorUid){
       if(!sourceImageForEdit){
         answer="I couldn't find an image to edit — reply to a Pulse that has an image (or attach one yourself) and tag me again with your edit instructions.";
       }else{
-        const quota=(me&&me.uid)?await checkAndConsumeNexorImageQuota(me.uid):{allowed:true};
-        if(!quota.allowed){
-          answer=nexorLimitReachedMessage(quota.resetAt);
-        }else{
-          answer="Here's the updated image:";
-          editPromptToApply=req.prompt||'enhance this image';
-        }
+        answer="Here's the updated image:";
+        editPromptToApply=req.prompt||'enhance this image';
       }
     }
   }else if(req.mode==='image'){
@@ -4454,13 +4325,8 @@ async function triggerNexorAIReply(rawText, pulseId, nexorUid){
     }else if(nexorImagePromptIsUnsafe(req.prompt)){
       answer=NEXOR_UNSAFE_IMAGE_REPLY;
     }else{
-      const quota=(me&&me.uid)?await checkAndConsumeNexorImageQuota(me.uid):{allowed:true};
-      if(!quota.allowed){
-        answer=nexorLimitReachedMessage(quota.resetAt);
-      }else{
-        answer="Here's what I generated for you:";
-        imagePromptToGenerate=req.prompt;
-      }
+      answer="Here's what I generated for you:";
+      imagePromptToGenerate=req.prompt;
     }
   }else{ // req.mode==='text'
     answer=req.prompt ? findNexorAnswer(req.prompt) : NEXOR_OPTIONS_PROMPT;
@@ -5323,7 +5189,24 @@ function removeCollab(target){
 // ============================================================
 // PULSE DETAIL
 // ============================================================
-const viewedPulses = new Set(); // track which pulses we've counted this session
+const viewedPulses = new Set(); // fast in-memory cache of pulses already counted THIS session
+// Registers exactly one view per account per Pulse, ever — persisted in
+// Firebase (not just an in-memory Set), so a page reload / new session can't
+// let the same account inflate the count again, and so this same function
+// can be reused anywhere a "real view" happens (Pulse detail, Bolts video
+// autoplay, etc.) instead of only counting views in the detail screen.
+async function registerPulseView(pulseId){
+  if(!pulseId || !me || !me.uid) return;
+  if(viewedPulses.has(pulseId)) return; // already handled this session, skip the DB round-trip
+  viewedPulses.add(pulseId);
+  try{
+    const seenRef=db.ref('pulseViews/'+pulseId+'/'+me.uid);
+    const snap=await seenRef.once('value');
+    if(snap.val()===true) return; // this account has already been counted for this Pulse before
+    await seenRef.set(true);
+    await db.ref('pulses/'+pulseId+'/views').transaction(c=>(c||0)+1);
+  }catch(e){ /* non-critical — never block viewing content over a views-count write */ }
+}
 async function openDetail(pulseId){
   if(!pulseId)return;
   navPush('detail-screen', ()=>openDetail(pulseId));
@@ -5332,11 +5215,8 @@ async function openDetail(pulseId){
   el.innerHTML='<div class="feed-loader"><i class="ph ph-spinner-gap spin"></i></div>';
   if(detailUnsub){detailUnsub();detailUnsub=null;}
 
-  // Increment view count ONCE per session per pulse (real views only)
-  if(!viewedPulses.has(pulseId)){
-    viewedPulses.add(pulseId);
-    db.ref('pulses/'+pulseId+'/views').transaction(c=>(c||0)+1);
-  }
+  // Count this as a real view — once per account, ever (see registerPulseView).
+  registerPulseView(pulseId);
 
   const ref=db.ref('pulses/'+pulseId);
   const handler=ref.on('value', async snap=>{
@@ -5909,6 +5789,16 @@ async function saveProfile(){
 
     // Release the old handle now that the new one is confirmed
     if(handleChanged && oldHandle) await db.ref('handleIndex/'+oldHandle).remove().catch(()=>{});
+
+    // Record this change so "About this account" can show a running history
+    // (Username change 1, 2, 3…) — one entry gets appended every time the
+    // handle actually changes, and a running counter is kept alongside it.
+    if(handleChanged){
+      await db.ref('users/'+me.uid+'/usernameHistory').push({
+        from: oldHandle||null, to: newHandle, at: firebase.database.ServerValue.TIMESTAMP
+      });
+      await db.ref('users/'+me.uid+'/usernameChangeCount').transaction(c=>(c||0)+1);
+    }
 
     Object.assign(myData,updates);
     updateSidebarUser();
@@ -7470,6 +7360,10 @@ function setupReelsObserver(){
         if(entry.isIntersecting && entry.intersectionRatio>=0.6){
           vid.muted=reelsMuted;
           vid.play().catch(()=>{});
+          // Bolts videos never counted views before — a video actually
+          // starting to autoplay in-frame is a real view, same as opening
+          // a Pulse's detail screen, so count it the same way (once per account).
+          registerPulseView(entry.target.dataset.id);
         } else {
           vid.pause();
         }
