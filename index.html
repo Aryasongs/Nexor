@@ -4084,6 +4084,60 @@ function nexorImagePromptIsUnsafe(prompt){
 }
 const NEXOR_UNSAFE_IMAGE_REPLY = "I can't generate that. Creating nude, sexual, or exploitative images is a violation of community guidelines, so I'm not able to help with this request. I'm happy to generate other images for you — just describe what you'd like to see instead.";
 
+// ------------------------------------------------------------------
+// DAILY IMAGE QUOTA — every user gets NEXOR_DAILY_IMAGE_LIMIT AI-generated
+// (or AI-edited) images per day. Tracked server-side in
+// nexorImageUsage/{uid} = {count, resetAt} so the limit holds across
+// devices/sessions. resetAt is always the next local midnight after the
+// count was last bumped from 0, so the window rolls over automatically —
+// no cron job or cleanup needed.
+// ------------------------------------------------------------------
+const NEXOR_DAILY_IMAGE_LIMIT = 4;
+
+function nexorNextMidnightTs(){
+  const d=new Date();
+  d.setHours(24,0,0,0); // rolls forward to the next local midnight
+  return d.getTime();
+}
+
+function formatNexorResetTime(resetAt){
+  try{
+    const d=new Date(resetAt);
+    const time=d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+    const date=d.toLocaleDateString([], {month:'short', day:'numeric'});
+    return `${time} on ${date}`;
+  }catch(e){ return 'midnight tomorrow'; }
+}
+
+function nexorLimitReachedMessage(resetAt){
+  return `You've used all ${NEXOR_DAILY_IMAGE_LIMIT} of your AI images for today. Your limit renews at ${formatNexorResetTime(resetAt)} — come back then and I'll make you more!`;
+}
+
+// Atomically checks + consumes one unit of a user's daily image quota.
+// Returns {allowed:true} and bumps the counter if they're under the limit,
+// or {allowed:false, resetAt} (counter left untouched) if they've hit it.
+async function checkAndConsumeNexorImageQuota(uid){
+  try{
+    const ref=db.ref('nexorImageUsage/'+uid);
+    const result=await ref.transaction(current=>{
+      if(!current || !current.resetAt || Date.now()>=current.resetAt){
+        return { count:1, resetAt:nexorNextMidnightTs() }; // fresh day/window
+      }
+      if(current.count>=NEXOR_DAILY_IMAGE_LIMIT){
+        return; // returning undefined aborts the write — quota stays as-is
+      }
+      current.count=(current.count||0)+1;
+      return current;
+    });
+    if(result.committed) return { allowed:true };
+    const val=(result.snapshot&&result.snapshot.val())||{};
+    return { allowed:false, resetAt: val.resetAt || nexorNextMidnightTs() };
+  }catch(e){
+    console.error('Nexor image quota check failed, allowing by default:', e);
+    return { allowed:true }; // fail open — a quota glitch shouldn't block normal use
+  }
+}
+
 // Real AI image generation via a Cloudflare Worker (Workers AI,
 // @cf/black-forest-labs/flux-1-schnell model) — free tier, no API key
 // needed in this client since the Worker itself holds the AI binding.
@@ -4366,8 +4420,13 @@ async function triggerNexorAIReply(rawText, pulseId, nexorUid){
       if(!sourceImageForEdit){
         answer="I couldn't find an image to edit — reply to a Pulse that has an image (or attach one yourself) and tag me again with your edit instructions.";
       }else{
-        answer="Here's the updated image:";
-        editPromptToApply=req.prompt||'enhance this image';
+        const quota=(me&&me.uid)?await checkAndConsumeNexorImageQuota(me.uid):{allowed:true};
+        if(!quota.allowed){
+          answer=nexorLimitReachedMessage(quota.resetAt);
+        }else{
+          answer="Here's the updated image:";
+          editPromptToApply=req.prompt||'enhance this image';
+        }
       }
     }
   }else if(req.mode==='image'){
@@ -4376,8 +4435,13 @@ async function triggerNexorAIReply(rawText, pulseId, nexorUid){
     }else if(nexorImagePromptIsUnsafe(req.prompt)){
       answer=NEXOR_UNSAFE_IMAGE_REPLY;
     }else{
-      answer="Here's what I generated for you:";
-      imagePromptToGenerate=req.prompt;
+      const quota=(me&&me.uid)?await checkAndConsumeNexorImageQuota(me.uid):{allowed:true};
+      if(!quota.allowed){
+        answer=nexorLimitReachedMessage(quota.resetAt);
+      }else{
+        answer="Here's what I generated for you:";
+        imagePromptToGenerate=req.prompt;
+      }
     }
   }else{ // req.mode==='text'
     answer=req.prompt ? findNexorAnswer(req.prompt) : NEXOR_OPTIONS_PROMPT;
