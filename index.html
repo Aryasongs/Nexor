@@ -2161,6 +2161,84 @@ function blockIfViolatesGuidelines(text, kindLabel){
   return true;
 }
 // ============================================================
+// IMAGE MODERATION
+// Every image is checked against an external safety endpoint before
+// a post is published — nothing is uploaded/saved until it comes
+// back "safe". This does not touch video or GIF-picker posts, only
+// user-selected images.
+// ============================================================
+const IMAGE_MODERATION_ENDPOINT='https://sparks-recombee-api.sgursharn076.workers.dev';
+function dataUrlToBlob(dataUrl){
+  const parts=String(dataUrl).split(',');
+  const mimeMatch=parts[0].match(/data:(.*?);base64/);
+  const mime=mimeMatch?mimeMatch[1]:'image/jpeg';
+  const bin=atob(parts[1]);
+  const bytes=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) bytes[i]=bin.charCodeAt(i);
+  return new Blob([bytes],{type:mime});
+}
+async function moderateImageUpload(dataUrl){
+  const fd=new FormData();
+  fd.append('image', dataUrlToBlob(dataUrl), 'image.jpg');
+  let res;
+  try{
+    res=await fetch(IMAGE_MODERATION_ENDPOINT,{method:'POST',body:fd});
+  }catch(networkErr){
+    // Usually a CORS failure (worker not sending Access-Control-Allow-Origin)
+    // or the endpoint being unreachable — this throws before we get any response at all.
+    console.error('[image-moderation] fetch() itself failed — likely CORS or network issue:', networkErr);
+    throw networkErr;
+  }
+  const raw=await res.text();
+  console.log('[image-moderation] HTTP', res.status, '— raw response body:', raw);
+  if(!res.ok){
+    throw new Error('Moderation endpoint returned HTTP '+res.status+': '+raw.slice(0,300));
+  }
+  let json;
+  try{ json=JSON.parse(raw); }
+  catch(parseErr){ throw new Error('Moderation endpoint did not return valid JSON: '+raw.slice(0,300)); }
+  console.log('[image-moderation] parsed JSON:', json);
+  return json;
+}
+// Pulls a "block"/"safe" verdict out of the worker's JSON response. Tries
+// response.action first (the documented shape); falls back to a couple of
+// other common shapes in case the worker nests or names it differently, and
+// logs a warning if nothing recognizable is found so the mismatch is visible
+// in devtools instead of silently letting everything through.
+function extractModerationAction(result){
+  if(!result || typeof result!=='object') return null;
+  if(typeof result.action==='string') return result.action.toLowerCase();
+  if(result.result && typeof result.result.action==='string') return result.result.action.toLowerCase();
+  if(result.moderation && typeof result.moderation.action==='string') return result.moderation.action.toLowerCase();
+  if(typeof result.blocked==='boolean') return result.blocked?'block':'safe';
+  if(typeof result.safe==='boolean') return result.safe?'safe':'block';
+  console.warn('[image-moderation] Could not find an action/blocked/safe field in the response — check the worker\'s JSON shape:', result);
+  return null;
+}
+// Checks every image in `imgs` (array of {data,...}) before publish.
+// Returns true only if every image comes back action:"safe". On the
+// first "block" (or if the check itself fails), shows the required
+// message/toast and returns false so the caller can abort publishing.
+async function moderateImagesBeforePublish(imgs){
+  for(const img of imgs){
+    let result;
+    try{
+      result=await moderateImageUpload(img.data);
+    } catch(e){
+      console.error('[image-moderation] Image moderation check failed:', e);
+      showToast('Could not verify image — please try again');
+      return false;
+    }
+    const action=extractModerationAction(result);
+    if(action==='block'){
+      showToast('This image violates our community guidelines.');
+      return false;
+    }
+  }
+  return true;
+}
+
+// ============================================================
 // CRISIS SUPPORT — shown when someone searches self-harm/suicide-related terms
 // ============================================================
 const CRISIS_SEARCH_TERMS=['suicide','suicidal','kill myself','end my life','want to die','self harm','self-harm','hurt myself'];
@@ -4263,9 +4341,16 @@ async function publishPulse(source){
   const isQuote=source==='modal'&&!!quoteTargetId&&!!quoteOrigPulse;
   const pollPayload=getValidPollPayload(source);
   if(!text&&!imgs.length&&!vid&&!gifUrl&&!isQuote&&!pollPayload)return;
-  if(blockIfViolatesGuidelines(text,'Pulse')) return;
   const btn=document.getElementById(source+'-post-btn');
   btn.disabled=true;
+  // Moderation gate: any post containing an uploaded image must pass the
+  // external image-safety check before we touch the existing upload flow.
+  // Video and GIF-picker posts are untouched by this check.
+  if(imgs.length){
+    btn.textContent='Checking image…';
+    const imagesOk=await moderateImagesBeforePublish(imgs);
+    if(!imagesOk){ btn.disabled=false; btn.textContent='Pulse'; return; }
+  }
   // Lightweight progress indicator so the user can see something is
   // actually uploading (ticks up while waiting, completes at 100% on success).
   let pct=0;
@@ -4325,6 +4410,20 @@ async function publishPulse(source){
     const ref=await db.ref('pulses').push(pulseData);
     clearInterval(progressTimer);
     btn.textContent='Uploading… 100%';
+    // Text moderation runs AFTER the Pulse is created: if it violates guidelines,
+    // delete it immediately (before any counts/notifications/mentions go out)
+    // and alert the poster via the notifications bar.
+    if(blockIfViolatesGuidelines(text,'Pulse')){
+      await db.ref('pulses/'+ref.key).remove().catch(()=>{});
+      ta.value=''; removeImage(source); removeVideo(source); removeGif(source);
+      if(source==='inline'||source==='modal') removeCollab(source);
+      setPollState(source,null);
+      const pollBox=document.getElementById(source+'-poll-box');
+      pollBox.classList.add('hidden'); pollBox.innerHTML='';
+      onComposeInput(ta,source+'-counter',source+'-post-btn');
+      closeModal('compose-modal');
+      return;
+    }
     await db.ref('userPulses/'+me.uid+'/'+ref.key).set(true);
     await db.ref('users/'+me.uid+'/pulsesCount').transaction(c=>(c||0)+1);
     if(isQuote){
@@ -4865,7 +4964,6 @@ function openReply(pulseId, handle){
 async function postReply(){
   const text=document.getElementById('reply-text').value.trim();
   if((!text&&!replyGifUrl)||!replyToId)return;
-  if(blockIfViolatesGuidelines(text,'comment')) return;
   const btn=document.getElementById('reply-post-btn'); btn.disabled=true;
   try{
     const replyData={uid:me.uid,creatorName:myData.name||'User',creatorHandle:myData.handle||'user',
@@ -4875,6 +4973,17 @@ async function postReply(){
     const ref=await db.ref('pulses').push(replyData);
     await db.ref('replies/'+replyToId+'/'+ref.key).set(true);
     await db.ref('pulses/'+replyToId+'/replies').transaction(c=>(c||0)+1);
+    // Text moderation runs AFTER the comment is created: if it violates guidelines,
+    // delete it (and undo the index/count we just added) and alert the poster.
+    if(blockIfViolatesGuidelines(text,'comment')){
+      await db.ref('pulses/'+ref.key).remove().catch(()=>{});
+      await db.ref('replies/'+replyToId+'/'+ref.key).remove().catch(()=>{});
+      await db.ref('pulses/'+replyToId+'/replies').transaction(c=>Math.max(0,(c||0)-1)).catch(()=>{});
+      removeReplyGif();
+      closeModal('reply-modal');
+      if(document.getElementById('detail-screen').classList.contains('active')) openDetail(replyToId);
+      return;
+    }
     await db.ref('userPulses/'+me.uid+'/'+ref.key).set(true);
     const pSnap=await db.ref('pulses/'+replyToId+'/uid').once('value');
     const creatorUid=pSnap.val();
@@ -6142,17 +6251,35 @@ async function saveEditPulse(){
   const ta=document.getElementById('edit-pulse-text');
   const text=ta.value.trim();
   if(!text){ showToast('Pulse cannot be empty'); return; }
-  if(blockIfViolatesGuidelines(text,'Pulse')) return;
   const btn=document.getElementById('edit-pulse-save-btn');
   btn.disabled=true;
   try{
     await db.ref('pulses/'+editPulseId).update({text, editedAt: firebase.database.ServerValue.TIMESTAMP});
-    showToast('Pulse updated');
-    closeModal('edit-pulse-modal');
     const pid=editPulseId; editPulseId=null;
-    // Refresh the card in-place if visible
     const snap=await db.ref('pulses/'+pid).once('value');
     const p=snap.val();
+    // Text moderation runs AFTER the edit is saved: if the new text violates
+    // guidelines, delete the Pulse entirely (same cleanup as a normal delete)
+    // and alert the poster, instead of leaving the edited violation live.
+    if(blockIfViolatesGuidelines(text, (p&&p.isReply)?'comment':'Pulse')){
+      await db.ref('pulses/'+pid).remove().catch(()=>{});
+      await db.ref('userPulses/'+me.uid+'/'+pid).remove().catch(()=>{});
+      if(p&&p.isReply&&p.parentId){
+        await db.ref('replies/'+p.parentId+'/'+pid).remove().catch(()=>{});
+        await db.ref('pulses/'+p.parentId+'/replies').transaction(c=>Math.max(0,(c||0)-1)).catch(()=>{});
+      } else {
+        await db.ref('users/'+me.uid+'/pulsesCount').transaction(c=>Math.max(0,(c||0)-1)).catch(()=>{});
+      }
+      document.getElementById('pc-'+pid)?.remove();
+      closeModal('edit-pulse-modal');
+      if(document.getElementById('detail-screen').classList.contains('active')){
+        if(p&&p.isReply&&p.parentId) openDetail(p.parentId); else navBack();
+      }
+      return;
+    }
+    showToast('Pulse updated');
+    closeModal('edit-pulse-modal');
+    // Refresh the card in-place if visible
     if(p){
       p.id=pid;
       const cardEl=document.getElementById('pc-'+pid);
@@ -7432,7 +7559,6 @@ async function postReelComment(){
   const text=input.value.trim();
   const pulseId=reelCommentsPulseId;
   if(!text||!pulseId) return;
-  if(blockIfViolatesGuidelines(text,'comment')) return;
   const btn=document.getElementById('reel-comment-post-btn'); btn.disabled=true;
   try{
     const replyData={uid:me.uid,creatorName:myData.name||'User',creatorHandle:myData.handle||'user',
@@ -7441,6 +7567,17 @@ async function postReelComment(){
     const ref=await db.ref('pulses').push(replyData);
     await db.ref('replies/'+pulseId+'/'+ref.key).set(true);
     await db.ref('pulses/'+pulseId+'/replies').transaction(c=>(c||0)+1);
+    // Text moderation runs AFTER the comment is created: if it violates guidelines,
+    // delete it (and undo the index/count we just added) and alert the poster.
+    if(blockIfViolatesGuidelines(text,'comment')){
+      await db.ref('pulses/'+ref.key).remove().catch(()=>{});
+      await db.ref('replies/'+pulseId+'/'+ref.key).remove().catch(()=>{});
+      await db.ref('pulses/'+pulseId+'/replies').transaction(c=>Math.max(0,(c||0)-1)).catch(()=>{});
+      input.value='';
+      onReelCommentInput();
+      await renderReelComments(pulseId);
+      return;
+    }
     await db.ref('userPulses/'+me.uid+'/'+ref.key).set(true);
     const pSnap=await db.ref('pulses/'+pulseId+'/uid').once('value');
     const creatorUid=pSnap.val();
