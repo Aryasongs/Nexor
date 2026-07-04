@@ -647,13 +647,18 @@ img{display:block;}
 .stories-bar::-webkit-scrollbar{display:none;}
 .story-item{display:flex;flex-direction:column;align-items:center;gap:5px;flex-shrink:0;width:66px;cursor:pointer;}
 .story-ring{width:60px;height:60px;border-radius:50%;padding:2.5px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--cyan),#7C5CFF 55%,#FF5C9E);position:relative;flex-shrink:0;}
-.story-ring.seen{background:var(--border2);}
+.story-ring.seen{background:var(--bg);}
 .story-ring.own-empty{background:var(--surface2);border:1.5px dashed var(--border2);}
 .story-ring-inner{width:100%;height:100%;border-radius:50%;background:var(--bg);padding:2px;}
 .story-avatar{width:100%;height:100%;border-radius:50%;object-fit:cover;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--text2);overflow:hidden;}
 .story-avatar img{width:100%;height:100%;object-fit:cover;}
 .story-plus-badge{position:absolute;bottom:-2px;right:-2px;width:20px;height:20px;border-radius:50%;background:var(--cyan);border:2px solid var(--bg);display:flex;align-items:center;justify-content:center;font-size:11px;color:#050A14;}
 .story-item-label{font-size:11px;color:var(--text2);max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* Applied to ANY avatar element anywhere in the app (feed, profile header,
+   chat, notifications, search…) when that account has an active story you
+   haven't fully watched yet — see applyStoryRings(). Disappears the moment
+   every one of their stories has been seen. */
+.has-story-ring{box-shadow:0 0 0 2px var(--bg), 0 0 0 4.5px var(--cyan);border-radius:50%;}
 
 .story-viewer{position:fixed;inset:0;background:#000;z-index:3000;display:none;align-items:center;justify-content:center;}
 .story-viewer.active{display:flex;}
@@ -5566,6 +5571,18 @@ function maybeShowBirthdayAnimation(uid, dobStr, displayName){
 }
 async function openProfile(uid){
   if(!uid) return;
+  // Universal story behavior: tapping ANY OTHER account's profile picture
+  // anywhere in the app (feed, chat, notifications, search, etc.) opens
+  // their active/unseen story first, Instagram-style, falling through to
+  // the normal profile screen once nothing new is left to watch. Your own
+  // avatar is deliberately excluded — "My Profile" nav links also call
+  // openProfile(me.uid), and hijacking those would break normal profile
+  // navigation. Viewing your own story has its own entry point instead:
+  // the "Your story" ring in the stories bar.
+  if(me && me.uid && uid!==me.uid){
+    const group = await getStoryGroupForUid(uid);
+    if(group && group.hasUnseen){ openAdhocStoryViewer(group); return; }
+  }
   navPush('profile-screen', ()=>openProfile(uid));
   const token=++profileLoadToken;
   profileUid=uid;
@@ -6221,7 +6238,68 @@ async function loadStoriesBar(){
     </div>`;
   });
   el.innerHTML = html;
+  scheduleRingScan();
 }
+
+// On-demand story lookup for ANY account — not just people you follow.
+// storyGroups (from loadStoriesBar) already covers you + who you follow;
+// this fills the gap for everyone else the app might show an avatar for
+// (e.g. a "For You" pulse from someone you don't follow), caching the
+// result so repeated taps/renders don't keep re-hitting the database.
+const storyCheckCache = new Map(); // uid -> group object | null (null = confirmed no active story)
+async function getStoryGroupForUid(uid){
+  const cachedGroup = storyGroups.find(g=>g.uid===uid);
+  if(cachedGroup) return cachedGroup;
+  if(storyCheckCache.has(uid)) return storyCheckCache.get(uid);
+  try{
+    const idxSnap=await db.ref('userStories/'+uid).once('value');
+    const ids=Object.keys(idxSnap.val()||{});
+    if(!ids.length){ storyCheckCache.set(uid,null); return null; }
+    const now=Date.now();
+    const items=(await Promise.all(ids.map(id=>db.ref('stories/'+id).once('value').then(s=>({id,...(s.val()||{})})))))
+      .filter(it=>it.uid && (!it.expiresAt || it.expiresAt>now))
+      .sort((a,b)=>(a.createdAt||0)-(b.createdAt||0));
+    if(!items.length){ storyCheckCache.set(uid,null); return null; }
+    const viewFlags=await Promise.all(items.map(it=>db.ref('storyViews/'+it.id+'/'+me.uid).once('value').then(s=>s.val()===true)));
+    const hasUnseen = uid!==me.uid && viewFlags.some(seen=>!seen);
+    const head=items[0];
+    const group={uid, name:head.creatorName||'User', handle:head.creatorHandle||'user', photo:head.creatorPhoto||null, verified:!!head.creatorVerified, badgeUrl:head.creatorBadgeUrl||null, items, hasUnseen};
+    storyCheckCache.set(uid, group);
+    return group;
+  }catch(e){ storyCheckCache.set(uid,null); return null; }
+}
+// Opens the viewer for a single account's stories even if that account
+// isn't part of the main storyGroups list yet (a stranger's story reached
+// via a feed avatar tap) — slots it in so the existing viewer/nav code
+// (which reads storyGroups[currentGroupIdx]) works completely unchanged.
+function openAdhocStoryViewer(group){
+  let idx=storyGroups.findIndex(g=>g.uid===group.uid);
+  if(idx===-1){ storyGroups=[...storyGroups, group]; idx=storyGroups.length-1; }
+  else storyGroups[idx]=group;
+  currentGroupIdx=idx; currentItemIdx=0;
+  document.getElementById('story-viewer').classList.add('active');
+  storyShowItem();
+}
+// Universal ring painter — scans every element in the app that opens a
+// profile (i.e. carries onclick="openProfile('UID')", which is how nearly
+// every avatar across the whole app already works) and toggles the ring
+// class based on cached story state, with NO extra network calls of its
+// own. Debounced + observed via MutationObserver so newly rendered avatars
+// (feed scroll, chat list updates, etc.) pick up the ring automatically.
+function applyStoryRings(){
+  document.querySelectorAll('[onclick*="openProfile("]').forEach(el=>{
+    const raw=el.getAttribute('onclick')||'';
+    const m=raw.match(/openProfile\('([^']*)'\)/);
+    if(!m || !m[1]) return;
+    const uid=m[1];
+    const group = storyGroups.find(g=>g.uid===uid) || (storyCheckCache.has(uid)?storyCheckCache.get(uid):null);
+    const show = !!group && uid!==me.uid && group.hasUnseen;
+    el.classList.toggle('has-story-ring', show);
+  });
+}
+let __ringScanT=null;
+function scheduleRingScan(){ clearTimeout(__ringScanT); __ringScanT=setTimeout(applyStoryRings,200); }
+new MutationObserver(scheduleRingScan).observe(document.body, {childList:true, subtree:true});
 
 function triggerStoryPicker(){ document.getElementById('story-media-input').click(); }
 
@@ -6341,6 +6419,7 @@ function storyShowItem(){
   const group=storyGroups[currentGroupIdx]; if(!group) return closeStoryViewer();
   const item=group.items[currentItemIdx]; if(!item) return closeStoryViewer();
   const isOwn = group.uid===me.uid;
+  if(!isOwn && group.hasUnseen){ group.hasUnseen=false; scheduleRingScan(); } // ring disappears the moment viewing starts
 
   // Header
   const av=document.getElementById('story-viewer-av');
