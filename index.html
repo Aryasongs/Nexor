@@ -672,6 +672,12 @@ img{display:block;}
 .story-viewer-media-wrap img,.story-viewer-media-wrap video{width:100%;height:100%;object-fit:contain;background:#000;}
 .story-tap-zone{position:absolute;top:0;bottom:0;width:33%;z-index:3;}
 .story-caption{position:absolute;left:0;right:0;bottom:96px;padding:0 22px;text-align:center;color:#fff;font-size:16px;font-weight:600;text-shadow:0 2px 10px rgba(0,0,0,.7);z-index:3;pointer-events:none;}
+.story-mention-tag{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);background:rgba(255,255,255,.95);color:#050A14;padding:7px 16px 7px 7px;border-radius:24px;display:none;align-items:center;gap:8px;font-size:14px;font-weight:700;z-index:6;box-shadow:0 8px 20px rgba(0,0,0,.4);cursor:pointer;}
+.story-mention-tag.show{display:inline-flex;}
+.story-mention-tag-av{width:24px;height:24px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,var(--cyan),var(--amber));display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:#050A14;flex-shrink:0;}
+.story-mention-tag-av img{width:100%;height:100%;object-fit:cover;}
+.story-via-tag{position:absolute;left:50%;top:calc(20px + env(safe-area-inset-top,0px) + 46px);transform:translateX(-50%);background:rgba(0,0,0,.45);color:#fff;padding:5px 12px;border-radius:99px;display:none;font-size:12px;font-weight:600;z-index:4;cursor:pointer;}
+.story-via-tag.show{display:inline-block;}
 .story-footer{position:absolute;left:0;right:0;bottom:0;padding:14px 14px calc(14px + var(--safe-bottom));display:flex;align-items:center;gap:10px;z-index:5;}
 .story-reply-input{flex:1;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:24px;padding:11px 16px;font-size:14px;outline:none;}
 .story-reply-input::placeholder{color:rgba(255,255,255,.7);}
@@ -1674,6 +1680,8 @@ img{display:block;}
     </div>
     <div class="story-viewer-media-wrap" id="story-viewer-media-wrap"></div>
     <div class="story-caption" id="story-caption-el"></div>
+    <div class="story-mention-tag" id="story-mention-tag-el" onclick="event.stopPropagation();openProfile(window.__currentStoryMentionUid)"></div>
+    <div class="story-via-tag" id="story-via-tag-el" onclick="event.stopPropagation();openProfile(window.__currentStoryViaUid)"></div>
     <div class="story-tap-zone" id="story-tap-prev" style="left:0;"></div>
     <div class="story-tap-zone" id="story-tap-pause" style="left:33%;"></div>
     <div class="story-tap-zone" id="story-tap-next" style="right:0;"></div>
@@ -6421,21 +6429,42 @@ function cycleStoryTextBg(){
 }
 // Instagram-style "share this post to your story" — wraps a Pulse in a
 // story card; tapping it in the viewer opens the original Pulse.
+// Builds the Instagram-style "shared post" card markup used both in the
+// story creation preview and in the story viewer itself, so the two always
+// look identical. `label` is the small caption above the card (differs
+// between "about to share" vs "shared a post by @x" once it's live).
+function buildSharedPostCardHtml(snap, label){
+  const video = snap.video || null;
+  const thumb = snap.videoPoster || snap.image || null;
+  const mediaHtml = video
+    ? `<div style="position:relative;">${thumb?`<img src="${thumb}" style="width:100%;max-height:280px;object-fit:cover;display:block;">`:`<div style="width:100%;height:200px;background:#000;"></div>`}<div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;"><i class="ph-fill ph-play-circle" style="font-size:44px;color:rgba(255,255,255,.9);"></i></div></div>`
+    : (snap.image ? `<img src="${snap.image}" style="width:100%;max-height:280px;object-fit:cover;display:block;">` : '');
+  const av = snap.creatorPhoto ? `<img src="${snap.creatorPhoto}" style="width:100%;height:100%;object-fit:cover;">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--cyan),var(--amber));color:#050A14;font-weight:800;">${ESC((snap.creatorName||'U').charAt(0).toUpperCase())}</div>`;
+  return `<div style="position:absolute;inset:0;background:linear-gradient(160deg,#1b1030,#050A14);display:flex;align-items:center;justify-content:center;padding:60px 22px;">
+    <div style="width:100%;">
+      <div style="color:rgba(255,255,255,.65);font-size:12px;text-align:center;margin-bottom:12px;">${ESC(label)}</div>
+      <div style="width:100%;background:#11151c;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.5);">
+        <div style="display:flex;align-items:center;gap:10px;padding:13px 14px;">
+          <div style="width:30px;height:30px;border-radius:50%;overflow:hidden;flex-shrink:0;">${av}</div>
+          <div style="font-weight:700;font-size:13px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${ESC(snap.creatorName||'User')} <span style="color:rgba(255,255,255,.5);font-weight:500;">@${ESC(snap.creatorHandle||'user')}</span></div>
+        </div>
+        ${mediaHtml}
+        ${snap.text?`<div style="padding:12px 14px;color:#fff;font-size:14px;line-height:1.4;max-height:90px;overflow:hidden;">${ESC(snap.text.slice(0,220))}</div>`:''}
+      </div>
+    </div>
+  </div>`;
+}
 async function sharePulseToOwnStory(pulseId){
   try{
     const snap=await db.ref('pulses/'+pulseId).once('value');
     const p=snap.val();
     if(!p){ showToast('Could not find this post'); return; }
     const image=(p.images&&p.images[0])||p.imageBase64||null;
+    const video=p.videoUrl||p.videoBase64||null;
     resetStoryMentionChip();
-    pendingStoryMedia={mediaType:'pulse', mediaUrl:null, poster:null, duration:null, sharedPulseId:pulseId,
-      sharedSnapshot:{creatorName:p.creatorName||'User', creatorHandle:p.creatorHandle||'user', text:p.text||'', image}};
-    const preview=document.getElementById('story-create-preview');
-    preview.innerHTML=`<div style="position:absolute;inset:0;background:linear-gradient(160deg,#1b1030,#050A14);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 24px;gap:14px;">
-      <div style="color:rgba(255,255,255,.7);font-size:13px;">Sharing this post to your story</div>
-      ${image?`<img src="${image}" style="width:100%;max-height:45%;object-fit:cover;border-radius:14px;">`:''}
-      <div style="color:#fff;font-size:16px;text-align:center;max-height:120px;overflow:hidden;">${ESC((p.text||'').slice(0,200))}</div>
-    </div>`;
+    const sharedSnapshot={creatorName:p.creatorName||'User', creatorHandle:p.creatorHandle||'user', creatorPhoto:p.creatorPhoto||null, text:p.text||'', image, video, videoPoster:p.videoPoster||null};
+    pendingStoryMedia={mediaType:'pulse', mediaUrl:null, poster:null, duration:null, sharedPulseId:pulseId, sharedSnapshot};
+    document.getElementById('story-create-preview').innerHTML = buildSharedPostCardHtml(sharedSnapshot, video?'Sharing this reel to your story':'Sharing this post to your story');
     document.getElementById('story-create-screen').classList.add('active');
   }catch(e){ showToast('Could not share this post'); }
 }
@@ -6520,6 +6549,7 @@ async function publishStory(){
       mentionUid:pendingStoryMention?pendingStoryMention.uid:null,
       mentionName:pendingStoryMention?pendingStoryMention.name:null,
       mentionHandle:pendingStoryMention?pendingStoryMention.handle:null,
+      mentionPhoto:pendingStoryMention?pendingStoryMention.photo:null,
       createdAt:firebase.database.ServerValue.TIMESTAMP, expiresAt: now+STORY_LIFETIME_MS
     };
     const ref=await db.ref('stories').push(data);
@@ -6602,28 +6632,37 @@ function storyShowItem(){
     storyItemDuration = STORY_IMAGE_MS;
   } else if(item.mediaType==='pulse'){
     const snap=item.sharedSnapshot||{};
-    wrap.innerHTML=`<div style="position:absolute;inset:0;background:linear-gradient(160deg,#1b1030,#050A14);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;gap:14px;">
-      <div style="color:rgba(255,255,255,.7);font-size:13px;">shared a post by @${ESC(snap.creatorHandle||'user')}</div>
-      ${snap.image?`<img src="${snap.image}" style="width:100%;max-height:50%;object-fit:cover;border-radius:14px;">`:''}
-      <div style="color:#fff;font-size:16px;text-align:center;max-height:120px;overflow:hidden;">${ESC((snap.text||'').slice(0,200))}</div>
-      <div style="margin-top:6px;background:rgba(255,255,255,.16);color:#fff;padding:10px 22px;border-radius:99px;font-size:13px;font-weight:700;position:relative;z-index:6;" onclick="event.stopPropagation();openSharedPulseFromStory('${ESC(item.sharedPulseId)}')">View post</div>
-    </div>`;
+    wrap.innerHTML = buildSharedPostCardHtml(snap, `shared a ${snap.video?'reel':'post'} by @${ESC(snap.creatorHandle||'user')}`)
+      .replace('</div>\n  </div>', `<div style="text-align:center;margin-top:16px;"><span style="background:rgba(255,255,255,.16);color:#fff;padding:9px 20px;border-radius:99px;font-size:13px;font-weight:700;position:relative;z-index:6;display:inline-block;" onclick="event.stopPropagation();openSharedPulseFromStory('${ESC(item.sharedPulseId)}')">View ${snap.video?'reel':'post'}</span></div></div>\n  </div>`);
     storyItemDuration = STORY_IMAGE_MS;
   } else {
     wrap.innerHTML=`<img src="${item.mediaUrl}" alt="">`;
     storyItemDuration = STORY_IMAGE_MS;
   }
   document.getElementById('story-caption-el').textContent = item.caption||'';
+  const mentionTagEl=document.getElementById('story-mention-tag-el');
+  if(item.mentionUid){
+    window.__currentStoryMentionUid = item.mentionUid;
+    const mentionAv = item.mentionPhoto ? `<img src="${item.mentionPhoto}" alt="">` : ESC((item.mentionName||'U').charAt(0).toUpperCase());
+    mentionTagEl.innerHTML = `<span class="story-mention-tag-av">${mentionAv}</span>@${ESC(item.mentionHandle||'user')}`;
+    mentionTagEl.classList.add('show');
+  } else {
+    mentionTagEl.classList.remove('show');
+  }
+  const viaTagEl=document.getElementById('story-via-tag-el');
+  if(item.mentionedFromUid){
+    window.__currentStoryViaUid = item.mentionedFromUid;
+    viaTagEl.innerHTML = `<i class="ph ph-at"></i> via @${ESC(item.mentionedFromHandle||'user')}`;
+    viaTagEl.classList.add('show');
+  } else {
+    viaTagEl.classList.remove('show');
+  }
 
   // Footer: reply box for others' stories, view-count for your own, plus a
   // mention badge + one-tap reshare ("Add to your story") when the account
   // currently watching is the person this story tagged.
   const footer=document.getElementById('story-footer');
   const iAmMentioned = item.mentionUid && item.mentionUid===me.uid;
-  if(item.mentionUid){
-    document.getElementById('story-caption-el').innerHTML =
-      (item.caption?ESC(item.caption)+'<br>':'') + `<span style="background:rgba(255,255,255,.18);padding:3px 10px;border-radius:99px;font-size:13px;">@${ESC(item.mentionHandle||'user')}</span>`;
-  }
   window.__currentStoryItem = item; // avoids embedding arbitrary user text into an inline onclick attribute
   if(isOwn){
     footer.innerHTML = `<div class="story-own-views" onclick="openStoryViewersList('${ESC(item.id)}')"><i class="ph ph-eye"></i> ${fmtN(item.views||0)} views</div>`;
@@ -8481,6 +8520,7 @@ function buildReelItem(p, idx){
         <div class="reel-action-btn" onclick="openReelComments('${ESC(p.id)}')"><i class="ph ph-chat-circle-dots"></i><span>${fmtN(p.replies||0)}</span></div>
         <div class="reel-action-btn ${isBookmarked?'bookmarked-state':''}" id="rba-${CSS.escape(p.id)}" onclick="reelToggleBookmark('${ESC(p.id)}')"><i class="ph${isBookmarked?'-fill':''} ph-bookmark-simple"></i></div>
         <div class="reel-action-btn" onclick="shareUrl('${ESC(p.id)}')"><i class="ph ph-share-network"></i></div>
+        <div class="reel-action-btn" onclick="sharePulseToOwnStory('${ESC(p.id)}')"><i class="ph ph-circles-three"></i></div>
       </div>
     </div>
   </div>`;
