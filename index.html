@@ -1633,13 +1633,28 @@ img{display:block;}
   <div class="story-create-topbar">
     <button onclick="closeStoryCreateScreen()" style="color:#fff;font-size:22px;padding:6px;"><i class="ph ph-x"></i></button>
     <div style="font-weight:700;">New Story</div>
-    <div style="width:34px;"></div>
+    <button onclick="openStoryMentionPicker()" style="color:#fff;font-size:20px;padding:6px;" title="Mention someone"><i class="ph ph-at"></i></button>
   </div>
+  <div id="story-mention-chip-wrap" style="padding:0 16px;"></div>
   <div class="story-create-preview" id="story-create-preview">
     <input type="text" class="story-caption-input" id="story-caption-input" placeholder="Add a caption…" maxlength="150">
   </div>
   <div class="story-create-footer">
     <button class="story-share-btn" id="story-share-btn" onclick="publishStory()">Share to Story</button>
+  </div>
+</div>
+
+<!-- STORY MENTION PICKER — pick one account to tag in the story you're creating -->
+<div class="modal-overlay" id="story-mention-modal" style="z-index:3050;">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Mention someone</div>
+    <div class="rail-search" style="margin-bottom:12px;">
+      <i class="ph ph-magnifying-glass"></i>
+      <input type="text" placeholder="Search people…" id="story-mention-q" oninput="doStoryMentionSearch()">
+    </div>
+    <div id="story-mention-results" style="max-height:50vh;overflow-y:auto;"></div>
+    <button class="btn-sheet outline" style="margin-top:12px;" onclick="closeModal('story-mention-modal')">Cancel</button>
   </div>
 </div>
 
@@ -6224,7 +6239,7 @@ async function loadStoriesBar(){
   let html = `<div class="story-item" onclick="onMyStoryTap()">
     <div class="story-ring ${mineRingClass}">
       <div class="story-ring-inner"><div class="story-avatar">${myAvatar}</div></div>
-      <div class="story-plus-badge" onclick="event.stopPropagation();triggerStoryPicker()"><i class="ph ph-plus"></i></div>
+      <div class="story-plus-badge" onclick="event.stopPropagation();triggerStoryPicker(event)"><i class="ph ph-plus"></i></div>
     </div>
     <div class="story-item-label">Your story</div>
   </div>`;
@@ -6286,8 +6301,10 @@ function openAdhocStoryViewer(group){
 // class based on cached story state, with NO extra network calls of its
 // own. Debounced + observed via MutationObserver so newly rendered avatars
 // (feed scroll, chat list updates, etc.) pick up the ring automatically.
+const AVATAR_RING_SELECTOR = ['.pulse-av','.who-av','.article-reader-byline-av','.reel-av','.chat-list-av','.collab-chip-av']
+  .map(c=>c+'[onclick*="openProfile("]').join(',');
 function applyStoryRings(){
-  document.querySelectorAll('[onclick*="openProfile("]').forEach(el=>{
+  document.querySelectorAll(AVATAR_RING_SELECTOR).forEach(el=>{
     const raw=el.getAttribute('onclick')||'';
     const m=raw.match(/openProfile\('([^']*)'\)/);
     if(!m || !m[1]) return;
@@ -6301,7 +6318,20 @@ let __ringScanT=null;
 function scheduleRingScan(){ clearTimeout(__ringScanT); __ringScanT=setTimeout(applyStoryRings,200); }
 new MutationObserver(scheduleRingScan).observe(document.body, {childList:true, subtree:true});
 
-function triggerStoryPicker(){ document.getElementById('story-media-input').click(); }
+function triggerStoryPicker(e){
+  closeCtxMenu();
+  const menu=document.getElementById('ctx-menu');
+  menu.innerHTML=`
+    <div class="ctx-item" onclick="closeCtxMenu();document.getElementById('story-media-input').click()"><i class="ph ph-image"></i> Photo / Video</div>
+    <div class="ctx-item" onclick="closeCtxMenu();openTextStoryComposer()"><i class="ph ph-text-aa"></i> Type Text</div>
+  `;
+  menu.classList.remove('hidden');
+  const target = (e && e.target) ? e.target.closest('.story-plus-badge, .story-ring, button') : null;
+  const r = target ? target.getBoundingClientRect() : {bottom:120,left:16};
+  menu.style.top=Math.min(r.bottom+4,window.innerHeight-140)+'px';
+  menu.style.left=Math.max(4,r.left)+'px';
+  setTimeout(()=>document.addEventListener('click',closeCtxMenu,{once:true}),50);
+}
 
 async function onStoryMediaPicked(e){
   const file=e.target.files[0]; if(!file){ return; }
@@ -6347,9 +6377,23 @@ function uploadStoryVideo(file){
     }
   });
 }
+const STORY_TEXT_BACKGROUNDS = [
+  'linear-gradient(135deg,#7C5CFF,#FF5C9E)',
+  'linear-gradient(135deg,#00D4FF,#7C5CFF)',
+  'linear-gradient(135deg,#FF5C9E,#FFB020)',
+  'linear-gradient(135deg,#0F172A,#334155)',
+  'linear-gradient(135deg,#10B981,#00D4FF)'
+];
+let textStoryBgIdx=0;
+let pendingStoryMention=null; // {uid,name,handle,photo} chosen via openStoryMentionPicker()
+
+function resetStoryMentionChip(){
+  pendingStoryMention=null;
+  document.getElementById('story-mention-chip-wrap').innerHTML='';
+}
 function openStoryCreateScreen(mediaType, mediaUrl, poster, duration){
   pendingStoryMedia = {mediaType, mediaUrl, poster:poster||null, duration:duration||null};
-  document.getElementById('story-caption-input').value='';
+  resetStoryMentionChip();
   const preview=document.getElementById('story-create-preview');
   const mediaHtml = mediaType==='video'
     ? `<video src="${mediaUrl}" autoplay loop muted playsinline></video>`
@@ -6357,26 +6401,132 @@ function openStoryCreateScreen(mediaType, mediaUrl, poster, duration){
   preview.innerHTML = mediaHtml + `<input type="text" class="story-caption-input" id="story-caption-input" placeholder="Add a caption…" maxlength="150">`;
   document.getElementById('story-create-screen').classList.add('active');
 }
+// Instagram-style "type text on a colored background" story — no photo/video needed.
+function openTextStoryComposer(){
+  pendingStoryMedia={mediaType:'text', mediaUrl:null, poster:null, duration:null, bg:STORY_TEXT_BACKGROUNDS[0]};
+  textStoryBgIdx=0;
+  resetStoryMentionChip();
+  const preview=document.getElementById('story-create-preview');
+  preview.innerHTML=`
+    <div id="story-text-bg" style="position:absolute;inset:0;background:${STORY_TEXT_BACKGROUNDS[0]};"></div>
+    <textarea id="story-text-input" placeholder="Type something…" maxlength="200" style="position:relative;z-index:1;background:none;border:none;outline:none;color:#fff;font-size:28px;font-weight:800;text-align:center;width:85%;resize:none;max-height:60%;font-family:inherit;"></textarea>
+    <button onclick="cycleStoryTextBg()" style="position:absolute;bottom:110px;right:20px;z-index:2;width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.2);color:#fff;font-size:18px;"><i class="ph ph-palette"></i></button>`;
+  document.getElementById('story-create-screen').classList.add('active');
+}
+function cycleStoryTextBg(){
+  textStoryBgIdx=(textStoryBgIdx+1)%STORY_TEXT_BACKGROUNDS.length;
+  const bg=STORY_TEXT_BACKGROUNDS[textStoryBgIdx];
+  const bgEl=document.getElementById('story-text-bg'); if(bgEl) bgEl.style.background=bg;
+  if(pendingStoryMedia) pendingStoryMedia.bg=bg;
+}
+// Instagram-style "share this post to your story" — wraps a Pulse in a
+// story card; tapping it in the viewer opens the original Pulse.
+async function sharePulseToOwnStory(pulseId){
+  try{
+    const snap=await db.ref('pulses/'+pulseId).once('value');
+    const p=snap.val();
+    if(!p){ showToast('Could not find this post'); return; }
+    const image=(p.images&&p.images[0])||p.imageBase64||null;
+    resetStoryMentionChip();
+    pendingStoryMedia={mediaType:'pulse', mediaUrl:null, poster:null, duration:null, sharedPulseId:pulseId,
+      sharedSnapshot:{creatorName:p.creatorName||'User', creatorHandle:p.creatorHandle||'user', text:p.text||'', image}};
+    const preview=document.getElementById('story-create-preview');
+    preview.innerHTML=`<div style="position:absolute;inset:0;background:linear-gradient(160deg,#1b1030,#050A14);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:50px 24px;gap:14px;">
+      <div style="color:rgba(255,255,255,.7);font-size:13px;">Sharing this post to your story</div>
+      ${image?`<img src="${image}" style="width:100%;max-height:45%;object-fit:cover;border-radius:14px;">`:''}
+      <div style="color:#fff;font-size:16px;text-align:center;max-height:120px;overflow:hidden;">${ESC((p.text||'').slice(0,200))}</div>
+    </div>`;
+    document.getElementById('story-create-screen').classList.add('active');
+  }catch(e){ showToast('Could not share this post'); }
+}
 function closeStoryCreateScreen(){
   pendingStoryMedia=null;
+  resetStoryMentionChip();
   document.getElementById('story-create-screen').classList.remove('active');
+}
+function openStoryMentionPicker(){
+  openModal('story-mention-modal');
+  document.getElementById('story-mention-q').value='';
+  renderStoryMentionResults(Array.from(followingSet).slice(0,20));
+}
+let __storyMentionCandidates=[];
+async function renderStoryMentionResults(uids){
+  const el=document.getElementById('story-mention-results');
+  if(!uids.length){ el.innerHTML='<div class="empty-feed" style="padding:20px;"><p>No people to show.</p></div>'; return; }
+  el.innerHTML='<div class="feed-loader"><i class="ph ph-spinner-gap spin"></i></div>';
+  const users=await Promise.all(uids.map(id=>db.ref('users/'+id).once('value').then(s=>({id,...(s.val()||{})}))));
+  const filtered=users.filter(u=>u.id!==me.uid && !blockedSet.has(u.id));
+  __storyMentionCandidates=filtered;
+  if(!filtered.length){ el.innerHTML='<div class="empty-feed" style="padding:20px;"><p>No results.</p></div>'; return; }
+  el.innerHTML=filtered.map((u,i)=>`
+    <div class="who-item" onclick="pickStoryMentionByIndex(${i})">
+      <div class="who-av">${u.photoBase64?`<img src="${u.photoBase64}" alt="">`:((u.name||'U').charAt(0).toUpperCase())}</div>
+      <div class="who-info">
+        <div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl):''}</div>
+        <div class="who-handle">@${ESC(u.handle||'user')}</div>
+      </div>
+    </div>`).join('');
+}
+let storyMentionSearchT=null;
+function doStoryMentionSearch(){
+  clearTimeout(storyMentionSearchT);
+  storyMentionSearchT=setTimeout(async ()=>{
+    const raw=document.getElementById('story-mention-q').value.trim().toLowerCase().replace(/^@/,'');
+    if(!raw){ renderStoryMentionResults(Array.from(followingSet).slice(0,20)); return; }
+    const el=document.getElementById('story-mention-results');
+    el.innerHTML='<div class="feed-loader"><i class="ph ph-spinner-gap spin"></i></div>';
+    const usersSnap=await db.ref('users').limitToLast(300).once('value');
+    const matches=[];
+    usersSnap.forEach(c=>{
+      if(c.key===me.uid || blockedSet.has(c.key)) return;
+      const d=c.val()||{};
+      if((d.name||'').toLowerCase().includes(raw)||(d.handle||'').toLowerCase().includes(raw)) matches.push(c.key);
+    });
+    renderStoryMentionResults(matches.slice(0,25));
+  },250);
+}
+function pickStoryMentionByIndex(i){
+  const u=__storyMentionCandidates[i]; if(!u) return;
+  pickStoryMention({uid:u.id, name:u.name||'User', handle:u.handle||'user', photo:u.photoBase64||null});
+}
+function pickStoryMention(u){
+  pendingStoryMention={uid:u.uid, name:u.name, handle:u.handle, photo:u.photo};
+  closeModal('story-mention-modal');
+  document.getElementById('story-mention-chip-wrap').innerHTML=`
+    <div style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);color:#fff;padding:6px 12px;border-radius:99px;font-size:13px;">
+      <i class="ph ph-at"></i> ${ESC(u.handle)}
+      <i class="ph ph-x" style="cursor:pointer;" onclick="resetStoryMentionChip()"></i>
+    </div>`;
 }
 async function publishStory(){
   if(!pendingStoryMedia) return;
   const btn=document.getElementById('story-share-btn');
+  let caption='', text='';
+  if(pendingStoryMedia.mediaType==='text'){
+    text=(document.getElementById('story-text-input').value||'').trim();
+    if(!text){ showToast('Type something first'); return; }
+  } else if(pendingStoryMedia.mediaType!=='pulse'){
+    caption=(document.getElementById('story-caption-input').value||'').trim();
+  }
   btn.disabled=true; btn.textContent='Sharing…';
-  const caption=(document.getElementById('story-caption-input').value||'').trim();
   try{
     const now=Date.now();
     const data={
       uid:me.uid, creatorName:myData.name||'User', creatorHandle:myData.handle||'user',
       creatorPhoto:myData.photoBase64||null, creatorVerified:!!myData.verified, creatorBadgeUrl:myData.badgeUrl||null,
-      mediaType:pendingStoryMedia.mediaType, mediaUrl:pendingStoryMedia.mediaUrl, poster:pendingStoryMedia.poster,
-      duration:pendingStoryMedia.duration||null, caption,
+      mediaType:pendingStoryMedia.mediaType, mediaUrl:pendingStoryMedia.mediaUrl||null, poster:pendingStoryMedia.poster||null,
+      duration:pendingStoryMedia.duration||null, caption, text:text||null, bg:pendingStoryMedia.bg||null,
+      sharedPulseId:pendingStoryMedia.sharedPulseId||null, sharedSnapshot:pendingStoryMedia.sharedSnapshot||null,
+      mentionUid:pendingStoryMention?pendingStoryMention.uid:null,
+      mentionName:pendingStoryMention?pendingStoryMention.name:null,
+      mentionHandle:pendingStoryMention?pendingStoryMention.handle:null,
       createdAt:firebase.database.ServerValue.TIMESTAMP, expiresAt: now+STORY_LIFETIME_MS
     };
     const ref=await db.ref('stories').push(data);
     await db.ref('userStories/'+me.uid+'/'+ref.key).set(true);
+    if(pendingStoryMention && pendingStoryMention.uid!==me.uid){
+      sendNotification(pendingStoryMention.uid, {type:'story_mention', storyId:ref.key});
+    }
     showToast('Story shared ✓');
     closeStoryCreateScreen();
     loadStoriesBar();
@@ -6386,7 +6536,7 @@ async function publishStory(){
 
 function onMyStoryTap(){
   const mine=storyGroups.find(g=>g.uid===me.uid);
-  if(mine) openStoryViewerForUid(me.uid); else triggerStoryPicker();
+  if(mine) openStoryViewerForUid(me.uid); else triggerStoryPicker(window.event);
 }
 function openStoryViewerForUid(uid){
   const idx=storyGroups.findIndex(g=>g.uid===uid);
@@ -6445,16 +6595,40 @@ function storyShowItem(){
     storyItemDuration = (item.duration ? item.duration*1000 : STORY_IMAGE_MS);
     vid.onended = storyGoNext;
     vid.play().catch(()=>{});
+  } else if(item.mediaType==='text'){
+    wrap.innerHTML=`<div style="position:absolute;inset:0;background:${item.bg||STORY_TEXT_BACKGROUNDS[0]};display:flex;align-items:center;justify-content:center;padding:40px;">
+      <div style="color:#fff;font-size:28px;font-weight:800;text-align:center;word-break:break-word;">${ESC(item.text||'')}</div>
+    </div>`;
+    storyItemDuration = STORY_IMAGE_MS;
+  } else if(item.mediaType==='pulse'){
+    const snap=item.sharedSnapshot||{};
+    wrap.innerHTML=`<div style="position:absolute;inset:0;background:linear-gradient(160deg,#1b1030,#050A14);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;gap:14px;">
+      <div style="color:rgba(255,255,255,.7);font-size:13px;">shared a post by @${ESC(snap.creatorHandle||'user')}</div>
+      ${snap.image?`<img src="${snap.image}" style="width:100%;max-height:50%;object-fit:cover;border-radius:14px;">`:''}
+      <div style="color:#fff;font-size:16px;text-align:center;max-height:120px;overflow:hidden;">${ESC((snap.text||'').slice(0,200))}</div>
+      <div style="margin-top:6px;background:rgba(255,255,255,.16);color:#fff;padding:10px 22px;border-radius:99px;font-size:13px;font-weight:700;position:relative;z-index:6;" onclick="event.stopPropagation();openSharedPulseFromStory('${ESC(item.sharedPulseId)}')">View post</div>
+    </div>`;
+    storyItemDuration = STORY_IMAGE_MS;
   } else {
     wrap.innerHTML=`<img src="${item.mediaUrl}" alt="">`;
     storyItemDuration = STORY_IMAGE_MS;
   }
   document.getElementById('story-caption-el').textContent = item.caption||'';
 
-  // Footer: reply box for others' stories, view-count for your own
+  // Footer: reply box for others' stories, view-count for your own, plus a
+  // mention badge + one-tap reshare ("Add to your story") when the account
+  // currently watching is the person this story tagged.
   const footer=document.getElementById('story-footer');
+  const iAmMentioned = item.mentionUid && item.mentionUid===me.uid;
+  if(item.mentionUid){
+    document.getElementById('story-caption-el').innerHTML =
+      (item.caption?ESC(item.caption)+'<br>':'') + `<span style="background:rgba(255,255,255,.18);padding:3px 10px;border-radius:99px;font-size:13px;">@${ESC(item.mentionHandle||'user')}</span>`;
+  }
+  window.__currentStoryItem = item; // avoids embedding arbitrary user text into an inline onclick attribute
   if(isOwn){
     footer.innerHTML = `<div class="story-own-views" onclick="openStoryViewersList('${ESC(item.id)}')"><i class="ph ph-eye"></i> ${fmtN(item.views||0)} views</div>`;
+  } else if(iAmMentioned){
+    footer.innerHTML = `<button class="story-share-btn" style="width:100%;padding:12px;" onclick="reshareStoryMention(window.__currentStoryItem)">Add to your Story</button>`;
   } else {
     footer.innerHTML = `<input type="text" class="story-reply-input" id="story-reply-input" placeholder="Reply to ${ESC(group.name)}…" onkeydown="if(event.key==='Enter')sendStoryReplyFromInput('${ESC(group.uid)}')">
       <button class="story-reply-send" onclick="sendStoryReplyFromInput('${ESC(group.uid)}')"><i class="ph ph-paper-plane-tilt"></i></button>`;
@@ -6555,6 +6729,42 @@ function openStoryCtx(e){
   menu.style.top=Math.min(r.bottom+4,window.innerHeight-100)+'px';
   menu.style.left=Math.max(4,r.left-menu.offsetWidth+40)+'px';
   setTimeout(()=>document.addEventListener('click',()=>{closeCtxMenu();storyHoldEnd();},{once:true}),50);
+}
+function openSharedPulseFromStory(pulseId){
+  closeStoryViewer();
+  openDetail(pulseId);
+}
+// Instagram-style "Add to your Story" — the mentioned viewer reshares the
+// exact same story content to their own story, crediting the original poster.
+async function reshareStoryMention(item){
+  if(!item) return;
+  try{
+    const now=Date.now();
+    const data={
+      uid:me.uid, creatorName:myData.name||'User', creatorHandle:myData.handle||'user',
+      creatorPhoto:myData.photoBase64||null, creatorVerified:!!myData.verified, creatorBadgeUrl:myData.badgeUrl||null,
+      mediaType:item.mediaType, mediaUrl:item.mediaUrl||null, poster:item.poster||null, duration:item.duration||null,
+      caption:item.caption||null, text:item.text||null, bg:item.bg||null,
+      sharedPulseId:item.sharedPulseId||null, sharedSnapshot:item.sharedSnapshot||null,
+      mentionedFromUid:item.uid, mentionedFromHandle:item.creatorHandle||'user',
+      createdAt:firebase.database.ServerValue.TIMESTAMP, expiresAt: now+STORY_LIFETIME_MS
+    };
+    const ref=await db.ref('stories').push(data);
+    await db.ref('userStories/'+me.uid+'/'+ref.key).set(true);
+    showToast('Added to your story ✓');
+    closeStoryViewer();
+    loadStoriesBar();
+  }catch(e){ showToast('Could not add to your story'); }
+}
+// Opens the exact story a 'story_mention' notification points to, if it
+// hasn't expired yet.
+async function openStoryFromNotif(storyId, fromUid){
+  const group=await getStoryGroupForUid(fromUid);
+  const idx = group ? group.items.findIndex(it=>it.id===storyId) : -1;
+  if(!group || idx===-1){ showToast('This story has expired'); return; }
+  openAdhocStoryViewer(group);
+  currentItemIdx = idx;
+  storyShowItem();
 }
 async function deleteStory(storyId){
   const ok=await showConfirm({title:'Delete story?', message:'This cannot be undone.', okLabel:'Delete'});
@@ -6811,7 +7021,7 @@ function loadNotifs(){
     if(badgeM){badgeM.textContent=unread>99?'99+':unread;badgeM.classList.toggle('hidden',unread===0);}
     const el=document.getElementById('notif-list'); if(!el)return;
     if(!items.length){el.innerHTML='<div class="empty-feed"><i class="ph ph-bell"></i><p>No alerts yet</p></div>';return;}
-    const icons={like:'ph-fill ph-heart',follow:'ph ph-user-plus',follow_request:'ph ph-user-plus',follow_accept:'ph ph-user-check',repost:'ph ph-repeat',reply:'ph ph-chat-circle-dots',mention:'ph ph-at',collab_request:'ph ph-users-three',collab_accept:'ph ph-users-three',moderation:'ph ph-shield-warning'};
+    const icons={like:'ph-fill ph-heart',follow:'ph ph-user-plus',follow_request:'ph ph-user-plus',follow_accept:'ph ph-user-check',repost:'ph ph-repeat',reply:'ph ph-chat-circle-dots',mention:'ph ph-at',story_mention:'ph ph-at',collab_request:'ph ph-users-three',collab_accept:'ph ph-users-three',moderation:'ph ph-shield-warning'};
     const msgs={
       like:`<strong>${'%n'}</strong> liked your Pulse`,
       follow:`<strong>${'%n'}</strong> started following you`,
@@ -6820,6 +7030,7 @@ function loadNotifs(){
       repost:`<strong>${'%n'}</strong> reposted your Pulse`,
       reply:`<strong>${'%n'}</strong> commented on your Pulse`,
       mention:`<strong>${'%n'}</strong> tagged you in a Pulse`,
+      story_mention:`<strong>${'%n'}</strong> mentioned you in their story`,
       collab_request:`<strong>${'%n'}</strong> invited you to collaborate on a Pulse`,
       collab_accept:`<strong>${'%n'}</strong> accepted your collab invite`
     };
@@ -6851,7 +7062,7 @@ function loadNotifs(){
             <div class="notif-time">${timeAgo(n.createdAt)}</div>
           </div>`;
         }
-        return `<div class="notif-item notif-${n.type} ${n.read?'':'unread'}" onclick="markNotifRead('${ESC(n.id)}');${n.pulseId?`openDetail('${ESC(n.pulseId)}')`:(n.type==='follow'||n.type==='follow_accept')?`openProfile('${ESC(n.fromUid)}')`:''}">
+        return `<div class="notif-item notif-${n.type} ${n.read?'':'unread'}" onclick="markNotifRead('${ESC(n.id)}');${n.type==='story_mention'?`openStoryFromNotif('${ESC(n.storyId)}','${ESC(n.fromUid)}')`:n.pulseId?`openDetail('${ESC(n.pulseId)}')`:(n.type==='follow'||n.type==='follow_accept')?`openProfile('${ESC(n.fromUid)}')`:''}">
           <div class="notif-icon"><i class="${icons[n.type]||'ph ph-bell'}"></i></div>
           <div class="notif-body">${msg}</div>
           <div class="notif-time">${timeAgo(n.createdAt)}</div>
@@ -7323,6 +7534,7 @@ function openCtxMenu(e, pulseId, isOwn, creatorUid){
   `:'';
   menu.innerHTML=`
     <div class="ctx-item" onclick="closeCtxMenu();shareUrl('${ESC(pulseId)}')"><i class="ph ph-share-network"></i> Share</div>
+    <div class="ctx-item" onclick="closeCtxMenu();sharePulseToOwnStory('${ESC(pulseId)}')"><i class="ph ph-circles-three"></i> Add to your Story</div>
     <div class="ctx-item" onclick="closeCtxMenu();shareToInstagramStory('${ESC(pulseId)}')"><i class="ph ph-instagram-logo"></i> Instagram Story</div>
     <div class="ctx-item" onclick="closeCtxMenu();toggleBookmark('${ESC(pulseId)}')"><i class="ph ph-bookmark-simple"></i> ${bookmarkSet.has(pulseId)?'Remove Bookmark':'Bookmark'}</div>
     ${isOwn?`<div class="ctx-divider"></div><div class="ctx-item" onclick="closeCtxMenu();openEditPulse('${ESC(pulseId)}')"><i class="ph ph-pencil-simple"></i> Edit Pulse</div><div class="ctx-item danger" onclick="closeCtxMenu();deletePulse('${ESC(pulseId)}')"><i class="ph ph-trash"></i> Delete Pulse</div>`:''}
