@@ -591,6 +591,57 @@ img{display:block;}
 .share-profile-btn{font-size:13px;color:var(--text3);padding:8px;border-radius:50%;transition:background .15s,color .15s;}
 .share-profile-btn:hover{background:var(--cyan-dim);color:var(--cyan);}
 
+/* ====== ARTICLES (X-style long-form posts) ====== */
+.article-card{display:flex;gap:12px;padding:14px 16px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;}
+.article-card:hover{background:rgba(255,255,255,0.03);}
+.article-card-body{flex:1;min-width:0;}
+.article-card-title{font-size:16px;font-weight:800;color:var(--text);margin-bottom:4px;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.article-card-excerpt{font-size:13px;color:var(--text2);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;margin-bottom:6px;}
+.article-card-meta{font-size:12px;color:var(--text3);display:flex;align-items:center;gap:10px;flex-wrap:wrap;}
+.article-card-cover{width:96px;height:72px;border-radius:10px;object-fit:cover;flex-shrink:0;background:var(--surface2);}
+.article-tab-header{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 4px;gap:10px;}
+.article-locked-box{margin:16px;padding:22px 18px;background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius);text-align:center;}
+.article-locked-box i{font-size:30px;color:var(--amber);margin-bottom:8px;display:block;}
+.article-locked-box p{font-size:13px;color:var(--text2);line-height:1.5;}
+.article-locked-box .alb-progress{font-size:12px;color:var(--text3);margin-top:6px;}
+.btn-write-article{display:inline-flex;align-items:center;gap:6px;padding:9px 16px;background:linear-gradient(135deg,var(--cyan),#4FE3FF);color:#050A14;font-weight:800;font-size:13px;border-radius:999px;flex-shrink:0;}
+
+/* Article editor */
+.ae-cover-upload{width:100%;height:170px;border-radius:14px;background:var(--surface2);border:1.5px dashed var(--border2);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px;color:var(--text3);cursor:pointer;overflow:hidden;position:relative;margin-bottom:16px;font-size:13px;}
+.ae-cover-upload img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;}
+.ae-cover-remove{position:absolute;top:8px;right:8px;width:28px;height:28px;border-radius:50%;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;color:#fff;z-index:2;}
+.ae-title-input{width:100%;border:none;background:none;font-size:25px;font-weight:800;color:var(--text);line-height:1.3;resize:none;margin-bottom:6px;font-family:var(--font);overflow:hidden;}
+.ae-subtitle-input{width:100%;border:none;background:none;font-size:15px;color:var(--text2);resize:none;margin-bottom:14px;font-family:var(--font);overflow:hidden;}
+.ae-toolbar{display:flex;gap:2px;padding:8px 0;border-top:1px solid var(--border2);border-bottom:1px solid var(--border2);margin-bottom:16px;overflow-x:auto;position:sticky;top:0;background:var(--bg);z-index:5;}
+.ae-tb-btn{width:34px;height:34px;flex-shrink:0;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--text2);}
+.ae-tb-btn:hover{background:var(--surface2);color:var(--text);}
+.ae-body{min-height:260px;font-size:16px;line-height:1.7;color:var(--text);outline:none;padding-bottom:40px;}
+.ae-body p{margin-bottom:14px;}
+.ae-body h2{font-size:21px;font-weight:800;margin:20px 0 10px;}
+.ae-body blockquote{border-left:3px solid var(--cyan);padding-left:14px;color:var(--text2);font-style:italic;margin:14px 0;}
+.ae-body img{max-width:100%;border-radius:10px;margin:10px 0;}
+.ae-body ul,.ae-body ol{margin:0 0 14px 20px;}
+.ae-body:empty:before{content:attr(data-placeholder);color:var(--text3);}
+
+/* Article reader */
+.article-reader-cover{width:100%;max-height:280px;object-fit:cover;display:block;}
+.article-reader-wrap{padding:20px 20px 50px;max-width:680px;margin:0 auto;}
+.article-reader-title{font-size:27px;font-weight:900;line-height:1.25;margin-bottom:8px;word-break:break-word;}
+.article-reader-subtitle{font-size:16px;color:var(--text2);margin-bottom:18px;line-height:1.5;}
+.article-reader-byline{display:flex;align-items:center;gap:10px;margin-bottom:20px;padding-bottom:18px;border-bottom:1px solid var(--border2);}
+.article-reader-byline-av{width:44px;height:44px;border-radius:50%;overflow:hidden;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-weight:800;flex-shrink:0;}
+.article-reader-byline-av img{width:100%;height:100%;object-fit:cover;}
+.article-reader-body{font-size:17px;line-height:1.8;color:var(--text);word-break:break-word;}
+.article-reader-body p{margin-bottom:18px;}
+.article-reader-body h2{font-size:22px;font-weight:800;margin:26px 0 12px;}
+.article-reader-body blockquote{border-left:3px solid var(--cyan);padding-left:16px;color:var(--text2);font-style:italic;margin:18px 0;}
+.article-reader-body img{max-width:100%;border-radius:12px;margin:14px 0;}
+.article-reader-body ul,.article-reader-body ol{margin:0 0 18px 22px;}
+.article-reader-meta{font-size:13px;color:var(--text3);margin-bottom:20px;}
+.article-reader-actions{display:flex;gap:24px;padding-top:18px;margin-top:6px;border-top:1px solid var(--border2);color:var(--text3);}
+.article-reader-actions .ara-item{display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;}
+.article-reader-actions .ara-item.liked-state{color:var(--like);}
+
 /* ====== PULSE DETAIL ====== */
 .pulse-detail-text{font-size:20px;line-height:1.5;color:var(--text);margin-bottom:14px;word-break:break-word;white-space:pre-wrap;}
 .pulse-detail-meta{font-size:14px;color:var(--text3);margin-bottom:14px;padding-bottom:14px;border-bottom:1px solid var(--border);}
@@ -1322,6 +1373,7 @@ img{display:block;}
     <div class="profile-tab" data-tab="videos" onclick="switchProfileTab('videos',this)">Videos</div>
     <div class="profile-tab" data-tab="photos" onclick="switchProfileTab('photos',this)">Photos</div>
     <div class="profile-tab" data-tab="collabs" onclick="switchProfileTab('collabs',this)">Collabs<span id="profile-collab-badge" class="hidden" style="display:inline-block;margin-left:4px;background:var(--amber);color:#000;font-size:10px;font-weight:800;border-radius:99px;min-width:16px;padding:1px 5px;line-height:1.4;"></span></div>
+    <div class="profile-tab" data-tab="articles" onclick="switchProfileTab('articles',this)">Articles</div>
   </div>
   <div id="profile-pulses-list"></div>
   <button class="mobile-fab" id="profile-compose-fab" style="display:flex;" onclick="openComposeFromProfile()" title="Post"><i class="ph-bold ph-pencil-simple-line"></i></button>
@@ -1474,6 +1526,55 @@ img{display:block;}
     <div class="screen-topbar-title">Pulse</div>
   </div>
   <div id="detail-content"></div>
+</div>
+
+<!-- ARTICLE EDITOR — full-page long-form composer, X/Twitter Articles style.
+     Only reachable from openArticleEditor(), which itself is only ever
+     surfaced to accounts that pass articlesEligible() (1000+ combined
+     followers+likes) or who are editing an article they already published. -->
+<div class="screen-overlay" id="article-editor-screen">
+  <div class="screen-topbar">
+    <button class="back-btn" onclick="closeArticleEditor()"><i class="ph ph-x"></i></button>
+    <div class="screen-topbar-title" id="ae-screen-title">Write Article</div>
+    <button id="ae-publish-btn" style="margin-left:auto;background:linear-gradient(135deg,var(--cyan),#4FE3FF);color:#050A14;font-weight:800;font-size:13px;padding:9px 18px;border-radius:999px;" onclick="publishArticle()">Publish</button>
+  </div>
+  <div class="article-reader-wrap" style="padding-top:16px;">
+    <input type="file" id="ae-cover-input" accept="image/*" style="display:none" onchange="onAeCoverPick(event)">
+    <div class="ae-cover-upload" id="ae-cover-upload" onclick="document.getElementById('ae-cover-input').click()">
+      <i class="ph ph-image" style="font-size:26px;"></i>
+      <span>Add a cover image (optional)</span>
+    </div>
+    <textarea class="ae-title-input" id="ae-title" placeholder="Title" rows="1" maxlength="150" oninput="autoGrow(this)"></textarea>
+    <textarea class="ae-subtitle-input" id="ae-subtitle" placeholder="Add a subtitle (optional)" rows="1" maxlength="200" oninput="autoGrow(this)"></textarea>
+    <div class="ae-toolbar">
+      <button class="ae-tb-btn" onclick="aeExec('bold')" title="Bold"><i class="ph ph-text-b"></i></button>
+      <button class="ae-tb-btn" onclick="aeExec('italic')" title="Italic"><i class="ph ph-text-italic"></i></button>
+      <button class="ae-tb-btn" onclick="aeFormatBlock('h2')" title="Heading"><i class="ph ph-text-h-two"></i></button>
+      <button class="ae-tb-btn" onclick="aeFormatBlock('blockquote')" title="Quote"><i class="ph ph-quotes"></i></button>
+      <button class="ae-tb-btn" onclick="aeExec('insertUnorderedList')" title="Bullet list"><i class="ph ph-list-bullets"></i></button>
+      <button class="ae-tb-btn" onclick="aeExec('insertOrderedList')" title="Numbered list"><i class="ph ph-list-numbers"></i></button>
+      <button class="ae-tb-btn" onclick="aeInsertLink()" title="Link"><i class="ph ph-link"></i></button>
+      <button class="ae-tb-btn" onclick="document.getElementById('ae-img-input').click()" title="Insert image"><i class="ph ph-image"></i></button>
+      <button class="ae-tb-btn" onclick="aeFormatBlock('p')" title="Clear formatting"><i class="ph ph-text-t"></i></button>
+      <input type="file" id="ae-img-input" accept="image/*" style="display:none" onchange="onAeInlineImagePick(event)">
+    </div>
+    <div class="ae-body" id="ae-body" contenteditable="true" data-placeholder="Write your article…"></div>
+  </div>
+</div>
+
+<!-- ARTICLE READER — X/Twitter-Articles-style full read view. Never fed
+     from the main Pulses feed; only reachable via a profile's Articles tab
+     or a direct share link. -->
+<div class="screen-overlay" id="article-detail-screen">
+  <div class="screen-topbar">
+    <button class="back-btn" onclick="navBack()"><i class="ph ph-arrow-left"></i></button>
+    <div class="screen-topbar-title">Article</div>
+    <div style="margin-left:auto;display:flex;gap:4px;">
+      <button id="article-more-btn" class="hidden" style="font-size:18px;color:var(--text3);padding:8px;border-radius:50%;" onclick="openArticleCtx(event)"><i class="ph ph-dots-three-vertical"></i></button>
+      <button style="font-size:18px;color:var(--text3);padding:8px;border-radius:50%;" onclick="shareArticleCurrent()"><i class="ph ph-share-network"></i></button>
+    </div>
+  </div>
+  <div id="article-detail-content"></div>
 </div>
 
 <!-- ====== MODALS ====== -->
@@ -5582,6 +5683,7 @@ function switchProfileTab(tab,el){
   else if(tab==='videos') loadProfileFiltered(p=>!!(p.videoUrl||p.videoBase64),'ph-video-camera','No videos yet');
   else if(tab==='photos') loadProfileFiltered(p=>!!(p.imageBase64||(p.images&&p.images.length)),'ph-image','No photos yet');
   else if(tab==='collabs') loadProfileCollabs();
+  else if(tab==='articles') loadProfileArticles();
 }
 async function loadProfileFiltered(predicate, emptyIcon, emptyText){
   const el=document.getElementById('profile-pulses-list');
@@ -5645,6 +5747,290 @@ async function loadProfileLikes(){
   const pulses=await Promise.all(ids.map(id=>db.ref('pulses/'+id).once('value').then(s=>({id,...(s.val()||{})}))));
   pulses.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
   el.innerHTML=pulses.map(p=>buildPulseCard(p)).join('');
+}
+
+// ============================================================
+// ARTICLES — X/Twitter-style full-format long-reads.
+// Distinct from Pulses: stored in their own 'articles' node (never mixed
+// into the main feed query), shown only on the author's profile under a
+// dedicated "Articles" tab, and gated to accounts with meaningful reach
+// (followers + total likes >= ARTICLES_ENGAGEMENT_THRESHOLD) so it stays a
+// creator-tier feature rather than something every new account can spam.
+// ============================================================
+const ARTICLES_ENGAGEMENT_THRESHOLD = 1000;
+function articleEngagementScore(u){ return (u&&(u.followersCount||0))+(u&&(u.totalLikes||0)); }
+function articlesEligible(u){ return articleEngagementScore(u) >= ARTICLES_ENGAGEMENT_THRESHOLD; }
+
+let aeCoverData=null;       // pending cover image for the article being edited
+let aeEditingId=null;       // set when editing an existing article, else null (new article)
+let articleViewedSet = new Set();
+let currentArticleId = null; // whichever article is open in the reader, for share/ctx actions
+
+function autoGrow(ta){ ta.style.height='auto'; ta.style.height=ta.scrollHeight+'px'; }
+function aeExec(cmd){ document.getElementById('ae-body').focus(); document.execCommand(cmd,false,null); }
+function aeFormatBlock(tag){ document.getElementById('ae-body').focus(); document.execCommand('formatBlock',false,tag); }
+function aeInsertLink(){
+  const url=prompt('Link URL (include https://)');
+  if(!url) return;
+  document.getElementById('ae-body').focus();
+  document.execCommand('createLink',false,url);
+}
+function onAeCoverPick(e){
+  const f=e.target.files[0]; if(!f) return;
+  compressAndRead(f, data=>{
+    aeCoverData=data;
+    document.getElementById('ae-cover-upload').innerHTML=`<img src="${data}" alt=""><div class="ae-cover-remove" onclick="event.stopPropagation();removeAeCover()"><i class="ph ph-x"></i></div>`;
+  });
+}
+function removeAeCover(){
+  aeCoverData=null;
+  document.getElementById('ae-cover-upload').innerHTML=`<i class="ph ph-image" style="font-size:26px;"></i><span>Add a cover image (optional)</span>`;
+}
+function onAeInlineImagePick(e){
+  const f=e.target.files[0]; if(!f) return;
+  compressAndRead(f, data=>{
+    document.getElementById('ae-body').focus();
+    document.execCommand('insertImage',false,data);
+  });
+  e.target.value='';
+}
+// Minimal allow-list HTML sanitizer for article bodies — strips anything
+// that isn't plain text/formatting (scripts, event handlers, iframes, etc.)
+// before it's ever written to the database, since the body comes from a
+// contenteditable region built with document.execCommand.
+function sanitizeArticleHtml(html){
+  const allowed=new Set(['P','BR','B','STRONG','I','EM','U','H2','H3','BLOCKQUOTE','UL','OL','LI','A','IMG','DIV','SPAN']);
+  const doc=new DOMParser().parseFromString(html||'', 'text/html');
+  const walk=(node)=>{
+    Array.from(node.childNodes).forEach(child=>{
+      if(child.nodeType===1){
+        if(!allowed.has(child.tagName)){
+          while(child.firstChild) child.parentNode.insertBefore(child.firstChild, child);
+          child.parentNode.removeChild(child);
+          return;
+        }
+        Array.from(child.attributes).forEach(attr=>{
+          const name=attr.name.toLowerCase(), val=attr.value||'';
+          const keep=(child.tagName==='A'&&name==='href'&&/^https?:\/\//i.test(val))
+                   ||(child.tagName==='IMG'&&name==='src'&&(/^https?:\/\//i.test(val)||/^data:image\//i.test(val)));
+          if(!keep) child.removeAttribute(attr.name);
+        });
+        if(child.tagName==='A'){ child.setAttribute('target','_blank'); child.setAttribute('rel','noopener noreferrer'); }
+        walk(child);
+      } else if(child.nodeType!==3){
+        child.parentNode.removeChild(child);
+      }
+    });
+  };
+  walk(doc.body);
+  return doc.body.innerHTML;
+}
+function openArticleEditor(existing){
+  if(!existing && !articlesEligible(myData)){
+    showToast(`Articles unlock at ${ARTICLES_ENGAGEMENT_THRESHOLD}+ followers & likes combined`);
+    return;
+  }
+  aeEditingId = existing ? existing.id : null;
+  aeCoverData = existing ? (existing.coverImage||null) : null;
+  document.getElementById('ae-screen-title').textContent = existing ? 'Edit Article' : 'Write Article';
+  document.getElementById('ae-title').value = existing ? (existing.title||'') : '';
+  document.getElementById('ae-subtitle').value = existing ? (existing.subtitle||'') : '';
+  document.getElementById('ae-body').innerHTML = existing ? (existing.contentHtml||'') : '';
+  if(aeCoverData){ document.getElementById('ae-cover-upload').innerHTML=`<img src="${aeCoverData}" alt=""><div class="ae-cover-remove" onclick="event.stopPropagation();removeAeCover()"><i class="ph ph-x"></i></div>`; }
+  else removeAeCover();
+  navPush('article-editor-screen', ()=>openArticleEditor(existing));
+  showScreen('article-editor-screen');
+  setTimeout(()=>{ autoGrow(document.getElementById('ae-title')); autoGrow(document.getElementById('ae-subtitle')); },0);
+}
+function closeArticleEditor(){
+  const hasContent = document.getElementById('ae-title').value.trim() || document.getElementById('ae-body').textContent.trim();
+  if(hasContent){
+    showConfirm({title:'Discard article?', message:'Your draft will be lost.', okLabel:'Discard'}).then(ok=>{ if(ok) navBack(); });
+  } else navBack();
+}
+async function publishArticle(){
+  const title=document.getElementById('ae-title').value.trim();
+  const subtitle=document.getElementById('ae-subtitle').value.trim();
+  const bodyRaw=document.getElementById('ae-body').innerHTML;
+  const bodyText=document.getElementById('ae-body').textContent.trim();
+  if(!title){ showToast('Give your article a title'); return; }
+  if(!bodyText){ showToast('Your article needs some content'); return; }
+  if(!aeEditingId && !articlesEligible(myData)){ showToast('Articles are unlocked at 1000+ combined followers & likes'); return; }
+  const btn=document.getElementById('ae-publish-btn');
+  btn.disabled=true; btn.textContent='Publishing…';
+  try{
+    const contentHtml=sanitizeArticleHtml(bodyRaw);
+    const excerpt=bodyText.slice(0,180);
+    if(aeEditingId){
+      await db.ref('articles/'+aeEditingId).update({title,subtitle,contentHtml,excerpt,coverImage:aeCoverData||null,updatedAt:firebase.database.ServerValue.TIMESTAMP});
+      showToast('Article updated ✓');
+      navBack();
+      openArticleDetail(aeEditingId);
+    } else {
+      const data={
+        uid:me.uid, creatorName:myData.name||'User', creatorHandle:myData.handle||'user',
+        creatorPhoto:myData.photoBase64||null, creatorVerified:!!myData.verified, creatorBadgeUrl:myData.badgeUrl||null,
+        title, subtitle, contentHtml, excerpt, coverImage:aeCoverData||null,
+        likes:0, views:0, createdAt:firebase.database.ServerValue.TIMESTAMP
+      };
+      const ref=await db.ref('articles').push(data);
+      await db.ref('userArticles/'+me.uid+'/'+ref.key).set(true);
+      showToast('Article published ✓');
+      navBack();
+      openArticleDetail(ref.key);
+    }
+  }catch(e){ console.error(e); showToast('Could not publish article'); }
+  finally{ btn.disabled=false; btn.textContent='Publish'; }
+}
+async function deleteArticle(articleId){
+  const ok=await showConfirm({title:'Delete article?', message:'This cannot be undone.', okLabel:'Delete'});
+  if(!ok) return;
+  try{
+    await db.ref('articles/'+articleId).remove();
+    await db.ref('userArticles/'+me.uid+'/'+articleId).remove();
+    showToast('Article deleted');
+    navBack();
+  }catch(e){ showToast('Could not delete article'); }
+}
+function openArticleCtx(e){
+  if(!currentArticleId) return;
+  e.stopPropagation();
+  closeCtxMenu();
+  const menu=document.getElementById('ctx-menu');
+  menu.innerHTML=`
+    <div class="ctx-item" onclick="closeCtxMenu();editCurrentArticle()"><i class="ph ph-pencil-simple"></i> Edit Article</div>
+    <div class="ctx-item" onclick="closeCtxMenu();shareArticleCurrent()"><i class="ph ph-share-network"></i> Share</div>
+    <div class="ctx-item danger" onclick="closeCtxMenu();deleteArticle('${ESC(currentArticleId)}')"><i class="ph ph-trash"></i> Delete Article</div>
+  `;
+  menu.classList.remove('hidden');
+  const r=e.target.closest('button').getBoundingClientRect();
+  menu.style.top=Math.min(r.bottom+4,window.innerHeight-200)+'px';
+  menu.style.left=Math.max(4,r.left-menu.offsetWidth+40)+'px';
+  setTimeout(()=>document.addEventListener('click',closeCtxMenu,{once:true}),50);
+}
+async function editCurrentArticle(){
+  if(!currentArticleId) return;
+  const snap=await db.ref('articles/'+currentArticleId).once('value');
+  const a=snap.val(); if(a) openArticleEditor({id:currentArticleId,...a});
+}
+// Profile tab: lists this account's published articles (or the write/locked
+// CTA on your own profile), never touching the main Pulses feed at all.
+async function loadProfileArticles(){
+  const el=document.getElementById('profile-pulses-list');
+  const uid=profileUid||me.uid;
+  const isOwn=uid===me.uid;
+  if(!profileViewable){ el.innerHTML='<div class="empty-feed"><p>This content isn\'t available.</p></div>'; return; }
+  el.innerHTML='<div class="feed-loader"><i class="ph ph-spinner-gap spin"></i></div>';
+  let headerHtml='';
+  if(isOwn){
+    if(articlesEligible(myData)){
+      headerHtml=`<div class="article-tab-header"><span style="font-size:13px;color:var(--text3);">Long-form posts you've published</span><button class="btn-write-article" onclick="openArticleEditor()"><i class="ph ph-pencil-simple-line"></i> Write</button></div>`;
+    } else {
+      const score=articleEngagementScore(myData);
+      headerHtml=`<div class="article-locked-box"><i class="ph ph-lock-simple"></i><p><strong style="color:var(--text);">Articles unlock at ${ARTICLES_ENGAGEMENT_THRESHOLD}+ followers &amp; likes combined.</strong><br>Keep growing — you're at ${fmtN(score)||score} right now.</p></div>`;
+    }
+  }
+  const snap=await db.ref('userArticles/'+uid).once('value');
+  const ids=Object.keys(snap.val()||{});
+  if(!ids.length){
+    el.innerHTML=headerHtml || '';
+    el.innerHTML += '<div class="empty-feed"><i class="ph ph-article"></i><p>No articles yet</p></div>';
+    return;
+  }
+  let articles=await Promise.all(ids.map(id=>db.ref('articles/'+id).once('value').then(s=>({id,...(s.val()||{})}))));
+  articles=articles.filter(a=>a.uid); // drop any orphaned/deleted entries left in the index
+  articles.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+  el.innerHTML = headerHtml + articles.map(a=>buildArticleCard(a)).join('');
+}
+function buildArticleCard(a){
+  const cover=a.coverImage?`<img class="article-card-cover" src="${a.coverImage}" alt="">`:'';
+  return `<div class="article-card" onclick="openArticleDetail('${ESC(a.id)}')">
+    <div class="article-card-body">
+      <div class="article-card-title">${ESC(a.title||'Untitled')}</div>
+      ${a.excerpt?`<div class="article-card-excerpt">${ESC(a.excerpt)}</div>`:''}
+      <div class="article-card-meta"><span>${a.createdAt?joinDate(a.createdAt):''}</span><span><i class="ph ph-eye"></i> ${fmtN(a.views||0)}</span><span><i class="ph ph-heart"></i> ${fmtN(a.likes||0)}</span></div>
+    </div>
+    ${cover}
+  </div>`;
+}
+async function registerArticleView(articleId){
+  if(!articleId || !me || !me.uid) return;
+  if(articleViewedSet.has(articleId)) return;
+  articleViewedSet.add(articleId);
+  try{
+    const seenRef=db.ref('articleViews/'+articleId+'/'+me.uid);
+    const snap=await seenRef.once('value');
+    if(snap.val()===true) return;
+    await seenRef.set(true);
+    await db.ref('articles/'+articleId+'/views').transaction(c=>(c||0)+1);
+  }catch(e){ /* non-critical */ }
+}
+async function toggleArticleLike(articleId){
+  try{
+    const likeRef=db.ref('userArticleLikes/'+me.uid+'/'+articleId);
+    const snap=await likeRef.once('value');
+    const already=snap.val()===true;
+    const delta=already?-1:1;
+    await likeRef.set(already?null:true);
+    await db.ref('articles/'+articleId+'/likes').transaction(c=>Math.max(0,(c||0)+delta));
+    const btn=document.getElementById('ara-like-'+CSS.escape(articleId));
+    if(btn){
+      btn.classList.toggle('liked-state', !already);
+      btn.querySelector('i').className = !already ? 'ph-fill ph-heart' : 'ph ph-heart';
+      const numEl=btn.querySelector('span'); if(numEl) numEl.textContent=fmtN(Math.max(0,(+numEl.dataset.raw||0)+delta));
+    }
+  }catch(e){ showToast('Could not update like'); }
+}
+function shareArticleCurrent(){
+  if(!currentArticleId) return;
+  const url=`${location.origin}${location.pathname}?article=${currentArticleId}`;
+  if(navigator.share){ navigator.share({url}).catch(()=>{}); }
+  else { navigator.clipboard.writeText(url).then(()=>showToast('Article link copied!')).catch(()=>{}); }
+}
+async function openArticleDetail(articleId){
+  if(!articleId) return;
+  currentArticleId=articleId;
+  navPush('article-detail-screen', ()=>openArticleDetail(articleId));
+  showScreen('article-detail-screen');
+  const el=document.getElementById('article-detail-content');
+  el.innerHTML='<div class="feed-loader"><i class="ph ph-spinner-gap spin"></i></div>';
+  try{
+    const snap=await db.ref('articles/'+articleId).once('value');
+    const a=snap.val();
+    if(!a){ el.innerHTML='<div class="empty-feed"><p>Article not found.</p></div>'; return; }
+    registerArticleView(articleId);
+    const isOwn=a.uid===me.uid;
+    document.getElementById('article-more-btn').classList.toggle('hidden', !isOwn);
+    const likeSnap=await db.ref('userArticleLikes/'+me.uid+'/'+articleId).once('value');
+    const isLiked=likeSnap.val()===true;
+    const av=a.creatorPhoto?`<img src="${a.creatorPhoto}" alt="">`:ESC((a.creatorName||'U').charAt(0).toUpperCase());
+    const tick=a.creatorVerified?verifiedBadgeHtml('',a.uid,a.creatorBadgeUrl):'';
+    updateShareMeta({
+      title:`${a.title||'Article'} — ${a.creatorName||'User'} on Nexor Sparks`,
+      description: a.excerpt || `An article by @${a.creatorHandle||'user'} on Nexor Sparks.`,
+      image: a.coverImage || DEFAULT_SHARE_IMAGE,
+      url: `${location.origin}${location.pathname}?article=${articleId}`
+    });
+    el.innerHTML=`
+      ${a.coverImage?`<img class="article-reader-cover" src="${a.coverImage}" alt="">`:''}
+      <div class="article-reader-wrap">
+        <div class="article-reader-title">${ESC(a.title||'Untitled')}</div>
+        ${a.subtitle?`<div class="article-reader-subtitle">${ESC(a.subtitle)}</div>`:''}
+        <div class="article-reader-byline">
+          <div class="article-reader-byline-av" onclick="openProfile('${ESC(a.uid)}')">${av}</div>
+          <div>
+            <div style="font-weight:700;font-size:14px;display:flex;align-items:center;gap:3px;"><span onclick="openProfile('${ESC(a.uid)}')" style="cursor:pointer;">${ESC(a.creatorName||'User')}</span>${tick}</div>
+            <div class="article-reader-meta" style="margin:0;">@${ESC(a.creatorHandle||'user')} · ${a.createdAt?joinDate(a.createdAt):''}${a.updatedAt?' · edited':''}</div>
+          </div>
+        </div>
+        <div class="article-reader-body">${a.contentHtml||''}</div>
+        <div class="article-reader-actions">
+          <div class="ara-item ${isLiked?'liked-state':''}" id="ara-like-${ESC(articleId)}" onclick="toggleArticleLike('${ESC(articleId)}')"><i class="ph${isLiked?'-fill':''} ph-heart"></i><span data-raw="${a.likes||0}">${fmtN(a.likes||0)}</span></div>
+          <div class="ara-item"><i class="ph ph-eye"></i><span>${fmtN(a.views||0)}</span></div>
+          <div class="ara-item" onclick="shareArticleCurrent()"><i class="ph ph-share-network"></i></div>
+        </div>
+      </div>`;
+  }catch(e){ console.error(e); el.innerHTML='<div class="empty-feed"><p>Could not load this article.</p></div>'; }
 }
 
 function shareProfile(){
@@ -7667,7 +8053,7 @@ function showScreen(id){
   document.querySelectorAll('.screen-overlay').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   setNavActive(id);
-  if(id!=='profile-screen' && id!=='detail-screen') resetShareMeta();
+  if(id!=='profile-screen' && id!=='detail-screen' && id!=='article-detail-screen') resetShareMeta();
   if(id==='notif-screen'){ loadNotifs(); }
   if(id==='bookmarks-screen') loadBookmarksScreen();
   if(id==='lists-screen') loadListsScreen();
@@ -7922,6 +8308,8 @@ window.addEventListener('load',()=>{
   if(pulseId) sessionStorage.setItem('pendingPulseId',pulseId);
   const userId=new URLSearchParams(location.search).get('user');
   if(userId) sessionStorage.setItem('pendingUserId',userId);
+  const articleId=new URLSearchParams(location.search).get('article');
+  if(articleId) sessionStorage.setItem('pendingArticleId',articleId);
 });
 auth.onAuthStateChanged(u=>{
   if(u){
@@ -7929,6 +8317,8 @@ auth.onAuthStateChanged(u=>{
     if(pid){sessionStorage.removeItem('pendingPulseId');setTimeout(()=>openDetail(pid),800);}
     const uid=sessionStorage.getItem('pendingUserId');
     if(uid){sessionStorage.removeItem('pendingUserId');setTimeout(()=>openProfile(uid),800);}
+    const aid=sessionStorage.getItem('pendingArticleId');
+    if(aid){sessionStorage.removeItem('pendingArticleId');setTimeout(()=>openArticleDetail(aid),800);}
   }
 });
 
