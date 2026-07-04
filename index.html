@@ -2436,16 +2436,12 @@ async function openAboutAccount(uid){
     html += affiliateHtml;
     html += row('Profile name', ESC(u.name||'User'));
     html += row('Username', '@'+ESC(u.handle||'user'));
-    // Username change history — shows "Username change 1", "Username change 2"…
-    // one row per time this account has ever changed its handle.
-    if(u.usernameHistory){
-      const changes=Object.values(u.usernameHistory).sort((a,b)=>(a.at||0)-(b.at||0));
-      if(changes.length){
-        html += `<div style="padding:11px 0 4px;font-size:12px;color:var(--text3);font-weight:600;">Username changes (${changes.length})</div>`;
-        changes.forEach((c,i)=>{
-          html += row(`Username change ${i+1}`, `@${ESC(c.from||'—')} → @${ESC(c.to||'—')}`);
-        });
-      }
+    // Just the running count of how many times this account has ever
+    // changed its handle — deliberately NOT which usernames it used to be,
+    // to avoid exposing someone's past identity/handles to other viewers.
+    const usernameChanges = u.usernameChangeCount || (u.usernameHistory ? Object.keys(u.usernameHistory).length : 0);
+    if(usernameChanges > 0){
+      html += row('Username changes', String(usernameChanges));
     }
     html += row('Date joined', u.createdAt ? joinDate(u.createdAt) : 'Not available');
     const isSelf = uid===me.uid;
@@ -5296,7 +5292,9 @@ const viewedPulses = new Set(); // fast in-memory cache of pulses already counte
 // let the same account inflate the count again, and so this same function
 // can be reused anywhere a "real view" happens (Pulse detail, Bolts video
 // autoplay, etc.) instead of only counting views in the detail screen.
-async function registerPulseView(pulseId){
+// Also rolls the view up into the content owner's users/{uid}/totalViews
+// counter — this is what Articles eligibility (1000+ total views) checks.
+async function registerPulseView(pulseId, ownerUid){
   if(!pulseId || !me || !me.uid) return;
   if(viewedPulses.has(pulseId)) return; // already handled this session, skip the DB round-trip
   viewedPulses.add(pulseId);
@@ -5306,6 +5304,9 @@ async function registerPulseView(pulseId){
     if(snap.val()===true) return; // this account has already been counted for this Pulse before
     await seenRef.set(true);
     await db.ref('pulses/'+pulseId+'/views').transaction(c=>(c||0)+1);
+    let uid=ownerUid;
+    if(!uid){ const uSnap=await db.ref('pulses/'+pulseId+'/uid').once('value'); uid=uSnap.val(); }
+    if(uid) await db.ref('users/'+uid+'/totalViews').transaction(c=>(c||0)+1);
   }catch(e){ /* non-critical — never block viewing content over a views-count write */ }
 }
 async function openDetail(pulseId){
@@ -5753,12 +5754,12 @@ async function loadProfileLikes(){
 // ARTICLES — X/Twitter-style full-format long-reads.
 // Distinct from Pulses: stored in their own 'articles' node (never mixed
 // into the main feed query), shown only on the author's profile under a
-// dedicated "Articles" tab, and gated to accounts with meaningful reach
-// (followers + total likes >= ARTICLES_ENGAGEMENT_THRESHOLD) so it stays a
-// creator-tier feature rather than something every new account can spam.
+// dedicated "Articles" tab, and gated to accounts with real reach —
+// total views across their Pulses/Bolts/Articles >= ARTICLES_ENGAGEMENT_THRESHOLD —
+// so it stays a creator-tier feature rather than something every new account can spam.
 // ============================================================
 const ARTICLES_ENGAGEMENT_THRESHOLD = 1000;
-function articleEngagementScore(u){ return (u&&(u.followersCount||0))+(u&&(u.totalLikes||0)); }
+function articleEngagementScore(u){ return (u&&(u.totalViews||0)); }
 function articlesEligible(u){ return articleEngagementScore(u) >= ARTICLES_ENGAGEMENT_THRESHOLD; }
 
 let aeCoverData=null;       // pending cover image for the article being edited
@@ -5827,7 +5828,7 @@ function sanitizeArticleHtml(html){
 }
 function openArticleEditor(existing){
   if(!existing && !articlesEligible(myData)){
-    showToast(`Articles unlock at ${ARTICLES_ENGAGEMENT_THRESHOLD}+ followers & likes combined`);
+    showToast(`Articles unlock at ${ARTICLES_ENGAGEMENT_THRESHOLD}+ total views`);
     return;
   }
   aeEditingId = existing ? existing.id : null;
@@ -5855,7 +5856,7 @@ async function publishArticle(){
   const bodyText=document.getElementById('ae-body').textContent.trim();
   if(!title){ showToast('Give your article a title'); return; }
   if(!bodyText){ showToast('Your article needs some content'); return; }
-  if(!aeEditingId && !articlesEligible(myData)){ showToast('Articles are unlocked at 1000+ combined followers & likes'); return; }
+  if(!aeEditingId && !articlesEligible(myData)){ showToast(`Articles are unlocked at ${ARTICLES_ENGAGEMENT_THRESHOLD}+ total views`); return; }
   const btn=document.getElementById('ae-publish-btn');
   btn.disabled=true; btn.textContent='Publishing…';
   try{
@@ -5927,7 +5928,7 @@ async function loadProfileArticles(){
       headerHtml=`<div class="article-tab-header"><span style="font-size:13px;color:var(--text3);">Long-form posts you've published</span><button class="btn-write-article" onclick="openArticleEditor()"><i class="ph ph-pencil-simple-line"></i> Write</button></div>`;
     } else {
       const score=articleEngagementScore(myData);
-      headerHtml=`<div class="article-locked-box"><i class="ph ph-lock-simple"></i><p><strong style="color:var(--text);">Articles unlock at ${ARTICLES_ENGAGEMENT_THRESHOLD}+ followers &amp; likes combined.</strong><br>Keep growing — you're at ${fmtN(score)||score} right now.</p></div>`;
+      headerHtml=`<div class="article-locked-box"><i class="ph ph-lock-simple"></i><p><strong style="color:var(--text);">Articles unlock at ${ARTICLES_ENGAGEMENT_THRESHOLD}+ total views on your Pulses &amp; Bolts.</strong><br>Keep growing — you're at ${fmtN(score)||score} views right now.</p></div>`;
     }
   }
   const snap=await db.ref('userArticles/'+uid).once('value');
@@ -5953,7 +5954,7 @@ function buildArticleCard(a){
     ${cover}
   </div>`;
 }
-async function registerArticleView(articleId){
+async function registerArticleView(articleId, ownerUid){
   if(!articleId || !me || !me.uid) return;
   if(articleViewedSet.has(articleId)) return;
   articleViewedSet.add(articleId);
@@ -5963,6 +5964,7 @@ async function registerArticleView(articleId){
     if(snap.val()===true) return;
     await seenRef.set(true);
     await db.ref('articles/'+articleId+'/views').transaction(c=>(c||0)+1);
+    if(ownerUid) await db.ref('users/'+ownerUid+'/totalViews').transaction(c=>(c||0)+1);
   }catch(e){ /* non-critical */ }
 }
 async function toggleArticleLike(articleId){
@@ -5998,7 +6000,7 @@ async function openArticleDetail(articleId){
     const snap=await db.ref('articles/'+articleId).once('value');
     const a=snap.val();
     if(!a){ el.innerHTML='<div class="empty-feed"><p>Article not found.</p></div>'; return; }
-    registerArticleView(articleId);
+    registerArticleView(articleId, a.uid);
     const isOwn=a.uid===me.uid;
     document.getElementById('article-more-btn').classList.toggle('hidden', !isOwn);
     const likeSnap=await db.ref('userArticleLikes/'+me.uid+'/'+articleId).once('value');
@@ -7707,7 +7709,7 @@ function buildReelItem(p, idx){
   const tick=p.creatorVerified?verifiedBadgeHtml('',p.uid,p.creatorBadgeUrl):'';
   const followBtn = p.uid!==me.uid ? followBtnHtml(p.uid) : '';
   const src=p.videoUrl||p.videoBase64;
-  return `<div class="reel-item" data-idx="${idx}" data-id="${ESC(p.id)}">
+  return `<div class="reel-item" data-idx="${idx}" data-id="${ESC(p.id)}" data-uid="${ESC(p.uid)}">
     <div class="reel-topbar">
       <button class="reel-back-btn" onclick="navBack()"><i class="ph ph-arrow-left"></i></button>
       <div class="reel-topbar-title">Bolts</div>
@@ -7749,7 +7751,7 @@ function setupReelsObserver(){
           // Bolts videos never counted views before — a video actually
           // starting to autoplay in-frame is a real view, same as opening
           // a Pulse's detail screen, so count it the same way (once per account).
-          registerPulseView(entry.target.dataset.id);
+          registerPulseView(entry.target.dataset.id, entry.target.dataset.uid);
         } else {
           vid.pause();
         }
