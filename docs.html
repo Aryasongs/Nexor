@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Nexor Sparks API Docs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0B0E14;
+    --surface: #12161F;
+    --surface-2: #171C27;
+    --border: #232937;
+    --text: #E8ECF1;
+    --text-muted: #8993A6;
+    --text-dim: #5B6478;
+    --mint: #6EF2C2;
+    --amber: #FFB454;
+    --red: #FF6B6B;
+    --mono: 'JetBrains Mono', monospace;
+    --sans: 'Inter', sans-serif;
+    --display: 'Space Grotesk', sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a { color: var(--mint); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+
+  code, pre {
+    font-family: var(--mono);
+  }
+
+  /* ---------- Layout ---------- */
+  .layout {
+    display: flex;
+    min-height: 100vh;
+  }
+
+  .sidebar {
+    width: 260px;
+    flex-shrink: 0;
+    background: var(--surface);
+    border-right: 1px solid var(--border);
+    padding: 28px 20px;
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    overflow-y: auto;
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 32px;
+    padding-left: 4px;
+  }
+
+  .brand-mark {
+    width: 26px;
+    height: 26px;
+    flex-shrink: 0;
+  }
+
+  .brand-name {
+    font-family: var(--display);
+    font-weight: 700;
+    font-size: 16px;
+    letter-spacing: -0.01em;
+  }
+
+  .nav-group {
+    margin-bottom: 24px;
+  }
+
+  .nav-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    padding: 0 10px;
+    margin-bottom: 8px;
+    font-weight: 600;
+  }
+
+  .nav-link {
+    display: block;
+    padding: 7px 10px;
+    border-radius: 6px;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .nav-link:hover {
+    background: var(--surface-2);
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .nav-link.active {
+    background: rgba(110, 242, 194, 0.08);
+    color: var(--mint);
+  }
+
+  .main {
+    flex: 1;
+    max-width: 760px;
+    padding: 60px 48px 120px;
+  }
+
+  @media (max-width: 900px) {
+    .sidebar { display: none; }
+    .main { padding: 32px 20px 80px; max-width: 100%; }
+  }
+
+  /* ---------- Hero ---------- */
+  .hero {
+    margin-bottom: 64px;
+  }
+
+  .eyebrow {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--mint);
+    letter-spacing: 0.05em;
+    margin-bottom: 12px;
+  }
+
+  h1 {
+    font-family: var(--display);
+    font-size: 40px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0 0 16px;
+    line-height: 1.1;
+  }
+
+  .hero p {
+    font-size: 17px;
+    color: var(--text-muted);
+    max-width: 520px;
+    margin: 0 0 32px;
+  }
+
+  .pulse-wrap {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+    margin-bottom: 8px;
+    overflow: hidden;
+  }
+
+  .pulse-wrap svg { display: block; width: 100%; height: 80px; }
+
+  .pulse-line {
+    fill: none;
+    stroke: var(--mint);
+    stroke-width: 2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    filter: drop-shadow(0 0 6px rgba(110,242,194,0.5));
+    stroke-dasharray: 600;
+    stroke-dashoffset: 600;
+    animation: draw 3.2s linear infinite;
+  }
+
+  @keyframes draw {
+    to { stroke-dashoffset: -600; }
+  }
+
+  .hero-cta {
+    display: flex;
+    gap: 12px;
+    margin-top: 28px;
+    flex-wrap: wrap;
+  }
+
+  .btn {
+    font-family: var(--sans);
+    font-weight: 600;
+    font-size: 14px;
+    padding: 10px 18px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    cursor: pointer;
+    display: inline-block;
+  }
+
+  .btn-primary {
+    background: var(--mint);
+    color: #0B0E14;
+  }
+  .btn-primary:hover { opacity: 0.9; text-decoration: none; }
+
+  .btn-ghost {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text);
+  }
+  .btn-ghost:hover { background: var(--surface-2); text-decoration: none; }
+
+  /* ---------- Sections ---------- */
+  section {
+    margin-bottom: 56px;
+    scroll-margin-top: 24px;
+  }
+
+  h2 {
+    font-family: var(--display);
+    font-size: 24px;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin: 0 0 16px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h3 {
+    font-family: var(--display);
+    font-size: 17px;
+    font-weight: 600;
+    margin: 28px 0 10px;
+  }
+
+  p { color: var(--text-muted); margin: 0 0 14px; }
+
+  .lead { color: var(--text); }
+
+  /* ---------- Code blocks ---------- */
+  .code-block {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 16px 0 24px;
+  }
+
+  .code-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface-2);
+  }
+
+  .code-head span {
+    font-family: var(--mono);
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  .copy-btn {
+    background: none;
+    border: none;
+    color: var(--text-dim);
+    font-family: var(--sans);
+    font-size: 12px;
+    cursor: pointer;
+    padding: 2px 6px;
+  }
+  .copy-btn:hover { color: var(--mint); }
+
+  pre {
+    margin: 0;
+    padding: 16px;
+    overflow-x: auto;
+    font-size: 13px;
+    line-height: 1.6;
+    color: #C8D1E0;
+  }
+
+  .tok-key { color: var(--mint); }
+  .tok-str { color: #FFB454; }
+  .tok-comment { color: var(--text-dim); }
+  .tok-fn { color: #82AAFF; }
+
+  code.inline {
+    background: var(--surface-2);
+    border: 1px solid var(--border);
+    padding: 1px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+    color: var(--mint);
+  }
+
+  /* ---------- Tables ---------- */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0 24px;
+    font-size: 14px;
+  }
+
+  th {
+    text-align: left;
+    color: var(--text-dim);
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text-muted);
+  }
+
+  td:first-child, th:first-child { padding-left: 0; }
+
+  td code { color: var(--mint); }
+
+  .status-dot {
+    display: inline-block;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+  .dot-red { background: var(--red); }
+  .dot-amber { background: var(--amber); }
+  .dot-mint { background: var(--mint); }
+
+  /* ---------- Signup card ---------- */
+  .signup-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 24px;
+  }
+
+  .signup-card label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 6px;
+    margin-top: 14px;
+  }
+
+  .signup-card label:first-child { margin-top: 0; }
+
+  .signup-card input {
+    width: 100%;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 12px;
+    color: var(--text);
+    font-family: var(--sans);
+    font-size: 14px;
+  }
+
+  .signup-card input:focus {
+    outline: none;
+    border-color: var(--mint);
+  }
+
+  .signup-result {
+    margin-top: 18px;
+    padding: 14px;
+    background: rgba(110,242,194,0.06);
+    border: 1px solid rgba(110,242,194,0.25);
+    border-radius: 8px;
+    display: none;
+  }
+
+  .signup-result code {
+    word-break: break-all;
+    display: block;
+    margin-top: 6px;
+  }
+
+  .signup-error {
+    margin-top: 14px;
+    color: var(--red);
+    font-size: 13px;
+    display: none;
+  }
+
+  .callout {
+    background: rgba(255, 180, 84, 0.06);
+    border: 1px solid rgba(255, 180, 84, 0.25);
+    border-left: 3px solid var(--amber);
+    border-radius: 6px;
+    padding: 12px 16px;
+    font-size: 14px;
+    color: var(--text-muted);
+    margin: 16px 0 24px;
+  }
+
+  .callout strong { color: var(--amber); }
+
+  footer {
+    color: var(--text-dim);
+    font-size: 13px;
+    border-top: 1px solid var(--border);
+    padding-top: 24px;
+    margin-top: 60px;
+  }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- Sidebar -->
+  <nav class="sidebar">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 24 24" fill="none">
+        <path d="M2 12h5l2-7 4 14 2-7h7" stroke="#6EF2C2" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+      <span class="brand-name">Nexor Sparks</span>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Get Started</div>
+      <a class="nav-link active" href="#overview">Overview</a>
+      <a class="nav-link" href="#auth">Authentication</a>
+      <a class="nav-link" href="#get-key">Get an API key</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Reference</div>
+      <a class="nav-link" href="#endpoint-pulses">GET /v1/pulses/:handle</a>
+      <a class="nav-link" href="#rate-limits">Rate limits</a>
+      <a class="nav-link" href="#errors">Errors</a>
+    </div>
+
+    <div class="nav-group">
+      <div class="nav-label">Guides</div>
+      <a class="nav-link" href="#embed">Embed pulses on your site</a>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="main">
+
+    <section class="hero" id="overview">
+      <div class="eyebrow">NEXOR SPARKS · API DOCS</div>
+      <h1>Pull Pulses into<br/>anything you build.</h1>
+      <p class="lead">The Nexor Sparks API lets you fetch a user's Pulses and embed them anywhere on the web — a portfolio, a blog, a product page. One endpoint, one key, live in minutes.</p>
+
+      <div class="pulse-wrap">
+        <svg viewBox="0 0 600 80" preserveAspectRatio="none">
+          <path class="pulse-line" d="M0,40 L60,40 L80,40 L95,10 L110,70 L125,40 L160,40 L180,40 L195,20 L210,55 L225,40 L600,40" />
+        </svg>
+      </div>
+
+      <div class="hero-cta">
+        <a href="#get-key" class="btn btn-primary">Get your API key →</a>
+        <a href="#endpoint-pulses" class="btn btn-ghost">View the API reference</a>
+      </div>
+    </section>
+
+    <section id="auth">
+      <h2>Authentication</h2>
+      <p>Every request needs an API key, passed as a bearer token in the <code class="inline">Authorization</code> header.</p>
+
+      <div class="code-block">
+        <div class="code-head">
+          <span>Header</span>
+          <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+        </div>
+        <pre><code>Authorization: <span class="tok-str">Bearer nxs_your_api_key</span></code></pre>
+      </div>
+
+      <p>For quick testing in a browser, you can also pass the key as a query parameter:</p>
+
+      <div class="code-block">
+        <div class="code-head">
+          <span>URL param (testing only)</span>
+          <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+        </div>
+        <pre><code>?key=nxs_your_api_key</code></pre>
+      </div>
+
+      <div class="callout"><strong>Note —</strong> don't ship the query-param version in production code. Browser history and server logs can leak keys passed in URLs. Use the header in anything real.</div>
+    </section>
+
+    <section id="get-key">
+      <h2>Get an API key</h2>
+      <p>Enter your name and email — your key is generated instantly and shown once below.</p>
+
+      <div class="signup-card">
+        <form id="signupForm">
+          <label>Name</label>
+          <input type="text" id="name" placeholder="Your name" required />
+          <label>Email</label>
+          <input type="email" id="email" placeholder="you@example.com" required />
+          <button type="submit" class="btn btn-primary" id="submitBtn" style="margin-top:18px; width:100%;">Generate API key</button>
+        </form>
+
+        <div class="signup-error" id="errorBox"></div>
+
+        <div class="signup-result" id="resultBox">
+          <span style="font-size:12px; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.05em;">Your API key</span>
+          <code id="apiKeyText"></code>
+          <p style="margin-top:10px; margin-bottom:0; font-size:13px;">Save this now — it won't be shown again.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="endpoint-pulses">
+      <h2>GET /v1/pulses/:handle</h2>
+      <p>Returns the Pulses posted by a given handle, most recent data as stored.</p>
+
+      <h3>Path parameters</h3>
+      <table>
+        <tr><th>Parameter</th><th>Type</th><th>Description</th></tr>
+        <tr><td><code>handle</code></td><td>string</td><td>The creator's handle, without the @ symbol.</td></tr>
+      </table>
+
+      <h3>Request</h3>
+      <div class="code-block">
+        <div class="code-head">
+          <span>cURL</span>
+          <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+        </div>
+        <pre><code><span class="tok-fn">curl</span> https://nexor-sparks-api-v2.sgursharn076.workers.dev/v1/pulses/sharanpooni \
+  -H <span class="tok-str">"Authorization: Bearer nxs_your_api_key"</span></code></pre>
+      </div>
+
+      <div class="code-block">
+        <div class="code-head">
+          <span>JavaScript</span>
+          <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+        </div>
+        <pre><code><span class="tok-key">const</span> res = <span class="tok-key">await</span> <span class="tok-fn">fetch</span>(
+  <span class="tok-str">"https://nexor-sparks-api-v2.sgursharn076.workers.dev/v1/pulses/sharanpooni"</span>,
+  { headers: { <span class="tok-str">Authorization</span>: <span class="tok-str">"Bearer nxs_your_api_key"</span> } }
+);
+<span class="tok-key">const</span> data = <span class="tok-key">await</span> res.<span class="tok-fn">json</span>();</code></pre>
+      </div>
+
+      <h3>Response</h3>
+      <div class="code-block">
+        <div class="code-head">
+          <span>200 OK</span>
+        </div>
+        <pre><code>{
+  <span class="tok-key">"username"</span>: <span class="tok-str">"sharanpooni"</span>,
+  <span class="tok-key">"pulses"</span>: [
+    {
+      <span class="tok-key">"creatorHandle"</span>: <span class="tok-str">"sharanpooni"</span>,
+      <span class="tok-key">"createdAt"</span>: 1783017975595,
+      <span class="tok-key">"text"</span>: <span class="tok-str">"..."</span>
+      <span class="tok-comment">// additional fields as stored</span>
+    }
+  ]
+}</code></pre>
+      </div>
+    </section>
+
+    <section id="rate-limits">
+      <h2>Rate limits</h2>
+      <p>Each API key is limited to <strong style="color:var(--text)">60 requests per minute</strong>. Going over returns a <code class="inline">429</code>.</p>
+    </section>
+
+    <section id="errors">
+      <h2>Errors</h2>
+      <table>
+        <tr><th>Status</th><th>Meaning</th></tr>
+        <tr><td><span class="status-dot dot-amber"></span><code>401</code></td><td>Missing API key</td></tr>
+        <tr><td><span class="status-dot dot-red"></span><code>403</code></td><td>Invalid or inactive API key</td></tr>
+        <tr><td><span class="status-dot dot-red"></span><code>429</code></td><td>Rate limit exceeded — slow down and retry after a minute</td></tr>
+        <tr><td><span class="status-dot dot-amber"></span><code>502</code></td><td>Upstream data source unavailable</td></tr>
+        <tr><td><span class="status-dot dot-mint"></span><code>404</code></td><td>Route not found — check the path</td></tr>
+      </table>
+    </section>
+
+    <section id="embed">
+      <h2>Embed Pulses on your site</h2>
+      <p>Drop this snippet anywhere on your page. It fetches Pulses for a handle and renders them as simple cards.</p>
+
+      <div class="code-block">
+        <div class="code-head">
+          <span>HTML + JS</span>
+          <button class="copy-btn" onclick="copyBlock(this)">Copy</button>
+        </div>
+        <pre><code>&lt;div id=<span class="tok-str">"nexor-pulses"</span>&gt;&lt;/div&gt;
+&lt;script&gt;
+  <span class="tok-key">const</span> API_KEY = <span class="tok-str">"nxs_your_api_key"</span>;
+  <span class="tok-key">const</span> HANDLE = <span class="tok-str">"sharanpooni"</span>;
+
+  <span class="tok-fn">fetch</span>(<span class="tok-str">`https://nexor-sparks-api-v2.sgursharn076.workers.dev/v1/pulses/${HANDLE}`</span>, {
+    headers: { <span class="tok-str">Authorization</span>: <span class="tok-str">`Bearer ${API_KEY}`</span> }
+  })
+    .<span class="tok-fn">then</span>(r =&gt; r.<span class="tok-fn">json</span>())
+    .<span class="tok-fn">then</span>(data =&gt; {
+      <span class="tok-key">const</span> container = document.<span class="tok-fn">getElementById</span>(<span class="tok-str">"nexor-pulses"</span>);
+      container.innerHTML = data.pulses.<span class="tok-fn">map</span>(p =&gt; <span class="tok-str">`
+        &lt;div style="border:1px solid #232937;border-radius:8px;padding:12px;margin-bottom:10px;"&gt;
+          ${p.text || ''}
+        &lt;/div&gt;
+      `</span>).<span class="tok-fn">join</span>(<span class="tok-str">""</span>);
+    });
+&lt;/script&gt;</code></pre>
+      </div>
+
+      <div class="callout"><strong>Heads up —</strong> never expose your API key in client-side code on a public production site. For real deployments, proxy the request through your own backend so the key stays server-side.</div>
+    </section>
+
+    <footer>
+      Nexor Sparks API · built on Cloudflare Workers
+    </footer>
+
+  </main>
+</div>
+
+<script>
+  const API_BASE = "https://nexor-sparks-api-v2.sgursharn076.workers.dev";
+
+  const form = document.getElementById("signupForm");
+  const submitBtn = document.getElementById("submitBtn");
+  const resultBox = document.getElementById("resultBox");
+  const errorBox = document.getElementById("errorBox");
+  const apiKeyText = document.getElementById("apiKeyText");
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errorBox.style.display = "none";
+    resultBox.style.display = "none";
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Generating...";
+
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+
+    try {
+      const res = await fetch(`${API_BASE}/v1/generate-key`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email }),
+      });
+      const data = await res.json();
+
+      if (!res.ok) {
+        errorBox.textContent = data.error || "Something went wrong.";
+        errorBox.style.display = "block";
+      } else {
+        apiKeyText.textContent = data.apiKey;
+        resultBox.style.display = "block";
+        form.style.display = "none";
+      }
+    } catch (err) {
+      errorBox.textContent = "Network error. Please try again.";
+      errorBox.style.display = "block";
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Generate API key";
+    }
+  });
+
+  function copyBlock(btn) {
+    const pre = btn.closest(".code-block").querySelector("pre");
+    navigator.clipboard.writeText(pre.innerText).then(() => {
+      const old = btn.textContent;
+      btn.textContent = "Copied";
+      setTimeout(() => (btn.textContent = old), 1200);
+    });
+  }
+
+  // Highlight active sidebar link on scroll
+  const sections = document.querySelectorAll("section");
+  const links = document.querySelectorAll(".nav-link");
+  window.addEventListener("scroll", () => {
+    let current = "";
+    sections.forEach((sec) => {
+      if (window.scrollY >= sec.offsetTop - 80) current = sec.id;
+    });
+    links.forEach((link) => {
+      link.classList.toggle("active", link.getAttribute("href") === `#${current}`);
+    });
+  });
+</script>
+
+</body>
+</html>
