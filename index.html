@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -585,8 +585,9 @@ img{display:block;}
 .profile-stat-num{font-weight:800;color:var(--text);}
 .profile-stat-label{color:var(--text3);}
 .profile-stat:hover .profile-stat-num{text-decoration:underline;}
-.profile-tabs{display:flex;border-bottom:1px solid var(--border);}
-.profile-tab{flex:1;text-align:center;padding:14px;font-size:14px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
+.profile-tabs{display:flex;border-bottom:1px solid var(--border);overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.profile-tabs::-webkit-scrollbar{display:none;}
+.profile-tab{flex:1 0 auto;min-width:64px;white-space:nowrap;text-align:center;padding:14px 12px;font-size:14px;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;}
 .profile-tab.active{color:var(--text);border-bottom-color:var(--cyan);}
 .share-profile-btn{font-size:13px;color:var(--text3);padding:8px;border-radius:50%;transition:background .15s,color .15s;}
 .share-profile-btn:hover{background:var(--cyan-dim);color:var(--cyan);}
@@ -689,6 +690,11 @@ img{display:block;}
 .story-reply-input{flex:1;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.35);color:#fff;border-radius:24px;padding:11px 16px;font-size:14px;outline:none;}
 .story-reply-input::placeholder{color:rgba(255,255,255,.7);}
 .story-reply-send{color:#fff;font-size:22px;padding:6px;}
+.story-like-btn{color:#fff;font-size:22px;padding:6px;flex-shrink:0;transition:transform .15s;}
+.story-like-btn.liked{color:var(--like);}
+.story-like-btn.story-like-pop{animation:storyLikePop .28s ease;}
+@keyframes storyLikePop{0%{transform:scale(1);}45%{transform:scale(1.35);}100%{transform:scale(1);}}
+.viewer-row-like{margin-left:auto;color:var(--like);font-size:18px;flex-shrink:0;}
 .story-own-views{color:#fff;font-size:14px;font-weight:600;display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.14);padding:9px 16px;border-radius:99px;}
 .story-own-more{color:#fff;font-size:20px;padding:8px;margin-left:auto;}
 
@@ -916,6 +922,8 @@ i.spin::before{content:''!important;}
 .skeleton-line.w3{width:92%;}
 .skeleton-line.w4{width:70%;}
 .skeleton-media{width:100%;height:160px;border-radius:12px;margin-top:2px;}
+.skeleton-story-ring{width:60px;height:60px;border-radius:50%;}
+.skeleton-story-label{width:44px;height:9px;margin-top:2px;}
 
 /* ====== LIVE DOT ====== */
 .live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;animation:blink 1.5s ease-in-out infinite;}
@@ -1260,7 +1268,13 @@ i.spin::before{content:''!important;}
       </div>
     </div>
     <div id="feed-col">
-      <div class="stories-bar" id="stories-bar"></div>
+      <div class="stories-bar" id="stories-bar">
+        <div class="story-item"><div class="skeleton-block skeleton-story-ring"></div><div class="skeleton-block skeleton-story-label"></div></div>
+        <div class="story-item"><div class="skeleton-block skeleton-story-ring"></div><div class="skeleton-block skeleton-story-label"></div></div>
+        <div class="story-item"><div class="skeleton-block skeleton-story-ring"></div><div class="skeleton-block skeleton-story-label"></div></div>
+        <div class="story-item"><div class="skeleton-block skeleton-story-ring"></div><div class="skeleton-block skeleton-story-label"></div></div>
+        <div class="story-item"><div class="skeleton-block skeleton-story-ring"></div><div class="skeleton-block skeleton-story-label"></div></div>
+      </div>
       <input type="file" id="story-media-input" accept="image/*,video/mp4,video/quicktime,video/webm" style="display:none" onchange="onStoryMediaPicked(event)">
       <div id="feed-list"></div>
       <div class="skeleton-feed hidden" id="feed-loader">
@@ -5229,13 +5243,14 @@ async function toggleLocationSharing(){
 async function fetchUsersByIds(ids){
   return Promise.all(ids.map(id=>db.ref('users/'+id).once('value').then(s=>({id,...(s.val()||{})}))));
 }
-function buildAccountRow(u,actionLabel,actionFn){
+function buildAccountRow(u,actionLabel,actionFn,trailingHtml){
   return `<div class="blocked-row">
       <div class="who-av" style="cursor:pointer;" onclick="openProfile('${ESC(u.id)}')">${u.photoBase64?`<img src="${u.photoBase64}" alt="">`:((u.name||'U').charAt(0).toUpperCase())}</div>
       <div class="who-info" style="cursor:pointer;" onclick="openProfile('${ESC(u.id)}')">
         <div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl):''}</div>
         <div class="who-handle">@${ESC(u.handle||'user')}</div>
       </div>
+      ${trailingHtml||''}
       ${actionLabel?`<button class="btn-unblock" onclick="${actionFn}('${ESC(u.id)}')">${actionLabel}</button>`:''}
     </div>`;
 }
@@ -5692,16 +5707,19 @@ async function openProfile(uid){
   document.querySelectorAll('.profile-tab').forEach((t,i)=>t.classList.toggle('active',i===0));
   const collabBadgeReset=document.getElementById('profile-collab-badge');
   if(collabBadgeReset) collabBadgeReset.classList.add('hidden');
-  document.getElementById('profile-title-name').textContent='Loading…';
-  document.getElementById('profile-display-name').textContent='—';
-  document.getElementById('profile-handle').textContent='@—';
-  document.getElementById('profile-following-count').textContent='—';
-  document.getElementById('profile-followers-count').textContent='—';
-  document.getElementById('profile-likes-count').textContent='—';
-  document.getElementById('profile-av').innerHTML='<span id="profile-av-letter">·</span>';
-  document.getElementById('profile-banner-el').innerHTML='';
+  document.getElementById('profile-title-name').innerHTML='<span class="skeleton-block skeleton-line" style="width:90px;height:13px;display:inline-block;vertical-align:middle;"></span>';
+  document.getElementById('profile-display-name').innerHTML='<span class="skeleton-block skeleton-line" style="width:130px;height:16px;display:inline-block;"></span>';
+  document.getElementById('profile-handle').innerHTML='<span class="skeleton-block skeleton-line" style="width:80px;height:12px;display:inline-block;"></span>';
+  document.getElementById('profile-following-count').innerHTML='<span class="skeleton-block skeleton-line" style="width:22px;height:13px;display:inline-block;"></span>';
+  document.getElementById('profile-followers-count').innerHTML='<span class="skeleton-block skeleton-line" style="width:22px;height:13px;display:inline-block;"></span>';
+  document.getElementById('profile-likes-count').innerHTML='<span class="skeleton-block skeleton-line" style="width:22px;height:13px;display:inline-block;"></span>';
+  document.getElementById('profile-av').innerHTML='<div class="skeleton-block" style="width:100%;height:100%;border-radius:50%;"></div>';
+  document.getElementById('profile-banner-el').innerHTML='<div class="skeleton-block" style="width:100%;height:100%;"></div>';
   const el=document.getElementById('profile-pulses-list');
-  el.innerHTML='<div class="feed-loader"><i class="ph ph-spinner-gap spin"></i></div>';
+  el.innerHTML=`<div class="skeleton-feed">
+    <div class="skeleton-post"><div class="skeleton-block skeleton-avatar"></div><div class="skeleton-post-body"><div class="skeleton-block skeleton-line w1"></div><div class="skeleton-block skeleton-line w3"></div><div class="skeleton-block skeleton-line w4"></div></div></div>
+    <div class="skeleton-post"><div class="skeleton-block skeleton-avatar"></div><div class="skeleton-post-body"><div class="skeleton-block skeleton-line w2"></div><div class="skeleton-block skeleton-line w3"></div><div class="skeleton-block skeleton-media"></div></div></div>
+  </div>`;
   let snap;
   try{
     snap=await db.ref('users/'+uid).once('value');
@@ -6810,7 +6828,9 @@ function storyShowItem(){
     footer.innerHTML = `<button class="story-share-btn" style="width:100%;padding:12px;" onclick="reshareStoryMention(window.__currentStoryItem)">Add to your Story</button>`;
   } else {
     footer.innerHTML = `<input type="text" class="story-reply-input" id="story-reply-input" placeholder="Reply to ${ESC(group.name)}…" onkeydown="if(event.key==='Enter')sendStoryReplyFromInput('${ESC(group.uid)}')">
+      <button class="story-like-btn" id="story-like-btn" onclick="toggleCurrentStoryLike()"><i class="ph ph-heart"></i></button>
       <button class="story-reply-send" onclick="sendStoryReplyFromInput('${ESC(group.uid)}')"><i class="ph ph-paper-plane-tilt"></i></button>`;
+    refreshStoryLikeButton(item.id);
   }
 
   registerStoryView(item.id, group.uid);
@@ -6853,17 +6873,69 @@ async function registerStoryView(storyId, ownerUid){
     await db.ref('stories/'+storyId+'/views').transaction(c=>(c||0)+1);
   }catch(e){ /* non-critical */ }
 }
+
+// ============================================================
+// STORY LIKES — Instagram-style heart on someone else's story.
+// There's no separate "who liked" screen: a like is just an extra signal
+// shown right inside the existing story-viewers list (a small heart next
+// to whichever viewer also liked it), the same way Instagram does it.
+// ============================================================
+const storyLikedCache = new Map(); // storyId -> boolean, cached for this session so re-opening a story doesn't re-fetch
+async function refreshStoryLikeButton(storyId){
+  const btn=document.getElementById('story-like-btn'); if(!btn) return;
+  let liked=storyLikedCache.get(storyId);
+  if(liked===undefined){
+    try{
+      const snap=await db.ref('storyLikes/'+storyId+'/'+me.uid).once('value');
+      liked=snap.val()===true;
+    }catch(e){ liked=false; }
+    storyLikedCache.set(storyId, liked);
+  }
+  // Guard against the viewer having already swiped to a different item by the time this resolves
+  if(!window.__currentStoryItem || window.__currentStoryItem.id!==storyId) return;
+  btn.classList.toggle('liked', liked);
+  btn.innerHTML = `<i class="ph${liked?'-fill':''} ph-heart"></i>`;
+}
+async function toggleCurrentStoryLike(){
+  const item=window.__currentStoryItem; if(!item) return;
+  const storyId=item.id;
+  const nowLiked=!(storyLikedCache.get(storyId)===true);
+  storyLikedCache.set(storyId, nowLiked);
+  const btn=document.getElementById('story-like-btn');
+  if(btn){
+    btn.classList.toggle('liked', nowLiked);
+    btn.innerHTML = `<i class="ph${nowLiked?'-fill':''} ph-heart"></i>`;
+    btn.classList.remove('story-like-pop'); void btn.offsetWidth; btn.classList.add('story-like-pop');
+  }
+  try{
+    if(nowLiked){
+      await db.ref('storyLikes/'+storyId+'/'+me.uid).set(true);
+      const ownerUid=(storyGroups[currentGroupIdx]||{}).uid;
+      if(ownerUid) sendNotification(ownerUid, {type:'story_like', storyId});
+    } else {
+      await db.ref('storyLikes/'+storyId+'/'+me.uid).remove();
+    }
+  }catch(e){ showToast('Could not update like'); }
+}
+
 async function openStoryViewersList(storyId){
   storyHoldStart();
   const el=document.getElementById('story-viewers-list');
   el.innerHTML='<div class="feed-loader"><i class="ph ph-spinner-gap spin"></i></div>';
   openModal('story-viewers-modal');
   try{
-    const snap=await db.ref('storyViews/'+storyId).once('value');
-    const ids=Object.keys(snap.val()||{});
+    const [viewsSnap,likesSnap]=await Promise.all([
+      db.ref('storyViews/'+storyId).once('value'),
+      db.ref('storyLikes/'+storyId).once('value')
+    ]);
+    const ids=Object.keys(viewsSnap.val()||{});
     if(!ids.length){ el.innerHTML='<div class="empty-feed"><p>No views yet</p></div>'; return; }
+    const likedIds=new Set(Object.keys(likesSnap.val()||{}));
     const users=await fetchUsersByIds(ids);
-    el.innerHTML=users.map(u=>buildAccountRow(u,null,null)).join('');
+    // Instagram-style: no separate "who liked" screen — viewers who also liked
+    // just show a small heart next to their name here, sorted to the top.
+    users.sort((a,b)=>(likedIds.has(b.id)?1:0)-(likedIds.has(a.id)?1:0));
+    el.innerHTML=users.map(u=>buildAccountRow(u,null,null, likedIds.has(u.id)?'<i class="ph-fill ph-heart viewer-row-like"></i>':'')).join('');
   }catch(e){ el.innerHTML='<div class="empty-feed"><p>Could not load viewers</p></div>'; }
 }
 function closeStoryViewersModal(){ closeModal('story-viewers-modal'); storyHoldEnd(); }
@@ -7200,7 +7272,7 @@ function loadNotifs(){
     if(badgeM){badgeM.textContent=unread>99?'99+':unread;badgeM.classList.toggle('hidden',unread===0);}
     const el=document.getElementById('notif-list'); if(!el)return;
     if(!items.length){el.innerHTML='<div class="empty-feed"><i class="ph ph-bell"></i><p>No alerts yet</p></div>';return;}
-    const icons={like:'ph-fill ph-heart',follow:'ph ph-user-plus',follow_request:'ph ph-user-plus',follow_accept:'ph ph-user-check',repost:'ph ph-repeat',reply:'ph ph-chat-circle-dots',mention:'ph ph-at',story_mention:'ph ph-at',collab_request:'ph ph-users-three',collab_accept:'ph ph-users-three',moderation:'ph ph-shield-warning'};
+    const icons={like:'ph-fill ph-heart',follow:'ph ph-user-plus',follow_request:'ph ph-user-plus',follow_accept:'ph ph-user-check',repost:'ph ph-repeat',reply:'ph ph-chat-circle-dots',mention:'ph ph-at',story_mention:'ph ph-at',story_like:'ph-fill ph-heart',collab_request:'ph ph-users-three',collab_accept:'ph ph-users-three',moderation:'ph ph-shield-warning'};
     const msgs={
       like:`<strong>${'%n'}</strong> liked your Pulse`,
       follow:`<strong>${'%n'}</strong> started following you`,
@@ -7210,6 +7282,7 @@ function loadNotifs(){
       reply:`<strong>${'%n'}</strong> commented on your Pulse`,
       mention:`<strong>${'%n'}</strong> tagged you in a Pulse`,
       story_mention:`<strong>${'%n'}</strong> mentioned you in their story`,
+      story_like:`<strong>${'%n'}</strong> liked your story`,
       collab_request:`<strong>${'%n'}</strong> invited you to collaborate on a Pulse`,
       collab_accept:`<strong>${'%n'}</strong> accepted your collab invite`
     };
@@ -7241,7 +7314,7 @@ function loadNotifs(){
             <div class="notif-time">${timeAgo(n.createdAt)}</div>
           </div>`;
         }
-        return `<div class="notif-item notif-${n.type} ${n.read?'':'unread'}" onclick="markNotifRead('${ESC(n.id)}');${n.type==='story_mention'?`openStoryFromNotif('${ESC(n.storyId)}','${ESC(n.fromUid)}')`:n.pulseId?`openDetail('${ESC(n.pulseId)}')`:(n.type==='follow'||n.type==='follow_accept')?`openProfile('${ESC(n.fromUid)}')`:''}">
+        return `<div class="notif-item notif-${n.type} ${n.read?'':'unread'}" onclick="markNotifRead('${ESC(n.id)}');${n.type==='story_mention'?`openStoryFromNotif('${ESC(n.storyId)}','${ESC(n.fromUid)}')`:n.type==='story_like'?`openStoryFromNotif('${ESC(n.storyId)}','${ESC(me.uid)}')`:n.pulseId?`openDetail('${ESC(n.pulseId)}')`:(n.type==='follow'||n.type==='follow_accept')?`openProfile('${ESC(n.fromUid)}')`:''}">
           <div class="notif-icon"><i class="${icons[n.type]||'ph ph-bell'}"></i></div>
           <div class="notif-body">${msg}</div>
           <div class="notif-time">${timeAgo(n.createdAt)}</div>
