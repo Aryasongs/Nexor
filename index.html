@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -669,7 +669,14 @@ img{display:block;}
 .story-viewer-header{position:absolute;top:calc(20px + env(safe-area-inset-top,0px));left:10px;right:10px;display:flex;align-items:center;gap:10px;z-index:4;}
 .story-viewer-av{width:32px;height:32px;border-radius:50%;object-fit:cover;background:var(--surface2);flex-shrink:0;}
 .story-viewer-media-wrap{width:100%;height:100%;display:flex;align-items:center;justify-content:center;}
-.story-viewer-media-wrap img,.story-viewer-media-wrap video{width:100%;height:100%;object-fit:contain;background:#000;}
+/* ====== INSTAGRAM-STYLE MEDIA FRAME ======
+   Any story photo/video — no matter how wide or how tall — gets shown exactly
+   like Instagram: the full, uncropped media centered on top (object-fit:contain),
+   with a blurred, zoomed-in copy of the same media filling the rest of the
+   9:16 frame behind it instead of plain black bars. */
+.story-media-frame{position:relative;width:100%;height:100%;overflow:hidden;background:#000;}
+.story-media-bg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(34px) brightness(.55) saturate(1.25);transform:scale(1.18);}
+.story-media-fg{position:relative;z-index:1;width:100%;height:100%;object-fit:contain;display:block;}
 .story-tap-zone{position:absolute;top:0;bottom:0;width:33%;z-index:3;}
 .story-caption{position:absolute;left:0;right:0;bottom:96px;padding:0 22px;text-align:center;color:#fff;font-size:16px;font-weight:600;text-shadow:0 2px 10px rgba(0,0,0,.7);z-index:3;pointer-events:none;}
 .story-mention-tag{position:absolute;left:50%;top:46%;transform:translate(-50%,-50%);background:rgba(255,255,255,.95);color:#050A14;padding:7px 16px 7px 7px;border-radius:24px;display:none;align-items:center;gap:8px;font-size:14px;font-weight:700;z-index:6;box-shadow:0 8px 20px rgba(0,0,0,.4);cursor:pointer;}
@@ -689,7 +696,7 @@ img{display:block;}
 .story-create.active{display:flex;}
 .story-create-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;padding-top:calc(14px + env(safe-area-inset-top,0px));color:#fff;position:relative;z-index:2;}
 .story-create-preview{flex:1;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;background:#000;}
-.story-create-preview img,.story-create-preview video{max-width:100%;max-height:100%;object-fit:contain;}
+.story-create-preview .story-media-frame{width:100%;height:100%;flex:1;}
 .story-caption-input{position:absolute;bottom:110px;left:20px;right:20px;background:rgba(0,0,0,.4);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:14px;padding:11px 14px;font-size:15px;text-align:center;z-index:2;}
 .story-caption-input::placeholder{color:rgba(255,255,255,.65);}
 .story-create-footer{padding:16px;padding-bottom:calc(16px + var(--safe-bottom));display:flex;justify-content:center;}
@@ -6411,6 +6418,9 @@ function triggerStoryPicker(e){
   setTimeout(()=>document.addEventListener('click',closeCtxMenu,{once:true}),50);
 }
 
+let storyUploadPromise = null;  // in-flight upload of the currently-picked story video
+let pendingStoryVideoFile = null; // original File, kept so publishStory can retry the upload if it failed
+let pendingStoryTempUrl = null;   // local blob: URL currently backing the preview <video>, revoked when the composer closes
 async function onStoryMediaPicked(e){
   const file=e.target.files[0]; if(!file){ return; }
   const input=e.target;
@@ -6422,15 +6432,18 @@ async function onStoryMediaPicked(e){
     const tempUrl=URL.createObjectURL(file);
     const probe=document.createElement('video');
     probe.preload='metadata';
-    probe.onloadedmetadata=async ()=>{
+    probe.onloadedmetadata=()=>{
       const duration=probe.duration;
-      URL.revokeObjectURL(tempUrl);
-      if(duration>MAX_STORY_VIDEO_SECONDS+0.5){ showToast(`Story videos must be ${MAX_STORY_VIDEO_SECONDS}s or shorter`); input.value=''; return; }
-      showToast('Uploading video…');
-      try{
-        const fileData = await uploadStoryVideo(file);
-        openStoryCreateScreen('video', fileData.videoUrl, fileData.poster, Math.min(duration, MAX_STORY_VIDEO_SECONDS));
-      }catch(err){ showToast('Video upload failed'); }
+      if(duration>MAX_STORY_VIDEO_SECONDS+0.5){ showToast(`Story videos must be ${MAX_STORY_VIDEO_SECONDS}s or shorter`); URL.revokeObjectURL(tempUrl); input.value=''; return; }
+      const clampedDuration=Math.min(duration, MAX_STORY_VIDEO_SECONDS);
+      // Instagram-style flow: show + autoplay the video the instant it's picked,
+      // straight from the local file — no waiting for the network round-trip.
+      // The real upload runs in the background and is only awaited later, at
+      // the moment you actually tap "Share to Story".
+      pendingStoryVideoFile=file;
+      pendingStoryTempUrl=tempUrl;
+      openStoryCreateScreen('video', tempUrl, null, clampedDuration);
+      startStoryVideoUpload(file);
     };
     probe.onerror=()=>{ showToast('Could not read this video'); URL.revokeObjectURL(tempUrl); };
     probe.src=tempUrl;
@@ -6438,6 +6451,23 @@ async function onStoryMediaPicked(e){
     showToast('Please choose a photo or video');
   }
   input.value='';
+}
+// Kicks off (or retries) the background upload for the currently-picked story
+// video. Resolves/updates pendingStoryMedia.mediaUrl with the real hosted URL
+// once done, without touching the local preview that's already playing.
+function startStoryVideoUpload(file){
+  storyUploadPromise = uploadStoryVideo(file).then(fileData=>{
+    if(pendingStoryMedia && pendingStoryMedia.mediaType==='video'){
+      pendingStoryMedia.mediaUrl=fileData.videoUrl;
+      pendingStoryMedia.poster=fileData.poster;
+    }
+    storyUploadPromise=null;
+    return fileData;
+  }).catch(err=>{
+    storyUploadPromise=null;
+    throw err;
+  });
+  return storyUploadPromise;
 }
 // Mirrors the compose flow's video pipeline: Supabase Storage first, and
 // only falls back to Cloudinary if that fails, so story videos land in the
@@ -6473,9 +6503,18 @@ function openStoryCreateScreen(mediaType, mediaUrl, poster, duration){
   pendingStoryMedia = {mediaType, mediaUrl, poster:poster||null, duration:duration||null};
   resetStoryMentionChip();
   const preview=document.getElementById('story-create-preview');
+  // Instagram-style frame: a blurred, cropped copy of the media fills the
+  // background so wide or tall clips never show plain black bars, while the
+  // full uncropped media sits centered on top — same for both photo & video.
   const mediaHtml = mediaType==='video'
-    ? `<video src="${mediaUrl}" autoplay loop muted playsinline></video>`
-    : `<img src="${mediaUrl}" alt="">`;
+    ? `<div class="story-media-frame">
+         <video class="story-media-bg" src="${mediaUrl}" autoplay loop muted playsinline></video>
+         <video class="story-media-fg" src="${mediaUrl}" autoplay loop muted playsinline></video>
+       </div>`
+    : `<div class="story-media-frame">
+         <img class="story-media-bg" src="${mediaUrl}" alt="">
+         <img class="story-media-fg" src="${mediaUrl}" alt="">
+       </div>`;
   preview.innerHTML = mediaHtml + `<input type="text" class="story-caption-input" id="story-caption-input" placeholder="Add a caption…" maxlength="150">`;
   document.getElementById('story-create-screen').classList.add('active');
 }
@@ -6609,6 +6648,16 @@ async function publishStory(){
   }
   btn.disabled=true; btn.textContent='Sharing…';
   try{
+    // If this is a video, make sure it's actually finished uploading to a real
+    // hosted URL before we save the story — the on-screen preview may still be
+    // playing straight from the local file while that happens in the background.
+    if(pendingStoryMedia.mediaType==='video' && pendingStoryMedia.mediaUrl && pendingStoryMedia.mediaUrl.startsWith('blob:')){
+      btn.textContent='Uploading…';
+      if(!storyUploadPromise && pendingStoryVideoFile) startStoryVideoUpload(pendingStoryVideoFile);
+      if(storyUploadPromise) await storyUploadPromise;
+      if(!pendingStoryMedia.mediaUrl || pendingStoryMedia.mediaUrl.startsWith('blob:')) throw new Error('upload-incomplete');
+      btn.textContent='Sharing…';
+    }
     const now=Date.now();
     const data={
       uid:me.uid, creatorName:myData.name||'User', creatorHandle:myData.handle||'user',
@@ -6654,7 +6703,7 @@ function openStoryViewerForUid(uid){
 function closeStoryViewer(){
   cancelAnimationFrame(storyTimerRAF);
   const mediaWrap=document.getElementById('story-viewer-media-wrap');
-  const vid=mediaWrap.querySelector('video'); if(vid){ vid.pause(); }
+  mediaWrap.querySelectorAll('video').forEach(v=>v.pause());
   document.getElementById('story-viewer').classList.remove('active');
   currentGroupIdx=-1;
   loadStoriesBar(); // refresh ring seen-states now that we've viewed some
@@ -6697,15 +6746,22 @@ function storyShowItem(){
     `<div class="story-progress-track"><div class="story-progress-fill" id="story-progress-${i}" style="width:${i<currentItemIdx?'100%':'0%'}"></div></div>`
   ).join('');
 
-  // Media
+  // Media — Instagram-style frame: full media centered on top, with a
+  // blurred/zoomed copy of the same media filling the frame behind it so
+  // wide or tall clips never show plain black bars.
   const wrap=document.getElementById('story-viewer-media-wrap');
   storyElapsedBeforePause=0; storyPaused=false;
   if(item.mediaType==='video'){
-    wrap.innerHTML=`<video src="${item.mediaUrl}" playsinline autoplay></video>`;
-    const vid=wrap.querySelector('video');
+    wrap.innerHTML=`<div class="story-media-frame">
+        <video class="story-media-bg" src="${item.mediaUrl}" playsinline autoplay muted loop></video>
+        <video class="story-media-fg" src="${item.mediaUrl}" playsinline autoplay></video>
+      </div>`;
+    const vid=wrap.querySelector('.story-media-fg');
+    const bgVid=wrap.querySelector('.story-media-bg');
     storyItemDuration = (item.duration ? item.duration*1000 : STORY_IMAGE_MS);
     vid.onended = storyGoNext;
     vid.play().catch(()=>{});
+    bgVid.play().catch(()=>{});
   } else if(item.mediaType==='text'){
     wrap.innerHTML=`<div style="position:absolute;inset:0;background:${item.bg||STORY_TEXT_BACKGROUNDS[0]};display:flex;align-items:center;justify-content:center;padding:40px;">
       <div style="color:#fff;font-size:28px;font-weight:800;text-align:center;word-break:break-word;">${ESC(item.text||'')}</div>
@@ -6717,7 +6773,10 @@ function storyShowItem(){
       .replace('</div>\n  </div>', `<div style="text-align:center;margin-top:16px;"><span style="background:rgba(255,255,255,.16);color:#fff;padding:9px 20px;border-radius:99px;font-size:13px;font-weight:700;position:relative;z-index:6;display:inline-block;" onclick="event.stopPropagation();openSharedPulseFromStory('${ESC(item.sharedPulseId)}')">View ${snap.video?'reel':'post'}</span></div></div>\n  </div>`);
     storyItemDuration = STORY_IMAGE_MS;
   } else {
-    wrap.innerHTML=`<img src="${item.mediaUrl}" alt="">`;
+    wrap.innerHTML=`<div class="story-media-frame">
+        <img class="story-media-bg" src="${item.mediaUrl}" alt="">
+        <img class="story-media-fg" src="${item.mediaUrl}" alt="">
+      </div>`;
     storyItemDuration = STORY_IMAGE_MS;
   }
   document.getElementById('story-caption-el').textContent = item.caption||'';
@@ -6774,13 +6833,13 @@ function storyHoldStart(){
   storyPaused=true;
   storyElapsedBeforePause += (performance.now()-storyItemStartedAt);
   const wrap=document.getElementById('story-viewer-media-wrap');
-  const vid=wrap.querySelector('video'); if(vid) vid.pause();
+  wrap.querySelectorAll('video').forEach(v=>v.pause());
 }
 function storyHoldEnd(){
   storyPaused=false;
   storyItemStartedAt=performance.now();
   const wrap=document.getElementById('story-viewer-media-wrap');
-  const vid=wrap.querySelector('video'); if(vid) vid.play().catch(()=>{});
+  wrap.querySelectorAll('video').forEach(v=>v.play().catch(()=>{}));
 }
 async function registerStoryView(storyId, ownerUid){
   if(!storyId || !me || !me.uid || ownerUid===me.uid) return; // don't count your own views of your own story
