@@ -867,9 +867,48 @@ img{display:block;}
 .toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 @media(min-width:768px){.toast{bottom:24px;}}
 
-/* ====== SPINNER ====== */
+/* ====== SPINNER (X / Instagram style rotating ring) ======
+   Every loading state in the app (feed, profile, notifications, bookmarks,
+   chats, comments, image/video upload, post submit, story generation, etc.)
+   reuses this one <i class="ph ph-spinner-gap spin"> pattern, so restyling
+   just this class updates the loading animation everywhere at once. Instead
+   of spinning the phosphor glyph itself (which looks dated/jittery), we hide
+   the glyph and draw a clean two-tone rotating ring — the same visual
+   language X and Instagram use for their loading indicators. */
 @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
-.spin{animation:spin .7s linear infinite;}
+i.spin{
+  display:inline-block;
+  width:1em;height:1em;
+  vertical-align:-0.15em;
+  border-radius:50%;
+  border:2px solid rgba(240,244,255,0.14);
+  border-top-color:var(--cyan);
+  border-right-color:var(--cyan);
+  animation:spin .8s linear infinite;
+  color:transparent!important;
+}
+i.spin::before{content:''!important;}
+.feed-loader{color:var(--text3);}
+
+/* ====== SKELETON SHIMMER (feed skeleton, like X/Instagram's first-load state) ====== */
+.skeleton-feed{display:flex;flex-direction:column;}
+.skeleton-post{display:flex;gap:12px;padding:16px;border-bottom:1px solid var(--border2);}
+.skeleton-post-body{flex:1;display:flex;flex-direction:column;gap:8px;}
+.skeleton-block{position:relative;overflow:hidden;background:var(--surface2);border-radius:6px;}
+.skeleton-block::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg, transparent, rgba(240,244,255,0.07), transparent);
+  transform:translateX(-100%);
+  animation:skeletonShimmer 1.4s ease-in-out infinite;
+}
+@keyframes skeletonShimmer{100%{transform:translateX(100%);}}
+.skeleton-avatar{width:44px;height:44px;border-radius:50%;flex-shrink:0;}
+.skeleton-line{height:11px;border-radius:5px;}
+.skeleton-line.w1{width:38%;}
+.skeleton-line.w2{width:22%;}
+.skeleton-line.w3{width:92%;}
+.skeleton-line.w4{width:70%;}
+.skeleton-media{width:100%;height:160px;border-radius:12px;margin-top:2px;}
 
 /* ====== LIVE DOT ====== */
 .live-dot{width:8px;height:8px;border-radius:50%;background:var(--green);display:inline-block;animation:blink 1.5s ease-in-out infinite;}
@@ -1217,7 +1256,11 @@ img{display:block;}
       <div class="stories-bar" id="stories-bar"></div>
       <input type="file" id="story-media-input" accept="image/*,video/mp4,video/quicktime,video/webm" style="display:none" onchange="onStoryMediaPicked(event)">
       <div id="feed-list"></div>
-      <div class="feed-loader hidden" id="feed-loader"><i class="ph ph-spinner-gap spin"></i> Loading pulses…</div>
+      <div class="skeleton-feed hidden" id="feed-loader">
+        <div class="skeleton-post"><div class="skeleton-block skeleton-avatar"></div><div class="skeleton-post-body"><div class="skeleton-block skeleton-line w1"></div><div class="skeleton-block skeleton-line w3"></div><div class="skeleton-block skeleton-line w4"></div></div></div>
+        <div class="skeleton-post"><div class="skeleton-block skeleton-avatar"></div><div class="skeleton-post-body"><div class="skeleton-block skeleton-line w2"></div><div class="skeleton-block skeleton-line w3"></div><div class="skeleton-block skeleton-media"></div></div></div>
+        <div class="skeleton-post"><div class="skeleton-block skeleton-avatar"></div><div class="skeleton-post-body"><div class="skeleton-block skeleton-line w1"></div><div class="skeleton-block skeleton-line w4"></div></div></div>
+      </div>
       <div class="empty-feed hidden" id="feed-empty"><i class="ph ph-lightning"></i><p>No pulses yet. Be the first!</p></div>
     </div>
   </div>
@@ -3822,6 +3865,33 @@ const cvpObserver=('IntersectionObserver' in window) ? new IntersectionObserver(
     }
   });
 },{threshold:[0,0.6,1]}) : null;
+
+// Pauses every feed video immediately. Needed because IntersectionObserver only
+// fires when an element's geometry crosses the viewport — it does NOT fire when
+// a video is simply covered by another full-screen overlay (profile, messages,
+// notifications, etc). Without this, a Pulse video that was playing kept playing
+// silently "behind" whatever screen you navigated to.
+function cvpPauseAllFeed(){
+  document.querySelectorAll('.cvp video').forEach(v=>{ if(!v.paused) cvpPause(v); });
+}
+// Called when we land back on the feed (closing an overlay / going back).
+// Re-checks which video (if any) is actually visible enough right now and
+// resumes it — mirrors exactly what the IntersectionObserver would have done,
+// since simply removing the overlay doesn't trigger a new intersection event.
+function cvpResync(){
+  const videos=document.querySelectorAll('.cvp video');
+  const vh=window.innerHeight||document.documentElement.clientHeight;
+  let best=null, bestRatio=0;
+  videos.forEach(video=>{
+    const wrap=video.closest('.cvp'); if(!wrap) return;
+    const rect=wrap.getBoundingClientRect();
+    if(rect.width<=0||rect.height<=0) return;
+    const visibleH=Math.max(0, Math.min(rect.bottom,vh)-Math.max(rect.top,0));
+    const ratio=visibleH/rect.height;
+    if(ratio>bestRatio){ bestRatio=ratio; best=video; }
+  });
+  if(best && bestRatio>=0.6 && !best.dataset.cvpUserPaused) cvpPlay(best);
+}
 
 function cvpFlash(wrap,dir){
   const el=document.createElement('div');
@@ -6571,7 +6641,13 @@ function onMyStoryTap(){
 function openStoryViewerForUid(uid){
   const idx=storyGroups.findIndex(g=>g.uid===uid);
   if(idx===-1) return;
-  currentGroupIdx=idx; currentItemIdx=0;
+  currentGroupIdx=idx;
+  // Resume from the first item you haven't seen yet, like Instagram/X do —
+  // instead of always restarting at item 0. If every item's already been
+  // seen, it falls back to the start so re-watching a fully-seen story still works.
+  const group=storyGroups[idx];
+  const firstUnseen=group.items.findIndex(it=>!storySeenCache.has(it.id));
+  currentItemIdx = firstUnseen!==-1 ? firstUnseen : 0;
   document.getElementById('story-viewer').classList.add('active');
   storyShowItem();
 }
@@ -8845,6 +8921,7 @@ async function postReelComment(){
 // SCREEN NAV
 // ============================================================
 function showScreen(id){
+  cvpPauseAllFeed(); // stop any feed video before covering it with a new screen
   document.querySelectorAll('.screen-overlay').forEach(s=>s.classList.remove('active'));
   document.getElementById(id).classList.add('active');
   setNavActive(id);
@@ -8864,6 +8941,7 @@ function hideScreen(id){
   if(chatMsgsUnsub&&id==='chat-screen'){chatMsgsUnsub();chatMsgsUnsub=null;activeChatId=null;}
   if(id==='reels-screen') stopReels();
   setNavActive('');
+  setTimeout(cvpResync,0); // feed is visible again — resume whichever Pulse video is in view
 }
 function gotoFeed(){
   navHistory=[];
@@ -8871,6 +8949,7 @@ function gotoFeed(){
   document.querySelectorAll('.screen-overlay').forEach(s=>s.classList.remove('active'));
   stopReels();
   setNavActive('home');
+  setTimeout(cvpResync,0); // feed is visible again — resume whichever Pulse video is in view
 }
 // Call this at the top of any "open a screen" function to remember how to get
 // back to whatever was open before. If we're already showing the same screen
