@@ -75,7 +75,13 @@ img{display:block;max-width:100%;}
 .search-clear{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text3);flex-shrink:0;}
 .search-clear:hover{color:var(--text);background:var(--surface3);}
 
-.results-scroll{flex:1;overflow-y:auto;padding:18px 20px 40px;}
+/* result tabs (All / News / Videos / Images) */
+.result-tabs{display:flex;gap:22px;overflow-x:auto;padding:12px 20px 0;scrollbar-width:none;flex-shrink:0;border-bottom:1px solid var(--border2);}
+.result-tabs::-webkit-scrollbar{display:none;}
+.result-tab{flex-shrink:0;padding:6px 2px 12px;font-size:13.5px;font-weight:700;color:var(--text2);border-bottom:2.5px solid transparent;white-space:nowrap;}
+.result-tab.active{color:var(--cyan);border-color:var(--cyan);}
+
+.results-scroll{flex:1;overflow-y:auto;padding:18px 20px 90px;}
 .results-inner{max-width:760px;margin:0 auto;}
 .empty-hero{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:70px 20px;gap:10px;color:var(--text2);}
 .empty-hero .boot-mark{width:60px;height:60px;border-radius:16px;}
@@ -88,7 +94,7 @@ img{display:block;max-width:100%;}
 
 .overlay-scrim{position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:40;display:none;}
 .overlay-scrim.show{display:block;}
-#toast{position:fixed;bottom:calc(20px + var(--safe-bottom));left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface3);color:var(--text);padding:11px 18px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 12px 30px rgba(0,0,0,0.4);z-index:3000;opacity:0;transition:.25s;pointer-events:none;}
+#toast{position:fixed;bottom:calc(64px + var(--safe-bottom));left:50%;transform:translateX(-50%) translateY(20px);background:var(--surface3);color:var(--text);padding:11px 18px;border-radius:12px;font-size:13px;font-weight:600;box-shadow:0 12px 30px rgba(0,0,0,0.4);z-index:3000;opacity:0;transition:.25s;pointer-events:none;}
 #toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 
 @media (max-width:820px){
@@ -122,27 +128,121 @@ img{display:block;max-width:100%;}
 /* ===== Search layout: results + knowledge panel side by side ===== */
 .search-layout{display:flex;gap:24px;align-items:flex-start;}
 #gcse-container{flex:1;min-width:0;}
-#kg-panel{width:328px;flex-shrink:0;background:var(--surface2);border:1px solid var(--border2);border-radius:18px;padding:20px;}
 @media (max-width:900px){
   .search-layout{flex-direction:column;}
-  #kg-panel{width:100%;order:-1;}
+  #kg-panel{width:100%!important;order:-1;}
 }
 
-.kg-photo-main{width:100%;aspect-ratio:1/1;border-radius:14px;overflow:hidden;background:var(--surface3);margin-bottom:10px;}
+/* ===== Related searches (chip row shown above every result set, Google style) ===== */
+.related-wrap{margin-bottom:16px;}
+.related-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px;scrollbar-width:none;}
+.related-scroll::-webkit-scrollbar{display:none;}
+.related-chip{flex-shrink:0;display:flex;align-items:center;gap:7px;padding:10px 14px;border-radius:999px;background:var(--surface2);border:1px solid var(--border2);font-size:12.5px;color:var(--text);white-space:nowrap;}
+.related-chip:hover{border-color:var(--cyan-dim);color:var(--cyan);}
+.related-chip i{font-size:13px;color:var(--text3);}
+
+/* ===== Top stories carousel ===== */
+.topstories-wrap{margin-bottom:20px;}
+.topstories-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.topstories-title{font-size:16px;font-weight:800;}
+.topstories-scroll{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none;}
+.topstories-scroll::-webkit-scrollbar{display:none;}
+.ts-card{flex-shrink:0;width:190px;background:var(--surface2);border:1px solid var(--border2);border-radius:14px;overflow:hidden;}
+.ts-card img{width:100%;height:110px;object-fit:cover;background:var(--surface3);}
+.ts-body{padding:10px 12px 12px;}
+.ts-title{font-size:12.5px;font-weight:700;line-height:1.35;color:var(--cyan);margin-bottom:8px;}
+.ts-meta{font-size:10.5px;color:var(--text3);margin-bottom:6px;}
+.ts-source{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);font-weight:600;}
+.ts-source i{color:var(--like);font-size:13px;}
+.more-news-btn{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;padding:10px;border-radius:999px;background:var(--surface2);border:1px solid var(--border2);font-size:12.5px;font-weight:700;color:var(--text2);}
+.more-news-btn:hover{color:var(--cyan);border-color:var(--cyan-dim);}
+
+/* ===== Sponsored / ad result card ===== */
+.ad-card{background:var(--surface2);border:1px solid var(--border2);border-radius:14px;padding:14px;margin-bottom:12px;}
+.ad-paidfor{font-size:11px;color:var(--text3);margin-bottom:8px;}
+.ad-paidfor b{color:var(--text2);}
+.ad-row{display:flex;align-items:center;gap:9px;margin-bottom:8px;}
+.ad-favicon{width:26px;height:26px;border-radius:50%;background:var(--surface3);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:800;color:var(--cyan);flex-shrink:0;}
+.ad-src-name{font-size:13px;font-weight:700;color:var(--text);}
+.ad-src-url{font-size:11px;color:var(--green);}
+.ad-badge{margin-left:auto;font-size:9.5px;font-weight:800;color:var(--amber);border:1px solid rgba(255,184,48,0.4);border-radius:4px;padding:1px 6px;}
+.ad-title{color:var(--cyan);font-weight:700;font-size:15px;margin-bottom:6px;}
+.ad-desc{color:var(--text2);font-size:13px;line-height:1.5;}
+.ad-toggle{display:flex;align-items:center;justify-content:center;gap:6px;margin:2px 0 16px;padding:10px;border-radius:999px;background:var(--surface2);border:1px solid var(--border2);font-size:12.5px;font-weight:700;color:var(--text2);width:100%;}
+.ad-toggle:hover{color:var(--cyan);}
+
+/* ===== People also ask ===== */
+.paa-wrap{margin-top:22px;}
+.paa-title{font-size:17px;font-weight:800;margin-bottom:6px;}
+.paa-item{border-top:1px solid var(--border2);}
+.paa-item:last-child{border-bottom:1px solid var(--border2);}
+.paa-q{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 2px;cursor:pointer;}
+.paa-q span{font-size:13.5px;color:var(--text);line-height:1.4;}
+.paa-q i{color:var(--text3);flex-shrink:0;transition:transform .2s;}
+.paa-item.open .paa-q i{transform:rotate(180deg);color:var(--cyan);}
+.paa-a{display:none;font-size:12.5px;color:var(--text2);line-height:1.6;padding:0 2px 16px 2px;}
+.paa-item.open .paa-a{display:block;}
+
+/* ===== Knowledge panel — Google mobile knowledge-graph replica ===== */
+#kg-panel{width:328px;flex-shrink:0;background:var(--surface2);border:1px solid var(--border2);border-radius:18px;overflow:hidden;}
+.kg-top{padding:16px 16px 4px;}
+.kg-toprow{display:flex;align-items:flex-start;gap:8px;}
+.kg-name{font-size:19px;font-weight:800;line-height:1.25;flex:1;}
+.kg-icons{display:flex;gap:4px;flex-shrink:0;}
+.kg-icon-btn{width:30px;height:30px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:15px;flex-shrink:0;border:1px solid var(--border2);}
+.kg-icon-btn:hover{background:var(--surface3);color:var(--cyan);}
+.kg-subtitle{font-size:12.5px;color:var(--text2);line-height:1.45;margin-top:5px;}
+
+.kg-tabs{display:flex;gap:8px;overflow-x:auto;padding:14px 16px 0;scrollbar-width:none;}
+.kg-tabs::-webkit-scrollbar{display:none;}
+.kg-tab{flex-shrink:0;padding:8px 14px;border-radius:999px;background:var(--surface3);color:var(--text2);font-size:12px;font-weight:700;white-space:nowrap;border:1px solid transparent;}
+.kg-tab.active{background:var(--cyan-dim);color:var(--cyan);border-color:rgba(0,200,255,.35);}
+
+.kg-photos{display:flex;gap:2px;margin-top:14px;height:175px;background:var(--surface3);}
+.kg-photo-main{position:relative;overflow:hidden;flex:1.6;min-width:0;}
 .kg-photo-main img{width:100%;height:100%;object-fit:cover;}
-.kg-thumbs{display:flex;gap:6px;margin-bottom:16px;}
-.kg-thumb{width:52px;height:52px;border-radius:8px;overflow:hidden;cursor:pointer;border:2px solid transparent;flex-shrink:0;}
-.kg-thumb.active{border-color:var(--cyan);}
-.kg-thumb img{width:100%;height:100%;object-fit:cover;}
-.kg-name{font-size:19px;font-weight:800;line-height:1.25;}
-.kg-title{font-size:13px;color:var(--text2);margin-top:3px;margin-bottom:12px;}
-.kg-overview{font-size:13px;color:var(--text2);line-height:1.55;margin-bottom:16px;}
-.kg-facts-label{font-size:11px;font-weight:800;letter-spacing:.4px;color:var(--text3);text-transform:uppercase;margin-bottom:8px;}
-.kg-fact-row{display:flex;gap:14px;padding:7px 0;border-bottom:1px solid var(--border2);font-size:12.5px;}
+.kg-photo-cap{position:absolute;left:8px;bottom:8px;font-size:10px;font-weight:600;color:#fff;background:rgba(0,0,0,.5);padding:3px 8px;border-radius:6px;}
+.kg-photo-side{flex:1;overflow:hidden;min-width:0;}
+.kg-photo-side img{width:100%;height:100%;object-fit:cover;}
+
+.kg-quickcards{display:flex;gap:10px;padding:14px 16px 2px;}
+.kg-qcard{flex:1;min-width:0;background:var(--surface3);border-radius:14px;padding:12px 13px;}
+.kg-qcard-label{font-size:12px;font-weight:700;color:var(--text2);display:flex;align-items:center;justify-content:space-between;}
+.kg-qcard-label i{font-size:13px;color:var(--text3);}
+.kg-qcard-big{font-size:16.5px;font-weight:800;margin-top:9px;}
+.kg-qcard-sub{font-size:11px;color:var(--text3);margin-top:2px;}
+.kg-qcard-thumbs{display:flex;gap:4px;margin-top:9px;}
+.kg-qcard-thumbs img{width:32%;aspect-ratio:1/1;border-radius:7px;object-fit:cover;background:var(--surface2);}
+
+.kg-section{padding:14px 16px;border-top:1px solid var(--border2);margin-top:2px;}
+.kg-section-head{display:flex;align-items:center;gap:11px;cursor:pointer;}
+.kg-audio-btn{width:30px;height:30px;border-radius:50%;background:var(--cyan-dim);color:var(--cyan);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:14px;}
+.kg-audio-btn:hover{background:rgba(0,200,255,0.22);}
+.kg-section-title{font-size:13.5px;font-weight:700;flex:1;}
+.kg-section-chevron{color:var(--text3);transition:transform .2s;flex-shrink:0;}
+.kg-section.open .kg-section-chevron{transform:rotate(180deg);}
+.kg-section-body{font-size:13px;color:var(--text2);line-height:1.6;margin-top:11px;padding-left:41px;display:none;}
+.kg-section.open .kg-section-body{display:block;}
+.kg-section-body a{color:var(--cyan);font-weight:700;}
+.kg-hindi-note{margin-top:8px;font-size:12.5px;color:var(--text2);}
+
+.kg-quickfacts{padding:14px 16px 6px;border-top:1px solid var(--border2);}
+.kg-qf-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.kg-qf-title{font-size:13.5px;font-weight:800;}
+.kg-qf-icons{display:flex;align-items:center;gap:10px;color:var(--text3);font-size:15px;}
+.kg-fact-row{display:flex;gap:14px;padding:8px 0;border-bottom:1px solid var(--border2);font-size:12.5px;}
 .kg-fact-row:last-child{border-bottom:none;}
-.kg-fact-key{width:88px;flex-shrink:0;color:var(--text3);}
-.kg-fact-val{color:var(--text2);line-height:1.45;}
-.kg-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;background:var(--cyan-dim);color:var(--cyan);border-radius:6px;padding:3px 7px;margin-top:10px;}
+.kg-fact-key{width:82px;flex-shrink:0;color:var(--text3);}
+.kg-fact-val{color:var(--text2);line-height:1.5;}
+.kg-fact-val a{color:var(--cyan);}
+
+/* ===== Bottom chrome nav bar (mobile browser style) ===== */
+.bottom-nav{position:fixed;left:0;right:0;bottom:0;height:52px;background:rgba(9,16,28,0.92);backdrop-filter:blur(12px);border-top:1px solid var(--border2);display:flex;align-items:center;justify-content:space-around;padding-bottom:var(--safe-bottom);z-index:35;}
+@media (min-width:821px){ .bottom-nav{display:none;} .results-scroll{padding-bottom:40px;} }
+.bottom-nav button{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:17px;flex-shrink:0;}
+.bottom-nav button:disabled{opacity:.28;}
+.bottom-nav button:not(:disabled):hover{background:var(--surface2);color:var(--cyan);}
+.bottom-nav .tab-count{width:23px;height:23px;border:1.6px solid var(--text2);border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;color:var(--text2);}
 </style>
 </head>
 <body>
@@ -183,6 +283,14 @@ img{display:block;max-width:100%;}
       </div>
     </div>
 
+    <div class="result-tabs hidden" id="result-tabs">
+      <div class="result-tab active" data-tab="all">All</div>
+      <div class="result-tab" data-tab="news">News</div>
+      <div class="result-tab" data-tab="videos">Videos</div>
+      <div class="result-tab" data-tab="images">Images</div>
+      <div class="result-tab" data-tab="short">Short videos</div>
+    </div>
+
     <div class="results-scroll" id="results-scroll">
       <div class="results-inner">
         <div class="empty-hero" id="empty-hero">
@@ -195,13 +303,26 @@ img{display:block;max-width:100%;}
             <div class="suggest-chip" onclick="quickSearch('weather today')">weather today</div>
           </div>
         </div>
+
+        <div id="pre-results" class="hidden"></div>
+
         <div class="search-layout">
           <div id="gcse-container"><div id="gcse-results"></div></div>
           <div id="kg-panel" class="hidden"></div>
         </div>
+
+        <div id="paa-container"></div>
       </div>
     </div>
   </div>
+</div>
+
+<div class="bottom-nav hidden" id="bottom-nav">
+  <button id="nav-back" onclick="showToast('Peeche koi page nahi')"><i class="ph ph-arrow-left"></i></button>
+  <button id="nav-fwd" disabled><i class="ph ph-arrow-right"></i></button>
+  <button onclick="location.href='index.html'"><i class="ph ph-house"></i></button>
+  <button onclick="showToast('Share link copy ho gaya')"><i class="ph ph-export"></i></button>
+  <button><span class="tab-count">1</span></button>
 </div>
 
 <div id="toast"></div>
@@ -232,49 +353,78 @@ let gcseReady = false;
 // KNOWLEDGE GRAPH — curated panel shown next to results when a
 // search query matches a known entity. Add more people/brands here
 // by pushing another object with your own trigger keywords.
+//
+// Fields:
+//   tabs        -> pill tabs under the name (Overview / Songs / ...)
+//   images      -> [{src, caption}] shown in the photo strip
+//   quickCards  -> small stat cards under the photos (Age, Songs...)
+//   sections    -> collapsible rows w/ optional audio icon (Overview, हिन्दी summary...)
+//   facts       -> Quick facts key/value list
+//   peopleAlsoAsk -> [{q,a}] rendered below the panel, Google-style
 // ============================================================
 const KNOWLEDGE_ENTITIES = [
   {
     triggers:['gursharan pooni','gursharan singh pooni','sharan pooni','shara pooni','g pooni','pooni nexor','nexor ceo','nexor founder','nexor sparks founder','nexor sparks ceo'],
     name:'Gursharan Singh Pooni',
-    title:'Businessman, Founder & CEO of Nexor',
+    subtitle:'Businessman, Founder & CEO of Nexor',
+    tabs:['Overview'],
     images:[
-      'https://aryasongs.github.io/Pulse/IMG_9590.jpeg',
-      'https://aryasongs.github.io/Pulse/IMG_7683.jpeg',
-      'https://aryasongs.github.io/Pulse/IMG_7492.jpeg',
-      'https://aryasongs.github.io/Pulse/IMG_4960.png'
+      {src:'https://aryasongs.github.io/Pulse/IMG_9590.jpeg'},
+      {src:'https://aryasongs.github.io/Pulse/IMG_7683.jpeg'},
+      {src:'https://aryasongs.github.io/Pulse/IMG_7492.jpeg'},
+      {src:'https://aryasongs.github.io/Pulse/IMG_4960.png'}
     ],
-    overview:'Gursharan Singh Pooni is a businessman and former songwriter who is the CEO and largest shareholder of Nexor and Sparks.',
+    sections:[
+      {title:'Overview', audio:true, body:'Gursharan Singh Pooni is a businessman and former songwriter who is the CEO and largest shareholder of Nexor and Sparks.', link:{text:'Wikipedia',url:'#'}}
+    ],
     facts:{
       'Born':'02 February 2006 (20 years), Banga, India',
       'Parents':'Gurdial Singh, Ranjit Kaur',
       'Education':'Google Developers Campus Program (2024), Punjab High School (2021)',
       'Siblings':'Ravinder Kaur',
       'Height':'1.88 m'
-    }
+    },
+    peopleAlsoAsk:[
+      {q:'Who is the current CEO of Nexor?', a:'Gursharan Singh Pooni (Sharan Pooni) is the founder and current CEO of Nexor.'},
+      {q:'What company does Gursharan Singh Pooni run?', a:'He runs Nexor, the technology company behind Sparks, Nexor AI and Nexor Search.'},
+      {q:'Where is Gursharan Singh Pooni from?', a:'He was born in Banga, India.'}
+    ]
   },
   {
     triggers:['anmol sunda','anmol sundas','sunda nexor','co founder nexor','nexor co founder'],
     name:'Anmol Sunda',
-    title:'Co-founder of Nexor',
+    subtitle:'Co-founder of Nexor',
+    tabs:['Overview'],
     images:[],
-    overview:'Anmol Sunda is the co-founder of Nexor. Gursharan Singh Pooni (Sharan Pooni) has chosen him as his successor.',
+    sections:[
+      {title:'Overview', audio:true, body:'Anmol Sunda is the co-founder of Nexor. Gursharan Singh Pooni (Sharan Pooni) has chosen him as his successor.'}
+    ],
     facts:{
       'Role':'Co-founder, Nexor',
       'Successor of':'Gursharan Singh Pooni (Sharan Pooni)'
-    }
+    },
+    peopleAlsoAsk:[
+      {q:'Who is Anmol Sunda?', a:'Anmol Sunda is the co-founder of Nexor and the chosen successor to founder Gursharan Singh Pooni.'}
+    ]
   },
   {
     triggers:['nexor','sparks','nexor sparks','what is nexor','what is sparks'],
     name:'Nexor',
-    title:'Technology company · Social media platform',
-    images:['https://aryasongs.github.io/Pulse/621954EC-539B-4CA6-8CBB-9172C2BBC445.png'],
-    overview:'Nexor is a technology company that operates Sparks, a social media platform for sharing short updates called Pulses, along with Nexor AI and Nexor Search.',
+    subtitle:'Technology company · Social media platform',
+    tabs:['Overview'],
+    images:[{src:'https://aryasongs.github.io/Pulse/621954EC-539B-4CA6-8CBB-9172C2BBC445.png'}],
+    sections:[
+      {title:'Overview', audio:true, body:'Nexor is a technology company that operates Sparks, a social media platform for sharing short updates called Pulses, along with Nexor AI and Nexor Search.'}
+    ],
     facts:{
       'Founder & CEO':'Gursharan Singh Pooni (Sharan Pooni)',
       'Products':'Sparks, Nexor AI, Nexor Search',
       'Type':'Technology company'
-    }
+    },
+    peopleAlsoAsk:[
+      {q:'What is Sparks?', a:'Sparks is the Nexor social media platform for sharing short updates called Pulses.'},
+      {q:'Who founded Nexor?', a:'Nexor was founded by Gursharan Singh Pooni, who also serves as its CEO.'}
+    ]
   }
 ];
 let kgActiveImages = [];
@@ -288,37 +438,145 @@ function findKnowledgeEntity(q){
   }
   return null;
 }
+
+// ---------- Knowledge panel ----------
 function renderKnowledgePanel(ent){
   const panel = document.getElementById('kg-panel');
   if(!ent){ panel.classList.add('hidden'); panel.innerHTML=''; return; }
-  kgActiveImages = ent.images || [];
+
+  kgActiveImages = (ent.images||[]).map(im=> typeof im==='string' ? {src:im} : im);
+
+  const tabsHtml = (ent.tabs && ent.tabs.length) ? `
+    <div class="kg-tabs">
+      ${ent.tabs.map((t,i)=>`<div class="kg-tab ${i===0?'active':''}" onclick="kgSelectTab(this)">${escapeHtml(t)}</div>`).join('')}
+    </div>` : '';
+
+  let photosHtml = '';
+  if(kgActiveImages.length){
+    const main = kgActiveImages[0];
+    const side = kgActiveImages[1];
+    photosHtml = `
+      <div class="kg-photos">
+        <div class="kg-photo-main"><img id="kg-photo-main-img" src="${main.src}" loading="lazy">${main.caption?`<div class="kg-photo-cap">${escapeHtml(main.caption)}</div>`:''}</div>
+        ${side ? `<div class="kg-photo-side"><img src="${side.src}" loading="lazy"></div>` : ''}
+      </div>`;
+  }
+
+  let quickcardsHtml = '';
+  if(ent.quickCards && ent.quickCards.length){
+    quickcardsHtml = `<div class="kg-quickcards">${ent.quickCards.map(c=>{
+      if(c.thumbs){
+        return `<div class="kg-qcard"><div class="kg-qcard-label">${escapeHtml(c.label)} <i class="ph ph-caret-down"></i></div><div class="kg-qcard-thumbs">${c.thumbs.map(t=>`<img src="${t}" loading="lazy">`).join('')}</div></div>`;
+      }
+      return `<div class="kg-qcard"><div class="kg-qcard-label">${escapeHtml(c.label)}</div><div class="kg-qcard-big">${escapeHtml(c.big||'')}</div>${c.sub?`<div class="kg-qcard-sub">${escapeHtml(c.sub)}</div>`:''}</div>`;
+    }).join('')}</div>`;
+  }
+
+  const sectionsHtml = (ent.sections||[]).map((s,i)=>`
+    <div class="kg-section ${i===0?'open':''}">
+      <div class="kg-section-head" onclick="this.parentElement.classList.toggle('open')">
+        ${s.audio?'<div class="kg-audio-btn" onclick="event.stopPropagation();speakText(this)" data-text="'+escapeHtml(s.body)+'"><i class="ph-fill ph-speaker-high"></i></div>':'<div style="width:30px"></div>'}
+        <div class="kg-section-title">${escapeHtml(s.title)}</div>
+        <i class="ph ph-caret-down kg-section-chevron"></i>
+      </div>
+      <div class="kg-section-body">
+        ${escapeHtml(s.body)}
+        ${s.link?` <a href="${s.link.url||'#'}" target="_blank">${escapeHtml(s.link.text)} ›</a>`:''}
+        ${s.extraHtml||''}
+      </div>
+    </div>
+  `).join('');
+
   const factsHtml = Object.entries(ent.facts||{}).map(([k,v])=>`
     <div class="kg-fact-row"><div class="kg-fact-key">${escapeHtml(k)}</div><div class="kg-fact-val">${escapeHtml(v)}</div></div>
   `).join('');
-  let photoHtml = '';
-  if(kgActiveImages.length){
-    const thumbsHtml = kgActiveImages.length>1 ? kgActiveImages.map((src,i)=>`
-      <div class="kg-thumb ${i===0?'active':''}" data-i="${i}" onclick="kgSelectImage(${i})"><img src="${src}" loading="lazy"></div>
-    `).join('') : '';
-    photoHtml = `
-      <div class="kg-photo-main" id="kg-photo-main"><img id="kg-photo-main-img" src="${kgActiveImages[0]}" loading="lazy"></div>
-      ${thumbsHtml ? `<div class="kg-thumbs" id="kg-thumbs">${thumbsHtml}</div>` : '<div style="margin-bottom:16px"></div>'}
-    `;
-  }
+
   panel.innerHTML = `
-    ${photoHtml}
-    <div class="kg-name">${escapeHtml(ent.name)}</div>
-    <div class="kg-title">${escapeHtml(ent.title)}</div>
-    <div class="kg-overview">${escapeHtml(ent.overview)}</div>
-    <div class="kg-facts-label">Quick facts</div>
-    ${factsHtml}
-    <div class="kg-badge"><i class="ph-fill ph-check-circle"></i> Nexor Search Knowledge</div>
+    <div class="kg-top">
+      <div class="kg-toprow">
+        <div class="kg-name">${escapeHtml(ent.name)}</div>
+        <div class="kg-icons">
+          <button class="kg-icon-btn" onclick="showToast('Aur options')"><i class="ph ph-dots-three"></i></button>
+          <button class="kg-icon-btn" onclick="showToast('Share link copy ho gaya')"><i class="ph ph-export"></i></button>
+        </div>
+      </div>
+      <div class="kg-subtitle">${escapeHtml(ent.subtitle||'')}</div>
+      ${tabsHtml}
+    </div>
+    ${photosHtml}
+    ${quickcardsHtml}
+    ${sectionsHtml}
+    ${factsHtml ? `
+    <div class="kg-quickfacts">
+      <div class="kg-qf-head">
+        <div class="kg-qf-title">Quick facts</div>
+        <div class="kg-qf-icons"><i class="ph ph-dots-three"></i><i class="ph ph-caret-up"></i></div>
+      </div>
+      ${factsHtml}
+    </div>` : ''}
   `;
   panel.classList.remove('hidden');
 }
+function kgSelectTab(el){
+  el.parentElement.querySelectorAll('.kg-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+}
+function speakText(btn){
+  const text = btn.getAttribute('data-text')||'';
+  if(!text || !('speechSynthesis' in window)){ showToast('Audio uपलब्ध नहीं'); return; }
+  try{
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    window.speechSynthesis.speak(u);
+  }catch(e){ showToast('Audio play nahi ho paya'); }
+}
 function kgSelectImage(i){
-  document.getElementById('kg-photo-main-img').src = kgActiveImages[i];
-  document.querySelectorAll('#kg-thumbs .kg-thumb').forEach((el,idx)=>el.classList.toggle('active', idx===i));
+  const img = kgActiveImages[i];
+  if(!img) return;
+  document.getElementById('kg-photo-main-img').src = img.src;
+}
+
+// ---------- People also ask ----------
+function renderPeopleAlsoAsk(ent, query){
+  const wrap = document.getElementById('paa-container');
+  let items = ent && ent.peopleAlsoAsk ? ent.peopleAlsoAsk : genericPeopleAlsoAsk(query);
+  if(!items || !items.length){ wrap.innerHTML=''; return; }
+  wrap.innerHTML = `
+    <div class="paa-wrap">
+      <div class="paa-title">People also ask</div>
+      ${items.map(it=>`
+        <div class="paa-item">
+          <div class="paa-q" onclick="this.parentElement.classList.toggle('open')"><span>${escapeHtml(it.q)}</span><i class="ph ph-caret-down"></i></div>
+          <div class="paa-a">${escapeHtml(it.a)}</div>
+        </div>
+      `).join('')}
+    </div>
+  `;
+}
+function genericPeopleAlsoAsk(query){
+  const q = query.trim();
+  if(!q) return [];
+  return [
+    {q:`What is ${q}?`, a:`Search Nexor Search results above for a full explanation of "${q}".`},
+    {q:`Why is ${q} trending?`, a:`Check the latest headlines above to see current coverage on "${q}".`},
+    {q:`How does ${q} work?`, a:`Open one of the top results above for a detailed breakdown of "${q}".`}
+  ];
+}
+
+// ---------- Related searches ----------
+function renderRelatedSearches(query){
+  const container = document.getElementById('pre-results');
+  const q = query.trim();
+  if(!q){ container.classList.add('hidden'); container.innerHTML=''; return; }
+  const suggestions = [`${q} news`, `${q} today`, `${q} 2026`, `${q} latest updates`, `${q} live`];
+  container.innerHTML = `
+    <div class="related-wrap">
+      <div class="related-scroll">
+        ${suggestions.map(s=>`<div class="related-chip" onclick="quickSearch('${escapeAttr(s)}')"><i class="ph ph-magnifying-glass"></i>${escapeHtml(s)}</div>`).join('')}
+      </div>
+    </div>
+  `;
+  container.classList.remove('hidden');
 }
 
 auth.onAuthStateChanged(u=>{
@@ -379,6 +637,14 @@ document.getElementById('search-input').addEventListener('input', e=>{
   document.getElementById('search-clear-btn').classList.toggle('hidden', !e.target.value);
 });
 
+document.querySelectorAll('.result-tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.result-tab').forEach(t=>t.classList.remove('active'));
+    tab.classList.add('active');
+    showToast(tab.textContent + ' tab');
+  });
+});
+
 function runSearch(qOverride){
   const input = document.getElementById('search-input');
   const q = (qOverride!==undefined ? qOverride : input.value).trim();
@@ -390,8 +656,15 @@ function runSearch(qOverride){
 
   document.getElementById('empty-hero').classList.add('hidden');
   document.getElementById('gcse-container').classList.add('show');
+  document.getElementById('result-tabs').classList.remove('hidden');
+  document.getElementById('bottom-nav').classList.remove('hidden');
   gcseElement.execute(q);
-  renderKnowledgePanel(findKnowledgeEntity(q));
+
+  const ent = findKnowledgeEntity(q);
+  renderRelatedSearches(q);
+  renderKnowledgePanel(ent);
+  renderPeopleAlsoAsk(ent, q);
+
   pushHistory(q);
   toggleSidebar(false);
 }
