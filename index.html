@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -2483,6 +2483,11 @@ const CLOUDINARY_UPLOAD_PRESET = "sparks_upload";
 const CLOUDINARY_VIDEO_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/video/upload`;
 
 const VERIFIED_BADGE_URL = 'https://aryasongs.github.io/Pulse/5673DD39-FBCB-4A20-B9E5-AF205AA75FBC.png';
+// Organization-verified tick — replaces the normal blue tick (VERIFIED_BADGE_URL)
+// for accounts that are organizations (i.e. have an orgBadgeUrl set), so orgs
+// get this badge instead of the regular blue tick. The separate org logo chip
+// (orgBadgeUrl, e.g. NEXOR_BADGE_URL) still shows alongside it as before.
+const ORG_VERIFIED_BADGE_URL = 'https://nexor-f4d.pages.dev/IMG_8014.png';
 // Organization badge — shown ADDITIONALLY next to the verified tick (like
 // X/Twitter's gold check), never replaces it. Stored per-account in
 // Firebase at users/{uid}/badgeUrl (and copied onto each pulse as
@@ -2761,9 +2766,14 @@ const joinDate = ts => ts ? new Date(ts).toLocaleDateString('en-US',{month:'long
 // verified account. orgBadgeUrl is an ADDITIONAL badge shown right next to
 // it (like X/Twitter's gold org check) — e.g. @nexor's organization mark —
 // it never replaces the verified tick.
-function verifiedBadgeHtml(size='', uid='', orgBadgeUrl=''){
+function verifiedBadgeHtml(size='', uid='', orgBadgeUrl='', isBusiness=false){
   const clickAttr = uid ? `style="cursor:pointer;" onclick="event.stopPropagation();openAboutAccount('${uid.replace(/'/g,"\\'")}')"` : '';
-  let html = `<span class="verified-badge ${size}" ${clickAttr}><img src="${VERIFIED_BADGE_URL}" alt="Verified" onerror="this.style.display='none'"></span>`;
+  // Business/organization accounts (companies, brands, orgs — accountType==='business')
+  // get ORG_VERIFIED_BADGE_URL instead of the regular blue tick. Personal &
+  // creator accounts (including affiliates of an org, who just show the org's
+  // logo chip next to their own normal tick) keep VERIFIED_BADGE_URL.
+  const tickUrl = isBusiness ? ORG_VERIFIED_BADGE_URL : VERIFIED_BADGE_URL;
+  let html = `<span class="verified-badge ${size}" ${clickAttr}><img src="${tickUrl}" alt="Verified" onerror="this.style.display='none'"></span>`;
   if(orgBadgeUrl){
     html += `<span class="org-badge ${size}" ${clickAttr}><img src="${orgBadgeUrl}" alt="Organization" onerror="this.style.display='none'"></span>`;
   }
@@ -2803,7 +2813,7 @@ async function openAboutAccount(uid){
       }catch(e){}
     }
     let html = `<div style="text-align:center;margin-bottom:8px;">
-        <div style="font-size:15px;font-weight:700;">${ESC(u.name||'User')} ${u.verified?verifiedBadgeHtml('','',u.badgeUrl):''}</div>
+        <div style="font-size:15px;font-weight:700;">${ESC(u.name||'User')} ${u.verified?verifiedBadgeHtml('','',u.badgeUrl,u.accountType==='business'):''}</div>
         <div style="font-size:13px;color:var(--text3);">@${ESC(u.handle||'user')}</div>
       </div>`;
     html += affiliateHtml;
@@ -3565,7 +3575,7 @@ function buildPulseCard(p){
   const isAcceptedCollab = !!(p.collab && p.collaboratorStatus==='accepted' && p.collaboratorUid);
   const isPendingCollab  = !!(p.collab && p.collaboratorStatus==='pending' && p.collaboratorUid);
   const anyVerified = isAcceptedCollab ? (p.creatorVerified||p.collaboratorVerified) : p.creatorVerified;
-  const vBadge = anyVerified ? (p.creatorVerified?verifiedBadgeHtml('',p.uid,p.creatorBadgeUrl):verifiedBadgeHtml('',p.collaboratorUid,p.collaboratorBadgeUrl)) : '';
+  const vBadge = anyVerified ? (p.creatorVerified?verifiedBadgeHtml('',p.uid,p.creatorBadgeUrl,p.creatorAccountType==='business'):verifiedBadgeHtml('',p.collaboratorUid,p.collaboratorBadgeUrl,p.collaboratorAccountType==='business')) : '';
   const aiBadge = p.creatorIsAI ? aiLabelHtml() : '';
 
   // Header name/handle — "Name1 + Name2 ✅" and "@user1 · @user2" once accepted
@@ -4358,6 +4368,7 @@ async function ensureNexorAccount(){
     const updates={};
     if(!u.verified) updates.verified=true;
     if(u.badgeUrl!==NEXOR_BADGE_URL) updates.badgeUrl=NEXOR_BADGE_URL;
+    if(u.accountType!=='business') updates.accountType='business';
     if(Object.keys(updates).length) await db.ref('users/'+uid).update(updates).catch(()=>{});
   }catch(e){ /* best-effort */ }
 }
@@ -4835,7 +4846,7 @@ async function triggerNexorAIReply(rawText, pulseId, nexorUid){
     const uSnap=await db.ref('users/'+nexorUid).once('value');
     const nu=uSnap.val()||{};
     const replyData={uid:nexorUid,creatorName:nu.name||'Nexor',creatorHandle:nu.handle||NEXOR_HANDLE,
-      creatorVerified:true,creatorIsAI:true,creatorBadgeUrl:nu.badgeUrl||NEXOR_BADGE_URL,creatorPhoto:nu.photoBase64||null,
+      creatorVerified:true,creatorIsAI:true,creatorBadgeUrl:nu.badgeUrl||NEXOR_BADGE_URL,creatorAccountType:'business',creatorPhoto:nu.photoBase64||null,
       text:answer,parentId:pulseId,isReply:true,likes:0,replies:0,reposts:0,views:0,createdAt:firebase.database.ServerValue.TIMESTAMP};
     if(imagePromptToGenerate){
       const img=await generateNexorImage(imagePromptToGenerate);
@@ -4899,7 +4910,7 @@ async function publishPulse(source){
     const pulseData={
       uid:me.uid, creatorName:myData.name||'User', creatorHandle:myData.handle||'user',
       creatorVerified:myData.verified||false, creatorIsAI:myData.isAI||false,
-      creatorBadgeUrl:myData.badgeUrl||null,
+      creatorBadgeUrl:myData.badgeUrl||null,creatorAccountType:myData.accountType||'personal',
       creatorPhoto:myData.photoBase64||null, creatorPrivate:myData.private||false,
       text, likes:0, replies:0, reposts:0, views:0,
       images:imageList.length?imageList:null,
@@ -4918,7 +4929,7 @@ async function publishPulse(source){
       collaboratorHandle:collab?collab.handle:null,
       collaboratorPhoto:collab?(collab.photoBase64||null):null,
       collaboratorVerified:collab?(collab.verified||false):null,
-      collaboratorBadgeUrl:collab?(collab.badgeUrl||null):null,
+      collaboratorBadgeUrl:collab?(collab.badgeUrl||null):null,collaboratorAccountType:collab?(collab.accountType||'personal'):null,
       collaboratorStatus:collab?'pending':null,
       createdAt:firebase.database.ServerValue.TIMESTAMP
     };
@@ -5052,7 +5063,7 @@ async function doSimpleRepost(){
     const oSnap=await db.ref('pulses/'+pulseId).once('value');
     const orig=oSnap.val()||{};
     const rData={uid:me.uid,creatorName:myData.name||'User',creatorHandle:myData.handle||'user',
-      creatorVerified:myData.verified||false,creatorIsAI:myData.isAI||false,creatorBadgeUrl:myData.badgeUrl||null,creatorPhoto:myData.photoBase64||null,creatorPrivate:myData.private||false,
+      creatorVerified:myData.verified||false,creatorIsAI:myData.isAI||false,creatorBadgeUrl:myData.badgeUrl||null,creatorAccountType:myData.accountType||'personal',creatorPhoto:myData.photoBase64||null,creatorPrivate:myData.private||false,
       text:'',isRepost:true,repostOf:pulseId,repostOfText:orig.text||'',repostOfName:orig.creatorName||'User',
       repostOfImages:orig.images||(orig.imageBase64?[orig.imageBase64]:null),
       repostOfImageIsAI:orig.imageIsAI||false,
@@ -5531,7 +5542,7 @@ function buildAccountRow(u,actionLabel,actionFn,trailingHtml){
   return `<div class="blocked-row">
       <div class="who-av" style="cursor:pointer;" onclick="openProfile('${ESC(u.id)}')">${u.photoBase64?`<img src="${u.photoBase64}" alt="">`:((u.name||'U').charAt(0).toUpperCase())}</div>
       <div class="who-info" style="cursor:pointer;" onclick="openProfile('${ESC(u.id)}')">
-        <div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl):''}</div>
+        <div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl,u.accountType==='business'):''}</div>
         <div class="who-handle">@${ESC(u.handle||'user')}</div>
       </div>
       ${trailingHtml||''}
@@ -5598,7 +5609,7 @@ async function postReply(){
   const btn=document.getElementById('reply-post-btn'); btn.disabled=true;
   try{
     const replyData={uid:me.uid,creatorName:myData.name||'User',creatorHandle:myData.handle||'user',
-      creatorVerified:myData.verified||false,creatorIsAI:myData.isAI||false,creatorBadgeUrl:myData.badgeUrl||null,creatorPhoto:myData.photoBase64||null,
+      creatorVerified:myData.verified||false,creatorIsAI:myData.isAI||false,creatorBadgeUrl:myData.badgeUrl||null,creatorAccountType:myData.accountType||'personal',creatorPhoto:myData.photoBase64||null,
       text,parentId:replyToId,isReply:true,likes:0,replies:0,reposts:0,views:0,createdAt:firebase.database.ServerValue.TIMESTAMP};
     if(replyGifUrl){ replyData.images=[replyGifUrl]; replyData.isGif=true; replyData.mediaType='gif'; }
     const ref=await db.ref('pulses').push(replyData);
@@ -5732,7 +5743,7 @@ async function renderCollabPickerResults(uids){
     <div class="who-item" onclick="selectCollabUser('${ESC(u.id)}')">
       <div class="who-av">${u.photoBase64?`<img src="${u.photoBase64}" alt="">`:((u.name||'U').charAt(0).toUpperCase())}</div>
       <div class="who-info">
-        <div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl):''}</div>
+        <div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl,u.accountType==='business'):''}</div>
         <div class="who-handle">@${ESC(u.handle||'user')}</div>
       </div>
       <i class="ph ph-caret-right" style="color:var(--text3);"></i>
@@ -5846,7 +5857,7 @@ async function openDetail(pulseId){
          </div>`
       : `<div class="pulse-av" onclick="openProfile('${ESC(p.uid)}')" style="width:48px;height:48px;font-size:20px;">${avContent}</div>`;
     const anyVerifiedDetail = isAcceptedCollab ? (p.creatorVerified||p.collaboratorVerified) : p.creatorVerified;
-    const vBadge = anyVerifiedDetail ? (p.creatorVerified?verifiedBadgeHtml('verified-badge-lg',p.uid,p.creatorBadgeUrl):verifiedBadgeHtml('verified-badge-lg',p.collaboratorUid,p.collaboratorBadgeUrl)) : '';
+    const vBadge = anyVerifiedDetail ? (p.creatorVerified?verifiedBadgeHtml('verified-badge-lg',p.uid,p.creatorBadgeUrl,p.creatorAccountType==='business'):verifiedBadgeHtml('verified-badge-lg',p.collaboratorUid,p.collaboratorBadgeUrl,p.collaboratorAccountType==='business')) : '';
     const nameDisplayDetail = isAcceptedCollab
       ? `<span class="pulse-name" onclick="openProfile('${ESC(p.uid)}')" style="font-size:16px;">${ESC(p.creatorName||'User')}</span> + <span class="pulse-name" onclick="openProfile('${ESC(p.collaboratorUid)}')" style="font-size:16px;">${ESC(p.collaboratorName||'User')}</span>`
       : `<span class="pulse-name" onclick="openProfile('${ESC(p.uid)}')" style="font-size:16px;">${ESC(p.creatorName||'User')}</span>`;
@@ -6088,7 +6099,7 @@ async function openProfile(uid){
 
   // Name + badges
   const nameEl=document.getElementById('profile-display-name');
-  nameEl.innerHTML=`${ESC(u.name||'User')} ${u.verified?verifiedBadgeHtml('verified-badge-xl',uid,u.badgeUrl):''}${u.isAI?aiLabelHtml():''}`;
+  nameEl.innerHTML=`${ESC(u.name||'User')} ${u.verified?verifiedBadgeHtml('verified-badge-xl',uid,u.badgeUrl,u.accountType==='business'):''}${u.isAI?aiLabelHtml():''}`;
   // If this account is affiliated with an org but its own badgeUrl hasn't
   // synced into Firebase yet (that only happens once the affiliated user
   // themself signs in / opens their own profile — see syncAffiliateBadge),
@@ -6101,7 +6112,7 @@ async function openProfile(uid){
       let orgData=null;
       oS.forEach(c=>{orgData=c.val();});
       const orgPhoto = orgData && (orgData.photoBase64||orgData.badgeUrl);
-      if(orgPhoto) nameEl.innerHTML=`${ESC(u.name||'User')} ${verifiedBadgeHtml('verified-badge-xl',uid,orgPhoto)}${u.isAI?aiLabelHtml():''}`;
+      if(orgPhoto) nameEl.innerHTML=`${ESC(u.name||'User')} ${verifiedBadgeHtml('verified-badge-xl',uid,orgPhoto,u.accountType==='business')}${u.isAI?aiLabelHtml():''}`;
     }).catch(()=>{});
   }
 
@@ -6395,7 +6406,7 @@ async function publishArticle(){
     } else {
       const data={
         uid:me.uid, creatorName:myData.name||'User', creatorHandle:myData.handle||'user',
-        creatorPhoto:myData.photoBase64||null, creatorVerified:!!myData.verified, creatorBadgeUrl:myData.badgeUrl||null,
+        creatorPhoto:myData.photoBase64||null, creatorVerified:!!myData.verified, creatorBadgeUrl:myData.badgeUrl||null,creatorAccountType:myData.accountType||'personal',
         title, subtitle, contentHtml, excerpt, coverImage:aeCoverData||null,
         likes:0, views:0, createdAt:firebase.database.ServerValue.TIMESTAMP
       };
@@ -6531,7 +6542,7 @@ async function openArticleDetail(articleId){
     const likeSnap=await db.ref('userArticleLikes/'+me.uid+'/'+articleId).once('value');
     const isLiked=likeSnap.val()===true;
     const av=a.creatorPhoto?`<img src="${a.creatorPhoto}" alt="">`:ESC((a.creatorName||'U').charAt(0).toUpperCase());
-    const tick=a.creatorVerified?verifiedBadgeHtml('',a.uid,a.creatorBadgeUrl):'';
+    const tick=a.creatorVerified?verifiedBadgeHtml('',a.uid,a.creatorBadgeUrl,a.creatorAccountType==='business'):'';
     updateShareMeta({
       title:`${a.title||'Article'} — ${a.creatorName||'User'} on Nexor Sparks`,
       description: a.excerpt || `An article by @${a.creatorHandle||'user'} on Nexor Sparks.`,
@@ -6624,7 +6635,7 @@ async function loadStoriesBar(){
       const head=items[0];
       groups.push({
         uid, name:head.creatorName||'User', handle:head.creatorHandle||'user',
-        photo:head.creatorPhoto||null, verified:!!head.creatorVerified, badgeUrl:head.creatorBadgeUrl||null,
+        photo:head.creatorPhoto||null, verified:!!head.creatorVerified, badgeUrl:head.creatorBadgeUrl||null, accountType:head.creatorAccountType||'personal',
         items, hasUnseen
       });
     }catch(e){ /* skip this account on error, don't break the whole bar */ }
@@ -6681,7 +6692,7 @@ async function getStoryGroupForUid(uid){
     const viewFlags=await Promise.all(items.map(it=>db.ref('storyViews/'+it.id+'/'+me.uid).once('value').then(s=>s.val()===true)));
     const hasUnseen = uid!==me.uid && viewFlags.some(seen=>!seen);
     const head=items[0];
-    const group={uid, name:head.creatorName||'User', handle:head.creatorHandle||'user', photo:head.creatorPhoto||null, verified:!!head.creatorVerified, badgeUrl:head.creatorBadgeUrl||null, items, hasUnseen};
+    const group={uid, name:head.creatorName||'User', handle:head.creatorHandle||'user', photo:head.creatorPhoto||null, verified:!!head.creatorVerified, badgeUrl:head.creatorBadgeUrl||null, accountType:head.creatorAccountType||'personal', items, hasUnseen};
     storyCheckCache.set(uid, group);
     return group;
   }catch(e){ storyCheckCache.set(uid,null); return null; }
@@ -6962,7 +6973,7 @@ async function renderStoryMentionResults(uids){
     <div class="who-item" onclick="pickStoryMentionByIndex(${i})">
       <div class="who-av">${u.photoBase64?`<img src="${u.photoBase64}" alt="">`:((u.name||'U').charAt(0).toUpperCase())}</div>
       <div class="who-info">
-        <div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl):''}</div>
+        <div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl,u.accountType==='business'):''}</div>
         <div class="who-handle">@${ESC(u.handle||'user')}</div>
       </div>
     </div>`).join('');
@@ -7023,7 +7034,7 @@ async function publishStory(){
     const now=Date.now();
     const data={
       uid:me.uid, creatorName:myData.name||'User', creatorHandle:myData.handle||'user',
-      creatorPhoto:myData.photoBase64||null, creatorVerified:!!myData.verified, creatorBadgeUrl:myData.badgeUrl||null,
+      creatorPhoto:myData.photoBase64||null, creatorVerified:!!myData.verified, creatorBadgeUrl:myData.badgeUrl||null,creatorAccountType:myData.accountType||'personal',
       mediaType:pendingStoryMedia.mediaType, mediaUrl:pendingStoryMedia.mediaUrl||null, poster:pendingStoryMedia.poster||null,
       duration:pendingStoryMedia.duration||null, caption, text:text||null, bg:pendingStoryMedia.bg||null,
       sharedPulseId:pendingStoryMedia.sharedPulseId||null, sharedSnapshot:pendingStoryMedia.sharedSnapshot||null,
@@ -7099,7 +7110,7 @@ function storyShowItem(){
   }
   av.style.display='flex';av.style.alignItems='center';av.style.justifyContent='center';av.style.color='#050A14';av.style.fontWeight='800';
   const nameEl=document.getElementById('story-viewer-name');
-  nameEl.innerHTML = isOwn ? 'Your story' : (ESC(group.name)+(group.verified?verifiedBadgeHtml('',group.uid,group.badgeUrl):''));
+  nameEl.innerHTML = isOwn ? 'Your story' : (ESC(group.name)+(group.verified?verifiedBadgeHtml('',group.uid,group.badgeUrl,group.accountType==='business'):''));
   document.getElementById('story-viewer-time').textContent = item.createdAt ? timeAgo(item.createdAt) : '';
   document.getElementById('story-own-more-btn').classList.toggle('hidden', !isOwn);
 
@@ -7360,11 +7371,11 @@ async function sendStoryReply(otherUid, text){
     const other=otherSnap.val()||{};
     await db.ref('userChats/'+me.uid+'/'+chatId).update({
       otherUid, otherName:other.name||'User', otherHandle:other.handle||'user', otherPhoto:other.photoBase64||null,
-      otherVerified:other.verified||false, otherBadgeUrl:other.badgeUrl||null, lastMessage:replyText, lastMessageAt:now, unreadCount:0
+      otherVerified:other.verified||false, otherBadgeUrl:other.badgeUrl||null, otherAccountType:other.accountType||'personal', lastMessage:replyText, lastMessageAt:now, unreadCount:0
     });
     await db.ref('userChats/'+otherUid+'/'+chatId).update({
       otherUid:me.uid, otherName:myData.name||'User', otherHandle:myData.handle||'user', otherPhoto:myData.photoBase64||null,
-      otherVerified:myData.verified||false, otherBadgeUrl:myData.badgeUrl||null, lastMessage:replyText, lastMessageAt:now
+      otherVerified:myData.verified||false, otherBadgeUrl:myData.badgeUrl||null, otherAccountType:myData.accountType||'personal', lastMessage:replyText, lastMessageAt:now
     });
     await db.ref('userChats/'+otherUid+'/'+chatId+'/unreadCount').transaction(c=>(c||0)+1);
     showToast('Reply sent');
@@ -7396,7 +7407,7 @@ async function reshareStoryMention(item){
     const now=Date.now();
     const data={
       uid:me.uid, creatorName:myData.name||'User', creatorHandle:myData.handle||'user',
-      creatorPhoto:myData.photoBase64||null, creatorVerified:!!myData.verified, creatorBadgeUrl:myData.badgeUrl||null,
+      creatorPhoto:myData.photoBase64||null, creatorVerified:!!myData.verified, creatorBadgeUrl:myData.badgeUrl||null,creatorAccountType:myData.accountType||'personal',
       mediaType:item.mediaType, mediaUrl:item.mediaUrl||null, poster:item.poster||null, duration:item.duration||null,
       caption:item.caption||null, text:item.text||null, bg:item.bg||null,
       sharedPulseId:item.sharedPulseId||null, sharedSnapshot:item.sharedSnapshot||null,
@@ -7722,7 +7733,7 @@ async function openFollowList(kind){
       return `<div class="follow-user-item" onclick="closeModal('follow-list-modal');openProfile('${ESC(u.id)}')">
         <div class="who-av">${avContent}</div>
         <div class="who-info">
-          <div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl):''}</div>
+          <div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl,u.accountType==='business'):''}</div>
           <div class="who-handle">@${ESC(u.handle||'user')}</div>
         </div>
         ${isOwn?'':followBtnHtml(u.id)}
@@ -7927,7 +7938,7 @@ async function openListDetail(listId){
       users.map(u=>`
         <div class="who-item" style="padding:12px 18px;" onclick="openProfile('${ESC(u.id)}')">
           <div class="who-av">${u.photoBase64?`<img src="${u.photoBase64}" alt="">`:((u.name||'U').charAt(0))}</div>
-          <div class="who-info"><div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl):''}</div><div class="who-handle">@${ESC(u.handle||'user')}</div></div>
+          <div class="who-info"><div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl,u.accountType==='business'):''}</div><div class="who-handle">@${ESC(u.handle||'user')}</div></div>
           <button class="btn-follow-sm" style="border-color:var(--like);color:var(--like);" onclick="event.stopPropagation();removeMemberFromList('${ESC(listId)}','${ESC(u.id)}')">Remove</button>
         </div>`).join('');
   } catch(e){el.innerHTML='<div class="empty-feed"><p>Could not load list</p></div>';}
@@ -8045,7 +8056,7 @@ async function loadWhoToFollow(){
     <div class="who-item" onclick="openProfile('${ESC(u.id)}')">
       <div class="who-av">${u.photoBase64?`<img src="${u.photoBase64}" alt="">`:((u.name||'U').charAt(0))}</div>
       <div class="who-info">
-        <div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl):''}</div>
+        <div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl,u.accountType==='business'):''}</div>
         <div class="who-handle">@${ESC(u.handle||'user')}</div>
       </div>
       ${followBtnHtml(u.id)}
@@ -8055,7 +8066,7 @@ async function loadWhoToFollow(){
     <div class="who-item" onclick="openProfile('${ESC(u.id)}')">
       <div class="who-av">${u.photoBase64?`<img src="${u.photoBase64}" alt="">`:((u.name||'U').charAt(0))}</div>
       <div class="who-info">
-        <div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl):''}</div>
+        <div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl,u.accountType==='business'):''}</div>
         <div class="who-handle">@${ESC(u.handle||'user')} · ${fmtN(u.followersCount)} followers</div>
       </div>
       ${followBtnHtml(u.id)}
@@ -8103,7 +8114,7 @@ async function doExploreSearch(){
     <div class="who-item" onclick="openProfile('${ESC(u.id)}')">
       <div class="who-av">${u.photoBase64?`<img src="${u.photoBase64}" alt="">`:((u.name||'U').charAt(0).toUpperCase())}</div>
       <div class="who-info">
-        <div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl):''}</div>
+        <div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl,u.accountType==='business'):''}</div>
         <div class="who-handle">@${ESC(u.handle||'user')} · ${fmtN(u.followersCount)} followers</div>
       </div>
       ${followBtnHtml(u.id)}
@@ -8747,7 +8758,7 @@ function renderChatList(){
   el.innerHTML=list.map(c=>{
     const unread=c.unreadCount||0;
     const av=c.otherPhoto?`<img class="chat-list-av" src="${c.otherPhoto}" alt="">`:`<div class="chat-list-av" style="background:linear-gradient(135deg,var(--cyan),var(--amber));display:flex;align-items:center;justify-content:center;font-weight:800;color:#050A14;">${ESC((c.otherName||'U').charAt(0).toUpperCase())}</div>`;
-    const tick=c.otherVerified?verifiedBadgeHtml('',c.otherUid,c.otherBadgeUrl):'';
+    const tick=c.otherVerified?verifiedBadgeHtml('',c.otherUid,c.otherBadgeUrl,c.otherAccountType==='business'):'';
     return `<div class="chat-list-item ${unread?'unread':''}" onclick="openChat('${ESC(c.otherUid)}')">
       ${av}
       <div class="chat-list-info">
@@ -8860,7 +8871,7 @@ async function openChat(otherUid){
   try{
     const snap=await db.ref('users/'+otherUid).once('value');
     const u=snap.val()||{};
-    const tick=u.verified?verifiedBadgeHtml('',otherUid,u.badgeUrl||''):'';
+    const tick=u.verified?verifiedBadgeHtml('',otherUid,u.badgeUrl||'',u.accountType==='business'):'';
     document.getElementById('chat-thread-name').innerHTML=`<span id="chat-thread-name-text">${ESC(u.name||'User')}</span>${tick}`;
     document.getElementById('chat-thread-sub').textContent='@'+(u.handle||'user');
     const avEl=document.getElementById('chat-thread-av');
@@ -9069,7 +9080,7 @@ async function renderNewChatResults(uids){
     <div class="who-item" onclick="openChat('${ESC(u.id)}')">
       <div class="who-av">${u.photoBase64?`<img src="${u.photoBase64}" alt="">`:((u.name||'U').charAt(0).toUpperCase())}</div>
       <div class="who-info">
-        <div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl):''}</div>
+        <div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl,u.accountType==='business'):''}</div>
         <div class="who-handle">@${ESC(u.handle||'user')}</div>
       </div>
       <i class="ph ph-caret-right" style="color:var(--text3);"></i>
@@ -9186,7 +9197,7 @@ function renderReels(list, fetchError){
 function buildReelItem(p, idx){
   const isLiked=likedSet.has(p.id), isBookmarked=bookmarkSet.has(p.id);
   const av=p.creatorPhoto?`<img class="reel-av" src="${p.creatorPhoto}" alt="">`:`<div class="reel-av" style="background:linear-gradient(135deg,var(--cyan),var(--amber));display:flex;align-items:center;justify-content:center;font-weight:800;color:#050A14;">${ESC((p.creatorName||'U').charAt(0).toUpperCase())}</div>`;
-  const tick=p.creatorVerified?verifiedBadgeHtml('',p.uid,p.creatorBadgeUrl):'';
+  const tick=p.creatorVerified?verifiedBadgeHtml('',p.uid,p.creatorBadgeUrl,p.creatorAccountType==='business'):'';
   const followBtn = p.uid!==me.uid ? followBtnHtml(p.uid) : '';
   const src=p.videoUrl||p.videoBase64;
   return `<div class="reel-item" data-idx="${idx}" data-id="${ESC(p.id)}" data-uid="${ESC(p.uid)}">
@@ -9438,7 +9449,7 @@ async function renderReelComments(pulseId){
     }
     list.innerHTML=visible.map(r=>{
       const rav=r.creatorPhoto?`<img class="reel-comment-av" src="${r.creatorPhoto}" alt="">`:`<div class="reel-comment-av">${ESC((r.creatorName||'U').charAt(0).toUpperCase())}</div>`;
-      const tick=r.creatorVerified?verifiedBadgeHtml('',r.uid,r.creatorBadgeUrl):'';
+      const tick=r.creatorVerified?verifiedBadgeHtml('',r.uid,r.creatorBadgeUrl,r.creatorAccountType==='business'):'';
       return `<div class="reel-comment-item">
         ${rav}
         <div class="reel-comment-body">
@@ -9465,7 +9476,7 @@ async function postReelGifComment(gifUrl){
   if(!gifUrl||!pulseId) return;
   try{
     const replyData={uid:me.uid,creatorName:myData.name||'User',creatorHandle:myData.handle||'user',
-      creatorVerified:myData.verified||false,creatorIsAI:myData.isAI||false,creatorBadgeUrl:myData.badgeUrl||null,creatorPhoto:myData.photoBase64||null,
+      creatorVerified:myData.verified||false,creatorIsAI:myData.isAI||false,creatorBadgeUrl:myData.badgeUrl||null,creatorAccountType:myData.accountType||'personal',creatorPhoto:myData.photoBase64||null,
       text:'',gifUrl,parentId:pulseId,isReply:true,likes:0,replies:0,reposts:0,views:0,createdAt:firebase.database.ServerValue.TIMESTAMP};
     const ref=await db.ref('pulses').push(replyData);
     await db.ref('replies/'+pulseId+'/'+ref.key).set(true);
@@ -9493,7 +9504,7 @@ async function postReelComment(){
   const btn=document.getElementById('reel-comment-post-btn'); btn.disabled=true;
   try{
     const replyData={uid:me.uid,creatorName:myData.name||'User',creatorHandle:myData.handle||'user',
-      creatorVerified:myData.verified||false,creatorIsAI:myData.isAI||false,creatorBadgeUrl:myData.badgeUrl||null,creatorPhoto:myData.photoBase64||null,
+      creatorVerified:myData.verified||false,creatorIsAI:myData.isAI||false,creatorBadgeUrl:myData.badgeUrl||null,creatorAccountType:myData.accountType||'personal',creatorPhoto:myData.photoBase64||null,
       text,parentId:pulseId,isReply:true,likes:0,replies:0,reposts:0,views:0,createdAt:firebase.database.ServerValue.TIMESTAMP};
     const ref=await db.ref('pulses').push(replyData);
     await db.ref('replies/'+pulseId+'/'+ref.key).set(true);
