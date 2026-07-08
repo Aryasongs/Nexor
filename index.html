@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1054,6 +1054,19 @@ i.spin::before{content:''!important;}
 .chat-bubble{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;}
 .chat-bubble .pulse-hashtag,.chat-bubble .pulse-mention{user-select:text;}
 .chat-bubble.deleted{font-style:italic;color:var(--text3)!important;background:var(--surface2)!important;opacity:.75;display:flex;align-items:center;gap:6px;}
+/* Instagram-style "shared post" card inside a chat bubble */
+.chat-shared-card{display:flex;align-items:center;gap:10px;padding:8px;border-radius:16px;background:var(--surface2);border:1px solid var(--border2);cursor:pointer;max-width:260px;}
+.chat-shared-card-thumb{width:52px;height:52px;border-radius:10px;overflow:hidden;flex-shrink:0;background:#11151c;display:flex;align-items:center;justify-content:center;}
+.chat-shared-card-thumb img,.chat-shared-card-thumb video{width:100%;height:100%;object-fit:cover;}
+.chat-shared-card-thumb i{font-size:20px;color:var(--text3);}
+.chat-shared-card-body{min-width:0;flex:1;}
+.chat-shared-card-name{font-size:12.5px;font-weight:700;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.chat-shared-card-text{font-size:12px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:1px;}
+.chat-shared-card-view{font-size:11px;color:var(--cyan);font-weight:700;margin-top:3px;}
+/* Send-to-DM picker rows (reuses .who-item layout) */
+.dm-share-row{display:flex;align-items:center;gap:10px;padding:9px 2px;}
+.dm-share-send-btn{padding:6px 16px;border-radius:99px;font-size:12.5px;font-weight:700;background:var(--cyan);color:#050A14;border:none;cursor:pointer;flex-shrink:0;}
+.dm-share-send-btn:disabled{background:var(--surface2);color:var(--text3);cursor:default;}
 .msg-reactions{display:flex;gap:4px;margin-top:3px;flex-wrap:wrap;}
 .chat-bubble-row.mine .msg-reactions{justify-content:flex-end;}
 .msg-reaction-chip{background:var(--surface3);border:1px solid var(--border2);border-radius:12px;padding:1px 7px;font-size:12px;display:inline-flex;align-items:center;gap:2px;cursor:pointer;line-height:1.7;transition:transform .1s;}
@@ -1996,6 +2009,20 @@ i.spin::before{content:''!important;}
     </div>
     <div id="collab-picker-results" style="max-height:50vh;overflow-y:auto;"></div>
     <button class="btn-sheet outline" style="margin-top:12px;" onclick="closeModal('collab-picker-modal')">Cancel</button>
+  </div>
+</div>
+
+<!-- Send to friend (DM share) — Instagram-style share sheet -->
+<div class="modal-overlay" id="dm-share-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Send to</div>
+    <div class="rail-search" style="margin-bottom:12px;">
+      <i class="ph ph-magnifying-glass"></i>
+      <input type="text" placeholder="Search people…" id="dm-share-q" oninput="doDmShareSearch()">
+    </div>
+    <div id="dm-share-results" style="max-height:50vh;overflow-y:auto;"></div>
+    <button class="btn-sheet outline" style="margin-top:12px;" onclick="closeModal('dm-share-modal')">Done</button>
   </div>
 </div>
 
@@ -3151,6 +3178,27 @@ async function backfillPulseBadges(newBadgeUrl){
   } catch(e){ /* best-effort only */ }
 }
 
+// Rewrites creatorAccountType (and collaboratorAccountType, for accepted
+// collabs) on every existing Pulse/reply, plus creatorAccountType on every
+// Article and Story, of mine to the given accountType — so switching to a
+// Business account swaps the verified tick (blue tick -> org tick) on ALL
+// my past activity retroactively, not just new posts going forward.
+// Mirrors backfillPulseBadges' pattern. Best-effort, runs in background.
+async function backfillAccountType(uid, accountType){
+  try{
+    const updates={};
+    const ownSnap=await db.ref('pulses').orderByChild('uid').equalTo(uid).once('value');
+    ownSnap.forEach(c=>{ if((c.val()||{}).creatorAccountType!==accountType) updates['pulses/'+c.key+'/creatorAccountType']=accountType; });
+    const collabSnap=await db.ref('pulses').orderByChild('collaboratorUid').equalTo(uid).once('value');
+    collabSnap.forEach(c=>{ if((c.val()||{}).collaboratorAccountType!==accountType) updates['pulses/'+c.key+'/collaboratorAccountType']=accountType; });
+    const artSnap=await db.ref('articles').orderByChild('uid').equalTo(uid).once('value');
+    artSnap.forEach(c=>{ if((c.val()||{}).creatorAccountType!==accountType) updates['articles/'+c.key+'/creatorAccountType']=accountType; });
+    const storySnap=await db.ref('stories').orderByChild('uid').equalTo(uid).once('value');
+    storySnap.forEach(c=>{ if((c.val()||{}).creatorAccountType!==accountType) updates['stories/'+c.key+'/creatorAccountType']=accountType; });
+    if(Object.keys(updates).length) await db.ref().update(updates).catch(()=>{});
+  } catch(e){ /* best-effort only */ }
+}
+
 function friendlyErr(err){
   const m={
     'auth/invalid-email':'Invalid email address.',
@@ -3198,6 +3246,7 @@ async function onSignedIn(){
   startChatsOnce();
   ensureNexorAccount().catch(()=>{}); // just keeps @nexor's badge in sync, never posts anything
   syncAffiliateBadge().catch(()=>{}); // keeps my own org badge in sync with my affiliation, if any
+  if(myData.accountType==='business') backfillAccountType(me.uid, 'business').catch(()=>{}); // catches old posts made before this account went Business
   // Everything below only refines ranking/state — it never blocks or resets the feed,
   // it just re-renders in place once ready (no spinner, no reload flash).
   Promise.all([loadSentRequests(),loadLikes(),loadBookmarks(),loadReposts()])
@@ -4370,6 +4419,7 @@ async function ensureNexorAccount(){
     if(u.badgeUrl!==NEXOR_BADGE_URL) updates.badgeUrl=NEXOR_BADGE_URL;
     if(u.accountType!=='business') updates.accountType='business';
     if(Object.keys(updates).length) await db.ref('users/'+uid).update(updates).catch(()=>{});
+    backfillAccountType(uid, 'business').catch(()=>{}); // catch nexor's own past auto-posts too
   }catch(e){ /* best-effort */ }
 }
 
@@ -5385,6 +5435,7 @@ async function saveAccountType(){
     await db.ref('users/'+me.uid).update(updates);
     myData.accountType=updates.accountType;
     myData.accountCategory=updates.accountCategory;
+    backfillAccountType(me.uid, updates.accountType).catch(()=>{}); // retroactively update the tick on all past posts/replies/articles/stories
     showToast(acctTypeSelected==='personal' ? "You're back on a Personal account" : `Switched to a ${acctTypeSelected==='creator'?'Creator':'Business'} account ✓`);
     navBack();
     loadSettingsScreen();
@@ -5792,6 +5843,120 @@ function renderCollabChip(target){
 function removeCollab(target){
   setPendingCollab(target,null);
   renderCollabChip(target);
+}
+
+// ============================================================
+// SEND TO FRIEND (DM SHARE) — Instagram-style share sheet. Lets you send
+// any Pulse/Bolt straight into a friend's DM as a tappable preview card,
+// without leaving the feed/reel. Reuses the same search-your-following
+// pattern as the Collab picker above.
+// ============================================================
+let dmSharePulseId=null, dmShareUserCache={}, dmShareSentTo=new Set();
+function openDmShareModal(pulseId){
+  dmSharePulseId=pulseId;
+  dmShareSentTo=new Set();
+  document.getElementById('dm-share-q').value='';
+  openModal('dm-share-modal');
+  renderDmShareResults(Array.from(followingSet).slice(0,20));
+}
+async function renderDmShareResults(uids){
+  const el=document.getElementById('dm-share-results');
+  if(!uids.length){ el.innerHTML='<div class="empty-feed" style="padding:20px;"><p>No people to show yet.</p></div>'; return; }
+  el.innerHTML='<div class="feed-loader"><i class="ph ph-spinner-gap spin"></i></div>';
+  const users=await Promise.all(uids.map(id=>db.ref('users/'+id).once('value').then(s=>({id,...(s.val()||{})}))));
+  const filtered=users.filter(u=>u.id!==me.uid && !blockedSet.has(u.id));
+  if(!filtered.length){ el.innerHTML='<div class="empty-feed" style="padding:20px;"><p>No results.</p></div>'; return; }
+  filtered.forEach(u=>{dmShareUserCache[u.id]=u;});
+  el.innerHTML=filtered.map(u=>{
+    const sent=dmShareSentTo.has(u.id);
+    return `
+    <div class="dm-share-row">
+      <div class="who-av">${u.photoBase64?`<img src="${u.photoBase64}" alt="">`:((u.name||'U').charAt(0).toUpperCase())}</div>
+      <div class="who-info" style="flex:1;">
+        <div class="who-name">${ESC(u.name||'User')}${u.verified?verifiedBadgeHtml('',u.id,u.badgeUrl,u.accountType==='business'):''}</div>
+        <div class="who-handle">@${ESC(u.handle||'user')}</div>
+      </div>
+      <button class="dm-share-send-btn" id="dm-share-btn-${CSS.escape(u.id)}" ${sent?'disabled':''} onclick="sendPulseToDmUser('${ESC(u.id)}')">${sent?'Sent <i class="ph ph-check"></i>':'Send'}</button>
+    </div>`;
+  }).join('');
+}
+let dmShareSearchT=null;
+function doDmShareSearch(){
+  clearTimeout(dmShareSearchT);
+  dmShareSearchT=setTimeout(async ()=>{
+    const raw=document.getElementById('dm-share-q').value.trim().toLowerCase().replace(/^@/,'');
+    if(!raw){ renderDmShareResults(Array.from(followingSet).slice(0,20)); return; }
+    const el=document.getElementById('dm-share-results');
+    el.innerHTML='<div class="feed-loader"><i class="ph ph-spinner-gap spin"></i></div>';
+    const usersSnap=await db.ref('users').limitToLast(300).once('value');
+    const matches=[];
+    usersSnap.forEach(c=>{
+      if(c.key===me.uid || blockedSet.has(c.key)) return;
+      const d=c.val()||{};
+      if((d.name||'').toLowerCase().includes(raw)||(d.handle||'').toLowerCase().includes(raw)) matches.push(c.key);
+    });
+    renderDmShareResults(matches.slice(0,25));
+  },250);
+}
+async function sendPulseToDmUser(otherUid){
+  if(!dmSharePulseId || dmShareSentTo.has(otherUid)) return;
+  const btn=document.getElementById('dm-share-btn-'+CSS.escape(otherUid));
+  if(btn){ btn.disabled=true; btn.textContent='Sending…'; }
+  try{
+    const pSnap=await db.ref('pulses/'+dmSharePulseId).once('value');
+    const p=pSnap.val();
+    if(!p){ showToast('Could not find this post'); if(btn){btn.disabled=false;btn.textContent='Send';} return; }
+    const isVideo=!!(p.videoUrl||p.videoBase64);
+    const image=(p.images&&p.images[0])||p.imageBase64||null;
+    const sharedSnapshot={
+      creatorName:p.creatorName||'User', creatorHandle:p.creatorHandle||'user', creatorPhoto:p.creatorPhoto||null,
+      text:p.text||'', image, video:p.videoUrl||p.videoBase64||null, videoPoster:p.videoPoster||null, isVideo
+    };
+    const chatId=chatIdFor(me.uid,otherUid);
+    const lastMsgLabel = isVideo ? 'Sent a Bolt' : 'Sent a post';
+    await db.ref('messages').push({
+      chatId, senderUid:me.uid, text:'', sharedPulseId:dmSharePulseId, sharedSnapshot,
+      createdAt:firebase.database.ServerValue.TIMESTAMP
+    });
+    const now=firebase.database.ServerValue.TIMESTAMP;
+    const other=dmShareUserCache[otherUid]||{};
+    await db.ref('userChats/'+me.uid+'/'+chatId).update({
+      otherUid, otherName:other.name||'User', otherHandle:other.handle||'user', otherPhoto:other.photoBase64||null,
+      otherVerified:other.verified||false, otherBadgeUrl:other.badgeUrl||null, otherAccountType:other.accountType||'personal',
+      lastMessage:lastMsgLabel, lastMessageAt:now, unreadCount:0
+    });
+    await db.ref('userChats/'+otherUid+'/'+chatId).update({
+      otherUid:me.uid, otherName:myData.name||'User', otherHandle:myData.handle||'user', otherPhoto:myData.photoBase64||null,
+      otherVerified:myData.verified||false, otherBadgeUrl:myData.badgeUrl||null, otherAccountType:myData.accountType||'personal',
+      lastMessage:lastMsgLabel, lastMessageAt:now
+    });
+    await db.ref('userChats/'+otherUid+'/'+chatId+'/unreadCount').transaction(cur=>(cur||0)+1);
+    dmShareSentTo.add(otherUid);
+    if(btn){ btn.disabled=true; btn.innerHTML='Sent <i class="ph ph-check"></i>'; }
+    showToast('Sent!');
+  }catch(e){
+    console.error('DM share failed', e);
+    showToast('Could not send: '+(e.message||''));
+    if(btn){ btn.disabled=false; btn.textContent='Send'; }
+  }
+}
+// Compact "shared post" preview card rendered INSIDE a chat bubble —
+// smaller cousin of buildSharedPostCardHtml (which is full-bleed, for
+// stories). Tapping it opens the original Pulse/Bolt.
+function buildDmSharedCardHtml(snap, pulseId){
+  if(!snap) return '<div class="chat-shared-card"><div class="chat-shared-card-body"><div class="chat-shared-card-text">This post is no longer available</div></div></div>';
+  const thumb = snap.videoPoster || snap.image || null;
+  const thumbHtml = thumb
+    ? `<img src="${thumb}" alt="">`
+    : (snap.video ? `<i class="ph-fill ph-play-circle"></i>` : `<i class="ph ph-file-text"></i>`);
+  return `<div class="chat-shared-card" onclick="event.stopPropagation();openDetail('${ESC(pulseId)}')">
+    <div class="chat-shared-card-thumb">${thumbHtml}</div>
+    <div class="chat-shared-card-body">
+      <div class="chat-shared-card-name">${ESC(snap.creatorName||'User')}</div>
+      <div class="chat-shared-card-text">${ESC((snap.text||(snap.isVideo?'Bolt':'Post')).slice(0,40))}</div>
+      <div class="chat-shared-card-view">View ${snap.isVideo?'Bolt':'post'}</div>
+    </div>
+  </div>`;
 }
 
 // ============================================================
@@ -8956,6 +9121,14 @@ function renderChatMessages(items){
     const chipHtml = Object.keys(counts).length ? `<div class="msg-reactions">${Object.entries(counts).map(([em,ct])=>
       `<span class="msg-reaction-chip ${em===myReact?'mine-reacted':''}" onclick='event.stopPropagation();toggleMsgReaction("${m.id}","${em}")'>${em}${ct>1?' '+ct:''}</span>`
     ).join('')}</div>` : '';
+    if(m.sharedPulseId){
+      html+=`<div class="chat-bubble-row ${mine?'mine':''}"><div class="chat-msg-col">
+        ${buildDmSharedCardHtml(m.sharedSnapshot, m.sharedPulseId)}
+        ${chipHtml}
+        <div class="chat-bubble-time">${time}</div>
+      </div></div>`;
+      return;
+    }
     html+=`<div class="chat-bubble-row ${mine?'mine':''}"><div class="chat-msg-col">
       <div class="chat-bubble" onpointerdown="msgPressStart(event,'${m.id}',${mine})" onpointerup="msgPressCancel()" onpointerleave="msgPressCancel()" onpointercancel="msgPressCancel()" oncontextmenu="event.preventDefault();openMsgCtxMenu(event,'${m.id}',${mine})">${linkifyText(ESC(m.text||''))}</div>
       ${chipHtml}
@@ -9223,6 +9396,7 @@ function buildReelItem(p, idx){
         <div class="reel-action-btn ${isLiked?'liked-state':''}" id="rla-${CSS.escape(p.id)}" onclick="reelToggleLike('${ESC(p.id)}')"><i class="ph${isLiked?'-fill':''} ph-heart"></i><span>${fmtN(p.likes||0)}</span></div>
         <div class="reel-action-btn" onclick="openReelComments('${ESC(p.id)}')"><i class="ph ph-chat-circle-dots"></i><span>${fmtN(p.replies||0)}</span></div>
         <div class="reel-action-btn ${isBookmarked?'bookmarked-state':''}" id="rba-${CSS.escape(p.id)}" onclick="reelToggleBookmark('${ESC(p.id)}')"><i class="ph${isBookmarked?'-fill':''} ph-bookmark-simple"></i></div>
+        <div class="reel-action-btn" onclick="openDmShareModal('${ESC(p.id)}')"><i class="ph ph-paper-plane-tilt"></i></div>
         <div class="reel-action-btn" onclick="shareUrl('${ESC(p.id)}')"><i class="ph ph-share-network"></i></div>
         <div class="reel-action-btn" onclick="sharePulseToOwnStory('${ESC(p.id)}')"><i class="ph ph-circles-three"></i></div>
       </div>
