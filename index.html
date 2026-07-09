@@ -1169,6 +1169,16 @@ i.spin::before{content:''!important;}
   <div class="boot-spinner"><i class="ph ph-spinner-gap spin"></i></div>
 </div>
 
+<!-- ====== GEO-RESTRICTED PROFILE — shown instead of a profile that's legally blocked in your country ====== -->
+<div id="geo-restricted-screen" style="display:none;position:fixed;inset:0;z-index:9998;background:var(--bg,#050A14);align-items:center;justify-content:center;flex-direction:column;padding:24px;">
+  <button onclick="hideRestrictedOverlay();navBack();" style="position:absolute;top:18px;left:18px;background:none;border:none;color:var(--text2);font-size:22px;padding:8px;"><i class="ph ph-arrow-left"></i></button>
+  <div style="max-width:340px;width:100%;text-align:center;">
+    <i class="ph ph-scales" style="font-size:44px;color:var(--text3);"></i>
+    <div style="font-size:18px;font-weight:800;margin:14px 0 6px;">Content unavailable</div>
+    <div style="font-size:14px;color:var(--text3);">This account is unavailable in your country due to legal requirements.</div>
+  </div>
+</div>
+
 <!-- ====== TWO-FACTOR LOGIN GATE — shown after password login when 2FA is on, before the app is revealed ====== -->
 <div id="tfa-screen" style="display:none;position:fixed;inset:0;z-index:9999;background:var(--bg,#050A14);align-items:center;justify-content:center;flex-direction:column;padding:24px;">
   <div style="max-width:340px;width:100%;text-align:center;">
@@ -1670,6 +1680,18 @@ i.spin::before{content:''!important;}
       <div class="settings-row-text">
         <div class="settings-row-title">Link phone number</div>
         <div class="settings-row-sub" id="settings-phone-sub">Add a phone number for account recovery</div>
+      </div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+  </div>
+
+  <div class="settings-section-title hidden" id="settings-admin-title">Admin</div>
+  <div class="settings-section">
+    <div class="settings-row hidden" id="settings-admin-row" onclick="openGeoRestrictionsAdmin()">
+      <i class="ph ph-scales"></i>
+      <div class="settings-row-text">
+        <div class="settings-row-title">Country restrictions</div>
+        <div class="settings-row-sub">Legally block an account in specific countries</div>
       </div>
       <i class="ph ph-caret-right" style="font-size:16px;"></i>
     </div>
@@ -2199,6 +2221,29 @@ i.spin::before{content:''!important;}
   </div>
 </div>
 
+<!-- Geo-Restrictions Admin (only reachable if me.uid === ADMIN_UID; real enforcement is in DB rules) -->
+<div class="modal-overlay" id="geo-restrict-admin-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="display:flex;align-items:center;gap:6px;"><i class="ph ph-scales" style="color:var(--cyan);"></i> Country restrictions</div>
+
+    <div class="sheet-label">User UID to restrict</div>
+    <input class="sheet-field" id="gr-uid" type="text" placeholder="Firebase UID of the account">
+    <div class="sheet-label">Country codes (comma-separated, e.g. IN,PK)</div>
+    <input class="sheet-field" id="gr-countries" type="text" placeholder="IN,PK">
+    <div class="sheet-label">Reason</div>
+    <input class="sheet-field" id="gr-reason" type="text" placeholder="e.g. Court order under IT Act">
+    <div class="sheet-label">Legal / government order ID</div>
+    <input class="sheet-field" id="gr-order-id" type="text" placeholder="Order reference number">
+    <div class="auth-error" id="gr-err" style="margin-bottom:10px;"></div>
+    <button class="btn-sheet primary" id="gr-submit-btn" onclick="grAddRestriction()"><i class="ph ph-shield-warning"></i> Apply restriction</button>
+    <button class="btn-sheet outline" style="margin-top:8px;" onclick="closeModal('geo-restrict-admin-modal')">Close</button>
+
+    <div class="sheet-label" style="margin-top:18px;">Currently restricted accounts</div>
+    <div id="gr-list" style="max-height:35vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
 <!-- Link Phone Number — SMS OTP via TextBee -->
 <div class="modal-overlay" id="link-phone-modal">
   <div class="modal-sheet">
@@ -2711,6 +2756,13 @@ let bookmarkSet  = new Set();
 let repostSet    = new Set();
 let blockedSet   = new Set();
 let mutedSet     = new Set();
+let restrictedUidSet = new Set(); // uids that are legally geo-restricted in MY current country
+let myCountryCode = null;
+// ⚠️ Set this to your own Firebase Auth UID (Firebase Console → Authentication →
+// find your account → copy the "User UID" column). Only this UID is treated as
+// admin in the UI. The REAL enforcement is in the Database Rules, not here —
+// this constant only controls whether the admin screen is shown to you.
+const ADMIN_UID = 'aRq9nXHH63R90c5MC6DZ5wXD3r93';
 let unsubscribers = [];
 let profileUid = null;
 let profileHandleCache = '';
@@ -3416,7 +3468,7 @@ auth.onAuthStateChanged(async user => {
     document.getElementById('auth-screen').style.display='flex';
     document.getElementById('tfa-screen').style.display='none';
     document.getElementById('app').classList.remove('active');
-    myData={}; followingSet=new Set(); requestedSet=new Set(); likedSet=new Set(); bookmarkSet=new Set(); repostSet=new Set(); blockedSet=new Set(); mutedSet=new Set();
+    myData={}; followingSet=new Set(); requestedSet=new Set(); likedSet=new Set(); bookmarkSet=new Set(); repostSet=new Set(); blockedSet=new Set(); mutedSet=new Set(); restrictedUidSet=new Set();
     chatListCache=[]; activeChatId=null; activeChatOtherUid=null;
     document.getElementById('feed-list').innerHTML='';
     document.getElementById('stories-bar').innerHTML='';
@@ -3441,7 +3493,7 @@ async function onSignedIn(){
   if(myData.accountType==='business') backfillAccountType(me.uid, 'business').catch(()=>{}); // catches old posts made before this account went Business
   // Everything below only refines ranking/state — it never blocks or resets the feed,
   // it just re-renders in place once ready (no spinner, no reload flash).
-  Promise.all([loadSentRequests(),loadLikes(),loadBookmarks(),loadReposts()])
+  Promise.all([loadSentRequests(),loadLikes(),loadBookmarks(),loadReposts(),loadGeoRestrictions()])
     .then(()=>buildMyInterests())
     .catch(e=>console.error('buildMyInterests failed:',e))
     .finally(()=>renderFeed());
@@ -3478,6 +3530,131 @@ async function loadLikes(){ const s=await db.ref('userLikes/'+me.uid).once('valu
 async function loadBookmarks(){ const s=await db.ref('bookmarks/'+me.uid).once('value'); bookmarkSet=new Set(Object.keys(s.val()||{})); }
 async function loadReposts(){ const s=await db.ref('userReposts/'+me.uid).once('value'); repostSet=new Set(Object.keys(s.val()||{})); }
 async function loadBlocked(){ const s=await db.ref('blocked/'+me.uid).once('value'); blockedSet=new Set(Object.keys(s.val()||{})); }
+
+// ============================================================
+// GEO-RESTRICTIONS (country-specific legal takedowns)
+// ============================================================
+// Detects the visitor's country via IP lookup (best-effort, cached for the
+// session so we only make this call once). This is CLIENT-SIDE detection —
+// see the note further down / the chat writeup for why a real legal
+// compliance system should double-check this server-side.
+async function detectMyCountryCode(){
+  const cached=sessionStorage.getItem('myCountryCode');
+  if(cached) return cached==='__none__' ? null : cached;
+  try{
+    const ctrl=new AbortController();
+    const t=setTimeout(()=>ctrl.abort(),4000);
+    const res=await fetch('https://ipapi.co/json/',{signal:ctrl.signal});
+    clearTimeout(t);
+    if(!res.ok) throw new Error('geo lookup failed');
+    const data=await res.json();
+    const cc=(data && data.country_code) ? data.country_code.toUpperCase() : null;
+    sessionStorage.setItem('myCountryCode', cc||'__none__');
+    return cc;
+  }catch(e){ sessionStorage.setItem('myCountryCode','__none__'); return null; }
+}
+async function loadGeoRestrictions(){
+  try{
+    myCountryCode = await detectMyCountryCode();
+    if(!myCountryCode){ restrictedUidSet=new Set(); return; }
+    const snap=await db.ref('restrictions').once('value');
+    const data=snap.val()||{};
+    const set=new Set();
+    Object.keys(data).forEach(uid=>{ if(data[uid] && data[uid][myCountryCode]) set.add(uid); });
+    restrictedUidSet=set;
+  }catch(e){ console.error('loadGeoRestrictions failed', e); }
+}
+function restrictedMessageHtml(){
+  return `<div style="text-align:center;padding:60px 24px;color:var(--text3);">
+    <i class="ph ph-scales" style="font-size:44px;color:var(--text3);"></i>
+    <p style="font-size:16px;font-weight:700;color:var(--text2);margin:14px 0 6px;">Content unavailable</p>
+    <p style="font-size:14px;max-width:320px;margin:0 auto;">This account is unavailable in your country due to legal requirements.</p>
+  </div>`;
+}
+function showRestrictedOverlay(){ document.getElementById('geo-restricted-screen').style.display='flex'; }
+function hideRestrictedOverlay(){ document.getElementById('geo-restricted-screen').style.display='none'; }
+
+// ---- Admin controls (real enforcement is in Database Rules — this UI is
+// only reachable by ADMIN_UID as a convenience, it is NOT the security boundary) ----
+function openGeoRestrictionsAdmin(){
+  if(!me || me.uid!==ADMIN_UID){ showToast('Not authorized'); return; }
+  document.getElementById('gr-uid').value='';
+  document.getElementById('gr-countries').value='';
+  document.getElementById('gr-reason').value='';
+  document.getElementById('gr-order-id').value='';
+  document.getElementById('gr-err').textContent='';
+  openModal('geo-restrict-admin-modal');
+  grRenderList();
+}
+async function grAddRestriction(){
+  const errEl=document.getElementById('gr-err');
+  errEl.textContent='';
+  const uid=document.getElementById('gr-uid').value.trim();
+  const countriesRaw=document.getElementById('gr-countries').value.trim().toUpperCase();
+  const reason=document.getElementById('gr-reason').value.trim();
+  const orderId=document.getElementById('gr-order-id').value.trim();
+  if(!uid){ errEl.textContent='Enter the target user UID.'; return; }
+  const countries=countriesRaw.split(',').map(c=>c.trim()).filter(c=>/^[A-Z]{2}$/.test(c));
+  if(!countries.length){ errEl.textContent='Enter at least one valid 2-letter country code (e.g. IN, PK, US).'; return; }
+  const btn=document.getElementById('gr-submit-btn');
+  btn.disabled=true; btn.innerHTML='<i class="ph ph-spinner-gap spin"></i> Applying…';
+  try{
+    // Verify the account actually exists before restricting it
+    const uSnap=await db.ref('users/'+uid).once('value');
+    if(!uSnap.exists()){ errEl.textContent='No account found with that UID.'; btn.disabled=false; btn.innerHTML='<i class="ph ph-shield-warning"></i> Apply restriction'; return; }
+
+    const countryMap={}; countries.forEach(c=>countryMap[c]=true);
+    await db.ref('restrictions/'+uid).update(countryMap);
+    await db.ref('restrictionDetails/'+uid).set({
+      reason: reason||null,
+      legalOrderId: orderId||null,
+      countries,
+      createdAt: firebase.database.ServerValue.TIMESTAMP,
+      createdBy: me.uid
+    });
+    showToast('Restriction applied ✓');
+    document.getElementById('gr-uid').value='';
+    document.getElementById('gr-countries').value='';
+    document.getElementById('gr-reason').value='';
+    document.getElementById('gr-order-id').value='';
+    grRenderList();
+    if(uid===profileUid) restrictedUidSet.add(uid); // reflect instantly for the admin's own session
+  }catch(err){
+    errEl.textContent = err.message || 'Could not apply restriction — check Database Rules.';
+  }
+  btn.disabled=false; btn.innerHTML='<i class="ph ph-shield-warning"></i> Apply restriction';
+}
+async function grRenderList(){
+  const listEl=document.getElementById('gr-list');
+  listEl.innerHTML='<div class="feed-loader"><i class="ph ph-spinner-gap spin"></i></div>';
+  try{
+    const snap=await db.ref('restrictionDetails').once('value');
+    const data=snap.val()||{};
+    const uids=Object.keys(data);
+    if(!uids.length){ listEl.innerHTML='<p style="color:var(--text3);font-size:13px;padding:8px 4px;">No restricted accounts.</p>'; return; }
+    const rows=await Promise.all(uids.map(async uid=>{
+      const u=(await db.ref('users/'+uid).once('value')).val()||{};
+      const d=data[uid];
+      return `<div style="padding:12px 4px;border-bottom:1px solid var(--border,#1c2636);">
+        <div style="font-size:14px;font-weight:700;">${ESC(u.name||'Unknown user')} <span style="color:var(--text3);font-weight:400;">@${ESC(u.handle||uid)}</span></div>
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">Countries: ${ESC((d.countries||[]).join(', '))}</div>
+        ${d.reason?`<div style="font-size:12px;color:var(--text3);">Reason: ${ESC(d.reason)}</div>`:''}
+        ${d.legalOrderId?`<div style="font-size:12px;color:var(--text3);">Order ID: ${ESC(d.legalOrderId)}</div>`:''}
+        <button class="btn-sheet outline" style="margin-top:6px;padding:6px 12px;font-size:12px;" onclick="grRemoveRestriction('${ESC(uid)}')">Remove restriction</button>
+      </div>`;
+    }));
+    listEl.innerHTML=rows.join('');
+  }catch(e){ listEl.innerHTML='<p style="color:var(--text3);font-size:13px;padding:8px 4px;">Could not load — check Database Rules.</p>'; }
+}
+async function grRemoveRestriction(uid){
+  if(!confirm('Remove all country restrictions for this account?')) return;
+  try{
+    await db.ref('restrictions/'+uid).remove();
+    await db.ref('restrictionDetails/'+uid).remove();
+    showToast('Restriction removed');
+    grRenderList();
+  }catch(e){ showToast('Could not remove — check Database Rules.'); }
+}
 async function loadMuted(){ const s=await db.ref('muted/'+me.uid).once('value'); mutedSet=new Set(Object.keys(s.val()||{})); }
 
 // ============================================================
@@ -3564,7 +3741,7 @@ let feedOrderCache = null; // {tab, key, ids} — see note below
 function renderFeed(){
   if(!lastFeedPulses) return;
   const el = document.getElementById('feed-list');
-  let visible = lastFeedPulses.filter(p => !blockedSet.has(p.uid) && !mutedSet.has(p.uid) && isPulseVisible(p));
+  let visible = lastFeedPulses.filter(p => !blockedSet.has(p.uid) && !mutedSet.has(p.uid) && !restrictedUidSet.has(p.uid) && isPulseVisible(p));
   if(feedTab==='following'){
     visible = visible.filter(p => followingSet.has(p.uid)||p.uid===me.uid);
   } else {
@@ -3926,7 +4103,7 @@ function handleMentionTrigger(ta){
         : await db.ref('users').orderByChild('followersCount').limitToLast(6).once('value');
     }catch(e){ box.classList.add('hidden'); return; }
     const users=[]; snap.forEach(c=>users.unshift({id:c.key,...c.val()}));
-    const filtered=users.filter(u=>u.id!==me.uid&&(u.handle||'').toLowerCase().startsWith(q));
+    const filtered=users.filter(u=>u.id!==me.uid&&(u.handle||'').toLowerCase().startsWith(q)&&!restrictedUidSet.has(u.id));
     if(!filtered.length){ box.classList.add('hidden'); return; }
     box.innerHTML=filtered.map(u=>{
       const av=u.photoBase64?`<img src="${u.photoBase64}" alt="">`:(u.name||'U').charAt(0).toUpperCase();
@@ -5575,6 +5752,11 @@ async function loadSettingsScreen(){
   document.getElementById('settings-login-alerts-toggle').classList.toggle('on',alertsOn);
   document.getElementById('settings-login-alerts-sub').textContent = alertsOn?"On — we'll email you about new logins":"Off — turn on to be emailed about new logins";
   document.getElementById('settings-phone-sub').textContent = myData.phone ? (myData.phone+(myData.phoneVerified?' · Verified':' · Unverified')) : 'Add a phone number for account recovery';
+  const adminRow=document.getElementById('settings-admin-row');
+  const isAdminUser = !!(me && me.uid===ADMIN_UID);
+  if(adminRow) adminRow.classList.toggle('hidden', !isAdminUser);
+  const adminTitle=document.getElementById('settings-admin-title');
+  if(adminTitle) adminTitle.classList.toggle('hidden', !isAdminUser);
   refreshVerifySettingsRow();
   const acctType=myData.accountType||'personal';
   const acctLabels={personal:'Personal account',creator:'Creator'+(myData.accountCategory?' · '+myData.accountCategory:''),business:'Business'+(myData.accountCategory?' · '+myData.accountCategory:'')};
@@ -6199,6 +6381,7 @@ async function openDetail(pulseId){
   const handler=ref.on('value', async snap=>{
     const p=snap.val();
     if(!p){el.innerHTML='<div class="empty-feed"><p>Pulse not found.</p></div>';return;}
+    if(p.uid!==me.uid && restrictedUidSet.has(p.uid)){ el.innerHTML=restrictedMessageHtml(); return; }
     p.id=pulseId;
     const isLiked=likedSet.has(pulseId), isBM=bookmarkSet.has(pulseId);
     const letter=(p.creatorName||'U').charAt(0).toUpperCase();
@@ -6257,7 +6440,7 @@ async function openDetail(pulseId){
       replyPulses.forEach(r=>{ if(r.uid) validReplies.push(r); else orphanIds.push(r.id); });
       orphanIds.forEach(id=>{ db.ref('replies/'+pulseId+'/'+id).remove().catch(()=>{}); });
       validReplies.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-      repliesHtml='<div class="replies-section">'+validReplies.filter(r=>!blockedSet.has(r.uid)&&!mutedSet.has(r.uid)).map(r=>buildPulseCard(r)).join('')+'</div>';
+      repliesHtml='<div class="replies-section">'+validReplies.filter(r=>!blockedSet.has(r.uid)&&!mutedSet.has(r.uid)&&!restrictedUidSet.has(r.uid)).map(r=>buildPulseCard(r)).join('')+'</div>';
     }
     el.innerHTML=`
       <div style="padding:16px 18px 0;">
@@ -6345,6 +6528,10 @@ function maybeShowBirthdayAnimation(uid, dobStr, displayName){
 }
 async function openProfile(uid){
   if(!uid) return;
+  if(me && me.uid && uid!==me.uid && restrictedUidSet.has(uid)){
+    showRestrictedOverlay();
+    return;
+  }
   // Universal story behavior: tapping ANY OTHER account's profile picture
   // anywhere in the app (feed, chat, notifications, search, etc.) opens
   // their active/unseen story first, Instagram-style, falling through to
@@ -8529,7 +8716,7 @@ async function openFollowList(kind){
   try{
     const snap=await db.ref(kind+'/'+uid).once('value');
     const data=snap.val()||{};
-    const ids=Object.keys(data);
+    const ids=Object.keys(data).filter(id=>!restrictedUidSet.has(id));
     if(!ids.length){document.getElementById('follow-list-content').innerHTML='<div style="text-align:center;padding:24px;color:var(--text3);">No '+(kind==='followers'?'followers yet':'one following yet')+'</div>';return;}
     const users=await Promise.all(ids.map(id=>db.ref('users/'+id).once('value').then(s=>({id,...(s.val()||{})}))));
     document.getElementById('follow-list-content').innerHTML=users.map(u=>{
@@ -8560,14 +8747,15 @@ function loadNotifs(){
   const ref=db.ref('notifications/'+me.uid).orderByChild('createdAt').limitToLast(50);
   const handler=ref.on('value', snap=>{
     const items=[]; snap.forEach(child=>items.push({id:child.key,...child.val()}));
-    items.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-    const unread=items.filter(n=>!n.read).length;
+    const itemsAll=items.filter(n=>!restrictedUidSet.has(n.fromUid));
+    itemsAll.sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
+    const unread=itemsAll.filter(n=>!n.read).length;
     const badge=document.getElementById('notif-badge');
     if(badge){badge.textContent=unread;badge.classList.toggle('hidden',unread===0);}
     const badgeM=document.getElementById('notif-badge-mobile');
     if(badgeM){badgeM.textContent=unread>99?'99+':unread;badgeM.classList.toggle('hidden',unread===0);}
     const el=document.getElementById('notif-list'); if(!el)return;
-    if(!items.length){el.innerHTML='<div class="empty-feed"><i class="ph ph-bell"></i><p>No alerts yet</p></div>';return;}
+    if(!itemsAll.length){el.innerHTML='<div class="empty-feed"><i class="ph ph-bell"></i><p>No alerts yet</p></div>';return;}
     const icons={like:'ph-fill ph-heart',follow:'ph ph-user-plus',follow_request:'ph ph-user-plus',follow_accept:'ph ph-user-check',repost:'ph ph-repeat',reply:'ph ph-chat-circle-dots',mention:'ph ph-at',story_mention:'ph ph-at',story_like:'ph-fill ph-heart',collab_request:'ph ph-users-three',collab_accept:'ph ph-users-three',moderation:'ph ph-shield-warning'};
     const msgs={
       like:`<strong>${'%n'}</strong> liked your Pulse`,
@@ -8583,7 +8771,7 @@ function loadNotifs(){
       collab_accept:`<strong>${'%n'}</strong> accepted your collab invite`
     };
     try{
-      el.innerHTML=items.map(n=>{
+      el.innerHTML=itemsAll.map(n=>{
         // Moderation alerts carry their own literal message (no fromName to fill in)
         const msg=n.type==='moderation'?ESC(n.message||'Your content was removed for violating our community guidelines.'):(msgs[n.type]||'New notification').replace('%n',ESC(n.fromName));
         if(n.type==='follow_request'){
@@ -8894,6 +9082,7 @@ async function doExploreSearch(){
     const d=c.val()||{};
     if(c.key===me.uid) return;
     if(blockedSet.has(c.key)) return;
+    if(restrictedUidSet.has(c.key)) return;
     if((d.name||'').toLowerCase().includes(q)||(d.handle||'').toLowerCase().includes(q))
       people.push({id:c.key,...d});
   });
@@ -8906,6 +9095,7 @@ async function doExploreSearch(){
   snap.forEach(c=>{
     const d=c.val();
     if(blockedSet.has(d.uid)||mutedSet.has(d.uid)) return;
+    if(restrictedUidSet.has(d.uid)) return;
     if(!isPulseVisible({id:c.key,...d})) return;
     if((d.text||'').toLowerCase().includes(q)||(d.creatorName||'').toLowerCase().includes(q)||(d.creatorHandle||'').toLowerCase().includes(q))
       results.unshift({id:c.key,...d});
@@ -8951,7 +9141,7 @@ async function openHashtag(tag){
   const snap=await db.ref('pulses').orderByChild('createdAt').limitToLast(300).once('value');
   const re=new RegExp('(^|[^\\w@#])#'+tag.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+'(\\W|$)','i');
   const results=[];
-  snap.forEach(c=>{ const d=c.val(); const item={id:c.key,...d}; if(re.test(d.text||'')&&isPulseVisible(item)) results.unshift(item); });
+  snap.forEach(c=>{ const d=c.val(); const item={id:c.key,...d}; if(re.test(d.text||'')&&isPulseVisible(item)&&!restrictedUidSet.has(d.uid)) results.unshift(item); });
   if(!results.length){ el.innerHTML='<div class="empty-feed"><p>No Pulses with #'+ESC(tag)+'</p></div>'; return; }
   el.innerHTML='<div class="search-section-title">'+results.length+' Pulse'+(results.length===1?'':'s')+' · #'+ESC(tag)+'</div>'+results.map(p=>buildPulseCard(p)).join('');
 }
