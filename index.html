@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1170,12 +1170,16 @@ i.spin::before{content:''!important;}
 </div>
 
 <!-- ====== GEO-RESTRICTED PROFILE — shown instead of a profile that's legally blocked in your country ====== -->
-<div id="geo-restricted-screen" style="display:none;position:fixed;inset:0;z-index:9998;background:var(--bg,#050A14);align-items:center;justify-content:center;flex-direction:column;padding:24px;">
-  <button onclick="hideRestrictedOverlay();navBack();" style="position:absolute;top:18px;left:18px;background:none;border:none;color:var(--text2);font-size:22px;padding:8px;"><i class="ph ph-arrow-left"></i></button>
-  <div style="max-width:340px;width:100%;text-align:center;">
-    <i class="ph ph-scales" style="font-size:44px;color:var(--text3);"></i>
-    <div style="font-size:18px;font-weight:800;margin:14px 0 6px;">Content unavailable</div>
-    <div style="font-size:14px;color:var(--text3);">This account is unavailable in your country due to legal requirements.</div>
+<div id="geo-restricted-screen" style="display:none;position:fixed;inset:0;z-index:9998;background:var(--bg,#050A14);flex-direction:column;">
+  <div class="screen-topbar" style="border-bottom:none;">
+    <button class="back-btn" onclick="hideRestrictedOverlay();navBack();"><i class="ph ph-arrow-left"></i></button>
+    <div class="screen-topbar-title" id="grs-username" style="display:flex;align-items:center;gap:4px;font-weight:800;">—</div>
+    <div style="margin-left:auto;"><i class="ph ph-dots-three-vertical" style="font-size:18px;color:var(--text3);padding:8px;"></i></div>
+  </div>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;text-align:center;">
+    <div id="grs-avatar" style="width:96px;height:96px;border-radius:50%;overflow:hidden;background:linear-gradient(135deg,var(--cyan),var(--amber));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:32px;color:#050A14;margin-bottom:20px;"></div>
+    <div id="grs-title" style="font-size:17px;font-weight:800;margin-bottom:8px;">Account not available</div>
+    <div style="font-size:14px;color:var(--text3);max-width:300px;">This is because we complied with a legal request to restrict this content.</div>
   </div>
 </div>
 
@@ -3550,8 +3554,12 @@ async function detectMyCountryCode(){
     const data=await res.json();
     const cc=(data && data.country_code) ? data.country_code.toUpperCase() : null;
     sessionStorage.setItem('myCountryCode', cc||'__none__');
+    sessionStorage.setItem('myCountryName', (data&&data.country_name)||'');
     return cc;
   }catch(e){ sessionStorage.setItem('myCountryCode','__none__'); return null; }
+}
+function myCountryDisplayName(){
+  return sessionStorage.getItem('myCountryName') || 'your country';
 }
 async function loadGeoRestrictions(){
   try{
@@ -3571,7 +3579,21 @@ function restrictedMessageHtml(){
     <p style="font-size:14px;max-width:320px;margin:0 auto;">This account is unavailable in your country due to legal requirements.</p>
   </div>`;
 }
-function showRestrictedOverlay(){ document.getElementById('geo-restricted-screen').style.display='flex'; }
+async function showRestrictedOverlay(uid){
+  const scr=document.getElementById('geo-restricted-screen');
+  scr.style.display='flex';
+  document.getElementById('grs-username').innerHTML='—';
+  document.getElementById('grs-avatar').innerHTML='';
+  document.getElementById('grs-title').textContent='Account not available';
+  try{
+    const snap=await db.ref('users/'+uid).once('value');
+    const u=snap.val()||{};
+    const nameHtml=ESC(u.handle||u.name||'user')+(u.verified?verifiedBadgeHtml('',uid,u.badgeUrl,u.accountType==='business'):'');
+    document.getElementById('grs-username').innerHTML=nameHtml;
+    document.getElementById('grs-avatar').innerHTML = u.photoBase64 ? `<img src="${u.photoBase64}" style="width:100%;height:100%;object-fit:cover;">` : ESC((u.name||'U').charAt(0).toUpperCase());
+    document.getElementById('grs-title').textContent='Account not available in '+myCountryDisplayName();
+  }catch(e){}
+}
 function hideRestrictedOverlay(){ document.getElementById('geo-restricted-screen').style.display='none'; }
 
 // ---- Admin controls (real enforcement is in Database Rules — this UI is
@@ -4103,7 +4125,7 @@ function handleMentionTrigger(ta){
         : await db.ref('users').orderByChild('followersCount').limitToLast(6).once('value');
     }catch(e){ box.classList.add('hidden'); return; }
     const users=[]; snap.forEach(c=>users.unshift({id:c.key,...c.val()}));
-    const filtered=users.filter(u=>u.id!==me.uid&&(u.handle||'').toLowerCase().startsWith(q)&&!restrictedUidSet.has(u.id));
+    const filtered=users.filter(u=>u.id!==me.uid&&(u.handle||'').toLowerCase().startsWith(q));
     if(!filtered.length){ box.classList.add('hidden'); return; }
     box.innerHTML=filtered.map(u=>{
       const av=u.photoBase64?`<img src="${u.photoBase64}" alt="">`:(u.name||'U').charAt(0).toUpperCase();
@@ -6529,7 +6551,7 @@ function maybeShowBirthdayAnimation(uid, dobStr, displayName){
 async function openProfile(uid){
   if(!uid) return;
   if(me && me.uid && uid!==me.uid && restrictedUidSet.has(uid)){
-    showRestrictedOverlay();
+    showRestrictedOverlay(uid);
     return;
   }
   // Universal story behavior: tapping ANY OTHER account's profile picture
@@ -9082,7 +9104,8 @@ async function doExploreSearch(){
     const d=c.val()||{};
     if(c.key===me.uid) return;
     if(blockedSet.has(c.key)) return;
-    if(restrictedUidSet.has(c.key)) return;
+    // Restricted accounts intentionally still show up in search (like Instagram) —
+    // they just can't be opened. Do NOT filter them out here.
     if((d.name||'').toLowerCase().includes(q)||(d.handle||'').toLowerCase().includes(q))
       people.push({id:c.key,...d});
   });
