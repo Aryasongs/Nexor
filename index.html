@@ -32,6 +32,7 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -1606,6 +1607,14 @@ i.spin::before{content:''!important;}
       </div>
       <i class="ph ph-caret-right" style="font-size:16px;"></i>
     </div>
+    <div class="settings-row" onclick="openChangeEmailModal()">
+      <i class="ph ph-envelope-simple"></i>
+      <div class="settings-row-text">
+        <div class="settings-row-title">Change email</div>
+        <div class="settings-row-sub" id="settings-email-sub">Update the email linked to your account</div>
+      </div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
   </div>
 
   <div class="settings-section-title hidden" id="settings-pro-title">Professional Tools</div>
@@ -2103,6 +2112,35 @@ i.spin::before{content:''!important;}
   </div>
 </div>
 
+<!-- Change Email — step 1: confirm password + new email, step 2: enter OTP -->
+<div class="modal-overlay" id="change-email-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="display:flex;align-items:center;gap:6px;"><i class="ph ph-envelope-simple" style="color:var(--cyan);"></i> Change email</div>
+
+    <div id="ce-step1">
+      <p style="font-size:13px;color:var(--text3);margin-bottom:14px;">For your security, confirm your password and the new email you'd like to use. We'll send a one-time code to verify it.</p>
+      <div class="sheet-label">Current password</div>
+      <input class="sheet-field" id="ce-password" type="password" placeholder="Enter your current password" autocomplete="current-password">
+      <div class="sheet-label">New email address</div>
+      <input class="sheet-field" id="ce-new-email" type="email" placeholder="you@example.com" autocomplete="email">
+      <div class="auth-error" id="ce-err1" style="margin-bottom:10px;"></div>
+      <button class="btn-sheet primary" id="ce-send-btn" onclick="ceSendOtp()"><i class="ph ph-paper-plane-tilt"></i> Send code</button>
+      <button class="btn-sheet outline" style="margin-top:8px;" onclick="closeModal('change-email-modal')">Cancel</button>
+    </div>
+
+    <div id="ce-step2" class="hidden">
+      <p style="font-size:13px;color:var(--text3);margin-bottom:14px;">Enter the 6-digit code we sent to <strong id="ce-target-email"></strong>. It's valid for 15 minutes.</p>
+      <div class="sheet-label">6-digit code</div>
+      <input class="sheet-field" id="ce-otp" type="text" inputmode="numeric" maxlength="6" placeholder="123456" style="letter-spacing:4px;font-size:18px;text-align:center;">
+      <div class="auth-error" id="ce-err2" style="margin-bottom:10px;"></div>
+      <button class="btn-sheet primary" id="ce-verify-btn" onclick="ceVerifyOtp()"><i class="ph ph-check-circle"></i> Verify & update email</button>
+      <button class="btn-sheet outline" style="margin-top:8px;" onclick="ceResendOtp()">Resend code</button>
+      <button class="btn-sheet outline" style="margin-top:8px;" onclick="closeModal('change-email-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- Username Change Request — verified users must request a review to change their handle -->
 <div class="modal-overlay" id="username-change-request-modal">
   <div class="modal-sheet">
@@ -2406,6 +2444,13 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db   = firebase.database();
+
+// ============================================================
+// EMAILJS INIT (used for OTP emails — e.g. change email flow)
+// ============================================================
+const EMAILJS_SERVICE_ID  = 'service_vxn4vsc';
+const EMAILJS_TEMPLATE_ID = 'template_cl5k2o8';
+emailjs.init('Yit64A3Gx-7a-zRz');
 
 // ============================================================
 // SUPABASE STORAGE (new image/video/GIF uploads) — this uses only the
@@ -7833,6 +7878,101 @@ function checkHandleAvailability(val){
       statusEl.style.color='var(--green)'; statusEl.textContent='✓ @'+val+' is available';
     }
   }, 500);
+}
+
+// ============================================================
+// CHANGE EMAIL — password confirm -> OTP sent via EmailJS -> verify -> update
+// ============================================================
+let ceNewEmail = '';
+function openChangeEmailModal(){
+  document.getElementById('ce-password').value='';
+  document.getElementById('ce-new-email').value='';
+  document.getElementById('ce-otp').value='';
+  document.getElementById('ce-err1').textContent='';
+  document.getElementById('ce-err2').textContent='';
+  document.getElementById('ce-step1').classList.remove('hidden');
+  document.getElementById('ce-step2').classList.add('hidden');
+  openModal('change-email-modal');
+}
+function ceOtpKey(){ return 'otpRequests/'+me.uid+'/changeEmail'; }
+async function ceSendOtp(){
+  const errEl=document.getElementById('ce-err1');
+  errEl.textContent='';
+  const password=document.getElementById('ce-password').value;
+  const newEmail=document.getElementById('ce-new-email').value.trim().toLowerCase();
+  if(!password){ errEl.textContent='Enter your current password.'; return; }
+  if(!newEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(newEmail)){ errEl.textContent='Enter a valid email address.'; return; }
+  if(newEmail===(auth.currentUser.email||'').toLowerCase()){ errEl.textContent='That is already your current email.'; return; }
+  const btn=document.getElementById('ce-send-btn');
+  btn.disabled=true; btn.innerHTML='<i class="ph ph-spinner-gap spin"></i> Sending…';
+  try{
+    // Re-authenticate — required by Firebase before sensitive changes
+    const cred=firebase.auth.EmailAuthProvider.credential(auth.currentUser.email, password);
+    await auth.currentUser.reauthenticateWithCredential(cred);
+
+    // Make sure the new email isn't already used by another account
+    const ek=btoa(newEmail).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+    const existing=await db.ref('emailIndex/'+ek).once('value');
+    if(existing.exists() && existing.val().uid!==me.uid){ errEl.textContent='This email is already in use.'; btn.disabled=false; btn.innerHTML='<i class="ph ph-paper-plane-tilt"></i> Send code'; return; }
+
+    const otp=Math.floor(100000+Math.random()*900000).toString();
+    const expiresAt=Date.now()+15*60*1000;
+    const timeStr=new Date(expiresAt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+    await db.ref(ceOtpKey()).set({otp, newEmail, expiresAt, createdAt: firebase.database.ServerValue.TIMESTAMP});
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {email:newEmail, passcode:otp, time:timeStr});
+
+    ceNewEmail=newEmail;
+    document.getElementById('ce-target-email').textContent=newEmail;
+    document.getElementById('ce-otp').value='';
+    document.getElementById('ce-err2').textContent='';
+    document.getElementById('ce-step1').classList.add('hidden');
+    document.getElementById('ce-step2').classList.remove('hidden');
+  }catch(err){
+    errEl.textContent = err.code==='auth/wrong-password' ? 'Incorrect password.' : (err.message||'Could not send code, try again.');
+  }
+  btn.disabled=false; btn.innerHTML='<i class="ph ph-paper-plane-tilt"></i> Send code';
+}
+async function ceResendOtp(){
+  if(!ceNewEmail) return;
+  const otp=Math.floor(100000+Math.random()*900000).toString();
+  const expiresAt=Date.now()+15*60*1000;
+  const timeStr=new Date(expiresAt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+  try{
+    await db.ref(ceOtpKey()).set({otp, newEmail: ceNewEmail, expiresAt, createdAt: firebase.database.ServerValue.TIMESTAMP});
+    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {email:ceNewEmail, passcode:otp, time:timeStr});
+    showToast('Code resent');
+  }catch(e){ showToast('Could not resend code'); }
+}
+async function ceVerifyOtp(){
+  const errEl=document.getElementById('ce-err2');
+  errEl.textContent='';
+  const entered=document.getElementById('ce-otp').value.trim();
+  if(!entered){ errEl.textContent='Enter the code.'; return; }
+  const btn=document.getElementById('ce-verify-btn');
+  btn.disabled=true; btn.innerHTML='<i class="ph ph-spinner-gap spin"></i> Verifying…';
+  try{
+    const snap=await db.ref(ceOtpKey()).once('value');
+    const data=snap.val();
+    if(!data){ errEl.textContent='Request a new code.'; btn.disabled=false; btn.innerHTML='<i class="ph ph-check-circle"></i> Verify & update email'; return; }
+    if(Date.now()>data.expiresAt){ errEl.textContent='Code expired, resend and try again.'; btn.disabled=false; btn.innerHTML='<i class="ph ph-check-circle"></i> Verify & update email'; return; }
+    if(entered!==data.otp){ errEl.textContent='Incorrect code.'; btn.disabled=false; btn.innerHTML='<i class="ph ph-check-circle"></i> Verify & update email'; return; }
+
+    const oldEmail=(auth.currentUser.email||'').toLowerCase();
+    await auth.currentUser.updateEmail(data.newEmail);
+    await db.ref('users/'+me.uid+'/email').set(data.newEmail).catch(()=>{});
+
+    const oldEk=btoa(oldEmail).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+    const newEk=btoa(data.newEmail).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+    await db.ref('emailIndex/'+oldEk).remove().catch(()=>{});
+    await db.ref('emailIndex/'+newEk).set({uid:me.uid, name: myData.name||''}).catch(()=>{});
+    await db.ref(ceOtpKey()).remove().catch(()=>{});
+
+    closeModal('change-email-modal');
+    showToast('Email updated ✓');
+  }catch(err){
+    errEl.textContent = err.code==='auth/requires-recent-login' ? 'Session expired, please log out and back in, then retry.' : (err.message||'Could not update email.');
+  }
+  btn.disabled=false; btn.innerHTML='<i class="ph ph-check-circle"></i> Verify & update email';
 }
 
 // ============================================================
