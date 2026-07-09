@@ -1665,6 +1665,14 @@ i.spin::before{content:''!important;}
       </div>
       <i class="ph ph-caret-right" style="font-size:16px;"></i>
     </div>
+    <div class="settings-row" onclick="openLinkPhoneModal()">
+      <i class="ph ph-device-mobile"></i>
+      <div class="settings-row-text">
+        <div class="settings-row-title">Link phone number</div>
+        <div class="settings-row-sub" id="settings-phone-sub">Add a phone number for account recovery</div>
+      </div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
   </div>
 
   <div class="settings-section-title hidden" id="settings-pro-title">Professional Tools</div>
@@ -2191,6 +2199,33 @@ i.spin::before{content:''!important;}
   </div>
 </div>
 
+<!-- Link Phone Number — SMS OTP via TextBee -->
+<div class="modal-overlay" id="link-phone-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="display:flex;align-items:center;gap:6px;"><i class="ph ph-device-mobile" style="color:var(--cyan);"></i> Link phone number</div>
+
+    <div id="lp-step1">
+      <p style="font-size:13px;color:var(--text3);margin-bottom:14px;">Add a phone number to your account. We'll text you a 6-digit code to confirm it's yours.</p>
+      <div class="sheet-label">Phone number (with country code)</div>
+      <input class="sheet-field" id="lp-phone" type="tel" placeholder="+91XXXXXXXXXX" autocomplete="tel">
+      <div class="auth-error" id="lp-err1" style="margin-bottom:10px;"></div>
+      <button class="btn-sheet primary" id="lp-send-btn" onclick="lpSendOtp()"><i class="ph ph-paper-plane-tilt"></i> Send code</button>
+      <button class="btn-sheet outline" style="margin-top:8px;" onclick="closeModal('link-phone-modal')">Cancel</button>
+    </div>
+
+    <div id="lp-step2" class="hidden">
+      <p style="font-size:13px;color:var(--text3);margin-bottom:14px;">Enter the 6-digit code sent to <strong id="lp-target-phone"></strong>. It's valid for 5 minutes.</p>
+      <div class="sheet-label">6-digit code</div>
+      <input class="sheet-field" id="lp-otp" type="text" inputmode="numeric" maxlength="6" placeholder="123456" style="letter-spacing:4px;font-size:18px;text-align:center;">
+      <div class="auth-error" id="lp-err2" style="margin-bottom:10px;"></div>
+      <button class="btn-sheet primary" id="lp-verify-btn" onclick="lpVerifyOtp()"><i class="ph ph-check-circle"></i> Verify & link number</button>
+      <button class="btn-sheet outline" style="margin-top:8px;" id="lp-resend-btn" onclick="lpResendOtp()">Resend code (30s)</button>
+      <button class="btn-sheet outline" style="margin-top:8px;" onclick="closeModal('link-phone-modal')">Cancel</button>
+    </div>
+  </div>
+</div>
+
 <!-- Change Password -->
 <div class="modal-overlay" id="change-password-modal">
   <div class="modal-sheet">
@@ -2530,6 +2565,19 @@ const EMAILJS_TEMPLATE_ID = 'template_cl5k2o8';
 // TODO: create a second EmailJS template for login alerts (variables: {{email}}, {{device}}, {{time}}, {{location}})
 // then paste its Template ID below. Until you do, login alert emails will silently fail (caught + ignored).
 const EMAILJS_LOGIN_ALERT_TEMPLATE_ID = 'template_7k3pgfk';
+
+// ============================================================
+// TEXTBEE SMS CONFIG (used only for "Link phone number" — SMS OTP)
+// SECURITY NOTE: TextBee's x-api-key is a private secret, not a public/
+// domain-restricted key like EmailJS's. Because this app has no backend,
+// this key is visible to anyone who views the page source, and they could
+// use it to send SMS through your phone/plan. The in-app rate limit below
+// only stops abuse *through this app's own UI* — it can't stop someone who
+// copies the key out of the source and calls TextBee directly. If this
+// matters to you, proxy this call through a small server/Cloud Function
+// instead of calling TextBee directly from the browser.
+const TEXTBEE_API_KEY   = 'REPLACE_WITH_YOUR_TEXTBEE_API_KEY';
+const TEXTBEE_DEVICE_ID = 'REPLACE_WITH_YOUR_TEXTBEE_DEVICE_ID';
 emailjs.init('-Yit64A3Gx-7a-zRz');
 
 // ============================================================
@@ -5526,6 +5574,7 @@ async function loadSettingsScreen(){
   const alertsOn = myData.loginAlertsEnabled!==false; // on by default
   document.getElementById('settings-login-alerts-toggle').classList.toggle('on',alertsOn);
   document.getElementById('settings-login-alerts-sub').textContent = alertsOn?"On — we'll email you about new logins":"Off — turn on to be emailed about new logins";
+  document.getElementById('settings-phone-sub').textContent = myData.phone ? (myData.phone+(myData.phoneVerified?' · Verified':' · Unverified')) : 'Add a phone number for account recovery';
   refreshVerifySettingsRow();
   const acctType=myData.accountType||'personal';
   const acctLabels={personal:'Personal account',creator:'Creator'+(myData.accountCategory?' · '+myData.accountCategory:''),business:'Business'+(myData.accountCategory?' · '+myData.accountCategory:'')};
@@ -7888,6 +7937,31 @@ function onEpBannerPick(e){
     bp.innerHTML=`<img src="${data}" alt="" style="width:100%;height:100%;object-fit:cover;">`;
   });
 }
+// When name / handle / photo changes, older Pulses and Articles were storing
+// a frozen snapshot (creatorName/creatorHandle/creatorPhoto) taken at the
+// moment they were posted, so they never reflected later profile edits.
+// This walks the user's own Pulses + Articles (via the userPulses/userArticles
+// index) and patches that snapshot on each one to match the new profile.
+async function cascadeProfileUpdateToContent(uid, patch){
+  try{
+    const [pulsesSnap, articlesSnap] = await Promise.all([
+      db.ref('userPulses/'+uid).once('value'),
+      db.ref('userArticles/'+uid).once('value')
+    ]);
+    const updates={};
+    const fields=['creatorName','creatorHandle','creatorPhoto','creatorVerified','creatorBadgeUrl','creatorAccountType'];
+    pulsesSnap.forEach(c=>{ fields.forEach(f=>{ updates['pulses/'+c.key+'/'+f]=patch[f]!==undefined?patch[f]:null; }); });
+    articlesSnap.forEach(c=>{ fields.forEach(f=>{ updates['articles/'+c.key+'/'+f]=patch[f]!==undefined?patch[f]:null; }); });
+    const entries=Object.entries(updates);
+    if(!entries.length) return;
+    // Chunk into batches so one giant multi-path update doesn't get too large
+    // for accounts with a lot of posts.
+    const CHUNK=400;
+    for(let i=0;i<entries.length;i+=CHUNK){
+      await db.ref().update(Object.fromEntries(entries.slice(i,i+CHUNK)));
+    }
+  }catch(e){ console.error('cascadeProfileUpdateToContent failed', e); }
+}
 async function saveProfile(){
   const name=document.getElementById('ep-name').value.trim();
   const newHandle=(document.getElementById('ep-handle').value.trim()||'').replace(/[^a-zA-Z0-9_]/g,'').toLowerCase();
@@ -7906,6 +7980,8 @@ async function saveProfile(){
   if(RESERVED_HANDLES.includes(newHandle)){statusEl.style.color='var(--like)';statusEl.textContent='@'+newHandle+' is reserved and cannot be used.';return;}
 
   const oldHandle=myData.handle||'';
+  const oldName=myData.name||'';
+  const oldPhoto=myData.photoBase64||null;
   // Verified accounts can never change their handle directly here — they must
   // go through the "Request username change" review flow instead. Guarded
   // again here (not just via the disabled input) in case of any tampering.
@@ -7953,6 +8029,18 @@ async function saveProfile(){
     statusEl.textContent='';
     closeModal('edit-profile-modal');
     showToast('Profile updated ✓');
+
+    // If anything shown on old posts/articles changed, patch them in the
+    // background so they stop showing the stale name/handle/photo.
+    if(name!==oldName || handleChanged || (epPhotoData && epPhotoData!==oldPhoto)){
+      cascadeProfileUpdateToContent(me.uid, {
+        creatorName:name, creatorHandle:newHandle,
+        creatorPhoto: myData.photoBase64||null,
+        creatorVerified: !!myData.verified,
+        creatorBadgeUrl: myData.badgeUrl||null,
+        creatorAccountType: myData.accountType||'personal'
+      });
+    }
     if(profileUid===me.uid) openProfile(me.uid);
   } catch(e){ showToast('Could not save profile'); }
 }
@@ -8157,6 +8245,139 @@ async function cpSubmit(){
     errEl.textContent = err.code==='auth/wrong-password' ? 'Incorrect current password.' : (err.message||'Could not update password.');
   }
   btn.disabled=false; btn.innerHTML='<i class="ph ph-check-circle"></i> Update password';
+}
+
+// ============================================================
+// LINK PHONE NUMBER — SMS OTP via TextBee
+// ============================================================
+let lpPhone='';
+let lpResendTimer=null;
+
+function phoneKeyFor(phone){
+  // Firebase keys can't contain . # $ [ ] / — strip everything but digits
+  return phone.replace(/[^0-9]/g,'');
+}
+function openLinkPhoneModal(){
+  document.getElementById('lp-phone').value = myData.phone || '';
+  document.getElementById('lp-otp').value='';
+  document.getElementById('lp-err1').textContent='';
+  document.getElementById('lp-err2').textContent='';
+  document.getElementById('lp-step1').classList.remove('hidden');
+  document.getElementById('lp-step2').classList.add('hidden');
+  if(TEXTBEE_API_KEY.startsWith('REPLACE_WITH')){
+    document.getElementById('lp-err1').textContent='SMS is not configured yet — add your TextBee API key & device ID in the code first.';
+  }
+  openModal('link-phone-modal');
+}
+async function lpCheckRateLimit(phone){
+  const key='smsRateLimit/'+phoneKeyFor(phone);
+  const snap=await db.ref(key).once('value');
+  const data=snap.val();
+  const now=Date.now();
+  const hourMs=60*60*1000;
+  if(!data || (now-data.windowStart)>hourMs){
+    await db.ref(key).set({windowStart:now, count:1});
+    return true;
+  }
+  if(data.count>=5) return false;
+  await db.ref(key+'/count').set(data.count+1);
+  return true;
+}
+async function lpSendOtp(){
+  const errEl=document.getElementById('lp-err1');
+  errEl.textContent='';
+  const phone=document.getElementById('lp-phone').value.trim();
+  if(!/^\+?[0-9]{8,15}$/.test(phone)){ errEl.textContent='Enter a valid phone number with country code (e.g. +91XXXXXXXXXX).'; return; }
+  if(TEXTBEE_API_KEY.startsWith('REPLACE_WITH')){ errEl.textContent='SMS is not configured yet.'; return; }
+  const btn=document.getElementById('lp-send-btn');
+  btn.disabled=true; btn.innerHTML='<i class="ph ph-spinner-gap spin"></i> Sending…';
+  try{
+    const allowed=await lpCheckRateLimit(phone);
+    if(!allowed){ errEl.textContent='Too many code requests for this number. Try again in an hour.'; btn.disabled=false; btn.innerHTML='<i class="ph ph-paper-plane-tilt"></i> Send code'; return; }
+
+    const otp=Math.floor(100000+Math.random()*900000).toString();
+    const expiresAt=Date.now()+5*60*1000; // 5 minutes
+    await db.ref('otpRequests/'+me.uid+'/phone').set({otp, phone, expiresAt, createdAt: firebase.database.ServerValue.TIMESTAMP});
+
+    const res=await fetch(`https://api.textbee.dev/api/v1/gateway/devices/${TEXTBEE_DEVICE_ID}/send-sms`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':TEXTBEE_API_KEY},
+      body:JSON.stringify({recipients:[phone], message:`Your Pulse verification code is ${otp}. It expires in 5 minutes.`})
+    });
+    if(!res.ok){ const t=await res.text().catch(()=>''); throw new Error('SMS failed ('+res.status+') '+t); }
+
+    lpPhone=phone;
+    document.getElementById('lp-target-phone').textContent=phone;
+    document.getElementById('lp-otp').value='';
+    document.getElementById('lp-err2').textContent='';
+    document.getElementById('lp-step1').classList.add('hidden');
+    document.getElementById('lp-step2').classList.remove('hidden');
+    lpStartResendCooldown();
+  }catch(err){
+    errEl.textContent = err.message || 'Could not send code, try again.';
+  }
+  btn.disabled=false; btn.innerHTML='<i class="ph ph-paper-plane-tilt"></i> Send code';
+}
+function lpStartResendCooldown(){
+  const btn=document.getElementById('lp-resend-btn');
+  let secs=30;
+  btn.disabled=true;
+  btn.textContent='Resend code ('+secs+'s)';
+  clearInterval(lpResendTimer);
+  lpResendTimer=setInterval(()=>{
+    secs--;
+    if(secs<=0){ clearInterval(lpResendTimer); btn.disabled=false; btn.textContent='Resend code'; }
+    else btn.textContent='Resend code ('+secs+'s)';
+  },1000);
+}
+async function lpResendOtp(){
+  if(!lpPhone) return;
+  const errEl=document.getElementById('lp-err2');
+  errEl.textContent='';
+  try{
+    const allowed=await lpCheckRateLimit(lpPhone);
+    if(!allowed){ errEl.textContent='Too many code requests for this number. Try again in an hour.'; return; }
+    const otp=Math.floor(100000+Math.random()*900000).toString();
+    const expiresAt=Date.now()+5*60*1000;
+    await db.ref('otpRequests/'+me.uid+'/phone').set({otp, phone:lpPhone, expiresAt, createdAt: firebase.database.ServerValue.TIMESTAMP});
+    const res=await fetch(`https://api.textbee.dev/api/v1/gateway/devices/${TEXTBEE_DEVICE_ID}/send-sms`,{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':TEXTBEE_API_KEY},
+      body:JSON.stringify({recipients:[lpPhone], message:`Your Pulse verification code is ${otp}. It expires in 5 minutes.`})
+    });
+    if(!res.ok) throw new Error('Could not resend, try again.');
+    showToast('Code resent');
+    lpStartResendCooldown();
+  }catch(e){ errEl.textContent=e.message||'Could not resend code.'; }
+}
+async function lpVerifyOtp(){
+  const errEl=document.getElementById('lp-err2');
+  errEl.textContent='';
+  const entered=document.getElementById('lp-otp').value.trim();
+  if(!entered){ errEl.textContent='Enter the code.'; return; }
+  const btn=document.getElementById('lp-verify-btn');
+  btn.disabled=true; btn.innerHTML='<i class="ph ph-spinner-gap spin"></i> Verifying…';
+  try{
+    const snap=await db.ref('otpRequests/'+me.uid+'/phone').once('value');
+    const data=snap.val();
+    if(!data){ errEl.textContent='Request a new code.'; btn.disabled=false; btn.innerHTML='<i class="ph ph-check-circle"></i> Verify & link number'; return; }
+    if(Date.now()>data.expiresAt){ errEl.textContent='Code expired, resend and try again.'; btn.disabled=false; btn.innerHTML='<i class="ph ph-check-circle"></i> Verify & link number'; return; }
+    if(entered!==data.otp){ errEl.textContent='Incorrect code.'; btn.disabled=false; btn.innerHTML='<i class="ph ph-check-circle"></i> Verify & link number'; return; }
+
+    await db.ref('users/'+me.uid+'/phone').set(data.phone);
+    await db.ref('users/'+me.uid+'/phoneVerified').set(true);
+    myData.phone=data.phone; myData.phoneVerified=true;
+    await db.ref('otpRequests/'+me.uid+'/phone').remove().catch(()=>{});
+
+    clearInterval(lpResendTimer);
+    closeModal('link-phone-modal');
+    showToast('Phone number linked ✓');
+    const sub=document.getElementById('settings-phone-sub');
+    if(sub) sub.textContent = data.phone+' · Verified';
+  }catch(err){
+    errEl.textContent=err.message||'Could not verify, try again.';
+  }
+  btn.disabled=false; btn.innerHTML='<i class="ph ph-check-circle"></i> Verify & link number';
 }
 
 // ============================================================
