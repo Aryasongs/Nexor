@@ -1169,6 +1169,30 @@ i.spin::before{content:''!important;}
   <div class="boot-spinner"><i class="ph ph-spinner-gap spin"></i></div>
 </div>
 
+<!-- ====== ACCOUNT SUSPENDED — permanent or temporary, set by admin ====== -->
+<div id="suspend-screen" style="display:none;position:fixed;inset:0;z-index:9999;background:var(--bg,#050A14);align-items:center;justify-content:center;flex-direction:column;padding:24px;">
+  <div style="max-width:340px;width:100%;text-align:center;">
+    <i class="ph ph-prohibit" style="font-size:44px;color:var(--like);"></i>
+    <div id="suspend-title" style="font-size:19px;font-weight:800;margin:14px 0 8px;">Account suspended</div>
+    <div id="suspend-reason" style="font-size:14px;color:var(--text3);margin-bottom:10px;"></div>
+    <div id="suspend-until" style="font-size:13px;color:var(--text3);margin-bottom:20px;"></div>
+    <button class="btn-sheet outline" onclick="auth.signOut()">Sign out</button>
+  </div>
+</div>
+
+<!-- ====== ACCOUNT LOCKED — automatic suspicious-login security lock (7 days) ====== -->
+<div id="lock-screen" style="display:none;position:fixed;inset:0;z-index:9999;background:var(--bg,#050A14);align-items:center;justify-content:center;flex-direction:column;padding:24px;">
+  <div style="max-width:340px;width:100%;text-align:center;">
+    <i class="ph ph-lock-key" style="font-size:44px;color:var(--amber);"></i>
+    <div style="font-size:19px;font-weight:800;margin:14px 0 8px;">Account temporarily locked</div>
+    <div id="lock-reason" style="font-size:14px;color:var(--text3);margin-bottom:10px;"></div>
+    <div id="lock-until" style="font-size:13px;color:var(--text3);margin-bottom:20px;"></div>
+    <button class="btn-sheet primary" id="lock-appeal-btn" onclick="submitLockAppeal()"><i class="ph ph-flag"></i> Appeal this lock</button>
+    <div id="lock-appeal-sent" class="hidden" style="font-size:13px;color:var(--green);margin-bottom:8px;">✓ Appeal submitted — we'll review it soon</div>
+    <button class="btn-sheet outline" style="margin-top:8px;" onclick="auth.signOut()">Sign out</button>
+  </div>
+</div>
+
 <!-- ====== GEO-RESTRICTED PROFILE — shown instead of a profile that's legally blocked in your country ====== -->
 <div id="geo-restricted-screen" style="display:none;position:fixed;inset:0;z-index:9998;background:var(--bg,#050A14);flex-direction:column;">
   <div class="screen-topbar" style="border-bottom:none;">
@@ -1699,6 +1723,14 @@ i.spin::before{content:''!important;}
       </div>
       <i class="ph ph-caret-right" style="font-size:16px;"></i>
     </div>
+    <div class="settings-row hidden" id="settings-moderation-row" onclick="openModerationAdmin()">
+      <i class="ph ph-shield-warning"></i>
+      <div class="settings-row-text">
+        <div class="settings-row-title">Account moderation</div>
+        <div class="settings-row-sub">Suspend accounts, review security locks & appeals</div>
+      </div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
   </div>
 
   <div class="settings-section-title hidden" id="settings-pro-title">Professional Tools</div>
@@ -2222,6 +2254,37 @@ i.spin::before{content:''!important;}
       <button class="btn-sheet outline" style="margin-top:8px;" onclick="ceResendOtp()">Resend code</button>
       <button class="btn-sheet outline" style="margin-top:8px;" onclick="closeModal('change-email-modal')">Cancel</button>
     </div>
+  </div>
+</div>
+
+<!-- Account Moderation Admin (suspend accounts, review/lift security locks & appeals) -->
+<div class="modal-overlay" id="moderation-admin-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="display:flex;align-items:center;gap:6px;"><i class="ph ph-shield-warning" style="color:var(--cyan);"></i> Account moderation</div>
+
+    <div class="sheet-label">Suspend an account</div>
+    <input class="sheet-field" id="mod-uid" type="text" placeholder="Firebase UID">
+    <select class="sheet-field" id="mod-type" onchange="document.getElementById('mod-duration-wrap').classList.toggle('hidden', this.value!=='temporary')">
+      <option value="temporary">Temporary</option>
+      <option value="permanent">Permanent</option>
+    </select>
+    <div id="mod-duration-wrap">
+      <input class="sheet-field" id="mod-duration" type="number" min="1" placeholder="Duration in days (e.g. 7)">
+    </div>
+    <input class="sheet-field" id="mod-reason" type="text" placeholder="Reason (shown to the user)">
+    <div class="auth-error" id="mod-err" style="margin-bottom:10px;"></div>
+    <button class="btn-sheet primary" id="mod-suspend-btn" onclick="modSuspendUser()"><i class="ph ph-prohibit"></i> Suspend account</button>
+    <button class="btn-sheet outline" style="margin-top:8px;" onclick="closeModal('moderation-admin-modal')">Close</button>
+
+    <div class="sheet-label" style="margin-top:18px;">Active suspensions</div>
+    <div id="mod-suspend-list" style="max-height:26vh;overflow-y:auto;"></div>
+
+    <div class="sheet-label" style="margin-top:14px;">Active security locks</div>
+    <div id="mod-lock-list" style="max-height:26vh;overflow-y:auto;"></div>
+
+    <div class="sheet-label" style="margin-top:14px;">Pending appeals</div>
+    <div id="mod-appeal-list" style="max-height:26vh;overflow-y:auto;"></div>
   </div>
 </div>
 
@@ -2762,11 +2825,15 @@ let blockedSet   = new Set();
 let mutedSet     = new Set();
 let restrictedUidSet = new Set(); // uids that are legally geo-restricted in MY current country
 let myCountryCode = null;
+let mySuspension = null;   // {type, reason, until, suspendedAt, suspendedBy} or null
+let myAccountLock = null;  // {active, reason, deviceId, ipCountry, changedFields, lockedAt, lockedUntil, appealAllowed, appealText, appealStatus} or null
 // ⚠️ Set this to your own Firebase Auth UID (Firebase Console → Authentication →
 // find your account → copy the "User UID" column). Only this UID is treated as
 // admin in the UI. The REAL enforcement is in the Database Rules, not here —
 // this constant only controls whether the admin screen is shown to you.
 const ADMIN_UID = 'aRq9nXHH63R90c5MC6DZ5wXD3r93';
+let currentSuspensionData = null;
+let currentLockData = null;
 let unsubscribers = [];
 let profileUid = null;
 let profileHandleCache = '';
@@ -3448,6 +3515,37 @@ auth.onAuthStateChanged(async user => {
   if(boot) boot.style.display='none';
   if(user){
     document.getElementById('auth-screen').style.display='none';
+
+    // --- Suspension check (admin-applied, permanent or temporary) ---
+    const suspension = await checkSuspension(user.uid).catch(()=>null);
+    if(suspension){
+      document.getElementById('app').classList.remove('active');
+      document.getElementById('tfa-screen').style.display='none';
+      document.getElementById('lock-screen').style.display='none';
+      showSuspendScreen(suspension);
+      return;
+    }
+    document.getElementById('suspend-screen').style.display='none';
+
+    // --- Suspicious-login security lock (auto-triggered — see maybeTriggerSuspiciousLock) ---
+    const lock = await checkAccountLock(user.uid).catch(()=>null);
+    if(lock){
+      document.getElementById('app').classList.remove('active');
+      document.getElementById('tfa-screen').style.display='none';
+      showLockScreen(lock);
+      return;
+    }
+    document.getElementById('lock-screen').style.display='none';
+
+    // Track this device once per browser session (not on every page reload)
+    // so we know, for THIS session, whether it's a new/rarely used device —
+    // that flag is what a later email/password/username change checks.
+    const trackedKey='deviceTracked_'+user.uid;
+    if(sessionStorage.getItem(trackedKey)!=='1'){
+      await checkAndTrackDevice(user.uid);
+      sessionStorage.setItem(trackedKey,'1');
+    }
+
     // Check whether this account has two-factor login turned on, and whether
     // this browser session has already passed it (so we don't re-prompt on
     // every single page action, only on fresh sign-ins).
@@ -3471,6 +3569,8 @@ auth.onAuthStateChanged(async user => {
   } else {
     document.getElementById('auth-screen').style.display='flex';
     document.getElementById('tfa-screen').style.display='none';
+    document.getElementById('suspend-screen').style.display='none';
+    document.getElementById('lock-screen').style.display='none';
     document.getElementById('app').classList.remove('active');
     myData={}; followingSet=new Set(); requestedSet=new Set(); likedSet=new Set(); bookmarkSet=new Set(); repostSet=new Set(); blockedSet=new Set(); mutedSet=new Set(); restrictedUidSet=new Set();
     chatListCache=[]; activeChatId=null; activeChatOtherUid=null;
@@ -3572,6 +3672,142 @@ async function loadGeoRestrictions(){
     restrictedUidSet=set;
   }catch(e){ console.error('loadGeoRestrictions failed', e); }
 }
+// ============================================================
+// DEVICE TRACKING (used by the suspicious-login security lock)
+// ============================================================
+function getDeviceId(){
+  let id=localStorage.getItem('pulseDeviceId');
+  if(!id){ id='dev_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,10); localStorage.setItem('pulseDeviceId', id); }
+  return id;
+}
+// Records this login against this device, and flags (for THIS session only)
+// whether the device is new or has been used fewer than 3 times before.
+// That flag is what later triggers the suspicious-login lock if the user
+// changes their email/password/username during this same session.
+async function checkAndTrackDevice(uid){
+  try{
+    const deviceId=getDeviceId();
+    const ref=db.ref('knownDevices/'+uid+'/'+deviceId);
+    const snap=await ref.once('value');
+    const data=snap.val();
+    const priorLogins=data?(data.loginCount||0):0;
+    const suspicious = !data || priorLogins<3;
+    await ref.update({
+      lastSeen: firebase.database.ServerValue.TIMESTAMP,
+      firstSeen: data ? (data.firstSeen||firebase.database.ServerValue.TIMESTAMP) : firebase.database.ServerValue.TIMESTAMP,
+      loginCount: priorLogins+1
+    });
+    sessionStorage.setItem('suspiciousDevice_'+uid, suspicious?'1':'0');
+  }catch(e){ console.error('checkAndTrackDevice failed', e); }
+}
+// Call this right after a sensitive account change (email, password, or
+// username) succeeds. If the current session was flagged as a new/rarely
+// used device at login time, this locks the account for 7 days.
+async function maybeTriggerSuspiciousLock(uid, changedField){
+  try{
+    if(sessionStorage.getItem('suspiciousDevice_'+uid)!=='1') return false;
+    const ref=db.ref('accountLocks/'+uid);
+    const existing=(await ref.once('value')).val();
+    // If already locked, just add this field to the record instead of resetting the clock
+    const changedFields = (existing && existing.changedFields) ? existing.changedFields.slice() : [];
+    if(!changedFields.includes(changedField)) changedFields.push(changedField);
+    if(existing && existing.lockedUntil && existing.lockedUntil>Date.now()){
+      await ref.update({changedFields});
+      currentLockData = {...existing, changedFields};
+      return true;
+    }
+    const ipCountry = await guessLocationFromIP().catch(()=>null);
+    const lockData = {
+      deviceId: getDeviceId(),
+      ipCountry: ipCountry||'Unknown',
+      changedFields,
+      lockedAt: firebase.database.ServerValue.TIMESTAMP,
+      lockedUntil: Date.now()+7*24*60*60*1000,
+      reason: 'A sensitive account change ('+changedFields.join(', ')+') was made shortly after signing in from a new or rarely used device. This is an automatic security precaution.',
+      appealAllowed: true,
+      appealed: false
+    };
+    await ref.set(lockData);
+    currentLockData = lockData;
+    return true;
+  }catch(e){ console.error('maybeTriggerSuspiciousLock failed', e); return false; }
+}
+// Call this right after any sensitive change succeeds (email/password/username).
+// If it was suspicious, immediately hides the app and shows the lock screen —
+// no need to wait for a reload / next login.
+async function enforceSuspiciousLockIfTriggered(changedField){
+  const triggered = await maybeTriggerSuspiciousLock(me.uid, changedField);
+  if(triggered){
+    closeModal('change-email-modal'); closeModal('change-password-modal'); closeModal('edit-profile-modal');
+    document.getElementById('app').classList.remove('active');
+    showLockScreen(currentLockData);
+  }
+  return triggered;
+}
+// Quick synchronous check used to gate write actions while a lock/suspension
+// is active in the CURRENT session (populated at login by onAuthStateChanged).
+function isAccountBlocked(){
+  if(currentSuspensionData) return true;
+  if(currentLockData && currentLockData.lockedUntil>Date.now()) return true;
+  return false;
+}
+function blockIfLockedOrSuspended(){
+  if(!isAccountBlocked()) return false;
+  showToast(currentSuspensionData ? 'Your account is suspended' : 'Your account is temporarily locked for security');
+  return true;
+}
+
+// ============================================================
+// ACCOUNT ENFORCEMENT SCREENS (suspension + suspicious-login lock)
+// Checked at sign-in time, before the app is revealed — see onAuthStateChanged.
+// ============================================================
+async function checkSuspension(uid){
+  const snap=await db.ref('suspensions/'+uid).once('value');
+  const d=snap.val();
+  if(!d) return null;
+  if(d.type==='temporary' && d.until && d.until<=Date.now()) return null; // expired
+  return d;
+}
+async function checkAccountLock(uid){
+  const snap=await db.ref('accountLocks/'+uid).once('value');
+  const d=snap.val();
+  if(!d) return null;
+  if(d.lockedUntil && d.lockedUntil<=Date.now()) return null; // expired
+  return d;
+}
+function showSuspendScreen(d){
+  currentSuspensionData=d;
+  document.getElementById('suspend-title').textContent = d.type==='permanent' ? 'Account permanently suspended' : 'Account temporarily suspended';
+  document.getElementById('suspend-reason').textContent = d.reason || 'Your account was suspended for violating our community guidelines.';
+  document.getElementById('suspend-until').textContent = d.type==='temporary' && d.until ? ('You can log in again on '+new Date(d.until).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'})) : '';
+  document.getElementById('suspend-screen').style.display='flex';
+}
+function showLockScreen(d){
+  currentLockData=d;
+  document.getElementById('lock-reason').textContent = d.reason || 'Your account was temporarily locked as a security precaution.';
+  document.getElementById('lock-until').textContent = d.lockedUntil ? ('Your account unlocks on '+new Date(d.lockedUntil).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'})) : '';
+  document.getElementById('lock-appeal-btn').classList.toggle('hidden', !d.appealAllowed || d.appealed);
+  document.getElementById('lock-appeal-sent').classList.toggle('hidden', !d.appealed);
+  document.getElementById('lock-screen').style.display='flex';
+}
+async function submitLockAppeal(){
+  if(!me) return;
+  const btn=document.getElementById('lock-appeal-btn');
+  btn.disabled=true; btn.innerHTML='<i class="ph ph-spinner-gap spin"></i> Sending…';
+  try{
+    await db.ref('appeals/'+me.uid).push({
+      message:'I believe this lock was a mistake — please review my account.',
+      submittedAt: firebase.database.ServerValue.TIMESTAMP
+    });
+    await db.ref('accountLocks/'+me.uid+'/appealed').set(true);
+    if(currentLockData) currentLockData.appealed=true;
+    document.getElementById('lock-appeal-btn').classList.add('hidden');
+    document.getElementById('lock-appeal-sent').classList.remove('hidden');
+    showToast('Appeal submitted');
+  }catch(e){ showToast('Could not submit appeal'); }
+  btn.disabled=false; btn.innerHTML='<i class="ph ph-flag"></i> Appeal this lock';
+}
+
 function restrictedMessageHtml(){
   return `<div style="text-align:center;padding:60px 24px;color:var(--text3);">
     <i class="ph ph-scales" style="font-size:44px;color:var(--text3);"></i>
@@ -3598,6 +3834,121 @@ function hideRestrictedOverlay(){ document.getElementById('geo-restricted-screen
 
 // ---- Admin controls (real enforcement is in Database Rules — this UI is
 // only reachable by ADMIN_UID as a convenience, it is NOT the security boundary) ----
+// ---- Account moderation (suspend, review locks + appeals) — admin only ----
+function openModerationAdmin(){
+  if(!me || me.uid!==ADMIN_UID){ showToast('Not authorized'); return; }
+  document.getElementById('mod-uid').value='';
+  document.getElementById('mod-type').value='temporary';
+  document.getElementById('mod-duration-wrap').classList.remove('hidden');
+  document.getElementById('mod-duration').value='';
+  document.getElementById('mod-reason').value='';
+  document.getElementById('mod-err').textContent='';
+  openModal('moderation-admin-modal');
+  modRenderSuspendList();
+  modRenderLockList();
+  modRenderAppealList();
+}
+async function modSuspendUser(){
+  const errEl=document.getElementById('mod-err');
+  errEl.textContent='';
+  const uid=document.getElementById('mod-uid').value.trim();
+  const type=document.getElementById('mod-type').value;
+  const days=parseInt(document.getElementById('mod-duration').value,10);
+  const reason=document.getElementById('mod-reason').value.trim();
+  if(!uid){ errEl.textContent='Enter the target user UID.'; return; }
+  if(type==='temporary' && (!days || days<1)){ errEl.textContent='Enter how many days for a temporary suspension.'; return; }
+  const btn=document.getElementById('mod-suspend-btn');
+  btn.disabled=true; btn.innerHTML='<i class="ph ph-spinner-gap spin"></i> Suspending…';
+  try{
+    const uSnap=await db.ref('users/'+uid).once('value');
+    if(!uSnap.exists()){ errEl.textContent='No account found with that UID.'; btn.disabled=false; btn.innerHTML='<i class="ph ph-prohibit"></i> Suspend account'; return; }
+    await db.ref('suspensions/'+uid).set({
+      type,
+      until: type==='temporary' ? Date.now()+days*24*60*60*1000 : null,
+      reason: reason||null,
+      suspendedAt: firebase.database.ServerValue.TIMESTAMP,
+      suspendedBy: me.uid
+    });
+    showToast('Account suspended ✓');
+    document.getElementById('mod-uid').value='';
+    document.getElementById('mod-reason').value='';
+    modRenderSuspendList();
+  }catch(e){ errEl.textContent=e.message||'Could not suspend — check Database Rules.'; }
+  btn.disabled=false; btn.innerHTML='<i class="ph ph-prohibit"></i> Suspend account';
+}
+async function modLiftSuspension(uid){
+  if(!confirm('Lift this suspension?')) return;
+  try{ await db.ref('suspensions/'+uid).remove(); showToast('Suspension lifted'); modRenderSuspendList(); }
+  catch(e){ showToast('Could not lift — check Database Rules.'); }
+}
+async function modRenderSuspendList(){
+  const el=document.getElementById('mod-suspend-list');
+  el.innerHTML='<div class="feed-loader"><i class="ph ph-spinner-gap spin"></i></div>';
+  try{
+    const snap=await db.ref('suspensions').once('value');
+    const data=snap.val()||{};
+    const uids=Object.keys(data);
+    if(!uids.length){ el.innerHTML='<p style="color:var(--text3);font-size:13px;padding:8px 4px;">No active suspensions.</p>'; return; }
+    const rows=await Promise.all(uids.map(async uid=>{
+      const u=(await db.ref('users/'+uid).once('value')).val()||{};
+      const d=data[uid];
+      return `<div style="padding:12px 4px;border-bottom:1px solid var(--border,#1c2636);">
+        <div style="font-size:14px;font-weight:700;">${ESC(u.name||'Unknown')} <span style="color:var(--text3);font-weight:400;">@${ESC(u.handle||uid)}</span></div>
+        <div style="font-size:12px;color:var(--text3);">${d.type==='permanent'?'Permanent':'Until '+new Date(d.until).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'})}${d.reason?' · '+ESC(d.reason):''}</div>
+        <button class="btn-sheet outline" style="margin-top:6px;padding:6px 12px;font-size:12px;" onclick="modLiftSuspension('${ESC(uid)}')">Lift suspension</button>
+      </div>`;
+    }));
+    el.innerHTML=rows.join('');
+  }catch(e){ el.innerHTML='<p style="color:var(--text3);font-size:13px;padding:8px 4px;">Could not load.</p>'; }
+}
+async function modUnlockAccount(uid){
+  if(!confirm('Unlock this account early?')) return;
+  try{ await db.ref('accountLocks/'+uid).remove(); showToast('Account unlocked'); modRenderLockList(); }
+  catch(e){ showToast('Could not unlock — check Database Rules.'); }
+}
+async function modRenderLockList(){
+  const el=document.getElementById('mod-lock-list');
+  el.innerHTML='<div class="feed-loader"><i class="ph ph-spinner-gap spin"></i></div>';
+  try{
+    const snap=await db.ref('accountLocks').once('value');
+    const data=snap.val()||{};
+    const uids=Object.keys(data).filter(uid=>data[uid].lockedUntil>Date.now());
+    if(!uids.length){ el.innerHTML='<p style="color:var(--text3);font-size:13px;padding:8px 4px;">No active locks.</p>'; return; }
+    const rows=await Promise.all(uids.map(async uid=>{
+      const u=(await db.ref('users/'+uid).once('value')).val()||{};
+      const d=data[uid];
+      return `<div style="padding:12px 4px;border-bottom:1px solid var(--border,#1c2636);">
+        <div style="font-size:14px;font-weight:700;">${ESC(u.name||'Unknown')} <span style="color:var(--text3);font-weight:400;">@${ESC(u.handle||uid)}</span></div>
+        <div style="font-size:12px;color:var(--text3);">Changed: ${ESC((d.changedFields||[]).join(', '))} · Country: ${ESC(d.ipCountry||'?')} · Unlocks ${new Date(d.lockedUntil).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'})}</div>
+        ${d.appealed?'<div style="font-size:12px;color:var(--amber);">⚑ User appealed this lock</div>':''}
+        <button class="btn-sheet outline" style="margin-top:6px;padding:6px 12px;font-size:12px;" onclick="modUnlockAccount('${ESC(uid)}')">Unlock now</button>
+      </div>`;
+    }));
+    el.innerHTML=rows.join('');
+  }catch(e){ el.innerHTML='<p style="color:var(--text3);font-size:13px;padding:8px 4px;">Could not load.</p>'; }
+}
+async function modRenderAppealList(){
+  const el=document.getElementById('mod-appeal-list');
+  el.innerHTML='<div class="feed-loader"><i class="ph ph-spinner-gap spin"></i></div>';
+  try{
+    const snap=await db.ref('appeals').once('value');
+    const data=snap.val()||{};
+    const uids=Object.keys(data);
+    if(!uids.length){ el.innerHTML='<p style="color:var(--text3);font-size:13px;padding:8px 4px;">No appeals.</p>'; return; }
+    const rows=await Promise.all(uids.map(async uid=>{
+      const u=(await db.ref('users/'+uid).once('value')).val()||{};
+      const msgs=Object.values(data[uid]||{});
+      const latest=msgs[msgs.length-1]||{};
+      return `<div style="padding:12px 4px;border-bottom:1px solid var(--border,#1c2636);">
+        <div style="font-size:14px;font-weight:700;">${ESC(u.name||'Unknown')} <span style="color:var(--text3);font-weight:400;">@${ESC(u.handle||uid)}</span></div>
+        <div style="font-size:12px;color:var(--text3);">${ESC(latest.message||'')}</div>
+        <button class="btn-sheet outline" style="margin-top:6px;padding:6px 12px;font-size:12px;" onclick="modUnlockAccount('${ESC(uid)}')">Unlock account</button>
+      </div>`;
+    }));
+    el.innerHTML=rows.join('');
+  }catch(e){ el.innerHTML='<p style="color:var(--text3);font-size:13px;padding:8px 4px;">Could not load.</p>'; }
+}
+
 function openGeoRestrictionsAdmin(){
   if(!me || me.uid!==ADMIN_UID){ showToast('Not authorized'); return; }
   document.getElementById('gr-uid').value='';
@@ -5318,6 +5669,7 @@ async function triggerNexorAIReply(rawText, pulseId, nexorUid){
 }
 
 async function publishPulse(source){
+  if(blockIfLockedOrSuspended()) return;
   const ta=document.getElementById(source+'-text');
   const text=ta.value.trim();
   const imgs=source==='inline'?inlineImages:modalImages;
@@ -5448,6 +5800,7 @@ async function publishPulse(source){
 // LIKES
 // ============================================================
 async function toggleLike(pulseId){
+  if(blockIfLockedOrSuspended()) return;
   const already=likedSet.has(pulseId);
   if(already)likedSet.delete(pulseId);else likedSet.add(pulseId);
   paintLike(pulseId,!already);
@@ -5581,6 +5934,7 @@ function setFollowBtnState(targetUid, state){
 }
 async function toggleFollow(targetUid, btnEl){
   if(!targetUid||targetUid===me.uid)return;
+  if(blockIfLockedOrSuspended()) return;
   const already=followingSet.has(targetUid);
   const pending=requestedSet.has(targetUid);
 
@@ -5779,6 +6133,8 @@ async function loadSettingsScreen(){
   if(adminRow) adminRow.classList.toggle('hidden', !isAdminUser);
   const adminTitle=document.getElementById('settings-admin-title');
   if(adminTitle) adminTitle.classList.toggle('hidden', !isAdminUser);
+  const modRow=document.getElementById('settings-moderation-row');
+  if(modRow) modRow.classList.toggle('hidden', !isAdminUser);
   refreshVerifySettingsRow();
   const acctType=myData.accountType||'personal';
   const acctLabels={personal:'Personal account',creator:'Creator'+(myData.accountCategory?' · '+myData.accountCategory:''),business:'Business'+(myData.accountCategory?' · '+myData.accountCategory:'')};
@@ -6058,6 +6414,7 @@ function openReply(pulseId, handle){
   ta.setSelectionRange(prefill.length,prefill.length);
 }
 async function postReply(){
+  if(blockIfLockedOrSuspended()) return;
   const text=document.getElementById('reply-text').value.trim();
   if((!text&&!replyGifUrl)||!replyToId)return;
   const btn=document.getElementById('reply-post-btn'); btn.disabled=true;
@@ -8172,6 +8529,7 @@ async function cascadeProfileUpdateToContent(uid, patch){
   }catch(e){ console.error('cascadeProfileUpdateToContent failed', e); }
 }
 async function saveProfile(){
+  if(blockIfLockedOrSuspended()) return;
   const name=document.getElementById('ep-name').value.trim();
   const newHandle=(document.getElementById('ep-handle').value.trim()||'').replace(/[^a-zA-Z0-9_]/g,'').toLowerCase();
   const bio=document.getElementById('ep-bio').value.trim();
@@ -8251,6 +8609,7 @@ async function saveProfile(){
       });
     }
     if(profileUid===me.uid) openProfile(me.uid);
+    if(handleChanged) await enforceSuspiciousLockIfTriggered('username');
   } catch(e){ showToast('Could not save profile'); }
 }
 
@@ -8286,6 +8645,10 @@ function checkHandleAvailability(val){
 // SECURITY — device detection, login activity, login alerts,
 // two-factor login gate, change password
 // ============================================================
+// A stable per-browser identifier so we can tell "a device that's logged in
+// many times before" apart from "a device we've basically never seen" —
+// used to auto-lock the account if a barely-used device makes a sensitive
+// change (password/email/username), which is a strong account-takeover signal.
 function detectDeviceInfo(){
   const ua=navigator.userAgent;
   let browser='Unknown browser';
@@ -8305,7 +8668,8 @@ function detectDeviceInfo(){
 async function recordLoginActivity(uid){
   const {label}=detectDeviceInfo();
   const location=await guessLocationFromIP().catch(()=>null);
-  const entry={device:label, location: location||'Unknown location', time: firebase.database.ServerValue.TIMESTAMP};
+  const deviceId=getDeviceId();
+  const entry={device:label, location: location||'Unknown location', time: firebase.database.ServerValue.TIMESTAMP, deviceId};
   db.ref('loginHistory/'+uid).push(entry).catch(()=>{});
   // keep only the most recent 20 entries so this node never grows unbounded
   db.ref('loginHistory/'+uid).orderByChild('time').once('value').then(snap=>{
@@ -8434,6 +8798,7 @@ function openChangePasswordModal(){
   openModal('change-password-modal');
 }
 async function cpSubmit(){
+  if(blockIfLockedOrSuspended()) return;
   const errEl=document.getElementById('cp-err');
   errEl.textContent='';
   const current=document.getElementById('cp-current').value;
@@ -8450,6 +8815,7 @@ async function cpSubmit(){
     await auth.currentUser.updatePassword(next);
     closeModal('change-password-modal');
     showToast('Password updated ✓');
+    await enforceSuspiciousLockIfTriggered('password');
   }catch(err){
     errEl.textContent = err.code==='auth/wrong-password' ? 'Incorrect current password.' : (err.message||'Could not update password.');
   }
@@ -8605,6 +8971,7 @@ function openChangeEmailModal(){
 }
 function ceOtpKey(){ return 'otpRequests/'+me.uid+'/changeEmail'; }
 async function ceSendOtp(){
+  if(blockIfLockedOrSuspended()) return;
   const errEl=document.getElementById('ce-err1');
   errEl.textContent='';
   const password=document.getElementById('ce-password').value;
@@ -8678,6 +9045,7 @@ async function ceVerifyOtp(){
 
     closeModal('change-email-modal');
     showToast('Email updated ✓');
+    await enforceSuspiciousLockIfTriggered('email');
   }catch(err){
     errEl.textContent = err.code==='auth/requires-recent-login' ? 'Session expired, please log out and back in, then retry.' : (err.message||'Could not update email.');
   }
@@ -10059,6 +10427,7 @@ async function sendChatMessage(){
   const input=document.getElementById('chat-input');
   const text=input.value.trim();
   if(!text || !activeChatId || !activeChatOtherUid) return;
+  if(blockIfLockedOrSuspended()) return;
   if(blockedSet.has(activeChatOtherUid)){ showToast('You have blocked this user'); return; }
   input.value=''; chatAutoGrow(input); chatUpdateSendBtn();
   const chatId=activeChatId, otherUid=activeChatOtherUid;
