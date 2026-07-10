@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1170,13 +1170,34 @@ i.spin::before{content:''!important;}
 </div>
 
 <!-- ====== ACCOUNT SUSPENDED — permanent or temporary, set by admin ====== -->
-<div id="suspend-screen" style="display:none;position:fixed;inset:0;z-index:9999;background:var(--bg,#050A14);align-items:center;justify-content:center;flex-direction:column;padding:24px;">
-  <div style="max-width:340px;width:100%;text-align:center;">
-    <i class="ph ph-prohibit" style="font-size:44px;color:var(--like);"></i>
-    <div id="suspend-title" style="font-size:19px;font-weight:800;margin:14px 0 8px;">Account suspended</div>
-    <div id="suspend-reason" style="font-size:14px;color:var(--text3);margin-bottom:10px;"></div>
-    <div id="suspend-until" style="font-size:13px;color:var(--text3);margin-bottom:20px;"></div>
-    <button class="btn-sheet outline" onclick="auth.signOut()">Sign out</button>
+<div id="suspend-screen" style="display:none;position:fixed;inset:0;z-index:9999;background:var(--bg,#050A14);flex-direction:column;overflow-y:auto;">
+  <div style="max-width:440px;width:100%;margin:0 auto;padding:44px 24px 8px;text-align:center;">
+    <div id="suspend-avatar" style="width:96px;height:96px;border-radius:50%;margin:0 auto 20px;background:linear-gradient(135deg,var(--cyan),var(--amber));display:flex;align-items:center;justify-content:center;font-weight:800;font-size:32px;color:#050A14;overflow:hidden;"></div>
+    <div id="suspend-title" style="font-size:21px;font-weight:800;line-height:1.3;margin-bottom:12px;">We suspended your account</div>
+    <div id="suspend-appeal-window" style="font-size:14px;color:var(--text2);line-height:1.4;margin-bottom:8px;"></div>
+    <div id="suspend-date" style="font-size:13px;color:var(--text3);margin-bottom:8px;"></div>
+  </div>
+
+  <div class="settings-section" style="max-width:440px;width:100%;margin:0 auto;text-align:left;">
+    <div style="font-size:16px;font-weight:800;margin:10px 0 8px;">What this means</div>
+    <div style="font-size:14px;color:var(--text2);line-height:1.5;padding-bottom:6px;">Your account isn't visible to others on Nexor Sparks right now, and you can't use it.</div>
+  </div>
+
+  <div class="settings-section" style="max-width:440px;width:100%;margin:0 auto;text-align:left;">
+    <div style="font-size:16px;font-weight:800;margin:10px 0 8px;">What you can do</div>
+    <div id="suspend-appeal-copy" style="font-size:14px;color:var(--text2);line-height:1.5;padding-bottom:6px;"></div>
+  </div>
+
+  <div class="settings-section" style="max-width:440px;width:100%;margin:0 auto;text-align:left;border-bottom:none;">
+    <div style="font-size:16px;font-weight:800;margin:10px 0 8px;">Why this happened</div>
+    <div id="suspend-reason" style="font-size:14px;color:var(--text2);line-height:1.5;"></div>
+    <div id="suspend-until" style="font-size:13px;color:var(--text3);margin-top:10px;"></div>
+  </div>
+
+  <div style="max-width:440px;width:100%;margin:0 auto;padding:20px 24px calc(28px + var(--safe-bottom));">
+    <button class="btn-sheet primary" id="suspend-appeal-btn" onclick="submitSuspendAppeal()"><i class="ph ph-flag"></i> Appeal</button>
+    <div id="suspend-appeal-sent" class="hidden" style="font-size:13px;color:var(--green);margin:10px 0;text-align:center;">✓ Appeal submitted — we'll review it soon</div>
+    <button class="btn-sheet outline" style="margin-top:8px;" onclick="auth.signOut()">Sign out</button>
   </div>
 </div>
 
@@ -3775,12 +3796,66 @@ async function checkAccountLock(uid){
   if(d.lockedUntil && d.lockedUntil<=Date.now()) return null; // expired
   return d;
 }
-function showSuspendScreen(d){
+const SUSPEND_APPEAL_WINDOW_DAYS = 180; // permanent suspensions: days before the account may be permanently disabled
+async function showSuspendScreen(d){
   currentSuspensionData=d;
-  document.getElementById('suspend-title').textContent = d.type==='permanent' ? 'Account permanently suspended' : 'Account temporarily suspended';
-  document.getElementById('suspend-reason').textContent = d.reason || 'Your account was suspended for violating our community guidelines.';
-  document.getElementById('suspend-until').textContent = d.type==='temporary' && d.until ? ('You can log in again on '+new Date(d.until).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'})) : '';
   document.getElementById('suspend-screen').style.display='flex';
+  document.getElementById('suspend-title').textContent='We suspended your account';
+  const avEl=document.getElementById('suspend-avatar');
+  avEl.innerHTML='';
+
+  // myData isn't loaded yet at this point (onSignedIn/loadMyData only run once a user
+  // clears both the suspension and lock checks), so fetch this account's own name/photo
+  // directly — same pattern as showRestrictedOverlay() uses for other profiles.
+  try{
+    const snap = await db.ref('users/'+me.uid).once('value');
+    const u = snap.val()||{};
+    const name = u.name||'';
+    document.getElementById('suspend-title').textContent = name ? `We suspended your account, ${ESC(name)}` : 'We suspended your account';
+    if(u.photoBase64){ avEl.innerHTML=`<img src="${u.photoBase64}" style="width:100%;height:100%;object-fit:cover;">`; }
+    else { avEl.textContent = ESC((name||'U').charAt(0).toUpperCase()); }
+  }catch(e){}
+
+  let appealAllowed = !d.appealed;
+  const appealWinEl=document.getElementById('suspend-appeal-window');
+  if(d.type==='permanent'){
+    const daysSince = d.suspendedAt ? Math.floor((Date.now()-d.suspendedAt)/86400000) : 0;
+    const daysLeft = Math.max(0, SUSPEND_APPEAL_WINDOW_DAYS-daysSince);
+    appealWinEl.textContent = daysLeft>0 ? `${daysLeft} day${daysLeft===1?'':'s'} left to appeal or we'll permanently disable your account` : 'The appeal window for this account has closed.';
+    if(daysLeft<=0) appealAllowed=false;
+    document.getElementById('suspend-until').textContent='';
+  } else {
+    appealWinEl.textContent='This is a temporary suspension.';
+    document.getElementById('suspend-until').textContent = d.until ? ('You can log in again on '+new Date(d.until).toLocaleString('en-US',{dateStyle:'medium',timeStyle:'short'})) : '';
+  }
+
+  document.getElementById('suspend-date').textContent = d.suspendedAt ? ('Suspended on '+new Date(d.suspendedAt).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'})) : '';
+  document.getElementById('suspend-reason').textContent = d.reason || "Your account, or activity on it, doesn't follow our Community Standards.";
+  document.getElementById('suspend-appeal-copy').textContent = d.appealed
+    ? "We've received your appeal and are reviewing your account. We'll let you know once a decision is made."
+    : (appealAllowed ? 'You can appeal this decision below. We may need to collect some info from you to help us review your account again.' : 'The window to appeal this decision has closed.');
+
+  document.getElementById('suspend-appeal-btn').classList.toggle('hidden', !appealAllowed);
+  document.getElementById('suspend-appeal-sent').classList.toggle('hidden', !d.appealed);
+}
+async function submitSuspendAppeal(){
+  if(!me) return;
+  const btn=document.getElementById('suspend-appeal-btn');
+  btn.disabled=true; btn.innerHTML='<i class="ph ph-spinner-gap spin"></i> Sending…';
+  try{
+    await db.ref('appeals/'+me.uid).push({
+      type:'suspension',
+      message:'I believe this suspension was a mistake — please review my account.',
+      submittedAt: firebase.database.ServerValue.TIMESTAMP
+    });
+    await db.ref('suspensions/'+me.uid+'/appealed').set(true);
+    if(currentSuspensionData) currentSuspensionData.appealed=true;
+    document.getElementById('suspend-appeal-btn').classList.add('hidden');
+    document.getElementById('suspend-appeal-sent').classList.remove('hidden');
+    document.getElementById('suspend-appeal-copy').textContent="We've received your appeal and are reviewing your account. We'll let you know once a decision is made.";
+    showToast('Appeal submitted');
+  }catch(e){ showToast('Could not submit appeal'); }
+  btn.disabled=false; btn.innerHTML='<i class="ph ph-flag"></i> Appeal';
 }
 function showLockScreen(d){
   currentLockData=d;
@@ -3796,6 +3871,7 @@ async function submitLockAppeal(){
   btn.disabled=true; btn.innerHTML='<i class="ph ph-spinner-gap spin"></i> Sending…';
   try{
     await db.ref('appeals/'+me.uid).push({
+      type:'lock',
       message:'I believe this lock was a mistake — please review my account.',
       submittedAt: firebase.database.ServerValue.TIMESTAMP
     });
@@ -3939,10 +4015,14 @@ async function modRenderAppealList(){
       const u=(await db.ref('users/'+uid).once('value')).val()||{};
       const msgs=Object.values(data[uid]||{});
       const latest=msgs[msgs.length-1]||{};
+      const isSuspension = latest.type==='suspension';
+      const actionBtn = isSuspension
+        ? `<button class="btn-sheet outline" style="margin-top:6px;padding:6px 12px;font-size:12px;" onclick="modLiftSuspension('${ESC(uid)}')">Lift suspension</button>`
+        : `<button class="btn-sheet outline" style="margin-top:6px;padding:6px 12px;font-size:12px;" onclick="modUnlockAccount('${ESC(uid)}')">Unlock account</button>`;
       return `<div style="padding:12px 4px;border-bottom:1px solid var(--border,#1c2636);">
-        <div style="font-size:14px;font-weight:700;">${ESC(u.name||'Unknown')} <span style="color:var(--text3);font-weight:400;">@${ESC(u.handle||uid)}</span></div>
+        <div style="font-size:14px;font-weight:700;">${ESC(u.name||'Unknown')} <span style="color:var(--text3);font-weight:400;">@${ESC(u.handle||uid)}</span> <span style="color:var(--text3);font-weight:400;font-size:11px;">· ${isSuspension?'suspension':'lock'} appeal</span></div>
         <div style="font-size:12px;color:var(--text3);">${ESC(latest.message||'')}</div>
-        <button class="btn-sheet outline" style="margin-top:6px;padding:6px 12px;font-size:12px;" onclick="modUnlockAccount('${ESC(uid)}')">Unlock account</button>
+        ${actionBtn}
       </div>`;
     }));
     el.innerHTML=rows.join('');
