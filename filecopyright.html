@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copyright Infringement Report — Nexor Sparks</title>
+<meta name="description" content="Report copyrighted content posted on Nexor Sparks without permission.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23050A14'/%3E%3Cpath d='M7 2v11h3v9l7-12h-4l4-8z' fill='%2300C8FF'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#050A14;
+  --surface:#0D1B2E;
+  --surface2:#142236;
+  --border:rgba(0,200,255,0.08);
+  --border2:rgba(255,255,255,0.07);
+  --text:#F0F4FF;
+  --text2:rgba(240,244,255,0.6);
+  --text3:rgba(240,244,255,0.32);
+  --cyan:#00C8FF;
+  --amber:#FFB830;
+  --red:#FF3B5C;
+  --green:#00D68F;
+  --mono:'JetBrains Mono',monospace;
+  --font:'Inter',system-ui,sans-serif;
+}
+html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100%;-webkit-font-smoothing:antialiased;}
+body{background:
+  radial-gradient(ellipse 900px 500px at 12% -8%, rgba(0,200,255,0.10) 0%, transparent 60%),
+  radial-gradient(ellipse 700px 500px at 100% 10%, rgba(255,184,48,0.06) 0%, transparent 55%),
+  var(--bg);
+}
+button{border:none;cursor:pointer;font-family:inherit;}
+input,textarea,select{font-family:inherit;outline:none;}
+a{color:var(--cyan);}
+.hidden{display:none!important;}
+
+/* ===== Layout shell ===== */
+.wrap{max-width:680px;margin:0 auto;padding:0 20px 80px;}
+header.top{border-bottom:1px solid var(--border2);padding:20px 0;}
+.brand{display:flex;align-items:center;gap:10px;max-width:680px;margin:0 auto;padding:0 20px;}
+.brand-mark{width:30px;height:30px;border-radius:8px;background:linear-gradient(135deg,var(--cyan),#4FE3FF);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 20px rgba(0,200,255,0.35);}
+.brand-mark i{color:#050A14;font-size:16px;}
+.brand-name{font-weight:800;font-size:15px;letter-spacing:-0.2px;}
+.brand-sub{font-size:11px;color:var(--text3);font-family:var(--mono);letter-spacing:0.5px;text-transform:uppercase;}
+
+.hero{padding:44px 0 30px;}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:6px;font-family:var(--mono);font-size:11px;letter-spacing:1.2px;text-transform:uppercase;color:var(--amber);background:rgba(255,184,48,0.08);border:1px solid rgba(255,184,48,0.25);padding:5px 10px;border-radius:6px;margin-bottom:18px;}
+.hero h1{font-size:30px;font-weight:800;letter-spacing:-0.8px;line-height:1.15;margin-bottom:14px;}
+.hero p{font-size:14.5px;color:var(--text2);line-height:1.65;max-width:56ch;}
+.hero p+p{margin-top:10px;}
+.hero a{text-decoration:underline;text-underline-offset:2px;}
+
+/* ===== Form sections ===== */
+.step{display:flex;gap:16px;padding:32px 0;border-top:1px solid var(--border2);}
+.step-num{font-family:var(--mono);font-size:13px;color:var(--cyan);font-weight:600;flex-shrink:0;width:26px;padding-top:2px;}
+.step-body{flex:1;min-width:0;}
+.step-title{font-size:17px;font-weight:700;margin-bottom:4px;}
+.step-desc{font-size:13px;color:var(--text3);margin-bottom:18px;line-height:1.5;}
+
+.field{margin-bottom:16px;}
+.field label{display:block;font-size:12.5px;font-weight:600;color:var(--text2);margin-bottom:7px;}
+.field .hint{font-weight:400;color:var(--text3);}
+.field input[type=text],.field input[type=email],.field input[type=tel],.field input[type=url],.field textarea,.field select{
+  width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:10px;
+  padding:12px 13px;color:var(--text);font-size:14px;transition:border-color .15s;
+}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--cyan);}
+.field textarea{resize:vertical;min-height:84px;line-height:1.5;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+@media(max-width:520px){.field-row{grid-template-columns:1fr;}}
+
+.radio-group{display:flex;flex-direction:column;gap:8px;}
+.radio-opt{display:flex;align-items:flex-start;gap:10px;background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:12px 13px;cursor:pointer;transition:border-color .15s;}
+.radio-opt:has(input:checked){border-color:var(--cyan);background:rgba(0,200,255,0.05);}
+.radio-opt input{margin-top:2px;accent-color:var(--cyan);flex-shrink:0;}
+.radio-opt .opt-title{font-size:13.5px;font-weight:600;}
+.radio-opt .opt-sub{font-size:12px;color:var(--text3);margin-top:2px;}
+
+.or-divider{display:flex;align-items:center;gap:10px;margin:4px 0 16px;color:var(--text3);font-size:11px;font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;}
+.or-divider::before,.or-divider::after{content:'';flex:1;height:1px;background:var(--border2);}
+
+.check{display:flex;align-items:flex-start;gap:10px;padding:13px;border:1px solid var(--border2);border-radius:10px;background:var(--surface);margin-bottom:10px;cursor:pointer;}
+.check input{margin-top:2px;accent-color:var(--cyan);flex-shrink:0;width:16px;height:16px;}
+.check span{font-size:13px;color:var(--text2);line-height:1.55;}
+.check span strong{color:var(--text);}
+
+.sig-box{background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:16px;}
+.sig-box input{width:100%;background:transparent;border:none;border-bottom:2px solid var(--cyan);padding:6px 2px 10px;font-family:'Segoe Script','Brush Script MT',cursive;font-size:22px;color:var(--text);}
+.sig-box input::placeholder{font-family:var(--font);font-size:13px;color:var(--text3);}
+.sig-date{font-family:var(--mono);font-size:11px;color:var(--text3);margin-top:10px;}
+
+.err{color:var(--red);font-size:12.5px;margin-top:-6px;margin-bottom:14px;min-height:1px;}
+.submit-bar{padding-top:8px;}
+.btn-primary{width:100%;background:linear-gradient(135deg,var(--cyan),#4FE3FF);color:#050A14;font-weight:800;font-size:14.5px;padding:15px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .15s;}
+.btn-primary:disabled{opacity:0.55;cursor:default;}
+.foot-note{font-size:11.5px;color:var(--text3);text-align:center;margin-top:14px;line-height:1.6;}
+.spin{animation:spin 0.8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+
+/* ===== Confirmation screen ===== */
+#confirm-screen{display:none;text-align:center;padding:80px 20px;}
+.confirm-icon{width:64px;height:64px;border-radius:50%;background:rgba(0,214,143,0.12);border:1px solid rgba(0,214,143,0.35);display:flex;align-items:center;justify-content:center;margin:0 auto 22px;}
+.confirm-icon i{font-size:30px;color:var(--green);}
+#confirm-screen h2{font-size:22px;font-weight:800;margin-bottom:10px;}
+#confirm-screen p{font-size:14px;color:var(--text2);max-width:44ch;margin:0 auto 6px;line-height:1.6;}
+.ref-id{display:inline-block;margin-top:16px;font-family:var(--mono);font-size:13px;background:var(--surface);border:1px solid var(--border2);padding:9px 16px;border-radius:8px;color:var(--cyan);letter-spacing:0.5px;}
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="brand">
+    <div class="brand-mark"><i class="ph-fill ph-lightning"></i></div>
+    <div>
+      <div class="brand-name">Nexor Sparks</div>
+      <div class="brand-sub">Copyright Report</div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap" id="form-screen">
+  <div class="hero">
+    <div class="hero-eyebrow"><i class="ph ph-scales"></i> Legal request</div>
+    <h1>Report copyright infringement</h1>
+    <p>Use this form if you own the copyright — or represent someone who does — and believe a Pulse posted on Nexor Sparks uses that work without permission. This is a formal legal notice; the information below is reviewed by our team and, where valid, the content is removed and a strike is placed on the account that posted it.</p>
+    <p>Misuse of this form to target content you don't have rights to is itself a violation of law in most jurisdictions. If you're unsure whether something is infringing, consider contacting the poster first.</p>
+  </div>
+
+  <form id="cr-form" autocomplete="off">
+
+    <!-- 1. Complainant -->
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-body">
+        <div class="step-title">Your information</div>
+        <div class="step-desc">This is shared with our review team, and a summary may be shared with the account holder as part of our process.</div>
+
+        <div class="field">
+          <label>Your full legal name</label>
+          <input type="text" id="f-complainantName" required placeholder="e.g. Priya Sharma">
+        </div>
+
+        <div class="field">
+          <label>Are you the copyright owner, or authorized to act on their behalf?</label>
+          <div class="radio-group">
+            <label class="radio-opt"><input type="radio" name="relationship" value="owner" checked><span><span class="opt-title">I am the copyright owner</span></span></label>
+            <label class="radio-opt"><input type="radio" name="relationship" value="agent"><span><span class="opt-title">I'm an authorized representative</span><div class="opt-sub">Acting on behalf of the copyright owner (e.g. legal counsel, agency)</div></span></label>
+          </div>
+        </div>
+
+        <div class="field" id="ownerNameField">
+          <label>Copyright owner's full name / company <span class="hint">(if different from above)</span></label>
+          <input type="text" id="f-ownerName" placeholder="Leave blank if you are the owner">
+        </div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Email address</label>
+            <input type="email" id="f-complainantEmail" required placeholder="you@example.com">
+          </div>
+          <div class="field">
+            <label>Phone number</label>
+            <input type="tel" id="f-complainantPhone" required placeholder="+91 XXXXX XXXXX">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Mailing address</label>
+          <textarea id="f-complainantAddress" required placeholder="Street, city, state, postal code, country"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. The work -->
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-body">
+        <div class="step-title">The copyrighted work</div>
+        <div class="step-desc">Describe the original work you believe is being infringed.</div>
+
+        <div class="field">
+          <label>Title or short description of the work</label>
+          <input type="text" id="f-workTitle" required placeholder="e.g. \"Sunset Over Marina\" — original photograph">
+        </div>
+
+        <div class="field">
+          <label>Details</label>
+          <textarea id="f-workDescription" required placeholder="Describe the work: when it was created, where it was first published, and why you hold the rights to it."></textarea>
+        </div>
+
+        <div class="field">
+          <label>Link to the original work <span class="hint">(optional, but speeds up review)</span></label>
+          <input type="url" id="f-originalUrl" placeholder="https://">
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. Infringing content -->
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-body">
+        <div class="step-title">The content you're reporting</div>
+        <div class="step-desc">Give us the direct link to the Pulse, the @username that posted it, or both — at least one is required.</div>
+
+        <div class="field">
+          <label>Link to the infringing Pulse</label>
+          <input type="url" id="f-infringingUrl" placeholder="https://.../p/POST_ID">
+        </div>
+        <div class="or-divider">and / or</div>
+        <div class="field">
+          <label>@username of the account that posted it</label>
+          <input type="text" id="f-infringingUsername" placeholder="@username">
+        </div>
+
+        <div class="field">
+          <label>Anything else that helps us find it <span class="hint">(optional)</span></label>
+          <textarea id="f-infringingDescription" placeholder="e.g. it's a video posted around July 5th, appears in their pinned Pulse, etc."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. Legal order -->
+    <div class="step">
+      <div class="step-num">04</div>
+      <div class="step-body">
+        <div class="step-title">Court order</div>
+        <div class="step-desc">Optional. If a court has already ordered this content removed, adding the reference speeds up review — it isn't required to file a report.</div>
+
+        <div class="field-row">
+          <div class="field">
+            <label>Court order reference number <span class="hint">(optional)</span></label>
+            <input type="text" id="f-courtOrderRef" placeholder="Case / order number">
+          </div>
+          <div class="field">
+            <label>Link to the order document <span class="hint">(optional)</span></label>
+            <input type="url" id="f-courtOrderUrl" placeholder="https://">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Statements + signature -->
+    <div class="step">
+      <div class="step-num">05</div>
+      <div class="step-body">
+        <div class="step-title">Statements & signature</div>
+        <div class="step-desc">All three are required to submit a report.</div>
+
+        <label class="check">
+          <input type="checkbox" id="f-goodFaith" required>
+          <span>I have a <strong>good-faith belief</strong> that the use of this material is not authorized by the copyright owner, its agent, or the law.</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" id="f-accuracy" required>
+          <span>The information in this report is <strong>accurate</strong>, and — under penalty of perjury — I am the copyright owner or authorized to act on their behalf.</span>
+        </label>
+        <label class="check">
+          <input type="checkbox" id="f-signatureConsent" required>
+          <span>I understand that <strong>typing my name below counts as my digital signature</strong> on this legal notice.</span>
+        </label>
+
+        <div class="sig-box">
+          <label style="font-size:12.5px;font-weight:600;color:var(--text2);display:block;margin-bottom:2px;">Digital signature — type your full legal name</label>
+          <input type="text" id="f-signature" required placeholder="Full legal name">
+          <div class="sig-date" id="sig-date-display"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wrap" style="padding:0;">
+      <div class="err" id="cr-form-err"></div>
+      <div class="submit-bar">
+        <button type="submit" class="btn-primary" id="cr-submit-btn"><i class="ph ph-paper-plane-tilt"></i> Submit report</button>
+        <div class="foot-note">Submitting this form sends a formal legal notice to Nexor Sparks. False or bad-faith reports may result in legal liability for the person who filed them.</div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<div class="wrap" id="confirm-screen">
+  <div class="confirm-icon"><i class="ph-bold ph-check"></i></div>
+  <h2>Report submitted</h2>
+  <p>Our team will review the information you provided. If the report is valid, the Pulse is removed and a strike is recorded on the account that posted it.</p>
+  <p>Keep this reference for your records:</p>
+  <div class="ref-id" id="ref-id-display"></div>
+</div>
+
+<script>
+// Same Firebase project as the main Nexor Sparks app — reports land in
+// copyrightReports/{id} where the app's admin panel (Settings → Copyright
+// reports) reviews and acts on them.
+// NOTE: Database Rules must allow public (unauthenticated) writes to
+// "copyrightReports" — e.g. ".write": true — but NOT public reads, so
+// complaint details (names, addresses, phone numbers) stay private and are
+// only readable by the admin UID inside the main app.
+const firebaseConfig = {
+  apiKey:"AIzaSyC30TcmMVhP_8HdFYS1WufRiZwSDYNMTF0",
+  authDomain:"pulse2-92372.firebaseapp.com",
+  databaseURL:"https://pulse2-92372-default-rtdb.firebaseio.com",
+  projectId:"pulse2-92372",
+  storageBucket:"pulse2-92372.firebasestorage.app",
+  messagingSenderId:"276235725177",
+  appId:"1:276235725177:web:0f4e0789fae80a435927a8"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
+document.getElementById('sig-date-display').textContent = new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+
+document.querySelectorAll('input[name="relationship"]').forEach(r=>{
+  r.addEventListener('change', ()=>{
+    document.getElementById('ownerNameField').classList.toggle('hidden', r.value==='owner' && r.checked);
+  });
+});
+
+const $=id=>document.getElementById(id);
+
+$('cr-form').addEventListener('submit', async (e)=>{
+  e.preventDefault();
+  const errEl=$('cr-form-err');
+  errEl.textContent='';
+
+  const infringingUrl=$('f-infringingUrl').value.trim();
+  const infringingUsername=$('f-infringingUsername').value.trim().replace(/^@/,'');
+  if(!infringingUrl && !infringingUsername){
+    errEl.textContent='Provide either a link to the Pulse or the @username that posted it.';
+    window.scrollTo({top:$('f-infringingUrl').getBoundingClientRect().top+window.scrollY-100, behavior:'smooth'});
+    return;
+  }
+  if(!$('f-goodFaith').checked || !$('f-accuracy').checked || !$('f-signatureConsent').checked){
+    errEl.textContent='All three statements must be checked to submit.';
+    return;
+  }
+  if(!$('f-signature').value.trim()){
+    errEl.textContent='Type your full legal name as your digital signature.';
+    return;
+  }
+
+  const relationship = document.querySelector('input[name="relationship"]:checked').value === 'owner' ? 'owner' : 'agent';
+
+  const btn=$('cr-submit-btn');
+  btn.disabled=true; btn.innerHTML='<i class="ph ph-spinner-gap spin"></i> Submitting…';
+
+  const report = {
+    status:'pending',
+    submittedAt: firebase.database.ServerValue.TIMESTAMP,
+    complainantName: $('f-complainantName').value.trim(),
+    relationship,
+    ownerName: $('f-ownerName').value.trim() || null,
+    complainantEmail: $('f-complainantEmail').value.trim(),
+    complainantPhone: $('f-complainantPhone').value.trim(),
+    complainantAddress: $('f-complainantAddress').value.trim(),
+    workTitle: $('f-workTitle').value.trim(),
+    workDescription: $('f-workDescription').value.trim(),
+    originalWorkUrl: $('f-originalUrl').value.trim() || null,
+    infringingUrl: infringingUrl || null,
+    infringingUsername: infringingUsername || null,
+    infringingDescription: $('f-infringingDescription').value.trim() || null,
+    courtOrderRef: $('f-courtOrderRef').value.trim() || null,
+    courtOrderUrl: $('f-courtOrderUrl').value.trim() || null,
+    goodFaithStatement: true,
+    accuracyStatement: true,
+    signature: $('f-signature').value.trim(),
+    signedAt: firebase.database.ServerValue.TIMESTAMP,
+    userAgent: navigator.userAgent
+  };
+
+  try{
+    const ref = await db.ref('copyrightReports').push(report);
+    document.getElementById('form-screen').style.display='none';
+    document.getElementById('confirm-screen').style.display='block';
+    document.getElementById('ref-id-display').textContent = 'Reference: ' + ref.key;
+  }catch(err){
+    errEl.textContent = err.message || 'Could not submit — please try again in a moment.';
+    btn.disabled=false; btn.innerHTML='<i class="ph ph-paper-plane-tilt"></i> Submit report';
+  }
+});
+</script>
+</body>
+</html>
