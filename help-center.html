@@ -1,0 +1,901 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Help Center — Nexor Sparks</title>
+<meta name="description" content="Nexor Sparks Help Center — account, privacy, community guidelines, copyright aur safety se judi har jaankari.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23050A14'/%3E%3Cpath d='M7 2v11h3v9l7-12h-4l4-8z' fill='%2300C8FF'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#050A14;
+  --surface:#0D1B2E;
+  --surface2:#142236;
+  --surface3:#1A2D45;
+  --border:rgba(0,200,255,0.10);
+  --border2:rgba(255,255,255,0.07);
+  --text:#F0F4FF;
+  --text2:rgba(240,244,255,0.58);
+  --text3:rgba(240,244,255,0.32);
+  --cyan:#00C8FF;
+  --cyan-dim:rgba(0,200,255,0.12);
+  --amber:#FFB830;
+  --like:#FF3B5C;
+  --green:#00D68F;
+  --radius:16px;
+  --radius-sm:10px;
+  --font:'Inter',system-ui,sans-serif;
+}
+html{scroll-behavior:smooth;}
+html,body{background:var(--bg);color:var(--text);font-family:var(--font);min-height:100%;-webkit-font-smoothing:antialiased;}
+button{border:none;background:none;cursor:pointer;color:inherit;font-family:inherit;}
+a{color:inherit;text-decoration:none;}
+input,textarea{font-family:inherit;outline:none;}
+::-webkit-scrollbar{width:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--surface3);border-radius:99px;}
+.hidden{display:none!important;}
+img{display:block;max-width:100%;}
+
+/* ===== BACKDROP GLOW ===== */
+body{
+  background:
+    radial-gradient(ellipse 900px 500px at 15% -5%, rgba(0,200,255,0.13) 0%, transparent 60%),
+    radial-gradient(ellipse 700px 500px at 100% 15%, rgba(255,184,48,0.08) 0%, transparent 55%),
+    var(--bg);
+  background-attachment:fixed;
+}
+
+/* ===== HEADER ===== */
+header{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;gap:16px;
+  padding:14px 24px;
+  background:rgba(5,10,20,0.78);
+  backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border2);
+}
+.brand{display:flex;align-items:center;gap:10px;cursor:pointer;flex-shrink:0;}
+.brand-mark{
+  width:34px;height:34px;border-radius:9px;flex-shrink:0;
+  background:var(--bg);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 22px rgba(0,200,255,0.4);
+}
+.brand-mark svg{width:20px;height:20px;}
+.brand-text{display:flex;flex-direction:column;line-height:1.15;}
+.brand-text b{font-size:15px;font-weight:800;letter-spacing:-0.2px;}
+.brand-text span{font-size:10.5px;color:var(--cyan);font-weight:700;letter-spacing:.4px;text-transform:uppercase;}
+.header-search{
+  flex:1;max-width:420px;display:flex;align-items:center;gap:8px;
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:999px;padding:9px 16px;color:var(--text3);
+  transition:border-color .2s;
+}
+.header-search:focus-within{border-color:rgba(0,200,255,0.4);}
+.header-search i{font-size:16px;}
+.header-search input{background:none;border:none;color:var(--text);width:100%;font-size:13.5px;}
+.header-search input::placeholder{color:var(--text3);}
+.back-btn{
+  margin-left:auto;flex-shrink:0;
+  display:flex;align-items:center;gap:6px;
+  background:linear-gradient(135deg,var(--cyan),#4FE3FF);
+  color:#04101c;font-weight:800;font-size:12.5px;
+  padding:9px 16px;border-radius:999px;white-space:nowrap;
+  box-shadow:0 4px 16px rgba(0,200,255,0.28);
+}
+@media(max-width:760px){ .header-search{display:none;} .brand-text span{display:none;} }
+
+/* ===== HERO ===== */
+.hero{padding:56px 24px 28px;text-align:center;max-width:760px;margin:0 auto;}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--cyan-dim);color:var(--cyan);border:1px solid rgba(0,200,255,0.25);
+  font-size:11.5px;font-weight:800;letter-spacing:.6px;text-transform:uppercase;
+  padding:6px 14px;border-radius:999px;margin-bottom:18px;
+}
+.hero h1{font-size:34px;font-weight:800;letter-spacing:-0.8px;line-height:1.2;margin-bottom:10px;}
+.hero p{color:var(--text2);font-size:15px;line-height:1.6;margin-bottom:26px;}
+.hero-search{
+  display:flex;align-items:center;gap:10px;
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:16px;padding:14px 18px;max-width:520px;margin:0 auto 18px;
+  box-shadow:0 20px 50px rgba(0,0,0,0.35);
+}
+.hero-search i{font-size:19px;color:var(--cyan);}
+.hero-search input{background:none;border:none;color:var(--text);width:100%;font-size:15px;}
+.hero-search input::placeholder{color:var(--text3);}
+.hero-chips{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.chip{
+  background:var(--surface2);border:1px solid var(--border2);color:var(--text2);
+  font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:999px;
+  transition:.2s;
+}
+.chip:hover{border-color:rgba(0,200,255,0.35);color:var(--text);}
+
+/* ===== SEARCH RESULTS ===== */
+#search-results{max-width:720px;margin:0 auto 20px;padding:0 24px;}
+#search-results .sr-item{
+  display:block;background:var(--surface2);border:1px solid var(--border2);
+  border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:8px;
+}
+#search-results .sr-item b{font-size:13.5px;}
+#search-results .sr-item p{font-size:12px;color:var(--text3);margin-top:3px;}
+#search-empty{text-align:center;color:var(--text3);font-size:13px;padding:20px 0;}
+
+/* ===== CATEGORY GRID ===== */
+.section-wrap{max-width:1040px;margin:0 auto;padding:12px 24px 60px;}
+.section-label{font-size:12px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;color:var(--text3);margin:36px 0 14px;}
+.section-label:first-child{margin-top:0;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:14px;}
+.card{
+  background:linear-gradient(180deg,rgba(20,34,54,0.7),rgba(13,27,46,0.7));
+  border:1px solid var(--border2);border-radius:var(--radius);
+  padding:20px;display:flex;flex-direction:column;gap:10px;
+  transition:.2s;cursor:pointer;
+}
+.card:hover{border-color:rgba(0,200,255,0.3);transform:translateY(-2px);}
+.card-icon{
+  width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;
+  background:var(--cyan-dim);color:var(--cyan);font-size:20px;
+}
+.card.urgent .card-icon{background:rgba(255,59,92,0.13);color:var(--like);}
+.card h3{font-size:14.5px;font-weight:700;}
+.card p{font-size:12.5px;color:var(--text2);line-height:1.5;}
+
+/* ===== ARTICLE PAGE ===== */
+#page-article{display:none;max-width:760px;margin:0 auto;padding:28px 24px 80px;}
+.breadcrumb{display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--text3);margin-bottom:20px;}
+.breadcrumb b{color:var(--cyan);cursor:pointer;font-weight:700;}
+.article-icon{
+  width:52px;height:52px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+  background:var(--cyan-dim);color:var(--cyan);font-size:26px;margin-bottom:16px;
+}
+.article-icon.urgent{background:rgba(255,59,92,0.13);color:var(--like);}
+#page-article h1{font-size:25px;font-weight:800;letter-spacing:-0.4px;margin-bottom:6px;}
+.article-meta{font-size:12px;color:var(--text3);margin-bottom:24px;}
+.article-body{font-size:14.5px;line-height:1.85;color:var(--text2);}
+.article-body h2{font-size:16px;font-weight:700;color:var(--text);margin:26px 0 10px;}
+.article-body p{margin-bottom:14px;}
+.article-body ul,.article-body ol{margin:0 0 14px 20px;}
+.article-body li{margin-bottom:7px;}
+.article-body strong{color:var(--text);font-weight:700;}
+.callout{
+  background:var(--surface2);border:1px solid var(--border2);border-left:3px solid var(--cyan);
+  border-radius:var(--radius-sm);padding:14px 16px;margin:18px 0;font-size:13.5px;color:var(--text2);
+}
+.callout.warn{border-left-color:var(--like);}
+.callout.warn i{color:var(--like);}
+.callout i{color:var(--cyan);margin-right:6px;}
+.ext-link-btn{
+  display:inline-flex;align-items:center;gap:8px;margin-top:6px;
+  background:var(--surface3);border:1px solid var(--border2);color:var(--text);
+  font-size:13px;font-weight:700;padding:10px 16px;border-radius:999px;
+}
+.helpful{
+  margin-top:34px;padding-top:22px;border-top:1px solid var(--border2);
+  display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+}
+.helpful span{font-size:13px;color:var(--text2);font-weight:600;}
+.helpful button{
+  display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border2);
+  padding:8px 14px;border-radius:999px;font-size:12.5px;font-weight:700;color:var(--text2);
+}
+.helpful button:hover{border-color:rgba(0,200,255,0.3);color:var(--text);}
+.related{margin-top:28px;}
+.related a{display:block;font-size:13.5px;color:var(--cyan);font-weight:600;padding:9px 0;border-bottom:1px solid var(--border2);}
+
+/* ===== FOOTER ===== */
+footer{border-top:1px solid var(--border2);padding:34px 24px 50px;margin-top:20px;}
+.footer-in{max-width:1040px;margin:0 auto;display:flex;flex-wrap:wrap;justify-content:space-between;gap:24px;}
+.footer-col b{font-size:12px;text-transform:uppercase;letter-spacing:.6px;color:var(--text3);display:block;margin-bottom:12px;}
+.footer-col a{display:block;font-size:13px;color:var(--text2);margin-bottom:9px;}
+.footer-col a:hover{color:var(--cyan);}
+.footer-bottom{max-width:1040px;margin:26px auto 0;padding-top:20px;border-top:1px solid var(--border2);font-size:12px;color:var(--text3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
+
+/* ===== AI ASSISTANT WIDGET ===== */
+#ai-fab{
+  position:fixed;bottom:22px;right:22px;z-index:400;
+  width:58px;height:58px;border-radius:50%;
+  background:linear-gradient(135deg,#FFD98A,#FFB830);
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 8px 26px rgba(255,184,48,0.4);
+  animation:aiPulse 2.4s ease-in-out infinite;
+}
+#ai-fab i{font-size:26px;color:#221200;}
+@keyframes aiPulse{0%,100%{box-shadow:0 8px 26px rgba(255,184,48,0.4);}50%{box-shadow:0 8px 34px rgba(255,184,48,0.65);}}
+#ai-panel{
+  position:fixed;bottom:22px;right:22px;z-index:401;
+  width:360px;max-width:calc(100vw - 32px);height:520px;max-height:calc(100vh - 100px);
+  background:linear-gradient(180deg,rgba(20,34,54,0.98),rgba(10,20,34,0.98));
+  border:1px solid var(--border2);border-radius:20px;
+  box-shadow:0 30px 80px rgba(0,0,0,0.55);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.ai-head{
+  display:flex;align-items:center;gap:10px;padding:16px;border-bottom:1px solid var(--border2);
+  background:var(--surface2);
+}
+.ai-head-icon{
+  width:36px;height:36px;border-radius:10px;flex-shrink:0;
+  background:linear-gradient(135deg,#FFD98A,#FFB830);
+  display:flex;align-items:center;justify-content:center;color:#221200;font-size:18px;
+}
+.ai-head b{font-size:13.5px;font-weight:800;display:block;}
+.ai-head span{font-size:11px;color:var(--green);font-weight:600;display:flex;align-items:center;gap:4px;}
+.ai-head span::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);}
+.ai-close{margin-left:auto;color:var(--text3);font-size:20px;}
+.ai-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
+.msg{max-width:85%;font-size:13px;line-height:1.6;padding:10px 13px;border-radius:14px;}
+.msg.bot{background:var(--surface2);border:1px solid var(--border2);align-self:flex-start;border-bottom-left-radius:4px;}
+.msg.user{background:linear-gradient(135deg,var(--cyan),#4FE3FF);color:#04101c;font-weight:600;align-self:flex-end;border-bottom-right-radius:4px;}
+.msg-suggestions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-self:flex-start;max-width:100%;}
+.msg-suggestions button{
+  background:var(--surface3);border:1px solid var(--border2);color:var(--text);
+  font-size:11.5px;font-weight:700;padding:7px 12px;border-radius:999px;
+}
+.msg-suggestions button:hover{border-color:rgba(0,200,255,0.35);}
+.ai-input-row{display:flex;align-items:center;gap:8px;padding:12px;border-top:1px solid var(--border2);}
+.ai-input-row input{
+  flex:1;background:var(--surface2);border:1px solid var(--border2);color:var(--text);
+  font-size:13px;padding:11px 14px;border-radius:999px;
+}
+.ai-send{
+  width:40px;height:40px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--cyan),#4FE3FF);color:#04101c;
+  display:flex;align-items:center;justify-content:center;font-size:17px;
+}
+@media(max-width:480px){ #ai-panel{right:16px;bottom:16px;width:calc(100vw - 32px);} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand" onclick="goHome()">
+    <div class="brand-mark"><svg viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z" fill="#00C8FF"/></svg></div>
+    <div class="brand-text"><b>Nexor Sparks</b><span>Help Center</span></div>
+  </div>
+  <div class="header-search">
+    <i class="ph ph-magnifying-glass"></i>
+    <input id="search-input" type="text" placeholder="Help mein search karein..." oninput="doSearch(this.value)">
+  </div>
+  <a class="back-btn" href="https://nexor-f4d.pages.dev">
+    <i class="ph ph-arrow-left"></i> Nexor Sparks par wapas jaayein
+  </a>
+</header>
+
+<div id="page-home">
+  <div class="hero">
+    <div class="hero-eyebrow"><i class="ph ph-lifebuoy"></i> Official Help Center</div>
+    <h1>Aapko kis cheez mein madad chahiye?</h1>
+    <p>Account, privacy, community guidelines, copyright aur safety — Nexor Sparks se juda har jawaab yahan milega.</p>
+    <div class="hero-search">
+      <i class="ph ph-magnifying-glass"></i>
+      <input id="hero-search-input" type="text" placeholder="Jaise: password reset, hacked account, guidelines..." oninput="doSearch(this.value)">
+    </div>
+    <div class="hero-chips">
+      <button class="chip" onclick="go('password-forgot')">Password bhool gaye?</button>
+      <button class="chip" onclick="go('hacked-account')">Account hack ho gaya</button>
+      <button class="chip" onclick="go('community-guidelines')">Community Guidelines</button>
+      <button class="chip" onclick="go('privacy-policy')">Privacy Policy</button>
+    </div>
+  </div>
+
+  <div id="search-results" class="hidden"></div>
+
+  <div class="section-wrap" id="category-wrap">
+    <!-- populated by JS -->
+  </div>
+</div>
+
+<div id="page-article">
+  <div class="breadcrumb"><b onclick="goHome()">Help Center</b> <i class="ph ph-caret-right"></i> <span id="bc-category"></span></div>
+  <div class="article-icon" id="art-icon"><i class="ph ph-file-text"></i></div>
+  <h1 id="art-title"></h1>
+  <div class="article-meta" id="art-meta"></div>
+  <div class="article-body" id="art-body"></div>
+  <div class="helpful">
+    <span>Kya yeh article madadgaar tha?</span>
+    <button onclick="markHelpful(true)"><i class="ph ph-thumbs-up"></i> Haan</button>
+    <button onclick="markHelpful(false)"><i class="ph ph-thumbs-down"></i> Nahi</button>
+  </div>
+  <div class="related" id="art-related"></div>
+</div>
+
+<footer>
+  <div class="footer-in">
+    <div class="footer-col">
+      <b>Account</b>
+      <a onclick="go('password-forgot')">Password Reset</a>
+      <a onclick="go('hacked-account')">Hacked Account</a>
+      <a onclick="go('delete-account')">Account Delete/Deactivate</a>
+      <a onclick="go('getting-started')">Getting Started</a>
+    </div>
+    <div class="footer-col">
+      <b>Policies</b>
+      <a onclick="go('privacy-policy')">Privacy Policy</a>
+      <a onclick="go('terms-of-service')">Terms of Service</a>
+      <a onclick="go('community-guidelines')">Community Guidelines</a>
+      <a onclick="go('copyright-policy')">Copyright Policy</a>
+    </div>
+    <div class="footer-col">
+      <b>Safety</b>
+      <a onclick="go('report-content')">Report a Problem</a>
+      <a onclick="go('blocking-safety')">Blocking &amp; Safety Tools</a>
+      <a onclick="go('ai-content-label')">AI-Generated Content</a>
+      <a onclick="go('verification')">Verified &amp; Org Badges</a>
+    </div>
+    <div class="footer-col">
+      <b>Nexor Sparks</b>
+      <a href="https://nexor-f4d.pages.dev">Main App par jaayein</a>
+      <a href="https://nexor-f4d.pages.dev/filecopyright">Copyright Report File Karein</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span>© 2026 Nexor Sparks. All rights reserved.</span>
+    <span>Yeh sirf ek independent Help Center hai jo Nexor Sparks users ki madad ke liye banaya gaya hai.</span>
+  </div>
+</footer>
+
+<!-- ===== AI ASSISTANT ===== -->
+<div id="ai-fab" onclick="toggleAI(true)"><i class="ph-fill ph-sparkle"></i></div>
+<div id="ai-panel" class="hidden">
+  <div class="ai-head">
+    <div class="ai-head-icon"><i class="ph-fill ph-sparkle"></i></div>
+    <div><b>Sparky — AI Help Assistant</b><span>Online</span></div>
+    <i class="ph ph-x ai-close" onclick="toggleAI(false)"></i>
+  </div>
+  <div class="ai-body" id="ai-body"></div>
+  <div class="ai-input-row">
+    <input id="ai-input" type="text" placeholder="Apna sawal likhein..." onkeydown="if(event.key==='Enter')sendAI()">
+    <button class="ai-send" onclick="sendAI()"><i class="ph-fill ph-paper-plane-right"></i></button>
+  </div>
+</div>
+
+<script>
+// ============================================================
+// CONTENT DATA
+// ============================================================
+const CATS = [
+  {id:'account', label:'Account & Login'},
+  {id:'content', label:'Pulses, Articles & AI Content'},
+  {id:'policies', label:'Rules & Policies'},
+  {id:'safety', label:'Safety & Reporting'},
+];
+
+const ARTICLES = {
+  'getting-started':{
+    cat:'account', icon:'ph-rocket-launch', title:'Nexor Sparks par shuru kaise karein',
+    desc:'Naya account banana, profile set karna aur pehla Pulse post karna.',
+    keywords:['signup','account banana','naya account','shuru','register','profile setup'],
+    body:`
+      <p>Nexor Sparks par swagat hai. Naya account banane aur apni profile set up karne ke liye neeche diye steps follow karein.</p>
+      <h2>Account banayein</h2>
+      <ol>
+        <li>App ya website kholein aur <strong>Sign Up</strong> tab par tap karein.</li>
+        <li>Apna email ya phone number, ek unique username aur strong password daalein.</li>
+        <li>Verification code se apna email/phone confirm karein.</li>
+        <li>Apni age accurately daalein — Nexor Sparks use karne ke liye minimum age policy follow karna zaroori hai.</li>
+      </ol>
+      <h2>Profile complete karein</h2>
+      <ul>
+        <li>Ek clear profile photo aur short bio add karein.</li>
+        <li>Apni interests ke hisaab se logon ko follow karein taaki aapka feed personalize ho.</li>
+        <li>Notification aur privacy settings apni pasand ke hisaab se adjust karein.</li>
+      </ul>
+      <div class="callout"><i class="ph ph-info"></i>Pehli baar login karne ke baad hum recommend karte hain ki aap <strong>Privacy Policy</strong> aur <strong>Community Guidelines</strong> ek baar zaroor padh lein.</div>
+    `,
+    related:['password-forgot','privacy-policy','community-guidelines']
+  },
+  'password-forgot':{
+    cat:'account', icon:'ph-key', title:'Password bhool gaye hain? Reset kaise karein',
+    desc:'Login na ho paa raha ho toh apna password step-by-step reset karein.',
+    keywords:['password','bhool','forgot password','reset password','login nahi ho raha','change password'],
+    body:`
+      <p>Agar aap apna password bhool gaye hain toh chinta na karein — kuch steps mein aap wapas apne account mein login kar sakte hain.</p>
+      <h2>Password reset karne ke steps</h2>
+      <ol>
+        <li>Login screen par <strong>"Forgot Password?"</strong> link par tap karein.</li>
+        <li>Apna registered email ya phone number daalein.</li>
+        <li>Aapko ek verification code ya reset link bheja jaayega — usse open karein.</li>
+        <li>Naya, strong password set karein (letters, numbers aur symbols ka mix use karein).</li>
+        <li>Naye password se dobara login karein.</li>
+      </ol>
+      <h2>Agar reset code nahi mil raha</h2>
+      <ul>
+        <li>Spam/junk folder check karein.</li>
+        <li>Confirm karein ki aapne wahi email/number daala hai jo account se linked hai.</li>
+        <li>Kuch minute wait karke dobara try karein.</li>
+      </ul>
+      <div class="callout"><i class="ph ph-shield-check"></i>Password reset karne ke baad, agar aapko lagta hai ki koi aur bhi aapke account tak pahunch sakta tha, toh <strong>Hacked Account</strong> guide zaroor padhein.</div>
+    `,
+    related:['hacked-account','delete-account']
+  },
+  'hacked-account':{
+    urgent:true, cat:'account', icon:'ph-shield-warning', title:'Aapka account hack ya compromise ho gaya hai',
+    desc:'Agar lagta hai ki koi aur aapke account ka use kar raha hai, turant yeh steps follow karein.',
+    keywords:['hack','hacked','compromise','account chori','kisi ne login kiya','suspicious activity','unauthorized'],
+    body:`
+      <p>Agar aapko lagta hai ki aapka account kisi aur ne access kar liya hai, toh turant neeche diye steps follow karein.</p>
+      <h2>Compromise hone ke signs</h2>
+      <ul>
+        <li>Aapne khud post na kiye ho waise Pulses ya messages aapke account se ja rahe hain.</li>
+        <li>Profile info (bio, photo, email, password) khud-ba-khud badal gayi hai.</li>
+        <li>Aapko login/password change ki notification mili hai jo aapne khud nahi ki.</li>
+        <li>Aap apne khud ke account mein login nahi kar paa rahe.</li>
+      </ul>
+      <h2>Turant kya karein</h2>
+      <ol>
+        <li><strong>Password turant badlein</strong> — agar aap login kar paa rahe hain, toh "Password Reset" guide follow karke naya, strong aur unique password set karein.</li>
+        <li><strong>Agar login nahi ho paa raha</strong> — "Forgot Password" se reset link use karke access wapas lein.</li>
+        <li><strong>Active sessions check karein</strong> — settings mein jaakar dekhein kahin koi anjaan device login toh nahi hai, aur unhe logout karein.</li>
+        <li><strong>Connected email/phone verify karein</strong> — confirm karein ki recovery email/number aapka hi hai.</li>
+        <li><strong>Recent activity review karein</strong> — koi unauthorized Pulse, message ya profile change delete/undo karein.</li>
+      </ol>
+      <div class="callout warn"><i class="ph ph-warning"></i>Agar aap password reset nahi kar paa rahe kyunki attacker ne recovery email/phone bhi badal diya hai, toh AI Assistant (neeche right corner) ya "Report a Problem" page se account recovery request submit karein.</div>
+      <h2>Future mein account safe rakhne ke tips</h2>
+      <ul>
+        <li>Har jagah unique password use karein — koi aur website par wahi password repeat na karein.</li>
+        <li>Anjaan links ya messages mein apna password kabhi na daalein (phishing se bachein).</li>
+        <li>Regularly apni login activity check karte rahein.</li>
+      </ul>
+    `,
+    related:['password-forgot','report-content','privacy-policy']
+  },
+  'delete-account':{
+    cat:'account', icon:'ph-trash', title:'Account deactivate ya delete karna',
+    desc:'Apne account ko temporarily band karein ya permanently delete karein.',
+    keywords:['delete account','deactivate','account band','account remove'],
+    body:`
+      <p>Aap apna account temporarily deactivate ya permanently delete, dono kar sakte hain.</p>
+      <h2>Deactivate (temporary)</h2>
+      <p>Deactivate karne par aapki profile, Pulses aur messages sabko hide ho jaate hain, lekin data delete nahi hota. Jab bhi aap dobara login karenge, sab kuch wapas active ho jaayega.</p>
+      <h2>Delete (permanent)</h2>
+      <p>Permanent delete karne par aapka profile, Pulses, articles, messages aur data hamesha ke liye remove ho jaata hai. Yeh action <strong>undo nahi ho sakta</strong>, isliye pehle apna zaroori data (agar chahiye) save/download kar lein.</p>
+      <ol>
+        <li>Settings mein jaakar <strong>Account</strong> section kholein.</li>
+        <li><strong>Deactivate</strong> ya <strong>Delete Account</strong> option chunein.</li>
+        <li>Confirm karne ke liye apna password daalein.</li>
+      </ol>
+      <div class="callout"><i class="ph ph-info"></i>Agar aap sirf break lena chahte hain, toh Delete ke bajaye Deactivate use karna behtar hai.</div>
+    `,
+    related:['password-forgot','privacy-policy']
+  },
+  'pulses-articles':{
+    cat:'content', icon:'ph-lightning', title:'Pulses aur Articles post karna',
+    desc:'Content post karna, edit karna aur delete karna.',
+    keywords:['pulse','post','article','content post','delete post','edit post'],
+    body:`
+      <p>Nexor Sparks par aap apne moments <strong>Pulses</strong> ke roop mein share kar sakte hain, ya lambi content <strong>Articles</strong> ke format mein likh sakte hain.</p>
+      <h2>Pulse post karna</h2>
+      <ul>
+        <li>Photo, text ya media add karke apna Pulse create karein.</li>
+        <li>Post karne se pehle preview zaroor dekh lein.</li>
+        <li>Post karne ke baad bhi aap use edit ya delete kar sakte hain.</li>
+      </ul>
+      <h2>Apna content edit/delete karna</h2>
+      <ol>
+        <li>Apne Pulse/Article par jaakar (⋯) menu par tap karein.</li>
+        <li><strong>Edit</strong> ya <strong>Delete</strong> choose karein.</li>
+      </ol>
+      <div class="callout"><i class="ph ph-info"></i>Ek baar delete kiya gaya content wapas restore nahi kiya jaa sakta.</div>
+      <h2>Content post karte waqt yaad rakhein</h2>
+      <p>Har Pulse aur Article humari <strong>Community Guidelines</strong> ka palan karna chahiye. Guidelines todne wale content ko remove kiya jaa sakta hai.</p>
+    `,
+    related:['community-guidelines','ai-content-label','copyright-policy']
+  },
+  'ai-content-label':{
+    cat:'content', icon:'ph-sparkle', title:'AI-Generated content ka "AI" label kya hai',
+    desc:'Kuch Pulses/Articles par AI label kyun dikhta hai, iska matlab samjhein.',
+    keywords:['ai label','ai generated','ai badge','ai tag'],
+    body:`
+      <p>Jab koi content pura ya kuch hissa AI tools se generate ya significantly edit kiya gaya ho, toh usme aapko ek golden <strong>"AI"</strong> label dikh sakta hai.</p>
+      <h2>Yeh label kyun zaroori hai</h2>
+      <ul>
+        <li>Yeh community ko transparent rakhta hai ki content kis tarah banaya gaya.</li>
+        <li>Yeh trust banata hai — logon ko pata chalta hai ki content real photo/video hai ya AI se banaya gaya.</li>
+      </ul>
+      <h2>Apna AI-generated content label karna</h2>
+      <p>Agar aap AI tools se content bana rahe hain, toh use post karte waqt honestly label karein. Bina label ke misleading AI content post karna Community Guidelines ka ullanghan maana jaata hai.</p>
+    `,
+    related:['pulses-articles','community-guidelines']
+  },
+  'verification':{
+    cat:'content', icon:'ph-seal-check', title:'Verified badge aur Organization badge',
+    desc:'Blue tick aur org badge kaise milta hai aur inka kya matlab hai.',
+    keywords:['verified','blue tick','badge','organization badge','verification'],
+    body:`
+      <p>Nexor Sparks par do tarah ke badges hote hain jo profile ke naam ke saath dikhte hain.</p>
+      <h2>Verified Badge</h2>
+      <p>Yeh badge confirm karta hai ki account authentic hai aur uski identity verify ki gayi hai. Yeh spam/fake accounts se real users ko alag karne mein madad karta hai.</p>
+      <h2>Organization Badge</h2>
+      <p>Yeh badge verified badge ke saath, alag se dikhta hai aur confirm karta hai ki account ek official organisation/brand ka hai.</p>
+      <div class="callout"><i class="ph ph-info"></i>Badges sirf authenticity dikhate hain — yeh kisi bhi tarah endorsement ya priority ka matlab nahi rakhte.</div>
+      <h2>Fake verified badge se saavdhan rahein</h2>
+      <p>Agar koi account khud ko verified batata hai lekin uske paas asli badge nahi hai, toh use "Report a Problem" page se report karein.</p>
+    `,
+    related:['report-content','community-guidelines']
+  },
+  'privacy-policy':{
+    cat:'policies', icon:'ph-lock-key', title:'Privacy Policy',
+    desc:'Hum aapka data kaise collect, use aur protect karte hain.',
+    keywords:['privacy','data','policy','information collect'],
+    body:`
+      <p>Yeh Privacy Policy batati hai ki Nexor Sparks aapki information kaise collect, use, store aur protect karta hai.</p>
+      <h2>Hum kya collect karte hain</h2>
+      <ul>
+        <li><strong>Account info:</strong> username, email/phone, password (encrypted), profile details.</li>
+        <li><strong>Content:</strong> aapke Pulses, articles, messages, comments.</li>
+        <li><strong>Usage data:</strong> aap app kaise use karte hain, device aur log information.</li>
+      </ul>
+      <h2>Hum ise kaise use karte hain</h2>
+      <ul>
+        <li>Aapko app ki services provide karne aur personalize karne ke liye.</li>
+        <li>Account safety aur fraud prevention ke liye.</li>
+        <li>App ko improve karne aur bugs fix karne ke liye.</li>
+      </ul>
+      <h2>Data sharing</h2>
+      <p>Hum aapka personal data third parties ko bina consent ke bechte nahi hain. Data sirf tab share hota hai jab qanooni zaroorat ho, ya service providers (jaise hosting) ke saath jo humari taraf se kaam karte hain.</p>
+      <h2>Aapke rights</h2>
+      <ul>
+        <li>Apna data access, correct ya delete karne ka right.</li>
+        <li>Apna account kabhi bhi deactivate/delete karne ka right.</li>
+        <li>Privacy settings se control karna ki kaun aapka content dekh sakta hai.</li>
+      </ul>
+      <h2>Data retention</h2>
+      <p>Jab tak aapka account active hai, hum data rakhte hain. Account delete karne par, applicable qanoon ke hisaab se data delete ya anonymize kar diya jaata hai.</p>
+      <div class="callout"><i class="ph ph-info"></i>Privacy se related kisi bhi sawal ke liye AI Assistant se baat karein ya "Report a Problem" page use karein.</div>
+    `,
+    related:['delete-account','terms-of-service','blocking-safety']
+  },
+  'terms-of-service':{
+    cat:'policies', icon:'ph-file-text', title:'Terms of Service',
+    desc:'Nexor Sparks use karne ke rules aur conditions.',
+    keywords:['terms','tos','conditions','agreement'],
+    body:`
+      <p>Nexor Sparks use karke, aap in Terms of Service se agree karte hain.</p>
+      <h2>Eligibility</h2>
+      <p>Aapko is app ko use karne ke liye minimum age requirement poori karni hogi aur accurate information deni hogi.</p>
+      <h2>Aapki responsibility</h2>
+      <ul>
+        <li>Apne account aur password ki security ki zimmedari aapki hai.</li>
+        <li>Aap jo content post karte hain uski accuracy aur legality ki zimmedari aapki hai.</li>
+        <li>Ek se zyada fake ya impersonation accounts banana allowed nahi hai.</li>
+      </ul>
+      <h2>Content ownership</h2>
+      <p>Aap apne banaye content ke owner rehte hain. Post karke aap Nexor Sparks ko sirf itna license dete hain ki wo content ko app par display aur distribute kar sake.</p>
+      <h2>Prohibited conduct</h2>
+      <p>Harassment, hate speech, spam, fraud, illegal content aur intellectual property violation strictly prohibited hai — detail ke liye Community Guidelines dekhein.</p>
+      <h2>Suspension aur termination</h2>
+      <p>Terms ya Community Guidelines ka baar-baar ya serious violation hone par account suspend ya terminate kiya jaa sakta hai.</p>
+      <h2>Changes to Terms</h2>
+      <p>Hum in Terms ko samay-samay par update kar sakte hain. Bade changes ki jaankari app ke through di jaayegi.</p>
+    `,
+    related:['community-guidelines','copyright-policy']
+  },
+  'community-guidelines':{
+    cat:'policies', icon:'ph-users-three', title:'Community Guidelines',
+    desc:'Ek safe aur respectful community banane ke rules.',
+    keywords:['guidelines','rules','community rules','behavior','conduct'],
+    body:`
+      <p>Nexor Sparks ek safe, respectful aur authentic community banane mein believe karta hai. Yeh guidelines har user par apply hoti hain.</p>
+      <h2>Authentic raho</h2>
+      <ul>
+        <li>Apni asli identity use karein — impersonation allowed nahi hai.</li>
+        <li>AI-generated content ko honestly label karein.</li>
+        <li>Fake engagement (bots, bought followers) allowed nahi hai.</li>
+      </ul>
+      <h2>Respectful raho</h2>
+      <ul>
+        <li>Harassment, bullying ya threats bilkul allowed nahi.</li>
+        <li>Hate speech — race, religion, gender, sexuality, disability ke aadhar par — allowed nahi hai.</li>
+        <li>Kisi ki bhi privacy violate karna (personal info share karna) allowed nahi hai.</li>
+      </ul>
+      <h2>Safe content post karo</h2>
+      <ul>
+        <li>Graphic violence, gore ya disturbing content allowed nahi hai.</li>
+        <li>Nudity ya sexually explicit content allowed nahi hai.</li>
+        <li>Self-harm ko promote karne wala content allowed nahi hai — agar aap struggle kar rahe hain, please kisi trusted vyakti ya local helpline se turant baat karein.</li>
+        <li>Illegal activities (drugs, weapons, fraud) promote karna allowed nahi hai.</li>
+      </ul>
+      <h2>Spam aur misinformation</h2>
+      <p>Repetitive spam, misleading links aur jaan-boojh kar false information failana allowed nahi hai.</p>
+      <h2>Violation hone par kya hota hai</h2>
+      <ol>
+        <li>Content remove kiya jaa sakta hai.</li>
+        <li>Warning di jaa sakti hai.</li>
+        <li>Baar-baar ya serious violation par account temporarily ya permanently suspend kiya jaa sakta hai.</li>
+      </ol>
+      <div class="callout"><i class="ph ph-flag"></i>Kisi bhi content ya user ko guidelines todte dekhein, toh turant "Report a Problem" page se report karein.</div>
+    `,
+    related:['report-content','ai-content-label','terms-of-service']
+  },
+  'copyright-policy':{
+    cat:'policies', icon:'ph-copyright', title:'Copyright & Intellectual Property Policy',
+    desc:'Copyright infringement report kaise karein aur apne rights protect karein.',
+    keywords:['copyright','ip','intellectual property','dmca','infringement'],
+    body:`
+      <p>Nexor Sparks doosron ki intellectual property ka respect karta hai aur users se bhi wahi expect karta hai.</p>
+      <h2>Copyright rules</h2>
+      <ul>
+        <li>Sirf wahi content post karein jiske aap owner hain, ya jise post karne ka aapko permission/license mila ho.</li>
+        <li>Doosron ke photos, videos, music ya likhi hui cheezein bina permission use karna copyright infringement hai.</li>
+      </ul>
+      <h2>Agar aapka copyrighted content bina permission use hua hai</h2>
+      <p>Aap dedicated copyright report page ke through complaint file kar sakte hain. Wahan aapko infringing content ka link, apna ownership proof aur contact details submit karni hogi.</p>
+      <a class="ext-link-btn" href="https://nexor-f4d.pages.dev/filecopyright" target="_blank"><i class="ph ph-arrow-square-out"></i> Copyright Report File Karein</a>
+      <h2>Agar aapka content copyright claim ki wajah se remove hua hai</h2>
+      <p>Agar aapko lagta hai ki removal galti se hua hai (jaise ki content aapka original hai), toh usi report page ke through counter-request submit kar sakte hain.</p>
+      <div class="callout warn"><i class="ph ph-warning"></i>Baar-baar copyright violation karne wale accounts suspend ya permanently band kiye jaa sakte hain.</div>
+    `,
+    related:['terms-of-service','report-content']
+  },
+  'report-content':{
+    cat:'safety', icon:'ph-flag-banner', title:'Content, account ya problem report karna',
+    desc:'Guidelines todne wale content, fake accounts ya bugs report karein.',
+    keywords:['report','complaint','problem','bug','fake account','abuse'],
+    body:`
+      <p>Agar aapko koi content, account ya behavior humari Community Guidelines ke against lagta hai, toh use report karna zaroori hai.</p>
+      <h2>Pulse/Article report karna</h2>
+      <ol>
+        <li>Post par jaakar (⋯) menu par tap karein.</li>
+        <li><strong>Report</strong> select karein.</li>
+        <li>Sabse relevant reason chunein (spam, harassment, nudity, hate speech, misinformation, etc.).</li>
+      </ol>
+      <h2>Account report karna</h2>
+      <ol>
+        <li>Us user ki profile par jaayein.</li>
+        <li>(⋯) menu se <strong>Report Account</strong> chunein.</li>
+        <li>Reason batayein aur submit karein.</li>
+      </ol>
+      <h2>App bug ya technical problem report karna</h2>
+      <p>Kisi bug, crash ya technical issue ke liye AI Assistant (neeche right corner) ko screenshot ke saath issue describe karein.</p>
+      <div class="callout"><i class="ph ph-shield-check"></i>Reports anonymous rehte hain — jis user ko aapne report kiya hai, use pata nahi chalega ki kisne report kiya.</div>
+      <h2>Emergency ya immediate safety threat</h2>
+      <p>Agar situation mein kisi ki jaan ya safety ko immediate khatra hai, toh sabse pehle apni local emergency services ko contact karein.</p>
+    `,
+    related:['community-guidelines','blocking-safety','hacked-account']
+  },
+  'blocking-safety':{
+    cat:'safety', icon:'ph-shield-check', title:'Blocking aur Safety Tools',
+    desc:'Kisi user ko block/mute karna aur apni safety control karna.',
+    keywords:['block','mute','safety','harassment se bachna'],
+    body:`
+      <p>Nexor Sparks aapko apna experience control karne ke liye kayi tools deta hai.</p>
+      <h2>Block karna</h2>
+      <p>Jab aap kisi ko block karte hain, wo aapki profile, Pulses ya messages nahi dekh paayega aur na hi aapse contact kar payega.</p>
+      <ol>
+        <li>Us user ki profile kholein.</li>
+        <li>(⋯) menu se <strong>Block</strong> select karein.</li>
+      </ol>
+      <h2>Mute karna</h2>
+      <p>Mute karne par wo user aapko contact toh kar sakta hai, lekin aapko unki activity notifications nahi milengi — aur unhe pata nahi chalega ki aapne unhe mute kiya hai.</p>
+      <h2>Privacy settings</h2>
+      <ul>
+        <li>Control karein ki aapka profile kaun dekh sakta hai.</li>
+        <li>Control karein ki aapko message kaun bhej sakta hai.</li>
+        <li>Comments aur tags par restrictions set karein.</li>
+      </ul>
+      <div class="callout"><i class="ph ph-info"></i>Agar koi aapko harass kar raha hai, toh block karne ke saath-saath use report bhi zaroor karein.</div>
+    `,
+    related:['report-content','privacy-policy']
+  },
+};
+
+// ============================================================
+// CATEGORY GRID RENDER
+// ============================================================
+const CAT_LABELS = {account:'Account & Login', content:'Pulses, Articles & AI Content', policies:'Rules & Policies', safety:'Safety & Reporting'};
+function renderHome(){
+  const wrap = document.getElementById('category-wrap');
+  wrap.innerHTML = '';
+  Object.keys(CAT_LABELS).forEach(catKey=>{
+    const label = document.createElement('div');
+    label.className='section-label';
+    label.textContent = CAT_LABELS[catKey];
+    wrap.appendChild(label);
+    const grid = document.createElement('div');
+    grid.className='grid';
+    Object.entries(ARTICLES).filter(([id,a])=>a.cat===catKey).forEach(([id,a])=>{
+      const card=document.createElement('div');
+      card.className='card'+(a.urgent?' urgent':'');
+      card.onclick=()=>go(id);
+      card.innerHTML=`<div class="card-icon"><i class="ph ${a.icon}"></i></div><h3>${a.title}</h3><p>${a.desc}</p>`;
+      grid.appendChild(card);
+    });
+    wrap.appendChild(grid);
+  });
+}
+
+// ============================================================
+// ROUTER
+// ============================================================
+function goHome(){ location.hash=''; }
+function go(id){ location.hash = '#'+id; }
+window.addEventListener('hashchange', render);
+function render(){
+  const id = location.hash.replace('#','');
+  const homeEl = document.getElementById('page-home');
+  const artEl = document.getElementById('page-article');
+  if(id && ARTICLES[id]){
+    homeEl.style.display='none';
+    artEl.style.display='block';
+    renderArticle(id);
+    window.scrollTo(0,0);
+  } else {
+    homeEl.style.display='block';
+    artEl.style.display='none';
+    document.getElementById('search-results').classList.add('hidden');
+    document.getElementById('search-input').value='';
+    document.getElementById('hero-search-input').value='';
+  }
+}
+function renderArticle(id){
+  const a = ARTICLES[id];
+  document.getElementById('bc-category').textContent = CAT_LABELS[a.cat];
+  const iconEl = document.getElementById('art-icon');
+  iconEl.className = 'article-icon'+(a.urgent?' urgent':'');
+  iconEl.innerHTML = `<i class="ph ${a.icon}"></i>`;
+  document.getElementById('art-title').textContent = a.title;
+  document.getElementById('art-meta').textContent = CAT_LABELS[a.cat]+' · Help Article';
+  document.getElementById('art-body').innerHTML = a.body;
+  const relWrap = document.getElementById('art-related');
+  relWrap.innerHTML = '<div class="section-label">Related Articles</div>' +
+    (a.related||[]).map(rid=>`<a onclick="go('${rid}')">${ARTICLES[rid].title}</a>`).join('');
+}
+function markHelpful(v){ showToastMsg(v? 'Shukriya! Feedback save ho gaya.' : 'Feedback ke liye shukriya, hum article improve karenge.'); }
+function showToastMsg(msg){
+  let t=document.getElementById('toast-el');
+  if(!t){ t=document.createElement('div'); t.id='toast-el';
+    t.style.cssText='position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--surface3);border:1px solid var(--border2);color:var(--text);padding:11px 18px;border-radius:999px;font-size:12.5px;font-weight:600;z-index:500;box-shadow:0 10px 30px rgba(0,0,0,.4);transition:opacity .3s;';
+    document.body.appendChild(t);
+  }
+  t.textContent=msg; t.style.opacity='1';
+  clearTimeout(window._toastT); window._toastT=setTimeout(()=>t.style.opacity='0',2200);
+}
+
+// ============================================================
+// SEARCH
+// ============================================================
+function doSearch(q){
+  const heroInput=document.getElementById('hero-search-input');
+  const headInput=document.getElementById('search-input');
+  if(document.activeElement===heroInput) headInput.value=q; else heroInput.value=q;
+  const resultsEl=document.getElementById('search-results');
+  const catWrap=document.getElementById('category-wrap');
+  const heroEl=document.querySelector('.hero');
+  q=q.trim().toLowerCase();
+  if(!q){ resultsEl.classList.add('hidden'); catWrap.style.display='block'; return; }
+  catWrap.style.display='none';
+  const matches = Object.entries(ARTICLES).filter(([id,a])=>{
+    return a.title.toLowerCase().includes(q) || a.desc.toLowerCase().includes(q) || (a.keywords||[]).some(k=>k.includes(q)||q.includes(k));
+  });
+  resultsEl.classList.remove('hidden');
+  if(matches.length===0){
+    resultsEl.innerHTML = `<div id="search-empty">Koi result nahi mila "${q}" ke liye. Neeche AI Assistant se poochh sakte hain.</div>`;
+  } else {
+    resultsEl.innerHTML = matches.map(([id,a])=>`<a class="sr-item" onclick="go('${id}')"><b>${a.title}</b><p>${a.desc}</p></a>`).join('');
+  }
+}
+
+// ============================================================
+// AI ASSISTANT (rule-based, fully client-side)
+// ============================================================
+const AI_RULES = [
+  {kw:['hack','hacked','compromise','chori','suspicious login','kisi ne login'], reply:'Lagta hai aapka account compromise hua hai. Sabse pehle turant apna password reset karein aur active sessions check karein.', link:'hacked-account'},
+  {kw:['password','forgot','bhool','reset password'], reply:'Password reset karna aasan hai — login screen par "Forgot Password?" par tap karke apna email/phone verify karein.', link:'password-forgot'},
+  {kw:['delete account','deactivate','account band','remove account'], reply:'Aap account ko temporarily deactivate ya permanently delete, dono kar sakte hain. Settings > Account mein jaakar option milega.', link:'delete-account'},
+  {kw:['privacy','data','information collect'], reply:'Hum aapka data kaise collect aur use karte hain, iski poori jaankari Privacy Policy mein hai.', link:'privacy-policy'},
+  {kw:['guideline','rule','community','behavior'], reply:'Community Guidelines batati hain ki Nexor Sparks par kya post karna allowed hai aur kya nahi.', link:'community-guidelines'},
+  {kw:['copyright','dmca','intellectual property','ip'], reply:'Copyright infringement report karne ke liye humara dedicated copyright page use karein.', link:'copyright-policy'},
+  {kw:['report','complaint','fake account','abuse','harassment'], reply:'Kisi bhi content, account ya problem ko report karna simple hai — (⋯) menu se Report chunein.', link:'report-content'},
+  {kw:['block','mute','safety'], reply:'Aap kisi bhi user ko block ya mute kar sakte hain apni safety ke liye.', link:'blocking-safety'},
+  {kw:['ai label','ai generated','ai tag'], reply:'AI label batata hai ki content AI tools se generate ya significantly edit kiya gaya hai.', link:'ai-content-label'},
+  {kw:['verified','blue tick','badge','organization'], reply:'Verified badge account ki authenticity confirm karta hai, aur org badge official organisations ke liye hota hai.', link:'verification'},
+  {kw:['terms','tos','condition'], reply:'App use karne ke rules Terms of Service mein detail se diye gaye hain.', link:'terms-of-service'},
+  {kw:['pulse','post','article','content'], reply:'Pulses aur Articles post, edit ya delete karna bahut aasan hai.', link:'pulses-articles'},
+  {kw:['start','signup','naya account','register','shuru'], reply:'Naye account setup ke liye Getting Started guide follow karein.', link:'getting-started'},
+];
+function aiRespond(text){
+  const q=text.toLowerCase();
+  for(const rule of AI_RULES){
+    if(rule.kw.some(k=>q.includes(k))) return rule;
+  }
+  return null;
+}
+function toggleAI(open){
+  document.getElementById('ai-panel').classList.toggle('hidden', !open);
+  document.getElementById('ai-fab').classList.toggle('hidden', open);
+  if(open && !window._aiInit){
+    window._aiInit = true;
+    addBotMsg('Hi! Main Sparky hoon 👋 Aapki kis cheez mein madad kar sakta hoon?', ['password-forgot','hacked-account','community-guidelines','report-content']);
+  }
+}
+function addBotMsg(text, suggestLinks){
+  const body=document.getElementById('ai-body');
+  const div=document.createElement('div');
+  div.className='msg bot';
+  div.textContent=text;
+  body.appendChild(div);
+  if(suggestLinks && suggestLinks.length){
+    const sg=document.createElement('div');
+    sg.className='msg-suggestions';
+    suggestLinks.forEach(id=>{
+      const b=document.createElement('button');
+      b.textContent=ARTICLES[id].title;
+      b.onclick=()=>{ toggleAI(false); go(id); };
+      sg.appendChild(b);
+    });
+    body.appendChild(sg);
+  }
+  body.scrollTop=body.scrollHeight;
+}
+function addUserMsg(text){
+  const body=document.getElementById('ai-body');
+  const div=document.createElement('div');
+  div.className='msg user';
+  div.textContent=text;
+  body.appendChild(div);
+  body.scrollTop=body.scrollHeight;
+}
+function addTypingIndicator(){
+  const body=document.getElementById('ai-body');
+  const div=document.createElement('div');
+  div.className='msg bot';
+  div.id='typing-indicator';
+  div.textContent='Sparky type kar raha hai...';
+  div.style.opacity='0.6';
+  body.appendChild(div);
+  body.scrollTop=body.scrollHeight;
+}
+function removeTypingIndicator(){
+  const el=document.getElementById('typing-indicator');
+  if(el) el.remove();
+}
+async function sendAI(){
+  const input=document.getElementById('ai-input');
+  const text=input.value.trim();
+  if(!text) return;
+  addUserMsg(text);
+  input.value='';
+
+  // 1) Try instant rule-based match first (free, offline, zero latency)
+  const match=aiRespond(text);
+  if(match){
+    setTimeout(()=>addBotMsg(match.reply, [match.link]), 300);
+    return;
+  }
+
+  // 2) No rule matched — ask the real AI model via our secure server proxy
+  //    (the API key lives only on the server, never in this page)
+  addTypingIndicator();
+  try{
+    const res = await fetch('/api/chat', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ message: text })
+    });
+    const data = await res.json();
+    removeTypingIndicator();
+    if(res.ok && data.reply){
+      addBotMsg(data.reply, ['password-forgot','hacked-account','community-guidelines','report-content']);
+    } else {
+      addBotMsg('Abhi AI se connect nahi ho paaya. Neeche diye topics try karein, ya "Report a Problem" page se hume batayein.', ['password-forgot','hacked-account','community-guidelines','report-content']);
+    }
+  } catch(err){
+    removeTypingIndicator();
+    addBotMsg('Network issue lag raha hai. Neeche diye topics try karein, ya thodi der baad dobara try karein.', ['password-forgot','hacked-account','community-guidelines','report-content']);
+  }
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderHome();
+render();
+</script>
+</body>
+</html>
