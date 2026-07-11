@@ -659,6 +659,20 @@ const ARTICLES = {
     `,
     related:['community-guidelines','blocking-safety','hacked-account']
   },
+  'about-nexor':{
+    cat:'policies', icon:'ph-info', title:'About Nexor Sparks',
+    desc:'Who built Nexor Sparks and who leads the company.',
+    keywords:['founder','who founded','who made this','who owns','ceo','co-founder','cofounder','who created nexor','about nexor'],
+    body:`
+      <p>Nexor Sparks is built and run by Nexor.</p>
+      <h2>Leadership</h2>
+      <ul>
+        <li><strong>Founder & CEO:</strong> Gursharan Singh</li>
+        <li><strong>Co-Founder:</strong> Anmol Sunda</li>
+      </ul>
+    `,
+    related:['terms-of-service','privacy-policy']
+  },
   'blocking-safety':{
     cat:'safety', icon:'ph-shield-check', title:'Blocking and Safety Tools',
     desc:'Block/mute a user and control your own safety.',
@@ -782,10 +796,32 @@ function doSearch(q){
 }
 
 // ============================================================
+// ACCOUNT CONTEXT — shared from the main Nexor Sparks app (same origin)
+// via localStorage when the user opens Help Center from Settings. Only
+// ever contains non-sensitive display info (name, handle, verified
+// status, account type) — never an email, password, or anything private.
+// If the user opened this page directly (not from the app), this stays
+// null and everything below just falls back to the generic experience.
+// ============================================================
+let userCtx = null;
+try{
+  const raw = localStorage.getItem('nexorUserContext');
+  if(raw){
+    const parsed = JSON.parse(raw);
+    // Ignore stale context older than 12 hours so a long-idle tab
+    // doesn't keep greeting someone under an old name.
+    if(parsed && parsed.loggedIn && (Date.now()-(parsed.updatedAt||0) < 12*60*60*1000)){
+      userCtx = parsed;
+    }
+  }
+}catch(e){ userCtx = null; }
+function greetName(){ return userCtx && userCtx.name ? userCtx.name.split(' ')[0] : null; }
+
+// ============================================================
 // AI ASSISTANT (rule-based, fully client-side)
 // ============================================================
 const AI_RULES = [
-  {kw:['hack','hacked','compromise','compromised','stolen account','suspicious login','someone logged in','account taken over'], reply:'Sounds like your account may be compromised. Here\'s what to do right now: (1) If you can still log in, change your password immediately using Password Reset. (2) If you can\'t log in, use "Forgot Password" to get back in. (3) Check Settings for any unknown active sessions and log them out. (4) Verify your recovery email/phone is really yours. (5) Review recent activity and undo anything you didn\'t post. If any of these steps doesn\'t work — for example, the attacker has already changed your recovery email or phone — don\'t worry, you can still submit an account recovery request right here with me, or through the "Report a Problem" page, and we\'ll figure it out from there. Full guide linked below.', link:'hacked-account'},
+  {kw:['hack','hacked','compromise','compromised','stolen account','suspicious login','someone logged in','account taken over'], reply:'{name}Sounds like your account may be compromised.{handle} Here\'s what to do right now: (1) If you can still log in, change your password immediately using Password Reset. (2) If you can\'t log in, use "Forgot Password" to get back in. (3) Check Settings for any unknown active sessions and log them out. (4) Verify your recovery email/phone is really yours. (5) Review recent activity and undo anything you didn\'t post. If any of these steps doesn\'t work — for example, the attacker has already changed your recovery email or phone — don\'t worry, you can still submit an account recovery request right here with me, or through the "Report a Problem" page, and we\'ll figure it out from there. Full guide linked below.', link:'hacked-account'},
   {kw:['password','forgot','reset password'], reply:'Resetting your password is easy — tap "Forgot Password?" on the login screen and verify your email/phone to set a new one.', link:'password-forgot'},
   {kw:['delete account','deactivate','close account','remove account'], reply:'You can either temporarily deactivate or permanently delete your account. Go to Settings > Account to find the option.', link:'delete-account'},
   {kw:['privacy','data','information collection'], reply:'You can find everything about how we collect and use your data in our Privacy Policy.', link:'privacy-policy'},
@@ -798,6 +834,7 @@ const AI_RULES = [
   {kw:['terms','tos','condition'], reply:'The rules for using the app are laid out in detail in the Terms of Service.', link:'terms-of-service'},
   {kw:['pulse','post','article','content'], reply:'Posting, editing, or deleting Pulses and Articles is very easy.', link:'pulses-articles'},
   {kw:['start','signup','new account','register','getting started'], reply:'Follow the Getting Started guide to set up your new account.', link:'getting-started'},
+  {kw:['founder','who founded','who made this','who owns','ceo','co-founder','cofounder','who created nexor'], reply:'Nexor Sparks was founded by Gursharan Singh, who\'s also the CEO — Anmol Sunda is the Co-Founder.', link:'about-nexor'},
 ];
 function aiRespond(text){
   const q=text.toLowerCase();
@@ -806,12 +843,23 @@ function aiRespond(text){
   }
   return null;
 }
+// Fills {name}/{handle} tokens in a rule reply using the shared account
+// context, falling back to neutral phrasing when there's no context
+// (e.g. the page was opened directly, not from the app).
+function personalizeReply(text){
+  const n=greetName();
+  return text
+    .replace('{name}', n? `Hey ${n} — ` : '')
+    .replace('{handle}', (userCtx&&userCtx.handle)? ` I can see you're logged in as @${userCtx.handle}, so once you're back in the app, double-check that's really your account activity.` : '');
+}
 function toggleAI(open){
   document.getElementById('ai-panel').classList.toggle('hidden', !open);
   document.getElementById('ai-fab').classList.toggle('hidden', open);
   if(open && !window._aiInit){
     window._aiInit = true;
-    addBotMsg('Hi! I\'m Sparky 👋 What can I help you with?', ['password-forgot','hacked-account','community-guidelines','report-content']);
+    const n=greetName();
+    const handleLine = userCtx && userCtx.handle ? ` I can see you're logged in as @${userCtx.handle}, so I can tailor answers to your account.` : '';
+    addBotMsg((n?`Hi ${n}! `:'Hi! ')+'I\'m Sparky 👋'+handleLine+' What can I help you with?', ['password-forgot','hacked-account','community-guidelines','report-content']);
   }
 }
 function addBotMsg(text, suggestLinks){
@@ -865,7 +913,7 @@ async function sendAI(){
   // 1) Try instant rule-based match first (free, offline, zero latency)
   const match=aiRespond(text);
   if(match){
-    setTimeout(()=>addBotMsg(match.reply, [match.link]), 300);
+    setTimeout(()=>addBotMsg(personalizeReply(match.reply), [match.link]), 300);
     return;
   }
 
@@ -876,7 +924,12 @@ async function sendAI(){
     const res = await fetch('/api/chat', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
-      body: JSON.stringify({ message: text })
+      body: JSON.stringify({
+        message: text,
+        // Only ever the non-sensitive fields set in openHelpCenter() on
+        // the main app — never an email, password, or other private data.
+        context: userCtx ? { name:userCtx.name, handle:userCtx.handle, verified:userCtx.verified, accountType:userCtx.accountType } : null
+      })
     });
     const data = await res.json();
     removeTypingIndicator();
