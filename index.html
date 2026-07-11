@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -1195,7 +1195,7 @@ i.spin::before{content:''!important;}
   </div>
 
   <div style="max-width:440px;width:100%;margin:0 auto;padding:20px 24px calc(28px + var(--safe-bottom));">
-    <button class="btn-sheet primary" id="suspend-appeal-btn" onclick="submitSuspendAppeal()"><i class="ph ph-flag"></i> Appeal</button>
+    <button class="btn-sheet primary" id="suspend-appeal-btn" onclick="openSuspendAppealForm()"><i class="ph ph-flag"></i> Appeal</button>
     <div id="suspend-appeal-sent" class="hidden" style="font-size:13px;color:var(--green);margin:10px 0;text-align:center;">✓ Appeal submitted — we'll review it soon</div>
     <button class="btn-sheet outline" style="margin-top:8px;" onclick="auth.signOut()">Sign out</button>
   </div>
@@ -2605,6 +2605,55 @@ i.spin::before{content:''!important;}
   </div>
 </div>
 
+<!-- Appeal a suspension — full page, mirrors the Get Verified identity form.
+     z-index is set above #suspend-screen (9999) so it can open on top of it. -->
+<div class="fullpage-screen" id="appeal-form-page" style="z-index:10000;">
+  <div class="fullpage-header">
+    <button class="fullpage-back" onclick="closeSuspendAppealForm()"><i class="ph ph-arrow-left"></i></button>
+    <div class="fullpage-title">Appeal your suspension</div>
+  </div>
+  <div class="fullpage-body">
+    <div class="vr-section">
+      <div class="vr-section-title"><i class="ph ph-flag" style="color:var(--cyan);"></i> Request a review</div>
+      <div class="vr-section-sub">This is reviewed manually by our team — it isn't instant. All fields marked * are required.</div>
+    </div>
+
+    <div class="vr-section">
+      <div class="sheet-label vr-required">Full name</div>
+      <input class="sheet-field" id="sa-name" placeholder="Your full name, exactly as on your account" maxlength="80">
+
+      <div class="sheet-label">Email</div>
+      <input class="sheet-field" id="sa-email" readonly style="opacity:.7;">
+
+      <div class="sheet-label">Username</div>
+      <input class="sheet-field" id="sa-username" readonly style="opacity:.7;">
+    </div>
+
+    <div class="vr-section">
+      <div class="sheet-label">Photo of a government-issued ID (optional)</div>
+      <div class="vr-section-sub" style="margin-top:-6px;">Not required, but a clear photo of an ID matching your name can help us verify you and speed up review.</div>
+      <div class="vr-id-upload" id="sa-id-photo-preview" onclick="document.getElementById('sa-id-photo-input').click()">
+        <div class="vr-id-placeholder"><i class="ph ph-identification-card"></i><span>Tap to upload ID photo</span></div>
+      </div>
+      <input type="file" id="sa-id-photo-input" accept="image/*" style="display:none" onchange="onSaIdPhotoPick(event)">
+    </div>
+
+    <div class="vr-section">
+      <div class="sheet-label vr-required">Why do you believe this was a mistake?</div>
+      <textarea class="sheet-field" id="sa-message" rows="5" maxlength="600" placeholder="Explain your situation factually (at least 20 characters)..."></textarea>
+    </div>
+
+    <div class="vr-confirm-row">
+      <input type="checkbox" id="sa-confirm">
+      <label for="sa-confirm">I confirm the information above is accurate. I understand submitting false information may affect my appeal.</label>
+    </div>
+
+    <div class="auth-error" id="sa-err" style="margin-bottom:10px;"></div>
+    <button class="btn-sheet primary" id="sa-submit-btn" onclick="submitSuspendAppealForm()"><i class="ph ph-paper-plane-tilt"></i> Submit appeal</button>
+    <button class="btn-sheet outline" style="margin-top:8px;" onclick="closeSuspendAppealForm()">Cancel</button>
+  </div>
+</div>
+
 <!-- Full-size image lightbox viewer -->
 <div class="lightbox-overlay" id="lightbox-overlay" onclick="if(event.target===this)closeLightbox()">
   <button class="lightbox-close" onclick="closeLightbox()"><i class="ph ph-x"></i></button>
@@ -2855,6 +2904,8 @@ let myAccountLock = null;  // {active, reason, deviceId, ipCountry, changedField
 const ADMIN_UID = 'aRq9nXHH63R90c5MC6DZ5wXD3r93';
 let currentSuspensionData = null;
 let currentLockData = null;
+let mySuspendedProfile = null; // {name,handle,...} fetched once in showSuspendScreen, reused by the appeal form
+let saIdPhotoData = null;      // base64 ID photo picked in the suspension-appeal form, if any
 let unsubscribers = [];
 let profileUid = null;
 let profileHandleCache = '';
@@ -3810,6 +3861,7 @@ async function showSuspendScreen(d){
   try{
     const snap = await db.ref('users/'+me.uid).once('value');
     const u = snap.val()||{};
+    mySuspendedProfile = u;
     const name = u.name||'';
     document.getElementById('suspend-title').textContent = name ? `We suspended your account, ${ESC(name)}` : 'We suspended your account';
     if(u.photoBase64){ avEl.innerHTML=`<img src="${u.photoBase64}" style="width:100%;height:100%;object-fit:cover;">`; }
@@ -3838,24 +3890,59 @@ async function showSuspendScreen(d){
   document.getElementById('suspend-appeal-btn').classList.toggle('hidden', !appealAllowed);
   document.getElementById('suspend-appeal-sent').classList.toggle('hidden', !d.appealed);
 }
-async function submitSuspendAppeal(){
+function openSuspendAppealForm(){
   if(!me) return;
-  const btn=document.getElementById('suspend-appeal-btn');
-  btn.disabled=true; btn.innerHTML='<i class="ph ph-spinner-gap spin"></i> Sending…';
+  const p = mySuspendedProfile||{};
+  document.getElementById('sa-name').value = p.name||'';
+  document.getElementById('sa-email').value = me.email||'';
+  document.getElementById('sa-username').value = '@'+(p.handle||'');
+  document.getElementById('sa-message').value='';
+  document.getElementById('sa-id-photo-preview').innerHTML='<div class="vr-id-placeholder"><i class="ph ph-identification-card"></i><span>Tap to upload ID photo</span></div>';
+  document.getElementById('sa-id-photo-input').value='';
+  saIdPhotoData=null;
+  document.getElementById('sa-confirm').checked=false;
+  document.getElementById('sa-err').textContent='';
+  openModal('appeal-form-page');
+}
+function closeSuspendAppealForm(){ closeModal('appeal-form-page'); }
+function onSaIdPhotoPick(e){
+  const f=e.target.files[0]; if(!f) return;
+  compressAndRead(f, data=>{
+    saIdPhotoData=data;
+    document.getElementById('sa-id-photo-preview').innerHTML=`<img src="${data}" alt="ID photo">`;
+  });
+}
+async function submitSuspendAppealForm(){
+  if(!me) return;
+  const errEl=document.getElementById('sa-err');
+  errEl.textContent='';
+  const fullName=document.getElementById('sa-name').value.trim();
+  const message=document.getElementById('sa-message').value.trim();
+  const confirmed=document.getElementById('sa-confirm').checked;
+  if(!fullName || fullName.length<3){ errEl.textContent='Please enter your full name.'; return; }
+  if(!message || message.length<20){ errEl.textContent='Please explain your situation (at least 20 characters).'; return; }
+  if(!confirmed){ errEl.textContent='Please confirm the information above is accurate.'; return; }
+  const btn=document.getElementById('sa-submit-btn');
+  btn.disabled=true; btn.innerHTML='<i class="ph ph-spinner-gap spin"></i> Submitting…';
   try{
     await db.ref('appeals/'+me.uid).push({
       type:'suspension',
-      message:'I believe this suspension was a mistake — please review my account.',
+      fullName,
+      email: me.email||null,
+      username: (mySuspendedProfile&&mySuspendedProfile.handle)||null,
+      idPhotoBase64: saIdPhotoData||null,
+      message,
       submittedAt: firebase.database.ServerValue.TIMESTAMP
     });
     await db.ref('suspensions/'+me.uid+'/appealed').set(true);
     if(currentSuspensionData) currentSuspensionData.appealed=true;
+    closeSuspendAppealForm();
     document.getElementById('suspend-appeal-btn').classList.add('hidden');
     document.getElementById('suspend-appeal-sent').classList.remove('hidden');
     document.getElementById('suspend-appeal-copy').textContent="We've received your appeal and are reviewing your account. We'll let you know once a decision is made.";
     showToast('Appeal submitted');
-  }catch(e){ showToast('Could not submit appeal'); }
-  btn.disabled=false; btn.innerHTML='<i class="ph ph-flag"></i> Appeal';
+  }catch(e){ errEl.textContent='Could not submit: '+(e.message||'please try again'); }
+  finally{ btn.disabled=false; btn.innerHTML='<i class="ph ph-paper-plane-tilt"></i> Submit appeal'; }
 }
 function showLockScreen(d){
   currentLockData=d;
@@ -4019,9 +4106,14 @@ async function modRenderAppealList(){
       const actionBtn = isSuspension
         ? `<button class="btn-sheet outline" style="margin-top:6px;padding:6px 12px;font-size:12px;" onclick="modLiftSuspension('${ESC(uid)}')">Lift suspension</button>`
         : `<button class="btn-sheet outline" style="margin-top:6px;padding:6px 12px;font-size:12px;" onclick="modUnlockAccount('${ESC(uid)}')">Unlock account</button>`;
+      const detailsHtml = isSuspension ? `
+        <div style="font-size:12px;color:var(--text3);margin-top:4px;">${ESC(latest.fullName||'—')} · ${ESC(latest.email||'—')}${latest.username?' · @'+ESC(latest.username):''}</div>
+        ${latest.idPhotoBase64?`<a href="${latest.idPhotoBase64}" target="_blank" rel="noopener"><img src="${latest.idPhotoBase64}" alt="ID photo" style="width:56px;height:56px;object-fit:cover;border-radius:8px;margin-top:6px;border:1px solid var(--border2);"></a>`:''}
+      ` : '';
       return `<div style="padding:12px 4px;border-bottom:1px solid var(--border,#1c2636);">
         <div style="font-size:14px;font-weight:700;">${ESC(u.name||'Unknown')} <span style="color:var(--text3);font-weight:400;">@${ESC(u.handle||uid)}</span> <span style="color:var(--text3);font-weight:400;font-size:11px;">· ${isSuspension?'suspension':'lock'} appeal</span></div>
         <div style="font-size:12px;color:var(--text3);">${ESC(latest.message||'')}</div>
+        ${detailsHtml}
         ${actionBtn}
       </div>`;
     }));
