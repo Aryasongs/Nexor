@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Help Center — Nexor Sparks</title>
-<meta name="description" content="Nexor Sparks Help Center — account, privacy, community guidelines, copyright aur safety se judi har jaankari.">
+<meta name="description" content="Nexor Sparks Help Center — everything about account, privacy, community guidelines, copyright, and safety.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23050A14'/%3E%3Cpath d='M7 2v11h3v9l7-12h-4l4-8z' fill='%2300C8FF'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -260,25 +260,25 @@ footer{border-top:1px solid var(--border2);padding:34px 24px 50px;margin-top:20p
   </div>
   <div class="header-search">
     <i class="ph ph-magnifying-glass"></i>
-    <input id="search-input" type="text" placeholder="Help mein search karein..." oninput="doSearch(this.value)">
+    <input id="search-input" type="text" placeholder="Search help..." oninput="doSearch(this.value)">
   </div>
   <a class="back-btn" href="https://nexor-f4d.pages.dev">
-    <i class="ph ph-arrow-left"></i> Nexor Sparks par wapas jaayein
+    <i class="ph ph-arrow-left"></i> Back to Nexor Sparks
   </a>
 </header>
 
 <div id="page-home">
   <div class="hero">
     <div class="hero-eyebrow"><i class="ph ph-lifebuoy"></i> Official Help Center</div>
-    <h1>Aapko kis cheez mein madad chahiye?</h1>
-    <p>Account, privacy, community guidelines, copyright aur safety — Nexor Sparks se juda har jawaab yahan milega.</p>
+    <h1>What do you need help with?</h1>
+    <p>Account, privacy, community guidelines, copyright, and safety — find every answer about Nexor Sparks right here.</p>
     <div class="hero-search">
       <i class="ph ph-magnifying-glass"></i>
-      <input id="hero-search-input" type="text" placeholder="Jaise: password reset, hacked account, guidelines..." oninput="doSearch(this.value)">
+      <input id="hero-search-input" type="text" placeholder="Try: password reset, hacked account, guidelines..." oninput="doSearch(this.value)">
     </div>
     <div class="hero-chips">
-      <button class="chip" onclick="go('password-forgot')">Password bhool gaye?</button>
-      <button class="chip" onclick="go('hacked-account')">Account hack ho gaya</button>
+      <button class="chip" onclick="go('password-forgot')">Forgot your password?</button>
+      <button class="chip" onclick="go('hacked-account')">Account got hacked</button>
       <button class="chip" onclick="go('community-guidelines')">Community Guidelines</button>
       <button class="chip" onclick="go('privacy-policy')">Privacy Policy</button>
     </div>
@@ -298,9 +298,9 @@ footer{border-top:1px solid var(--border2);padding:34px 24px 50px;margin-top:20p
   <div class="article-meta" id="art-meta"></div>
   <div class="article-body" id="art-body"></div>
   <div class="helpful">
-    <span>Kya yeh article madadgaar tha?</span>
-    <button onclick="markHelpful(true)"><i class="ph ph-thumbs-up"></i> Haan</button>
-    <button onclick="markHelpful(false)"><i class="ph ph-thumbs-down"></i> Nahi</button>
+    <span>Was this article helpful?</span>
+    <button onclick="markHelpful(true)"><i class="ph ph-thumbs-up"></i> Yes</button>
+    <button onclick="markHelpful(false)"><i class="ph ph-thumbs-down"></i> No</button>
   </div>
   <div class="related" id="art-related"></div>
 </div>
@@ -330,13 +330,13 @@ footer{border-top:1px solid var(--border2);padding:34px 24px 50px;margin-top:20p
     </div>
     <div class="footer-col">
       <b>Nexor Sparks</b>
-      <a href="https://nexor-f4d.pages.dev">Main App par jaayein</a>
-      <a href="https://nexor-f4d.pages.dev/filecopyright">Copyright Report File Karein</a>
+      <a href="https://nexor-f4d.pages.dev">Go to Main App</a>
+      <a href="https://nexor-f4d.pages.dev/filecopyright">File a Copyright Report</a>
     </div>
   </div>
   <div class="footer-bottom">
     <span>© 2026 Nexor Sparks. All rights reserved.</span>
-    <span>Yeh sirf ek independent Help Center hai jo Nexor Sparks users ki madad ke liye banaya gaya hai.</span>
+    <span>This is an independent Help Center built to assist Nexor Sparks users.</span>
   </div>
 </footer>
 
@@ -350,7 +350,7 @@ footer{border-top:1px solid var(--border2);padding:34px 24px 50px;margin-top:20p
   </div>
   <div class="ai-body" id="ai-body"></div>
   <div class="ai-input-row">
-    <input id="ai-input" type="text" placeholder="Apna sawal likhein..." onkeydown="if(event.key==='Enter')sendAI()">
+    <input id="ai-input" type="text" placeholder="Type your question..." onkeydown="if(event.key==='Enter')sendAI()">
     <button class="ai-send" onclick="sendAI()"><i class="ph-fill ph-paper-plane-right"></i></button>
   </div>
 </div>
@@ -368,318 +368,318 @@ const CATS = [
 
 const ARTICLES = {
   'getting-started':{
-    cat:'account', icon:'ph-rocket-launch', title:'Nexor Sparks par shuru kaise karein',
-    desc:'Naya account banana, profile set karna aur pehla Pulse post karna.',
-    keywords:['signup','account banana','naya account','shuru','register','profile setup'],
+    cat:'account', icon:'ph-rocket-launch', title:'Getting started on Nexor Sparks',
+    desc:'Create a new account, set up your profile, and post your first Pulse.',
+    keywords:['signup','create account','new account','getting started','register','profile setup'],
     body:`
-      <p>Nexor Sparks par swagat hai. Naya account banane aur apni profile set up karne ke liye neeche diye steps follow karein.</p>
-      <h2>Account banayein</h2>
+      <p>Welcome to Nexor Sparks. Follow the steps below to create a new account and set up your profile.</p>
+      <h2>Create an account</h2>
       <ol>
-        <li>App ya website kholein aur <strong>Sign Up</strong> tab par tap karein.</li>
-        <li>Apna email ya phone number, ek unique username aur strong password daalein.</li>
-        <li>Verification code se apna email/phone confirm karein.</li>
-        <li>Apni age accurately daalein — Nexor Sparks use karne ke liye minimum age policy follow karna zaroori hai.</li>
+        <li>Open the app or website and tap the <strong>Sign Up</strong> tab.</li>
+        <li>Enter your email or phone number, a unique username, and a strong password.</li>
+        <li>Confirm your email/phone with the verification code.</li>
+        <li>Enter your age accurately — you must meet the minimum age policy to use Nexor Sparks.</li>
       </ol>
-      <h2>Profile complete karein</h2>
+      <h2>Complete your profile</h2>
       <ul>
-        <li>Ek clear profile photo aur short bio add karein.</li>
-        <li>Apni interests ke hisaab se logon ko follow karein taaki aapka feed personalize ho.</li>
-        <li>Notification aur privacy settings apni pasand ke hisaab se adjust karein.</li>
+        <li>Add a clear profile photo and a short bio.</li>
+        <li>Follow people based on your interests so your feed gets personalized.</li>
+        <li>Adjust your notification and privacy settings to your liking.</li>
       </ul>
-      <div class="callout"><i class="ph ph-info"></i>Pehli baar login karne ke baad hum recommend karte hain ki aap <strong>Privacy Policy</strong> aur <strong>Community Guidelines</strong> ek baar zaroor padh lein.</div>
+      <div class="callout"><i class="ph ph-info"></i>After logging in for the first time, we recommend reading the <strong>Privacy Policy</strong> and <strong>Community Guidelines</strong> at least once.</div>
     `,
     related:['password-forgot','privacy-policy','community-guidelines']
   },
   'password-forgot':{
-    cat:'account', icon:'ph-key', title:'Password bhool gaye hain? Reset kaise karein',
-    desc:'Login na ho paa raha ho toh apna password step-by-step reset karein.',
-    keywords:['password','bhool','forgot password','reset password','login nahi ho raha','change password'],
+    cat:'account', icon:'ph-key', title:'Forgot your password? How to reset it',
+    desc:'Can\'t log in? Reset your password step by step.',
+    keywords:['password','forgot','forgot password','reset password','cant login','change password'],
     body:`
-      <p>Agar aap apna password bhool gaye hain toh chinta na karein — kuch steps mein aap wapas apne account mein login kar sakte hain.</p>
-      <h2>Password reset karne ke steps</h2>
+      <p>If you've forgotten your password, don't worry — you can get back into your account in a few steps.</p>
+      <h2>Steps to reset your password</h2>
       <ol>
-        <li>Login screen par <strong>"Forgot Password?"</strong> link par tap karein.</li>
-        <li>Apna registered email ya phone number daalein.</li>
-        <li>Aapko ek verification code ya reset link bheja jaayega — usse open karein.</li>
-        <li>Naya, strong password set karein (letters, numbers aur symbols ka mix use karein).</li>
-        <li>Naye password se dobara login karein.</li>
+        <li>Tap <strong>"Forgot Password?"</strong> on the login screen.</li>
+        <li>Enter your registered email or phone number.</li>
+        <li>You'll be sent a verification code or reset link — open it.</li>
+        <li>Set a new, strong password (use a mix of letters, numbers, and symbols).</li>
+        <li>Log in again with your new password.</li>
       </ol>
-      <h2>Agar reset code nahi mil raha</h2>
+      <h2>If you're not receiving the reset code</h2>
       <ul>
-        <li>Spam/junk folder check karein.</li>
-        <li>Confirm karein ki aapne wahi email/number daala hai jo account se linked hai.</li>
-        <li>Kuch minute wait karke dobara try karein.</li>
+        <li>Check your spam/junk folder.</li>
+        <li>Confirm you entered the same email/number linked to your account.</li>
+        <li>Wait a few minutes and try again.</li>
       </ul>
-      <div class="callout"><i class="ph ph-shield-check"></i>Password reset karne ke baad, agar aapko lagta hai ki koi aur bhi aapke account tak pahunch sakta tha, toh <strong>Hacked Account</strong> guide zaroor padhein.</div>
+      <div class="callout"><i class="ph ph-shield-check"></i>After resetting your password, if you think someone else may have had access to your account, be sure to read the <strong>Hacked Account</strong> guide.</div>
     `,
     related:['hacked-account','delete-account']
   },
   'hacked-account':{
-    urgent:true, cat:'account', icon:'ph-shield-warning', title:'Aapka account hack ya compromise ho gaya hai',
-    desc:'Agar lagta hai ki koi aur aapke account ka use kar raha hai, turant yeh steps follow karein.',
-    keywords:['hack','hacked','compromise','account chori','kisi ne login kiya','suspicious activity','unauthorized'],
+    urgent:true, cat:'account', icon:'ph-shield-warning', title:'Your account has been hacked or compromised',
+    desc:'If you think someone else is using your account, follow these steps immediately.',
+    keywords:['hack','hacked','compromise','compromised','account stolen','someone logged in','suspicious activity','unauthorized'],
     body:`
-      <p>Agar aapko lagta hai ki aapka account kisi aur ne access kar liya hai, toh turant neeche diye steps follow karein.</p>
-      <h2>Compromise hone ke signs</h2>
+      <p>If you think someone else has accessed your account, immediately follow the steps below.</p>
+      <h2>Signs of compromise</h2>
       <ul>
-        <li>Aapne khud post na kiye ho waise Pulses ya messages aapke account se ja rahe hain.</li>
-        <li>Profile info (bio, photo, email, password) khud-ba-khud badal gayi hai.</li>
-        <li>Aapko login/password change ki notification mili hai jo aapne khud nahi ki.</li>
-        <li>Aap apne khud ke account mein login nahi kar paa rahe.</li>
+        <li>Pulses or messages are going out from your account that you didn't post.</li>
+        <li>Your profile info (bio, photo, email, password) has changed on its own.</li>
+        <li>You received a login/password change notification that you didn't make yourself.</li>
+        <li>You're unable to log into your own account.</li>
       </ul>
-      <h2>Turant kya karein</h2>
+      <h2>What to do immediately</h2>
       <ol>
-        <li><strong>Password turant badlein</strong> — agar aap login kar paa rahe hain, toh "Password Reset" guide follow karke naya, strong aur unique password set karein.</li>
-        <li><strong>Agar login nahi ho paa raha</strong> — "Forgot Password" se reset link use karke access wapas lein.</li>
-        <li><strong>Active sessions check karein</strong> — settings mein jaakar dekhein kahin koi anjaan device login toh nahi hai, aur unhe logout karein.</li>
-        <li><strong>Connected email/phone verify karein</strong> — confirm karein ki recovery email/number aapka hi hai.</li>
-        <li><strong>Recent activity review karein</strong> — koi unauthorized Pulse, message ya profile change delete/undo karein.</li>
+        <li><strong>Change your password right away</strong> — if you can still log in, follow the "Password Reset" guide to set a new, strong, and unique password.</li>
+        <li><strong>If you can't log in</strong> — use the "Forgot Password" reset link to regain access.</li>
+        <li><strong>Check active sessions</strong> — go to settings and check whether any unknown device is logged in, and log them out.</li>
+        <li><strong>Verify your connected email/phone</strong> — confirm the recovery email/number is really yours.</li>
+        <li><strong>Review recent activity</strong> — delete/undo any unauthorized Pulse, message, or profile change.</li>
       </ol>
-      <div class="callout warn"><i class="ph ph-warning"></i>Agar aap password reset nahi kar paa rahe kyunki attacker ne recovery email/phone bhi badal diya hai, toh AI Assistant (neeche right corner) ya "Report a Problem" page se account recovery request submit karein.</div>
-      <h2>Future mein account safe rakhne ke tips</h2>
+      <div class="callout warn"><i class="ph ph-warning"></i>If you can't reset your password because the attacker has also changed your recovery email/phone, submit an account recovery request via the AI Assistant (bottom right corner) or the "Report a Problem" page.</div>
+      <h2>Tips to keep your account safe in the future</h2>
       <ul>
-        <li>Har jagah unique password use karein — koi aur website par wahi password repeat na karein.</li>
-        <li>Anjaan links ya messages mein apna password kabhi na daalein (phishing se bachein).</li>
-        <li>Regularly apni login activity check karte rahein.</li>
+        <li>Use a unique password everywhere — never repeat the same password on another website.</li>
+        <li>Never enter your password on unfamiliar links or messages (avoid phishing).</li>
+        <li>Keep checking your login activity regularly.</li>
       </ul>
     `,
     related:['password-forgot','report-content','privacy-policy']
   },
   'delete-account':{
-    cat:'account', icon:'ph-trash', title:'Account deactivate ya delete karna',
-    desc:'Apne account ko temporarily band karein ya permanently delete karein.',
-    keywords:['delete account','deactivate','account band','account remove'],
+    cat:'account', icon:'ph-trash', title:'Deactivating or deleting your account',
+    desc:'Temporarily pause your account or permanently delete it.',
+    keywords:['delete account','deactivate','close account','remove account'],
     body:`
-      <p>Aap apna account temporarily deactivate ya permanently delete, dono kar sakte hain.</p>
+      <p>You can either temporarily deactivate or permanently delete your account.</p>
       <h2>Deactivate (temporary)</h2>
-      <p>Deactivate karne par aapki profile, Pulses aur messages sabko hide ho jaate hain, lekin data delete nahi hota. Jab bhi aap dobara login karenge, sab kuch wapas active ho jaayega.</p>
+      <p>When you deactivate, your profile, Pulses, and messages are all hidden, but no data is deleted. Everything becomes active again as soon as you log back in.</p>
       <h2>Delete (permanent)</h2>
-      <p>Permanent delete karne par aapka profile, Pulses, articles, messages aur data hamesha ke liye remove ho jaata hai. Yeh action <strong>undo nahi ho sakta</strong>, isliye pehle apna zaroori data (agar chahiye) save/download kar lein.</p>
+      <p>Permanently deleting removes your profile, Pulses, articles, messages, and data forever. This action <strong>cannot be undone</strong>, so save/download any important data first if needed.</p>
       <ol>
-        <li>Settings mein jaakar <strong>Account</strong> section kholein.</li>
-        <li><strong>Deactivate</strong> ya <strong>Delete Account</strong> option chunein.</li>
-        <li>Confirm karne ke liye apna password daalein.</li>
+        <li>Go to the <strong>Account</strong> section in Settings.</li>
+        <li>Choose the <strong>Deactivate</strong> or <strong>Delete Account</strong> option.</li>
+        <li>Enter your password to confirm.</li>
       </ol>
-      <div class="callout"><i class="ph ph-info"></i>Agar aap sirf break lena chahte hain, toh Delete ke bajaye Deactivate use karna behtar hai.</div>
+      <div class="callout"><i class="ph ph-info"></i>If you just want a break, it's better to use Deactivate instead of Delete.</div>
     `,
     related:['password-forgot','privacy-policy']
   },
   'pulses-articles':{
-    cat:'content', icon:'ph-lightning', title:'Pulses aur Articles post karna',
-    desc:'Content post karna, edit karna aur delete karna.',
-    keywords:['pulse','post','article','content post','delete post','edit post'],
+    cat:'content', icon:'ph-lightning', title:'Posting Pulses and Articles',
+    desc:'Post, edit, and delete your content.',
+    keywords:['pulse','post','article','post content','delete post','edit post'],
     body:`
-      <p>Nexor Sparks par aap apne moments <strong>Pulses</strong> ke roop mein share kar sakte hain, ya lambi content <strong>Articles</strong> ke format mein likh sakte hain.</p>
-      <h2>Pulse post karna</h2>
+      <p>On Nexor Sparks, you can share your moments as <strong>Pulses</strong>, or write longer content in the <strong>Articles</strong> format.</p>
+      <h2>Posting a Pulse</h2>
       <ul>
-        <li>Photo, text ya media add karke apna Pulse create karein.</li>
-        <li>Post karne se pehle preview zaroor dekh lein.</li>
-        <li>Post karne ke baad bhi aap use edit ya delete kar sakte hain.</li>
+        <li>Create your Pulse by adding a photo, text, or media.</li>
+        <li>Be sure to preview it before posting.</li>
+        <li>You can edit or delete it even after posting.</li>
       </ul>
-      <h2>Apna content edit/delete karna</h2>
+      <h2>Editing/deleting your content</h2>
       <ol>
-        <li>Apne Pulse/Article par jaakar (⋯) menu par tap karein.</li>
-        <li><strong>Edit</strong> ya <strong>Delete</strong> choose karein.</li>
+        <li>Go to your Pulse/Article and tap the (⋯) menu.</li>
+        <li>Choose <strong>Edit</strong> or <strong>Delete</strong>.</li>
       </ol>
-      <div class="callout"><i class="ph ph-info"></i>Ek baar delete kiya gaya content wapas restore nahi kiya jaa sakta.</div>
-      <h2>Content post karte waqt yaad rakhein</h2>
-      <p>Har Pulse aur Article humari <strong>Community Guidelines</strong> ka palan karna chahiye. Guidelines todne wale content ko remove kiya jaa sakta hai.</p>
+      <div class="callout"><i class="ph ph-info"></i>Once deleted, content cannot be restored.</div>
+      <h2>Keep in mind while posting content</h2>
+      <p>Every Pulse and Article must follow our <strong>Community Guidelines</strong>. Content that violates the guidelines may be removed.</p>
     `,
     related:['community-guidelines','ai-content-label','copyright-policy']
   },
   'ai-content-label':{
-    cat:'content', icon:'ph-sparkle', title:'AI-Generated content ka "AI" label kya hai',
-    desc:'Kuch Pulses/Articles par AI label kyun dikhta hai, iska matlab samjhein.',
+    cat:'content', icon:'ph-sparkle', title:'What is the "AI" label on AI-generated content',
+    desc:'Understand why some Pulses/Articles show an AI label.',
     keywords:['ai label','ai generated','ai badge','ai tag'],
     body:`
-      <p>Jab koi content pura ya kuch hissa AI tools se generate ya significantly edit kiya gaya ho, toh usme aapko ek golden <strong>"AI"</strong> label dikh sakta hai.</p>
-      <h2>Yeh label kyun zaroori hai</h2>
+      <p>When content has been fully or significantly generated or edited with AI tools, you may see a golden <strong>"AI"</strong> label on it.</p>
+      <h2>Why this label matters</h2>
       <ul>
-        <li>Yeh community ko transparent rakhta hai ki content kis tarah banaya gaya.</li>
-        <li>Yeh trust banata hai — logon ko pata chalta hai ki content real photo/video hai ya AI se banaya gaya.</li>
+        <li>It keeps the community transparent about how content was made.</li>
+        <li>It builds trust — people know whether content is a real photo/video or AI-generated.</li>
       </ul>
-      <h2>Apna AI-generated content label karna</h2>
-      <p>Agar aap AI tools se content bana rahe hain, toh use post karte waqt honestly label karein. Bina label ke misleading AI content post karna Community Guidelines ka ullanghan maana jaata hai.</p>
+      <h2>Labeling your own AI-generated content</h2>
+      <p>If you're creating content with AI tools, label it honestly when posting. Posting misleading AI content without a label is considered a violation of the Community Guidelines.</p>
     `,
     related:['pulses-articles','community-guidelines']
   },
   'verification':{
-    cat:'content', icon:'ph-seal-check', title:'Verified badge aur Organization badge',
-    desc:'Blue tick aur org badge kaise milta hai aur inka kya matlab hai.',
+    cat:'content', icon:'ph-seal-check', title:'Verified badge and Organization badge',
+    desc:'How to get the blue tick and org badge, and what they mean.',
     keywords:['verified','blue tick','badge','organization badge','verification'],
     body:`
-      <p>Nexor Sparks par do tarah ke badges hote hain jo profile ke naam ke saath dikhte hain.</p>
+      <p>Nexor Sparks has two types of badges that appear next to a profile's name.</p>
       <h2>Verified Badge</h2>
-      <p>Yeh badge confirm karta hai ki account authentic hai aur uski identity verify ki gayi hai. Yeh spam/fake accounts se real users ko alag karne mein madad karta hai.</p>
+      <p>This badge confirms that the account is authentic and its identity has been verified. It helps distinguish real users from spam/fake accounts.</p>
       <h2>Organization Badge</h2>
-      <p>Yeh badge verified badge ke saath, alag se dikhta hai aur confirm karta hai ki account ek official organisation/brand ka hai.</p>
-      <div class="callout"><i class="ph ph-info"></i>Badges sirf authenticity dikhate hain — yeh kisi bhi tarah endorsement ya priority ka matlab nahi rakhte.</div>
-      <h2>Fake verified badge se saavdhan rahein</h2>
-      <p>Agar koi account khud ko verified batata hai lekin uske paas asli badge nahi hai, toh use "Report a Problem" page se report karein.</p>
+      <p>This badge appears separately alongside the verified badge and confirms that the account belongs to an official organization/brand.</p>
+      <div class="callout"><i class="ph ph-info"></i>Badges only indicate authenticity — they don't imply any kind of endorsement or priority.</div>
+      <h2>Beware of fake verified badges</h2>
+      <p>If an account claims to be verified but doesn't have the real badge, report it via the "Report a Problem" page.</p>
     `,
     related:['report-content','community-guidelines']
   },
   'privacy-policy':{
     cat:'policies', icon:'ph-lock-key', title:'Privacy Policy',
-    desc:'Hum aapka data kaise collect, use aur protect karte hain.',
-    keywords:['privacy','data','policy','information collect'],
+    desc:'How we collect, use, and protect your data.',
+    keywords:['privacy','data','policy','information collection'],
     body:`
-      <p>Yeh Privacy Policy batati hai ki Nexor Sparks aapki information kaise collect, use, store aur protect karta hai.</p>
-      <h2>Hum kya collect karte hain</h2>
+      <p>This Privacy Policy explains how Nexor Sparks collects, uses, stores, and protects your information.</p>
+      <h2>What we collect</h2>
       <ul>
         <li><strong>Account info:</strong> username, email/phone, password (encrypted), profile details.</li>
-        <li><strong>Content:</strong> aapke Pulses, articles, messages, comments.</li>
-        <li><strong>Usage data:</strong> aap app kaise use karte hain, device aur log information.</li>
+        <li><strong>Content:</strong> your Pulses, articles, messages, comments.</li>
+        <li><strong>Usage data:</strong> how you use the app, device and log information.</li>
       </ul>
-      <h2>Hum ise kaise use karte hain</h2>
+      <h2>How we use it</h2>
       <ul>
-        <li>Aapko app ki services provide karne aur personalize karne ke liye.</li>
-        <li>Account safety aur fraud prevention ke liye.</li>
-        <li>App ko improve karne aur bugs fix karne ke liye.</li>
+        <li>To provide and personalize app services for you.</li>
+        <li>For account safety and fraud prevention.</li>
+        <li>To improve the app and fix bugs.</li>
       </ul>
       <h2>Data sharing</h2>
-      <p>Hum aapka personal data third parties ko bina consent ke bechte nahi hain. Data sirf tab share hota hai jab qanooni zaroorat ho, ya service providers (jaise hosting) ke saath jo humari taraf se kaam karte hain.</p>
-      <h2>Aapke rights</h2>
+      <p>We do not sell your personal data to third parties without consent. Data is only shared when legally required, or with service providers (like hosting) who work on our behalf.</p>
+      <h2>Your rights</h2>
       <ul>
-        <li>Apna data access, correct ya delete karne ka right.</li>
-        <li>Apna account kabhi bhi deactivate/delete karne ka right.</li>
-        <li>Privacy settings se control karna ki kaun aapka content dekh sakta hai.</li>
+        <li>The right to access, correct, or delete your data.</li>
+        <li>The right to deactivate/delete your account at any time.</li>
+        <li>Control who can see your content via privacy settings.</li>
       </ul>
       <h2>Data retention</h2>
-      <p>Jab tak aapka account active hai, hum data rakhte hain. Account delete karne par, applicable qanoon ke hisaab se data delete ya anonymize kar diya jaata hai.</p>
-      <div class="callout"><i class="ph ph-info"></i>Privacy se related kisi bhi sawal ke liye AI Assistant se baat karein ya "Report a Problem" page use karein.</div>
+      <p>We retain data as long as your account is active. When you delete your account, data is deleted or anonymized in accordance with applicable law.</p>
+      <div class="callout"><i class="ph ph-info"></i>For any privacy-related questions, talk to the AI Assistant or use the "Report a Problem" page.</div>
     `,
     related:['delete-account','terms-of-service','blocking-safety']
   },
   'terms-of-service':{
     cat:'policies', icon:'ph-file-text', title:'Terms of Service',
-    desc:'Nexor Sparks use karne ke rules aur conditions.',
+    desc:'Rules and conditions for using Nexor Sparks.',
     keywords:['terms','tos','conditions','agreement'],
     body:`
-      <p>Nexor Sparks use karke, aap in Terms of Service se agree karte hain.</p>
+      <p>By using Nexor Sparks, you agree to these Terms of Service.</p>
       <h2>Eligibility</h2>
-      <p>Aapko is app ko use karne ke liye minimum age requirement poori karni hogi aur accurate information deni hogi.</p>
-      <h2>Aapki responsibility</h2>
+      <p>You must meet the minimum age requirement to use this app and must provide accurate information.</p>
+      <h2>Your responsibility</h2>
       <ul>
-        <li>Apne account aur password ki security ki zimmedari aapki hai.</li>
-        <li>Aap jo content post karte hain uski accuracy aur legality ki zimmedari aapki hai.</li>
-        <li>Ek se zyada fake ya impersonation accounts banana allowed nahi hai.</li>
+        <li>You are responsible for the security of your account and password.</li>
+        <li>You are responsible for the accuracy and legality of the content you post.</li>
+        <li>Creating multiple fake or impersonation accounts is not allowed.</li>
       </ul>
       <h2>Content ownership</h2>
-      <p>Aap apne banaye content ke owner rehte hain. Post karke aap Nexor Sparks ko sirf itna license dete hain ki wo content ko app par display aur distribute kar sake.</p>
+      <p>You remain the owner of the content you create. By posting, you grant Nexor Sparks only enough license to display and distribute the content on the app.</p>
       <h2>Prohibited conduct</h2>
-      <p>Harassment, hate speech, spam, fraud, illegal content aur intellectual property violation strictly prohibited hai — detail ke liye Community Guidelines dekhein.</p>
-      <h2>Suspension aur termination</h2>
-      <p>Terms ya Community Guidelines ka baar-baar ya serious violation hone par account suspend ya terminate kiya jaa sakta hai.</p>
+      <p>Harassment, hate speech, spam, fraud, illegal content, and intellectual property violations are strictly prohibited — see Community Guidelines for details.</p>
+      <h2>Suspension and termination</h2>
+      <p>Repeated or serious violations of the Terms or Community Guidelines may result in account suspension or termination.</p>
       <h2>Changes to Terms</h2>
-      <p>Hum in Terms ko samay-samay par update kar sakte hain. Bade changes ki jaankari app ke through di jaayegi.</p>
+      <p>We may update these Terms from time to time. Major changes will be communicated through the app.</p>
     `,
     related:['community-guidelines','copyright-policy']
   },
   'community-guidelines':{
     cat:'policies', icon:'ph-users-three', title:'Community Guidelines',
-    desc:'Ek safe aur respectful community banane ke rules.',
+    desc:'Rules for building a safe and respectful community.',
     keywords:['guidelines','rules','community rules','behavior','conduct'],
     body:`
-      <p>Nexor Sparks ek safe, respectful aur authentic community banane mein believe karta hai. Yeh guidelines har user par apply hoti hain.</p>
-      <h2>Authentic raho</h2>
+      <p>Nexor Sparks believes in building a safe, respectful, and authentic community. These guidelines apply to every user.</p>
+      <h2>Be authentic</h2>
       <ul>
-        <li>Apni asli identity use karein — impersonation allowed nahi hai.</li>
-        <li>AI-generated content ko honestly label karein.</li>
-        <li>Fake engagement (bots, bought followers) allowed nahi hai.</li>
+        <li>Use your real identity — impersonation is not allowed.</li>
+        <li>Honestly label AI-generated content.</li>
+        <li>Fake engagement (bots, bought followers) is not allowed.</li>
       </ul>
-      <h2>Respectful raho</h2>
+      <h2>Be respectful</h2>
       <ul>
-        <li>Harassment, bullying ya threats bilkul allowed nahi.</li>
-        <li>Hate speech — race, religion, gender, sexuality, disability ke aadhar par — allowed nahi hai.</li>
-        <li>Kisi ki bhi privacy violate karna (personal info share karna) allowed nahi hai.</li>
+        <li>Harassment, bullying, or threats are absolutely not allowed.</li>
+        <li>Hate speech — based on race, religion, gender, sexuality, disability — is not allowed.</li>
+        <li>Violating anyone's privacy (sharing personal info) is not allowed.</li>
       </ul>
-      <h2>Safe content post karo</h2>
+      <h2>Post safe content</h2>
       <ul>
-        <li>Graphic violence, gore ya disturbing content allowed nahi hai.</li>
-        <li>Nudity ya sexually explicit content allowed nahi hai.</li>
-        <li>Self-harm ko promote karne wala content allowed nahi hai — agar aap struggle kar rahe hain, please kisi trusted vyakti ya local helpline se turant baat karein.</li>
-        <li>Illegal activities (drugs, weapons, fraud) promote karna allowed nahi hai.</li>
+        <li>Graphic violence, gore, or disturbing content is not allowed.</li>
+        <li>Nudity or sexually explicit content is not allowed.</li>
+        <li>Content promoting self-harm is not allowed — if you're struggling, please talk to a trusted person or a local helpline right away.</li>
+        <li>Promoting illegal activities (drugs, weapons, fraud) is not allowed.</li>
       </ul>
-      <h2>Spam aur misinformation</h2>
-      <p>Repetitive spam, misleading links aur jaan-boojh kar false information failana allowed nahi hai.</p>
-      <h2>Violation hone par kya hota hai</h2>
+      <h2>Spam and misinformation</h2>
+      <p>Repetitive spam, misleading links, and deliberately spreading false information are not allowed.</p>
+      <h2>What happens when you violate</h2>
       <ol>
-        <li>Content remove kiya jaa sakta hai.</li>
-        <li>Warning di jaa sakti hai.</li>
-        <li>Baar-baar ya serious violation par account temporarily ya permanently suspend kiya jaa sakta hai.</li>
+        <li>Content may be removed.</li>
+        <li>A warning may be issued.</li>
+        <li>Repeated or serious violations may result in temporary or permanent account suspension.</li>
       </ol>
-      <div class="callout"><i class="ph ph-flag"></i>Kisi bhi content ya user ko guidelines todte dekhein, toh turant "Report a Problem" page se report karein.</div>
+      <div class="callout"><i class="ph ph-flag"></i>If you see any content or user breaking the guidelines, report it right away via the "Report a Problem" page.</div>
     `,
     related:['report-content','ai-content-label','terms-of-service']
   },
   'copyright-policy':{
     cat:'policies', icon:'ph-copyright', title:'Copyright & Intellectual Property Policy',
-    desc:'Copyright infringement report kaise karein aur apne rights protect karein.',
+    desc:'How to report copyright infringement and protect your rights.',
     keywords:['copyright','ip','intellectual property','dmca','infringement'],
     body:`
-      <p>Nexor Sparks doosron ki intellectual property ka respect karta hai aur users se bhi wahi expect karta hai.</p>
+      <p>Nexor Sparks respects others' intellectual property and expects the same from its users.</p>
       <h2>Copyright rules</h2>
       <ul>
-        <li>Sirf wahi content post karein jiske aap owner hain, ya jise post karne ka aapko permission/license mila ho.</li>
-        <li>Doosron ke photos, videos, music ya likhi hui cheezein bina permission use karna copyright infringement hai.</li>
+        <li>Only post content you own, or that you have permission/license to post.</li>
+        <li>Using others' photos, videos, music, or writing without permission is copyright infringement.</li>
       </ul>
-      <h2>Agar aapka copyrighted content bina permission use hua hai</h2>
-      <p>Aap dedicated copyright report page ke through complaint file kar sakte hain. Wahan aapko infringing content ka link, apna ownership proof aur contact details submit karni hogi.</p>
-      <a class="ext-link-btn" href="https://nexor-f4d.pages.dev/filecopyright" target="_blank"><i class="ph ph-arrow-square-out"></i> Copyright Report File Karein</a>
-      <h2>Agar aapka content copyright claim ki wajah se remove hua hai</h2>
-      <p>Agar aapko lagta hai ki removal galti se hua hai (jaise ki content aapka original hai), toh usi report page ke through counter-request submit kar sakte hain.</p>
-      <div class="callout warn"><i class="ph ph-warning"></i>Baar-baar copyright violation karne wale accounts suspend ya permanently band kiye jaa sakte hain.</div>
+      <h2>If your copyrighted content has been used without permission</h2>
+      <p>You can file a complaint through our dedicated copyright report page. You'll need to submit a link to the infringing content, proof of your ownership, and your contact details.</p>
+      <a class="ext-link-btn" href="https://nexor-f4d.pages.dev/filecopyright" target="_blank"><i class="ph ph-arrow-square-out"></i> File a Copyright Report</a>
+      <h2>If your content was removed due to a copyright claim</h2>
+      <p>If you believe the removal was a mistake (e.g. the content is your original work), you can submit a counter-request through the same report page.</p>
+      <div class="callout warn"><i class="ph ph-warning"></i>Accounts with repeated copyright violations may be suspended or permanently banned.</div>
     `,
     related:['terms-of-service','report-content']
   },
   'report-content':{
-    cat:'safety', icon:'ph-flag-banner', title:'Content, account ya problem report karna',
-    desc:'Guidelines todne wale content, fake accounts ya bugs report karein.',
+    cat:'safety', icon:'ph-flag-banner', title:'Reporting content, an account, or a problem',
+    desc:'Report content, fake accounts, or bugs that break the guidelines.',
     keywords:['report','complaint','problem','bug','fake account','abuse'],
     body:`
-      <p>Agar aapko koi content, account ya behavior humari Community Guidelines ke against lagta hai, toh use report karna zaroori hai.</p>
-      <h2>Pulse/Article report karna</h2>
+      <p>If you find any content, account, or behavior that goes against our Community Guidelines, it's important to report it.</p>
+      <h2>Reporting a Pulse/Article</h2>
       <ol>
-        <li>Post par jaakar (⋯) menu par tap karein.</li>
-        <li><strong>Report</strong> select karein.</li>
-        <li>Sabse relevant reason chunein (spam, harassment, nudity, hate speech, misinformation, etc.).</li>
+        <li>Go to the post and tap the (⋯) menu.</li>
+        <li>Select <strong>Report</strong>.</li>
+        <li>Choose the most relevant reason (spam, harassment, nudity, hate speech, misinformation, etc.).</li>
       </ol>
-      <h2>Account report karna</h2>
+      <h2>Reporting an account</h2>
       <ol>
-        <li>Us user ki profile par jaayein.</li>
-        <li>(⋯) menu se <strong>Report Account</strong> chunein.</li>
-        <li>Reason batayein aur submit karein.</li>
+        <li>Go to that user's profile.</li>
+        <li>Choose <strong>Report Account</strong> from the (⋯) menu.</li>
+        <li>State a reason and submit.</li>
       </ol>
-      <h2>App bug ya technical problem report karna</h2>
-      <p>Kisi bug, crash ya technical issue ke liye AI Assistant (neeche right corner) ko screenshot ke saath issue describe karein.</p>
-      <div class="callout"><i class="ph ph-shield-check"></i>Reports anonymous rehte hain — jis user ko aapne report kiya hai, use pata nahi chalega ki kisne report kiya.</div>
-      <h2>Emergency ya immediate safety threat</h2>
-      <p>Agar situation mein kisi ki jaan ya safety ko immediate khatra hai, toh sabse pehle apni local emergency services ko contact karein.</p>
+      <h2>Reporting an app bug or technical problem</h2>
+      <p>Describe the bug, crash, or technical issue to the AI Assistant (bottom right corner) along with a screenshot.</p>
+      <div class="callout"><i class="ph ph-shield-check"></i>Reports stay anonymous — the user you reported won't know who reported them.</div>
+      <h2>Emergency or immediate safety threat</h2>
+      <p>If there is an immediate threat to someone's life or safety, contact your local emergency services first.</p>
     `,
     related:['community-guidelines','blocking-safety','hacked-account']
   },
   'blocking-safety':{
-    cat:'safety', icon:'ph-shield-check', title:'Blocking aur Safety Tools',
-    desc:'Kisi user ko block/mute karna aur apni safety control karna.',
-    keywords:['block','mute','safety','harassment se bachna'],
+    cat:'safety', icon:'ph-shield-check', title:'Blocking and Safety Tools',
+    desc:'Block/mute a user and control your own safety.',
+    keywords:['block','mute','safety','avoid harassment'],
     body:`
-      <p>Nexor Sparks aapko apna experience control karne ke liye kayi tools deta hai.</p>
-      <h2>Block karna</h2>
-      <p>Jab aap kisi ko block karte hain, wo aapki profile, Pulses ya messages nahi dekh paayega aur na hi aapse contact kar payega.</p>
+      <p>Nexor Sparks gives you several tools to control your experience.</p>
+      <h2>Blocking</h2>
+      <p>When you block someone, they won't be able to see your profile, Pulses, or messages, and won't be able to contact you.</p>
       <ol>
-        <li>Us user ki profile kholein.</li>
-        <li>(⋯) menu se <strong>Block</strong> select karein.</li>
+        <li>Open that user's profile.</li>
+        <li>Select <strong>Block</strong> from the (⋯) menu.</li>
       </ol>
-      <h2>Mute karna</h2>
-      <p>Mute karne par wo user aapko contact toh kar sakta hai, lekin aapko unki activity notifications nahi milengi — aur unhe pata nahi chalega ki aapne unhe mute kiya hai.</p>
+      <h2>Muting</h2>
+      <p>When you mute someone, they can still contact you, but you won't get notifications about their activity — and they won't know you've muted them.</p>
       <h2>Privacy settings</h2>
       <ul>
-        <li>Control karein ki aapka profile kaun dekh sakta hai.</li>
-        <li>Control karein ki aapko message kaun bhej sakta hai.</li>
-        <li>Comments aur tags par restrictions set karein.</li>
+        <li>Control who can see your profile.</li>
+        <li>Control who can message you.</li>
+        <li>Set restrictions on comments and tags.</li>
       </ul>
-      <div class="callout"><i class="ph ph-info"></i>Agar koi aapko harass kar raha hai, toh block karne ke saath-saath use report bhi zaroor karein.</div>
+      <div class="callout"><i class="ph ph-info"></i>If someone is harassing you, be sure to report them in addition to blocking them.</div>
     `,
     related:['report-content','privacy-policy']
   },
@@ -746,7 +746,7 @@ function renderArticle(id){
   relWrap.innerHTML = '<div class="section-label">Related Articles</div>' +
     (a.related||[]).map(rid=>`<a onclick="go('${rid}')">${ARTICLES[rid].title}</a>`).join('');
 }
-function markHelpful(v){ showToastMsg(v? 'Shukriya! Feedback save ho gaya.' : 'Feedback ke liye shukriya, hum article improve karenge.'); }
+function markHelpful(v){ showToastMsg(v? 'Thanks! Your feedback has been saved.' : 'Thanks for the feedback — we\'ll work on improving this article.'); }
 function showToastMsg(msg){
   let t=document.getElementById('toast-el');
   if(!t){ t=document.createElement('div'); t.id='toast-el';
@@ -775,7 +775,7 @@ function doSearch(q){
   });
   resultsEl.classList.remove('hidden');
   if(matches.length===0){
-    resultsEl.innerHTML = `<div id="search-empty">Koi result nahi mila "${q}" ke liye. Neeche AI Assistant se poochh sakte hain.</div>`;
+    resultsEl.innerHTML = `<div id="search-empty">No results found for "${q}". You can ask the AI Assistant below.</div>`;
   } else {
     resultsEl.innerHTML = matches.map(([id,a])=>`<a class="sr-item" onclick="go('${id}')"><b>${a.title}</b><p>${a.desc}</p></a>`).join('');
   }
@@ -785,19 +785,19 @@ function doSearch(q){
 // AI ASSISTANT (rule-based, fully client-side)
 // ============================================================
 const AI_RULES = [
-  {kw:['hack','hacked','compromise','chori','suspicious login','kisi ne login'], reply:'Lagta hai aapka account compromise hua hai. Sabse pehle turant apna password reset karein aur active sessions check karein.', link:'hacked-account'},
-  {kw:['password','forgot','bhool','reset password'], reply:'Password reset karna aasan hai — login screen par "Forgot Password?" par tap karke apna email/phone verify karein.', link:'password-forgot'},
-  {kw:['delete account','deactivate','account band','remove account'], reply:'Aap account ko temporarily deactivate ya permanently delete, dono kar sakte hain. Settings > Account mein jaakar option milega.', link:'delete-account'},
-  {kw:['privacy','data','information collect'], reply:'Hum aapka data kaise collect aur use karte hain, iski poori jaankari Privacy Policy mein hai.', link:'privacy-policy'},
-  {kw:['guideline','rule','community','behavior'], reply:'Community Guidelines batati hain ki Nexor Sparks par kya post karna allowed hai aur kya nahi.', link:'community-guidelines'},
-  {kw:['copyright','dmca','intellectual property','ip'], reply:'Copyright infringement report karne ke liye humara dedicated copyright page use karein.', link:'copyright-policy'},
-  {kw:['report','complaint','fake account','abuse','harassment'], reply:'Kisi bhi content, account ya problem ko report karna simple hai — (⋯) menu se Report chunein.', link:'report-content'},
-  {kw:['block','mute','safety'], reply:'Aap kisi bhi user ko block ya mute kar sakte hain apni safety ke liye.', link:'blocking-safety'},
-  {kw:['ai label','ai generated','ai tag'], reply:'AI label batata hai ki content AI tools se generate ya significantly edit kiya gaya hai.', link:'ai-content-label'},
-  {kw:['verified','blue tick','badge','organization'], reply:'Verified badge account ki authenticity confirm karta hai, aur org badge official organisations ke liye hota hai.', link:'verification'},
-  {kw:['terms','tos','condition'], reply:'App use karne ke rules Terms of Service mein detail se diye gaye hain.', link:'terms-of-service'},
-  {kw:['pulse','post','article','content'], reply:'Pulses aur Articles post, edit ya delete karna bahut aasan hai.', link:'pulses-articles'},
-  {kw:['start','signup','naya account','register','shuru'], reply:'Naye account setup ke liye Getting Started guide follow karein.', link:'getting-started'},
+  {kw:['hack','hacked','compromise','compromised','stolen account','suspicious login','someone logged in','account taken over'], reply:'Sounds like your account may be compromised. Here\'s what to do right now: (1) If you can still log in, change your password immediately using Password Reset. (2) If you can\'t log in, use "Forgot Password" to get back in. (3) Check Settings for any unknown active sessions and log them out. (4) Verify your recovery email/phone is really yours. (5) Review recent activity and undo anything you didn\'t post. If any of these steps doesn\'t work — for example, the attacker has already changed your recovery email or phone — don\'t worry, you can still submit an account recovery request right here with me, or through the "Report a Problem" page, and we\'ll figure it out from there. Full guide linked below.', link:'hacked-account'},
+  {kw:['password','forgot','reset password'], reply:'Resetting your password is easy — tap "Forgot Password?" on the login screen and verify your email/phone to set a new one.', link:'password-forgot'},
+  {kw:['delete account','deactivate','close account','remove account'], reply:'You can either temporarily deactivate or permanently delete your account. Go to Settings > Account to find the option.', link:'delete-account'},
+  {kw:['privacy','data','information collection'], reply:'You can find everything about how we collect and use your data in our Privacy Policy.', link:'privacy-policy'},
+  {kw:['guideline','rule','community','behavior'], reply:'Community Guidelines explain what\'s allowed on Nexor Sparks and what isn\'t.', link:'community-guidelines'},
+  {kw:['copyright','dmca','intellectual property','ip'], reply:'To report copyright infringement, use our dedicated copyright report page.', link:'copyright-policy'},
+  {kw:['report','complaint','fake account','abuse','harassment'], reply:'Reporting any content, account, or problem is simple — just select Report from the (⋯) menu.', link:'report-content'},
+  {kw:['block','mute','safety'], reply:'You can block or mute any user to protect your own safety.', link:'blocking-safety'},
+  {kw:['ai label','ai generated','ai tag'], reply:'The AI label shows that content was generated or significantly edited using AI tools.', link:'ai-content-label'},
+  {kw:['verified','blue tick','badge','organization'], reply:'The verified badge confirms an account\'s authenticity, and the org badge is for official organizations.', link:'verification'},
+  {kw:['terms','tos','condition'], reply:'The rules for using the app are laid out in detail in the Terms of Service.', link:'terms-of-service'},
+  {kw:['pulse','post','article','content'], reply:'Posting, editing, or deleting Pulses and Articles is very easy.', link:'pulses-articles'},
+  {kw:['start','signup','new account','register','getting started'], reply:'Follow the Getting Started guide to set up your new account.', link:'getting-started'},
 ];
 function aiRespond(text){
   const q=text.toLowerCase();
@@ -811,7 +811,7 @@ function toggleAI(open){
   document.getElementById('ai-fab').classList.toggle('hidden', open);
   if(open && !window._aiInit){
     window._aiInit = true;
-    addBotMsg('Hi! Main Sparky hoon 👋 Aapki kis cheez mein madad kar sakta hoon?', ['password-forgot','hacked-account','community-guidelines','report-content']);
+    addBotMsg('Hi! I\'m Sparky 👋 What can I help you with?', ['password-forgot','hacked-account','community-guidelines','report-content']);
   }
 }
 function addBotMsg(text, suggestLinks){
@@ -846,7 +846,7 @@ function addTypingIndicator(){
   const div=document.createElement('div');
   div.className='msg bot';
   div.id='typing-indicator';
-  div.textContent='Sparky type kar raha hai...';
+  div.textContent='Sparky is typing...';
   div.style.opacity='0.6';
   body.appendChild(div);
   body.scrollTop=body.scrollHeight;
@@ -883,11 +883,11 @@ async function sendAI(){
     if(res.ok && data.reply){
       addBotMsg(data.reply, ['password-forgot','hacked-account','community-guidelines','report-content']);
     } else {
-      addBotMsg('Abhi AI se connect nahi ho paaya. Neeche diye topics try karein, ya "Report a Problem" page se hume batayein.', ['password-forgot','hacked-account','community-guidelines','report-content']);
+      addBotMsg('Couldn\'t connect to the AI right now. Try one of the topics below, or let us know via the "Report a Problem" page.', ['password-forgot','hacked-account','community-guidelines','report-content']);
     }
   } catch(err){
     removeTypingIndicator();
-    addBotMsg('Network issue lag raha hai. Neeche diye topics try karein, ya thodi der baad dobara try karein.', ['password-forgot','hacked-account','community-guidelines','report-content']);
+    addBotMsg('Looks like a network issue. Try one of the topics below, or try again in a little while.', ['password-forgot','hacked-account','community-guidelines','report-content']);
   }
 }
 
