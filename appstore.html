@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexor Sparks</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#0A0A12;
+    --bg-panel:#14141F;
+    --bg-panel-2:#1B1B29;
+    --violet:#7C5CFF;
+    --cyan:#33E6E0;
+    --gold:#FFC857;
+    --text-primary:#F5F4FF;
+    --text-muted:#9694B0;
+    --line:#26263A;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:var(--bg-deep);
+    color:var(--text-primary);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    -webkit-font-smoothing:antialiased;
+  }
+  a{color:inherit; text-decoration:none;}
+
+  /* Sticky mini nav */
+  .navbar{
+    position:sticky; top:0; z-index:50;
+    display:flex; align-items:center; gap:12px;
+    padding:12px 20px;
+    background:rgba(10,10,18,0.7);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+    opacity:0; transform:translateY(-100%);
+    transition:opacity .3s ease, transform .3s ease;
+  }
+  .navbar.show{opacity:1; transform:translateY(0);}
+  .navbar img{width:34px; height:34px; border-radius:9px; object-fit:cover;}
+  .navbar .nav-name{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14px;}
+  .navbar .nav-btn{margin-left:auto;}
+
+  .wrap{max-width:760px; margin:0 auto; padding:0 20px 80px;}
+
+  /* Hero */
+  .hero{
+    display:flex; gap:22px; align-items:flex-start;
+    padding:40px 0 28px;
+    position:relative;
+  }
+  .icon-holder{position:relative; flex-shrink:0;}
+  .icon-holder::before{
+    content:'';
+    position:absolute; inset:-14px;
+    border-radius:34px;
+    background:radial-gradient(circle, rgba(124,92,255,0.35), transparent 70%);
+    animation:pulse 3.2s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%,100%{transform:scale(0.92); opacity:.55;}
+    50%{transform:scale(1.08); opacity:1;}
+  }
+  .app-icon{
+    width:104px; height:104px; border-radius:24px; object-fit:cover;
+    position:relative; z-index:1;
+    box-shadow:0 12px 30px rgba(0,0,0,0.5);
+    border:1px solid rgba(255,255,255,0.08);
+  }
+  .hero-info{flex:1; min-width:0; padding-top:4px;}
+  .app-name{font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:700; line-height:1.2;}
+  .app-tagline{color:var(--text-muted); font-size:14px; margin-top:4px;}
+  .app-dev{color:var(--cyan); font-size:13px; margin-top:8px; font-weight:500;}
+
+  .get-btn{
+    margin-top:16px;
+    display:inline-flex; align-items:center; justify-content:center;
+    gap:8px;
+    min-width:104px;
+    padding:9px 22px;
+    border-radius:999px;
+    background:var(--violet);
+    color:#fff;
+    font-weight:700; font-size:14px;
+    letter-spacing:.03em;
+    border:none; cursor:pointer;
+    transition:background .2s ease, transform .15s ease;
+    position:relative;
+    overflow:hidden;
+  }
+  .get-btn:hover{background:#8f74ff;}
+  .get-btn:active{transform:scale(.97);}
+  .get-btn.update{background:var(--cyan); color:#042220;}
+  .get-btn.update:hover{background:#5cf0ea;}
+  .get-btn.open{background:var(--bg-panel-2); color:var(--text-primary); border:1px solid var(--line);}
+  .get-btn .progress-fill{
+    position:absolute; left:0; top:0; bottom:0;
+    background:rgba(255,255,255,0.28);
+    width:0%;
+    transition:width .12s linear;
+  }
+  .get-btn span{position:relative; z-index:1;}
+
+  .reset-link{
+    display:block; margin-top:8px; font-size:11px; color:var(--text-muted);
+    cursor:pointer; width:fit-content; border-bottom:1px dashed transparent;
+  }
+  .reset-link:hover{color:var(--text-primary); border-bottom-color:var(--text-muted);}
+
+  /* Stat strip */
+  .stats{
+    display:flex; border-top:1px solid var(--line); border-bottom:1px solid var(--line);
+    padding:16px 0; margin-top:8px;
+  }
+  .stat{flex:1; text-align:center; padding:0 8px; border-right:1px solid var(--line);}
+  .stat:last-child{border-right:none;}
+  .stat .val{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:16px;}
+  .stat .lbl{color:var(--text-muted); font-size:11px; margin-top:3px; text-transform:uppercase; letter-spacing:.05em;}
+  .stars{color:var(--gold); letter-spacing:1px;}
+
+  /* Section */
+  .section{padding:30px 0; border-bottom:1px solid var(--line);}
+  .section-title{
+    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:17px;
+    margin-bottom:12px;
+  }
+  .desc{color:var(--text-muted); font-size:14px; line-height:1.7;}
+  .desc strong{color:var(--text-primary);}
+
+  .feature-grid{
+    display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:16px;
+  }
+  .feature{
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:14px;
+    padding:16px;
+  }
+  .feature .f-icon{
+    width:30px; height:30px; border-radius:9px;
+    background:linear-gradient(135deg, var(--violet), var(--cyan));
+    margin-bottom:10px;
+  }
+  .feature .f-title{font-size:13px; font-weight:600;}
+  .feature .f-text{font-size:12px; color:var(--text-muted); margin-top:4px; line-height:1.5;}
+
+  .whats-new{
+    background:var(--bg-panel); border:1px solid var(--line); border-radius:14px; padding:16px;
+  }
+  .wn-version{
+    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--cyan);
+  }
+  .wn-list{margin-top:10px; padding-left:18px; color:var(--text-muted); font-size:13px; line-height:1.8;}
+
+  .info-grid{
+    display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:4px;
+  }
+  .info-item .i-lbl{font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em;}
+  .info-item .i-val{font-size:13px; margin-top:5px; font-weight:500;}
+
+  .note{
+    margin-top:14px; font-size:12px; color:var(--text-muted);
+    border-left:2px solid var(--violet); padding-left:12px; line-height:1.6;
+  }
+
+  .toast{
+    position:fixed; left:50%; bottom:28px; transform:translate(-50%, 20px);
+    background:var(--bg-panel-2); border:1px solid var(--line);
+    padding:12px 18px; border-radius:12px; font-size:13px;
+    opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease;
+    max-width:90%; text-align:center; z-index:100;
+  }
+  .toast.show{opacity:1; transform:translate(-50%, 0);}
+
+  footer{padding:26px 0 10px; text-align:center; color:var(--text-muted); font-size:11px;}
+</style>
+</head>
+<body>
+
+  <div class="navbar" id="navbar">
+    <img src="https://nexor-f4d.pages.dev/download.jpg" alt="Nexor Sparks">
+    <div class="nav-name">Nexor Sparks</div>
+    <button class="get-btn nav-btn" id="btnNav"><span class="progress-fill"></span><span class="btn-label">GET</span></button>
+  </div>
+
+  <div class="wrap">
+    <div class="hero">
+      <div class="icon-holder">
+        <img class="app-icon" src="https://nexor-f4d.pages.dev/download.jpg" alt="Nexor Sparks icon">
+      </div>
+      <div class="hero-info">
+        <div class="app-name">Nexor Sparks</div>
+        <div class="app-tagline">Aapke roz ke kaam, ek jagah, tez raftaar se</div>
+        <div class="app-dev">Nexor</div>
+        <button class="get-btn" id="btnMain"><span class="progress-fill"></span><span class="btn-label">GET</span></button>
+        <span class="reset-link" id="resetLink" style="display:none;">App hata kar dobara dekhein (uninstall / reset)</span>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="val stars">★★★★☆</div>
+        <div class="lbl">4.6 · 2.1K Ratings</div>
+      </div>
+      <div class="stat">
+        <div class="val">4+</div>
+        <div class="lbl">Age</div>
+      </div>
+      <div class="stat">
+        <div class="val" id="statSize">18 MB</div>
+        <div class="lbl">Size</div>
+      </div>
+      <div class="stat">
+        <div class="val">Productivity</div>
+        <div class="lbl">Category</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Nexor Sparks ke baare mein</div>
+      <div class="desc">
+        <strong>Nexor Sparks</strong> ek halka-fulka productivity app hai jo aapke ideas, tasks aur notes ko ek jagah rakhta hai — bina kisi jhanjhat ke. Quick capture, smart reminders aur clean interface ke saath, roz ka kaam thoda aasan ban jaata hai.
+      </div>
+      <div class="feature-grid">
+        <div class="feature">
+          <div class="f-icon"></div>
+          <div class="f-title">Quick Capture</div>
+          <div class="f-text">Ek tap mein idea ya task note karein</div>
+        </div>
+        <div class="feature">
+          <div class="f-icon"></div>
+          <div class="f-title">Smart Reminders</div>
+          <div class="f-text">Sahi waqt par sahi yaad dilaye</div>
+        </div>
+        <div class="feature">
+          <div class="f-icon"></div>
+          <div class="f-title">Offline First</div>
+          <div class="f-text">Bina internet ke bhi kaam chale</div>
+        </div>
+        <div class="feature">
+          <div class="f-icon"></div>
+          <div class="f-title">Clean Design</div>
+          <div class="f-text">Distraction-free, tez interface</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">What's New</div>
+      <div class="whats-new">
+        <div class="wn-version">Version 1.4.0</div>
+        <ul class="wn-list">
+          <li>Naya dark theme accent</li>
+          <li>Faster app launch</li>
+          <li>Chhote bugs theek kiye gaye</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <div class="section-title">Information</div>
+      <div class="info-grid">
+        <div class="info-item">
+          <div class="i-lbl">Developer</div>
+          <div class="i-val">Nexor</div>
+        </div>
+        <div class="info-item">
+          <div class="i-lbl">Version</div>
+          <div class="i-val">1.4.0</div>
+        </div>
+        <div class="info-item">
+          <div class="i-lbl">Platform</div>
+          <div class="i-val">Android (APK)</div>
+        </div>
+      </div>
+      <div class="note">
+        Yeh app official Google Play/App Store se nahi, seedha developer ke server se APK ke roop mein milta hai. Install karne se pehle apne phone mein "Unknown sources" install permission dena hoga. Install/Update/Open button ka status is browser tab tak simulate hota hai — kisi bhi browser ke liye ye technically possible nahi ki wo aapke phone mein real app install-status ko check kare.
+      </div>
+    </div>
+
+    <footer>Yeh ek unofficial download page hai, Apple App Store se koi sambandh nahi.</footer>
+  </div>
+
+  <div class="toast" id="toast"></div>
+
+<script>
+(function(){
+  const APK_URL = "https://nexor-f4d.pages.dev/app-release.apk";
+  const LATEST_VERSION = "1.4.0";
+  const STORAGE_KEY = "nexor_sparks_installed_version";
+
+  const btnMain = document.getElementById('btnMain');
+  const btnNav = document.getElementById('btnNav');
+  const resetLink = document.getElementById('resetLink');
+  const navbar = document.getElementById('navbar');
+  const toastEl = document.getElementById('toast');
+
+  let installedVersion = null;
+  let busy = false;
+
+  function showToast(msg){
+    toastEl.textContent = msg;
+    toastEl.classList.add('show');
+    clearTimeout(showToast._t);
+    showToast._t = setTimeout(()=> toastEl.classList.remove('show'), 2600);
+  }
+
+  function versionLess(a, b){
+    const pa = a.split('.').map(Number), pb = b.split('.').map(Number);
+    for(let i=0;i<Math.max(pa.length,pb.length);i++){
+      const x = pa[i]||0, y = pb[i]||0;
+      if(x<y) return true;
+      if(x>y) return false;
+    }
+    return false;
+  }
+
+  function render(){
+    [btnMain, btnNav].forEach(btn=>{
+      const label = btn.querySelector('.btn-label');
+      btn.classList.remove('update','open');
+      btn.disabled = busy;
+      if(!installedVersion){
+        label.textContent = 'GET';
+      } else if(versionLess(installedVersion, LATEST_VERSION)){
+        btn.classList.add('update');
+        label.textContent = 'UPDATE';
+      } else {
+        btn.classList.add('open');
+        label.textContent = 'OPEN';
+      }
+    });
+    resetLink.style.display = installedVersion ? 'block' : 'none';
+  }
+
+  async function loadState(){
+    try{
+      const res = await window.storage.get(STORAGE_KEY, false);
+      installedVersion = res ? res.value : null;
+    }catch(e){
+      installedVersion = null;
+    }
+    render();
+  }
+
+  function animateProgress(btn, onDone){
+    const fill = btn.querySelector('.progress-fill');
+    const label = btn.querySelector('.btn-label');
+    let pct = 0;
+    busy = true;
+    render();
+    label.textContent = 'Downloading';
+    const iv = setInterval(()=>{
+      pct += Math.random()*18 + 8;
+      if(pct >= 100){
+        pct = 100;
+        clearInterval(iv);
+        fill.style.width = '100%';
+        setTimeout(()=>{
+          fill.style.width = '0%';
+          busy = false;
+          onDone();
+        }, 250);
+        return;
+      }
+      fill.style.width = pct + '%';
+    }, 160);
+  }
+
+  async function handleClick(){
+    if(busy) return;
+    if(!installedVersion || versionLess(installedVersion, LATEST_VERSION)){
+      const wasUpdate = !!installedVersion;
+      animateProgress(btnMain, async ()=>{
+        try{
+          await window.storage.set(STORAGE_KEY, LATEST_VERSION, false);
+        }catch(e){}
+        installedVersion = LATEST_VERSION;
+        render();
+        showToast(wasUpdate ? 'Update download shuru — APK file save ho rahi hai' : 'APK download shuru ho gaya');
+        const a = document.createElement('a');
+        a.href = APK_URL;
+        a.download = '';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      });
+      animateProgress(btnNav, ()=>{});
+    } else {
+      showToast('Nexor Sparks pehle se download ho chuka hai. App kholne ke liye apne phone par icon tap karein.');
+    }
+  }
+
+  btnMain.addEventListener('click', handleClick);
+  btnNav.addEventListener('click', handleClick);
+
+  resetLink.addEventListener('click', async ()=>{
+    try{ await window.storage.delete(STORAGE_KEY, false); }catch(e){}
+    installedVersion = null;
+    render();
+    showToast('Status reset ho gaya — GET dobara dikhega');
+  });
+
+  window.addEventListener('scroll', ()=>{
+    if(window.scrollY > 140) navbar.classList.add('show');
+    else navbar.classList.remove('show');
+  });
+
+  loadState();
+})();
+</script>
+</body>
+</html>
