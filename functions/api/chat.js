@@ -1,0 +1,131 @@
+// Auto-generated plain-text knowledge base from the Help Center articles.
+// Used to ground Gemini's answers in the site's real content.
+const KNOWLEDGE_BASE = `
+### Nexor Sparks par shuru kaise karein (id: getting-started)
+Nexor Sparks par swagat hai. Naya account banane aur apni profile set up karne ke liye neeche diye steps follow karein. Account banayein App ya website kholein aur Sign Up tab par tap karein. Apna email ya phone number, ek unique username aur strong password daalein. Verification code se apna email/phone confirm karein. Apni age accurately daalein — Nexor Sparks use karne ke liye minimum age policy follow karna zaroori hai. Profile complete karein Ek clear profile photo aur short bio add karein. Apni interests ke hisaab se logon ko follow karein taaki aapka feed personalize ho. Notification aur privacy settings apni pasand ke hisaab se adjust karein. Pehli baar login karne ke baad hum recommend karte hain ki aap Privacy Policy aur Community Guidelines ek baar zaroor padh lein.
+
+### Password bhool gaye hain? Reset kaise karein (id: password-forgot)
+Agar aap apna password bhool gaye hain toh chinta na karein — kuch steps mein aap wapas apne account mein login kar sakte hain. Password reset karne ke steps Login screen par "Forgot Password?" link par tap karein. Apna registered email ya phone number daalein. Aapko ek verification code ya reset link bheja jaayega — usse open karein. Naya, strong password set karein (letters, numbers aur symbols ka mix use karein). Naye password se dobara login karein. Agar reset code nahi mil raha Spam/junk folder check karein. Confirm karein ki aapne wahi email/number daala hai jo account se linked hai. Kuch minute wait karke dobara try karein. Password reset karne ke baad, agar aapko lagta hai ki koi aur bhi aapke account tak pahunch sakta tha, toh Hacked Account guide zaroor padhein.
+
+### Aapka account hack ya compromise ho gaya hai (id: hacked-account)
+Agar aapko lagta hai ki aapka account kisi aur ne access kar liya hai, toh turant neeche diye steps follow karein. Compromise hone ke signs Aapne khud post na kiye ho waise Pulses ya messages aapke account se ja rahe hain. Profile info (bio, photo, email, password) khud-ba-khud badal gayi hai. Aapko login/password change ki notification mili hai jo aapne khud nahi ki. Aap apne khud ke account mein login nahi kar paa rahe. Turant kya karein Password turant badlein — agar aap login kar paa rahe hain, toh "Password Reset" guide follow karke naya, strong aur unique password set karein. Agar login nahi ho paa raha — "Forgot Password" se reset link use karke access wapas lein. Active sessions check karein — settings mein jaakar dekhein kahin koi anjaan device login toh nahi hai, aur unhe logout karein. Connected email/phone verify karein — confirm karein ki recovery email/number aapka hi hai. Recent activity review karein — koi unauthorized Pulse, message ya profile change delete/undo karein. Agar aap password reset nahi kar paa rahe kyunki attacker ne recovery email/phone bhi badal diya hai, toh AI Assistant (neeche right corner) ya "Report a Problem" page se account recovery request submit karein. Future mein account safe rakhne ke tips Har jagah unique password use karein — koi aur website par wahi password repeat na karein. Anjaan links ya messages mein apna password kabhi na daalein (phishing se bachein). Regularly apni login activity check karte rahein.
+
+### Account deactivate ya delete karna (id: delete-account)
+Aap apna account temporarily deactivate ya permanently delete, dono kar sakte hain. Deactivate (temporary) Deactivate karne par aapki profile, Pulses aur messages sabko hide ho jaate hain, lekin data delete nahi hota. Jab bhi aap dobara login karenge, sab kuch wapas active ho jaayega. Delete (permanent) Permanent delete karne par aapka profile, Pulses, articles, messages aur data hamesha ke liye remove ho jaata hai. Yeh action undo nahi ho sakta , isliye pehle apna zaroori data (agar chahiye) save/download kar lein. Settings mein jaakar Account section kholein. Deactivate ya Delete Account option chunein. Confirm karne ke liye apna password daalein. Agar aap sirf break lena chahte hain, toh Delete ke bajaye Deactivate use karna behtar hai.
+
+### Pulses aur Articles post karna (id: pulses-articles)
+Nexor Sparks par aap apne moments Pulses ke roop mein share kar sakte hain, ya lambi content Articles ke format mein likh sakte hain. Pulse post karna Photo, text ya media add karke apna Pulse create karein. Post karne se pehle preview zaroor dekh lein. Post karne ke baad bhi aap use edit ya delete kar sakte hain. Apna content edit/delete karna Apne Pulse/Article par jaakar (⋯) menu par tap karein. Edit ya Delete choose karein. Ek baar delete kiya gaya content wapas restore nahi kiya jaa sakta. Content post karte waqt yaad rakhein Har Pulse aur Article humari Community Guidelines ka palan karna chahiye. Guidelines todne wale content ko remove kiya jaa sakta hai.
+
+### AI-Generated content ka "AI" label kya hai (id: ai-content-label)
+Jab koi content pura ya kuch hissa AI tools se generate ya significantly edit kiya gaya ho, toh usme aapko ek golden "AI" label dikh sakta hai. Yeh label kyun zaroori hai Yeh community ko transparent rakhta hai ki content kis tarah banaya gaya. Yeh trust banata hai — logon ko pata chalta hai ki content real photo/video hai ya AI se banaya gaya. Apna AI-generated content label karna Agar aap AI tools se content bana rahe hain, toh use post karte waqt honestly label karein. Bina label ke misleading AI content post karna Community Guidelines ka ullanghan maana jaata hai.
+
+### Verified badge aur Organization badge (id: verification)
+Nexor Sparks par do tarah ke badges hote hain jo profile ke naam ke saath dikhte hain. Verified Badge Yeh badge confirm karta hai ki account authentic hai aur uski identity verify ki gayi hai. Yeh spam/fake accounts se real users ko alag karne mein madad karta hai. Organization Badge Yeh badge verified badge ke saath, alag se dikhta hai aur confirm karta hai ki account ek official organisation/brand ka hai. Badges sirf authenticity dikhate hain — yeh kisi bhi tarah endorsement ya priority ka matlab nahi rakhte. Fake verified badge se saavdhan rahein Agar koi account khud ko verified batata hai lekin uske paas asli badge nahi hai, toh use "Report a Problem" page se report karein.
+
+### Privacy Policy (id: privacy-policy)
+Yeh Privacy Policy batati hai ki Nexor Sparks aapki information kaise collect, use, store aur protect karta hai. Hum kya collect karte hain Account info: username, email/phone, password (encrypted), profile details. Content: aapke Pulses, articles, messages, comments. Usage data: aap app kaise use karte hain, device aur log information. Hum ise kaise use karte hain Aapko app ki services provide karne aur personalize karne ke liye. Account safety aur fraud prevention ke liye. App ko improve karne aur bugs fix karne ke liye. Data sharing Hum aapka personal data third parties ko bina consent ke bechte nahi hain. Data sirf tab share hota hai jab qanooni zaroorat ho, ya service providers (jaise hosting) ke saath jo humari taraf se kaam karte hain. Aapke rights Apna data access, correct ya delete karne ka right. Apna account kabhi bhi deactivate/delete karne ka right. Privacy settings se control karna ki kaun aapka content dekh sakta hai. Data retention Jab tak aapka account active hai, hum data rakhte hain. Account delete karne par, applicable qanoon ke hisaab se data delete ya anonymize kar diya jaata hai. Privacy se related kisi bhi sawal ke liye AI Assistant se baat karein ya "Report a Problem" page use karein.
+
+### Terms of Service (id: terms-of-service)
+Nexor Sparks use karke, aap in Terms of Service se agree karte hain. Eligibility Aapko is app ko use karne ke liye minimum age requirement poori karni hogi aur accurate information deni hogi. Aapki responsibility Apne account aur password ki security ki zimmedari aapki hai. Aap jo content post karte hain uski accuracy aur legality ki zimmedari aapki hai. Ek se zyada fake ya impersonation accounts banana allowed nahi hai. Content ownership Aap apne banaye content ke owner rehte hain. Post karke aap Nexor Sparks ko sirf itna license dete hain ki wo content ko app par display aur distribute kar sake. Prohibited conduct Harassment, hate speech, spam, fraud, illegal content aur intellectual property violation strictly prohibited hai — detail ke liye Community Guidelines dekhein. Suspension aur termination Terms ya Community Guidelines ka baar-baar ya serious violation hone par account suspend ya terminate kiya jaa sakta hai. Changes to Terms Hum in Terms ko samay-samay par update kar sakte hain. Bade changes ki jaankari app ke through di jaayegi.
+
+### Community Guidelines (id: community-guidelines)
+Nexor Sparks ek safe, respectful aur authentic community banane mein believe karta hai. Yeh guidelines har user par apply hoti hain. Authentic raho Apni asli identity use karein — impersonation allowed nahi hai. AI-generated content ko honestly label karein. Fake engagement (bots, bought followers) allowed nahi hai. Respectful raho Harassment, bullying ya threats bilkul allowed nahi. Hate speech — race, religion, gender, sexuality, disability ke aadhar par — allowed nahi hai. Kisi ki bhi privacy violate karna (personal info share karna) allowed nahi hai. Safe content post karo Graphic violence, gore ya disturbing content allowed nahi hai. Nudity ya sexually explicit content allowed nahi hai. Self-harm ko promote karne wala content allowed nahi hai — agar aap struggle kar rahe hain, please kisi trusted vyakti ya local helpline se turant baat karein. Illegal activities (drugs, weapons, fraud) promote karna allowed nahi hai. Spam aur misinformation Repetitive spam, misleading links aur jaan-boojh kar false information failana allowed nahi hai. Violation hone par kya hota hai Content remove kiya jaa sakta hai. Warning di jaa sakti hai. Baar-baar ya serious violation par account temporarily ya permanently suspend kiya jaa sakta hai. Kisi bhi content ya user ko guidelines todte dekhein, toh turant "Report a Problem" page se report karein.
+
+### Copyright & Intellectual Property Policy (id: copyright-policy)
+Nexor Sparks doosron ki intellectual property ka respect karta hai aur users se bhi wahi expect karta hai. Copyright rules Sirf wahi content post karein jiske aap owner hain, ya jise post karne ka aapko permission/license mila ho. Doosron ke photos, videos, music ya likhi hui cheezein bina permission use karna copyright infringement hai. Agar aapka copyrighted content bina permission use hua hai Aap dedicated copyright report page ke through complaint file kar sakte hain. Wahan aapko infringing content ka link, apna ownership proof aur contact details submit karni hogi. Copyright Report File Karein Agar aapka content copyright claim ki wajah se remove hua hai Agar aapko lagta hai ki removal galti se hua hai (jaise ki content aapka original hai), toh usi report page ke through counter-request submit kar sakte hain. Baar-baar copyright violation karne wale accounts suspend ya permanently band kiye jaa sakte hain.
+
+### Content, account ya problem report karna (id: report-content)
+Agar aapko koi content, account ya behavior humari Community Guidelines ke against lagta hai, toh use report karna zaroori hai. Pulse/Article report karna Post par jaakar (⋯) menu par tap karein. Report select karein. Sabse relevant reason chunein (spam, harassment, nudity, hate speech, misinformation, etc.). Account report karna Us user ki profile par jaayein. (⋯) menu se Report Account chunein. Reason batayein aur submit karein. App bug ya technical problem report karna Kisi bug, crash ya technical issue ke liye AI Assistant (neeche right corner) ko screenshot ke saath issue describe karein. Reports anonymous rehte hain — jis user ko aapne report kiya hai, use pata nahi chalega ki kisne report kiya. Emergency ya immediate safety threat Agar situation mein kisi ki jaan ya safety ko immediate khatra hai, toh sabse pehle apni local emergency services ko contact karein.
+
+### Blocking aur Safety Tools (id: blocking-safety)
+Nexor Sparks aapko apna experience control karne ke liye kayi tools deta hai. Block karna Jab aap kisi ko block karte hain, wo aapki profile, Pulses ya messages nahi dekh paayega aur na hi aapse contact kar payega. Us user ki profile kholein. (⋯) menu se Block select karein. Mute karna Mute karne par wo user aapko contact toh kar sakta hai, lekin aapko unki activity notifications nahi milengi — aur unhe pata nahi chalega ki aapne unhe mute kiya hai. Privacy settings Control karein ki aapka profile kaun dekh sakta hai. Control karein ki aapko message kaun bhej sakta hai. Comments aur tags par restrictions set karein. Agar koi aapko harass kar raha hai, toh block karne ke saath-saath use report bhi zaroor karein.
+
+`;
+
+// Cloudflare Pages Function — POST /api/chat
+// Keeps the Gemini API key on the server. It is NEVER sent to the browser.
+// Set GEMINI_API_KEY in: Cloudflare Pages dashboard → your project →
+// Settings → Environment variables → Production (and Preview) → Add variable.
+
+const SYSTEM_PROMPT = `You are "Sparky", the AI Help Assistant for Nexor Sparks, a social app where users post "Pulses" (short posts) and "Articles".
+Answer briefly (2-5 sentences), in friendly Hinglish (Hindi+English mix, Latin script), like Instagram's help bot.
+
+You must answer ONLY using the information in the HELP CENTER KNOWLEDGE BASE below — this is the site's real, official help content.
+Do not invent steps, policies, or features that are not written in the knowledge base.
+If the knowledge base does not cover the user's question, say clearly that you don't have that information yet and suggest they use the "Report a Problem" page, instead of guessing.
+Never claim to take real actions (like actually resetting a password) — only guide the user on the steps to do it themselves in the app, based on the knowledge base.
+
+===== HELP CENTER KNOWLEDGE BASE =====
+${KNOWLEDGE_BASE}
+===== END OF KNOWLEDGE BASE =====`;
+
+export async function onRequestPost(context) {
+  const { request, env } = context;
+
+  if (!env.GEMINI_API_KEY) {
+    return new Response(JSON.stringify({ error: "AI is not configured yet. Add GEMINI_API_KEY in Cloudflare Pages environment variables." }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  let body;
+  try {
+    body = await request.json();
+  } catch {
+    return new Response(JSON.stringify({ error: "Invalid request body" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  const userMessage = String(body.message || "").slice(0, 1500);
+  if (!userMessage.trim()) {
+    return new Response(JSON.stringify({ error: "Empty message" }), {
+      status: 400,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+
+  try {
+    const resp = await fetch(
+      "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-goog-api-key": env.GEMINI_API_KEY,
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [{ text: `${SYSTEM_PROMPT}\n\nUser message: ${userMessage}` }],
+            },
+          ],
+        }),
+      }
+    );
+
+    if (!resp.ok) {
+      const errText = await resp.text();
+      return new Response(JSON.stringify({ error: "AI service error", detail: errText }), {
+        status: 502,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    const data = await resp.json();
+    const reply =
+      data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ||
+      "Sorry, main abhi jawaab generate nahi kar paaya. Kripya doosre shabdon mein try karein.";
+
+    return new Response(JSON.stringify({ reply }), {
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: "Request failed" }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
+  }
+}
