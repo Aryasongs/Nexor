@@ -1644,7 +1644,218 @@ i.spin::before{content:''!important;}
 <div class="screen-overlay" id="settings-screen">
   <div class="screen-topbar">
     <button class="back-btn" onclick="navBack()"><i class="ph ph-arrow-left"></i></button>
-    <div class="screen-topbar-title">Settings</div>
+    <div class="screen-topbar-title">Settings and activity</div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-row" onclick="navShow('account-center-screen')">
+      <i class="ph ph-identification-card" style="color:var(--cyan);"></i>
+      <div class="settings-row-text">
+        <div class="settings-row-title">Account Center</div>
+        <div class="settings-row-sub">Password, security, ads and more</div>
+      </div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+  </div>
+
+  <div class="settings-section">
+    <div class="settings-row" onclick="comingSoon('Saved')">
+      <i class="ph ph-bookmark-simple"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Saved</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Archive')">
+      <i class="ph ph-archive"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Archive</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Your activity')">
+      <i class="ph ph-chart-line"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Your activity</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Notifications')">
+      <i class="ph ph-bell"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Notifications</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Time management')">
+      <i class="ph ph-clock"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Time management</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+  </div>
+
+  <div class="settings-section-title">Who can see your content</div>
+  <div class="settings-section">
+    <div class="settings-row" onclick="togglePrivateAccount()">
+      <i class="ph ph-lock-simple"></i>
+      <div class="settings-row-text">
+        <div class="settings-row-title">Account privacy</div>
+        <div class="settings-row-sub" id="settings-private-sub">Only followers can see your Pulses</div>
+      </div>
+      <div class="toggle-switch" id="settings-private-toggle" onclick="event.stopPropagation();togglePrivateAccount()"></div>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Close Friends')">
+      <i class="ph ph-star"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Close Friends</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Crossposting')">
+      <i class="ph ph-share-network"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Crossposting</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="navShow('blocked-screen')">
+      <i class="ph ph-prohibit"></i>
+      <div class="settings-row-text">
+        <div class="settings-row-title">Blocked</div>
+        <div class="settings-row-sub" id="settings-blocked-count">Manage people you've blocked</div>
+      </div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="toggleLocationSharing()">
+      <i class="ph ph-map-pin"></i>
+      <div class="settings-row-text">
+        <div class="settings-row-title">Story, live and location</div>
+        <div class="settings-row-sub" id="settings-location-sub">Show "Account based in" (country) on your About info</div>
+      </div>
+      <div class="toggle-switch" id="settings-location-toggle" onclick="event.stopPropagation();toggleLocationSharing()"></div>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Activity in Friends feed')">
+      <i class="ph ph-users"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Activity in Friends feed</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+  </div>
+
+  <div class="settings-section-title">How others can interact with you</div>
+  <div class="settings-section">
+    <div class="settings-row" onclick="comingSoon('Messages and story replies')">
+      <i class="ph ph-chat-circle-dots"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Messages and story replies</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Tags and mentions')">
+      <i class="ph ph-at"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Tags and mentions</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Comments')">
+      <i class="ph ph-chat-circle"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Comments</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Sharing')">
+      <i class="ph ph-arrows-clockwise"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Sharing</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Restricted')">
+      <i class="ph ph-shield-slash"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Restricted</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Limit interactions')">
+      <i class="ph ph-warning-circle"></i>
+      <div class="settings-row-text">
+        <div class="settings-row-title">Limit interactions</div>
+        <div class="settings-row-sub">Off</div>
+      </div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Hidden Words')">
+      <i class="ph ph-text-aa"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Hidden Words</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Follow and invite friends')">
+      <i class="ph ph-user-plus"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Follow and invite friends</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+  </div>
+
+  <div class="settings-section-title">What you see</div>
+  <div class="settings-section">
+    <div class="settings-row" onclick="comingSoon('Favorites')">
+      <i class="ph ph-star-half"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Favorites</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="navShow('muted-screen')">
+      <i class="ph ph-speaker-slash"></i>
+      <div class="settings-row-text">
+        <div class="settings-row-title">Muted accounts</div>
+        <div class="settings-row-sub">Manage people you've muted</div>
+      </div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Content preferences')">
+      <i class="ph ph-sliders-horizontal"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Content preferences</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Like and share counts')">
+      <i class="ph ph-heart"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Like and share counts</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+  </div>
+
+  <div class="settings-section-title">Your app and media</div>
+  <div class="settings-section">
+    <div class="settings-row" onclick="comingSoon('Device permissions')">
+      <i class="ph ph-device-mobile"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Device permissions</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Archiving and downloading')">
+      <i class="ph ph-download-simple"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Archiving and downloading</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Accessibility')">
+      <i class="ph ph-person-simple-circle"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Accessibility</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Language and translations')">
+      <i class="ph ph-translate"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Language and translations</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Media quality')">
+      <i class="ph ph-cell-signal-full"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Media quality</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('App website permissions')">
+      <i class="ph ph-desktop"></i>
+      <div class="settings-row-text"><div class="settings-row-title">App website permissions</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+  </div>
+
+  <div class="settings-section-title">Family Center</div>
+  <div class="settings-section">
+    <div class="settings-row" onclick="comingSoon('Supervision for Teen Accounts')">
+      <i class="ph ph-house-line"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Supervision for Teen Accounts</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+  </div>
+
+  <div class="settings-section-title">Your insights and tools</div>
+  <div class="settings-section">
+    <div class="settings-row" onclick="openAccountTypeScreen()">
+      <i class="ph ph-chart-bar"></i>
+      <div class="settings-row-text">
+        <div class="settings-row-title">Account type and tools</div>
+        <div class="settings-row-sub" id="settings-acct-type-sub">Personal account</div>
+      </div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
   </div>
 
   <div class="settings-section-title">Account</div>
@@ -1656,14 +1867,6 @@ i.spin::before{content:''!important;}
         <div class="settings-row-sub">Name, bio, photo, banner & more</div>
       </div>
       <i class="ph ph-caret-right" style="font-size:16px;"></i>
-    </div>
-    <div class="settings-row" onclick="togglePrivateAccount()">
-      <i class="ph ph-lock-simple"></i>
-      <div class="settings-row-text">
-        <div class="settings-row-title">Private account</div>
-        <div class="settings-row-sub" id="settings-private-sub">Only followers can see your Pulses</div>
-      </div>
-      <div class="toggle-switch" id="settings-private-toggle" onclick="event.stopPropagation();togglePrivateAccount()"></div>
     </div>
     <div class="settings-row" onclick="openDobEditor()">
       <i class="ph ph-cake"></i>
@@ -1680,14 +1883,6 @@ i.spin::before{content:''!important;}
         <div class="settings-row-sub" id="settings-verify-sub">Apply for the verified badge</div>
       </div>
       <i class="ph ph-caret-right" style="font-size:16px;" id="settings-verify-caret"></i>
-    </div>
-    <div class="settings-row" onclick="openAccountTypeScreen()">
-      <i class="ph ph-identification-badge"></i>
-      <div class="settings-row-text">
-        <div class="settings-row-title">Account type</div>
-        <div class="settings-row-sub" id="settings-acct-type-sub">Personal account</div>
-      </div>
-      <i class="ph ph-caret-right" style="font-size:16px;"></i>
     </div>
     <div class="settings-row" onclick="openChangeEmailModal()">
       <i class="ph ph-envelope-simple"></i>
@@ -1743,7 +1938,7 @@ i.spin::before{content:''!important;}
     </div>
   </div>
 
-  <div class="settings-section-title">Account Center</div>
+  <div class="settings-section-title">Copyright</div>
   <div class="settings-section">
     <div class="settings-row" onclick="openCopyrightStrikesModal()">
       <i class="ph ph-scales" style="color:var(--amber);"></i>
@@ -1815,34 +2010,6 @@ i.spin::before{content:''!important;}
     </div>
   </div>
 
-  <div class="settings-section-title">Privacy & Safety</div>
-  <div class="settings-section">
-    <div class="settings-row" onclick="navShow('blocked-screen')">
-      <i class="ph ph-prohibit"></i>
-      <div class="settings-row-text">
-        <div class="settings-row-title">Blocked accounts</div>
-        <div class="settings-row-sub" id="settings-blocked-count">Manage people you've blocked</div>
-      </div>
-      <i class="ph ph-caret-right" style="font-size:16px;"></i>
-    </div>
-    <div class="settings-row" onclick="navShow('muted-screen')">
-      <i class="ph ph-speaker-slash"></i>
-      <div class="settings-row-text">
-        <div class="settings-row-title">Muted accounts</div>
-        <div class="settings-row-sub">Manage people you've muted</div>
-      </div>
-      <i class="ph ph-caret-right" style="font-size:16px;"></i>
-    </div>
-    <div class="settings-row" onclick="toggleLocationSharing()">
-      <i class="ph ph-map-pin"></i>
-      <div class="settings-row-text">
-        <div class="settings-row-title">Share location guess</div>
-        <div class="settings-row-sub" id="settings-location-sub">Show "Account based in" (country) on your About info</div>
-      </div>
-      <div class="toggle-switch" id="settings-location-toggle" onclick="event.stopPropagation();toggleLocationSharing()"></div>
-    </div>
-  </div>
-
   <div class="settings-section-title">Support & Legal</div>
   <div class="settings-section">
     <div class="settings-row" onclick="openHelpCenter()">
@@ -1902,6 +2069,62 @@ i.spin::before{content:''!important;}
       <div class="settings-row-text">
         <div class="settings-row-title" style="color:var(--like);">Sign out</div>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- ACCOUNT CENTER — Instagram/Meta-style hub reachable from Settings and activity -->
+<div class="screen-overlay" id="account-center-screen">
+  <div class="screen-topbar">
+    <button class="back-btn" onclick="navBack()"><i class="ph ph-arrow-left"></i></button>
+    <div class="screen-topbar-title">Account Center</div>
+  </div>
+  <div style="padding:14px 16px 4px;font-size:13px;color:var(--text3);">Manage your security and settings across Sparks. <a style="color:var(--cyan);font-weight:600;cursor:pointer;" onclick="showToast('Learn more — coming soon')">Learn more</a></div>
+
+  <div class="settings-section-title">Your account</div>
+  <div class="settings-section">
+    <div class="settings-row" onclick="openChangePasswordModal()">
+      <i class="ph ph-shield-check" style="color:var(--cyan);"></i>
+      <div class="settings-row-text">
+        <div class="settings-row-title">Password and security</div>
+        <div class="settings-row-sub">Change your password, two-factor login &amp; more</div>
+      </div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Connected experiences')">
+      <i class="ph ph-tree-structure"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Connected experiences</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Your information and permissions')">
+      <i class="ph ph-file-lock"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Your information and permissions</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Ad preferences')">
+      <i class="ph ph-megaphone-simple"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Ad preferences</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Sparks Pay')">
+      <i class="ph ph-credit-card"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Sparks Pay</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Subscriptions')">
+      <i class="ph ph-arrows-counter-clockwise"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Subscriptions</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Your media gallery')">
+      <i class="ph ph-images-square"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Your media gallery</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="comingSoon('Manage accounts')">
+      <i class="ph ph-user-switch"></i>
+      <div class="settings-row-text"><div class="settings-row-title">Manage accounts</div></div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
     </div>
   </div>
 </div>
@@ -2302,36 +2525,26 @@ i.spin::before{content:''!important;}
   </div>
 </div>
 
-<!-- Change Email — step 1: confirm password + new email, step 2: enter OTP -->
+<!-- Change Email — step 1: confirm password + new email, step 2: Firebase verification link sent -->
 <div class="modal-overlay" id="change-email-modal">
   <div class="modal-sheet">
     <div class="modal-handle"></div>
     <div class="modal-title" style="display:flex;align-items:center;gap:6px;"><i class="ph ph-envelope-simple" style="color:var(--cyan);"></i> Change email</div>
 
     <div id="ce-step1">
-      <p style="font-size:13px;color:var(--text3);margin-bottom:14px;">For your security, confirm your password and the new email you'd like to use. We'll send a one-time code to verify it.</p>
+      <p style="font-size:13px;color:var(--text3);margin-bottom:14px;">For your security, confirm your password and the new email you'd like to use. We'll send a verification link to that address from Firebase.</p>
       <div class="sheet-label">Current password</div>
       <input class="sheet-field" id="ce-password" type="password" placeholder="Enter your current password" autocomplete="current-password">
       <div class="sheet-label">New email address</div>
       <input class="sheet-field" id="ce-new-email" type="email" placeholder="you@example.com" autocomplete="email">
       <div class="auth-error" id="ce-err1" style="margin-bottom:10px;"></div>
-      <button class="btn-sheet primary" id="ce-send-btn" onclick="ceSendOtp()"><i class="ph ph-paper-plane-tilt"></i> Send code</button>
-      <button class="btn-sheet outline" style="margin-top:8px;" onclick="ceCachedPassword='';closeModal('change-email-modal')">Cancel</button>
-    </div>
-
-    <div id="ce-step2" class="hidden">
-      <p style="font-size:13px;color:var(--text3);margin-bottom:14px;">Enter the 6-digit code we sent to <strong id="ce-target-email"></strong>. It's valid for 15 minutes.</p>
-      <div class="sheet-label">6-digit code</div>
-      <input class="sheet-field" id="ce-otp" type="text" inputmode="numeric" maxlength="6" placeholder="123456" style="letter-spacing:4px;font-size:18px;text-align:center;">
-      <div class="auth-error" id="ce-err2" style="margin-bottom:10px;"></div>
-      <button class="btn-sheet primary" id="ce-verify-btn" onclick="ceVerifyOtp()"><i class="ph ph-check-circle"></i> Verify code</button>
-      <button class="btn-sheet outline" style="margin-top:8px;" onclick="ceResendOtp()">Resend code</button>
-      <button class="btn-sheet outline" style="margin-top:8px;" onclick="ceCachedPassword='';closeModal('change-email-modal')">Cancel</button>
+      <button class="btn-sheet primary" id="ce-send-btn" onclick="ceSendVerification()"><i class="ph ph-paper-plane-tilt"></i> Send verification link</button>
+      <button class="btn-sheet outline" style="margin-top:8px;" onclick="closeModal('change-email-modal')">Cancel</button>
     </div>
 
     <div id="ce-step3" class="hidden">
-      <p style="font-size:13px;color:var(--text3);margin-bottom:14px;"><i class="ph ph-link" style="color:var(--cyan);"></i> Code verified. We've sent one more confirmation link to <strong id="ce-target-email2"></strong> — open that email and tap the link to finish updating your address. Your email won't change until you confirm it there.</p>
-      <button class="btn-sheet primary" onclick="ceCachedPassword='';closeModal('change-email-modal')">Got it</button>
+      <p style="font-size:13px;color:var(--text3);margin-bottom:14px;"><i class="ph ph-link" style="color:var(--cyan);"></i> We've sent a confirmation link to <strong id="ce-target-email2"></strong> — open that email and tap the link to finish updating your address. Your email won't change until you confirm it there.</p>
+      <button class="btn-sheet primary" onclick="closeModal('change-email-modal')">Got it</button>
     </div>
   </div>
 </div>
@@ -3797,7 +4010,7 @@ function updateSidebarUser(){
   });
 }
 // Completes a "change email" that's waiting on Firebase's verification LINK
-// (sent by verifyBeforeUpdateEmail — see ceVerifyOtp). The link can be tapped
+// (sent by verifyBeforeUpdateEmail — see ceSendVerification). The link can be tapped
 // in a completely separate session/device, so on every sign-in we check for
 // a pending request and, if Firebase now reports the new address as current,
 // sync our own database records to match.
@@ -9470,32 +9683,21 @@ async function lpVerifyOtp(){
 }
 
 // ============================================================
-// CHANGE EMAIL — password confirm -> OTP sent via EmailJS -> OTP verified ->
-// Firebase sends its own verification LINK to the new address -> email is
-// only actually updated once the user opens that email and taps the link
-// (finalized in finalizePendingEmailChangeIfVerified(), called on sign-in).
+// CHANGE EMAIL — password confirm -> Firebase sends its own verification
+// LINK to the new address -> email is only actually updated once the user
+// opens that email and taps the link (finalized in
+// finalizePendingEmailChangeIfVerified(), called on sign-in).
+// No OTP is used here — verification is handled entirely by Firebase.
 // ============================================================
-let ceNewEmail = '';
-let ceCachedPassword = ''; // held only in memory, only for the duration of this flow — needed to
-                            // re-authenticate right before verifyBeforeUpdateEmail (see ceVerifyOtp).
-                            // Without a FRESH reauth at that exact moment, Firebase silently refuses
-                            // to send its verification link once the initial reauth (done when the
-                            // OTP was sent) goes stale — which easily happens while the user is busy
-                            // checking their inbox for the OTP.
 function openChangeEmailModal(){
   document.getElementById('ce-password').value='';
   document.getElementById('ce-new-email').value='';
-  document.getElementById('ce-otp').value='';
   document.getElementById('ce-err1').textContent='';
-  document.getElementById('ce-err2').textContent='';
   document.getElementById('ce-step1').classList.remove('hidden');
-  document.getElementById('ce-step2').classList.add('hidden');
   document.getElementById('ce-step3').classList.add('hidden');
-  ceCachedPassword='';
   openModal('change-email-modal');
 }
-function ceOtpKey(){ return 'otpRequests/'+me.uid+'/changeEmail'; }
-async function ceSendOtp(){
+async function ceSendVerification(){
   if(blockIfLockedOrSuspended()) return;
   const errEl=document.getElementById('ce-err1');
   errEl.textContent='';
@@ -9507,100 +9709,41 @@ async function ceSendOtp(){
   const btn=document.getElementById('ce-send-btn');
   btn.disabled=true; btn.innerHTML='<i class="ph ph-spinner-gap spin"></i> Sending…';
   try{
-    // Re-authenticate — required by Firebase before sensitive changes
+    // Re-authenticate — required by Firebase before sensitive changes, and
+    // needed immediately before verifyBeforeUpdateEmail below since Firebase
+    // only sends the link when the session is "recently" authenticated.
+    const oldEmail=(auth.currentUser.email||'').toLowerCase();
     const cred=firebase.auth.EmailAuthProvider.credential(auth.currentUser.email, password);
     await auth.currentUser.reauthenticateWithCredential(cred);
 
     // Make sure the new email isn't already used by another account
     const ek=btoa(newEmail).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
     const existing=await db.ref('emailIndex/'+ek).once('value');
-    if(existing.exists() && existing.val().uid!==me.uid){ errEl.textContent='This email is already in use.'; btn.disabled=false; btn.innerHTML='<i class="ph ph-paper-plane-tilt"></i> Send code'; return; }
+    if(existing.exists() && existing.val().uid!==me.uid){ errEl.textContent='This email is already in use.'; btn.disabled=false; btn.innerHTML='<i class="ph ph-paper-plane-tilt"></i> Send verification link'; return; }
 
-    const otp=Math.floor(100000+Math.random()*900000).toString();
-    const expiresAt=Date.now()+15*60*1000;
-    const timeStr=new Date(expiresAt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-    await db.ref(ceOtpKey()).set({otp, newEmail, expiresAt, createdAt: firebase.database.ServerValue.TIMESTAMP});
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {email:newEmail, passcode:otp, time:timeStr});
-
-    ceNewEmail=newEmail;
-    ceCachedPassword=password; // needed again just before verifyBeforeUpdateEmail — see note above
-    document.getElementById('ce-target-email').textContent=newEmail;
-    document.getElementById('ce-otp').value='';
-    document.getElementById('ce-err2').textContent='';
-    document.getElementById('ce-step1').classList.add('hidden');
-    document.getElementById('ce-step2').classList.remove('hidden');
-  }catch(err){
-    errEl.textContent = err.code==='auth/wrong-password' ? 'Incorrect password.' : (err.message||err.text||('Could not send code (status '+(err.status||'?')+'), try again.'));
-  }
-  btn.disabled=false; btn.innerHTML='<i class="ph ph-paper-plane-tilt"></i> Send code';
-}
-async function ceResendOtp(){
-  if(!ceNewEmail) return;
-  const otp=Math.floor(100000+Math.random()*900000).toString();
-  const expiresAt=Date.now()+15*60*1000;
-  const timeStr=new Date(expiresAt).toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
-  try{
-    await db.ref(ceOtpKey()).set({otp, newEmail: ceNewEmail, expiresAt, createdAt: firebase.database.ServerValue.TIMESTAMP});
-    await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {email:ceNewEmail, passcode:otp, time:timeStr});
-    showToast('Code resent');
-  }catch(e){ showToast('Could not resend code'); }
-}
-async function ceVerifyOtp(){
-  const errEl=document.getElementById('ce-err2');
-  errEl.textContent='';
-  const entered=document.getElementById('ce-otp').value.trim();
-  if(!entered){ errEl.textContent='Enter the code.'; return; }
-  const btn=document.getElementById('ce-verify-btn');
-  btn.disabled=true; btn.innerHTML='<i class="ph ph-spinner-gap spin"></i> Verifying…';
-  try{
-    const snap=await db.ref(ceOtpKey()).once('value');
-    const data=snap.val();
-    if(!data){ errEl.textContent='Request a new code.'; btn.disabled=false; btn.innerHTML='<i class="ph ph-check-circle"></i> Verify code'; return; }
-    if(Date.now()>data.expiresAt){ errEl.textContent='Code expired, resend and try again.'; btn.disabled=false; btn.innerHTML='<i class="ph ph-check-circle"></i> Verify code'; return; }
-    if(entered!==data.otp){ errEl.textContent='Incorrect code.'; btn.disabled=false; btn.innerHTML='<i class="ph ph-check-circle"></i> Verify code'; return; }
-
-    // OTP proved the user controls the inbox. Now hand off to Firebase's own
-    // email-verification LINK — the actual auth email only changes once the
-    // user opens that email and taps the link (Firebase does this on its own,
-    // even in a later session — see finalizePendingEmailChangeIfVerified()).
-    //
-    // IMPORTANT: Firebase refuses to send that link unless the session is
-    // "recently" authenticated. The reauth done back in ceSendOtp() can go
-    // stale by the time the user finishes checking their inbox for the OTP,
-    // so we reauthenticate ONE more time, right here, immediately before
-    // calling verifyBeforeUpdateEmail — that's what actually triggers Firebase
-    // to send the email.
-    const oldEmail=(auth.currentUser.email||'').toLowerCase();
-    if(!ceCachedPassword){ errEl.textContent='Session expired — close this and start over from "Send code".'; btn.disabled=false; btn.innerHTML='<i class="ph ph-check-circle"></i> Verify code'; return; }
+    // Firebase's own email-verification LINK — the actual auth email only
+    // changes once the user opens that email and taps the link (Firebase
+    // does this on its own, even in a later session — see
+    // finalizePendingEmailChangeIfVerified()).
     try{
-      const cred=firebase.auth.EmailAuthProvider.credential(oldEmail, ceCachedPassword);
-      await auth.currentUser.reauthenticateWithCredential(cred);
-    }catch(reauthErr){
-      console.error('Re-auth before verifyBeforeUpdateEmail failed:', reauthErr);
-      errEl.textContent='Could not confirm your password — close this and start over from "Send code".';
-      btn.disabled=false; btn.innerHTML='<i class="ph ph-check-circle"></i> Verify code';
-      return;
-    }
-    try{
-      await auth.currentUser.verifyBeforeUpdateEmail(data.newEmail);
+      await auth.currentUser.verifyBeforeUpdateEmail(newEmail);
     }catch(linkErr){
       console.error('verifyBeforeUpdateEmail failed:', linkErr.code, linkErr.message);
       errEl.textContent = '['+(linkErr.code||'error')+'] '+(linkErr.message||'Could not send the verification link.');
-      btn.disabled=false; btn.innerHTML='<i class="ph ph-check-circle"></i> Verify code';
+      btn.disabled=false; btn.innerHTML='<i class="ph ph-paper-plane-tilt"></i> Send verification link';
       return;
     }
-    ceCachedPassword=''; // done with it — clear from memory
-    await db.ref('users/'+me.uid+'/pendingEmailChange').set({oldEmail, newEmail:data.newEmail, requestedAt: firebase.database.ServerValue.TIMESTAMP});
-    await db.ref(ceOtpKey()).remove().catch(()=>{});
 
-    document.getElementById('ce-target-email2').textContent=data.newEmail;
-    document.getElementById('ce-step2').classList.add('hidden');
+    await db.ref('users/'+me.uid+'/pendingEmailChange').set({oldEmail, newEmail, requestedAt: firebase.database.ServerValue.TIMESTAMP});
+
+    document.getElementById('ce-target-email2').textContent=newEmail;
+    document.getElementById('ce-step1').classList.add('hidden');
     document.getElementById('ce-step3').classList.remove('hidden');
   }catch(err){
-    console.error('ceVerifyOtp failed:', err.code, err.message);
-    errEl.textContent = err.code==='auth/requires-recent-login' ? 'Session expired, please log out and back in, then retry.' : ('['+(err.code||'error')+'] '+(err.message||'Could not send verification link.'));
+    console.error('ceSendVerification failed:', err.code, err.message);
+    errEl.textContent = err.code==='auth/wrong-password' ? 'Incorrect password.' : (err.code==='auth/requires-recent-login' ? 'Session expired, please log out and back in, then retry.' : ('['+(err.code||'error')+'] '+(err.message||'Could not send verification link.')));
   }
-  btn.disabled=false; btn.innerHTML='<i class="ph ph-check-circle"></i> Verify code';
+  btn.disabled=false; btn.innerHTML='<i class="ph ph-paper-plane-tilt"></i> Send verification link';
 }
 
 // ============================================================
@@ -11556,7 +11699,7 @@ function navBack(){
   }
 }
 function setNavActive(screenId){
-  const map={'explore-screen':'explore','notif-screen':'notif','profile-screen':'profile','bookmarks-screen':'bookmarks','lists-screen':'lists','analytics-screen':'analytics','settings-screen':'settings','blocked-screen':'settings','muted-screen':'settings','account-type-screen':'settings','messages-screen':'messages','chat-screen':'messages','reels-screen':'reels','':null,'home':'home'};
+  const map={'explore-screen':'explore','notif-screen':'notif','profile-screen':'profile','bookmarks-screen':'bookmarks','lists-screen':'lists','analytics-screen':'analytics','settings-screen':'settings','blocked-screen':'settings','muted-screen':'settings','account-type-screen':'settings','account-center-screen':'settings','messages-screen':'messages','chat-screen':'messages','reels-screen':'reels','':null,'home':'home'};
   const active=map[screenId]||(screenId==='home'?'home':null);
   ['nl-home','nl-explore','nl-notif','nl-bookmarks','nl-lists','nl-analytics','nl-profile','nl-settings','nl-messages'].forEach(id=>document.getElementById(id)?.classList.remove('active'));
   if(active) document.getElementById('nl-'+active)?.classList.add('active');
@@ -11706,6 +11849,8 @@ function showToast(msg){
   clearTimeout(toastT);
   toastT=setTimeout(()=>t.classList.remove('show'),2500);
 }
+// Placeholder for Instagram-style settings rows that are UI-only for now.
+function comingSoon(feature){ showToast((feature||'This feature')+' — coming soon'); }
 
 // ============================================================
 // CUSTOM CONFIRM MODAL (replaces native browser confirm()/alert())
