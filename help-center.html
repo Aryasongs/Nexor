@@ -482,10 +482,56 @@ const ARTICLES = {
         <li>Choose <strong>Edit</strong> or <strong>Delete</strong>.</li>
       </ol>
       <div class="callout"><i class="ph ph-info"></i>Once deleted, content cannot be restored.</div>
+      <h2>Unlocking Articles</h2>
+      <p>The Articles tab unlocks once your total views across your Pulses and Bolts reach a certain threshold, shown on the locked-Articles screen. Keep posting Pulses/Bolts to grow your view count and it'll unlock automatically.</p>
       <h2>Keep in mind while posting content</h2>
       <p>Every Pulse and Article must follow our <strong>Community Guidelines</strong>. Content that violates the guidelines may be removed.</p>
     `,
-    related:['community-guidelines','ai-content-label','copyright-policy']
+    related:['bolts','community-guidelines','ai-content-label']
+  },
+  'bolts':{
+    cat:'content', icon:'ph-play-circle', title:'Bolts — short-form videos/reels',
+    desc:'Watch, post, and share Bolts, Nexor Sparks\' short video feature.',
+    keywords:['bolts','reels','short video','video feed'],
+    body:`
+      <p>Bolts are Nexor Sparks' short-form vertical video feature (like Reels), found in the <strong>Bolts</strong> tab of the bottom navigation.</p>
+      <ul>
+        <li>Scroll through the full-screen Bolts feed to discover short videos from creators.</li>
+        <li>Like, comment, and share any Bolt.</li>
+        <li>Tap the paper-plane <strong>Send to DM</strong> icon on a Bolt to send it straight into a chat, Instagram-style.</li>
+        <li>Bolts are muted by default — just tap the video to unmute.</li>
+      </ul>
+      <div class="callout"><i class="ph ph-info"></i>Views on your own Bolts count toward unlocking the Articles feature.</div>
+    `,
+    related:['pulses-articles','direct-messages']
+  },
+  'stories':{
+    cat:'content', icon:'ph-circles-three', title:'Stories',
+    desc:'Post and view short-lived photo/video Stories.',
+    keywords:['stories','story','share to story'],
+    body:`
+      <p>Stories are short-lived photo/video updates that appear at the top of the app and disappear after a set time, similar to Instagram Stories.</p>
+      <ul>
+        <li>Tap <strong>Share to Story</strong> to post one from a photo/video, or from an existing Pulse/Bolt via the share sheet.</li>
+        <li>A story ring around a profile photo means that user has an active Story — tap it to view.</li>
+        <li>Reply directly to someone's Story using the reply box at the bottom of the Story viewer.</li>
+      </ul>
+    `,
+    related:['pulses-articles','bolts']
+  },
+  'direct-messages':{
+    cat:'content', icon:'ph-paper-plane-tilt', title:'Direct Messages (DMs)',
+    desc:'Message people privately and send them Pulses or Bolts.',
+    keywords:['dm','direct message','chat','messages','send to dm'],
+    body:`
+      <p>Nexor Sparks lets you message people privately via <strong>Direct Messages</strong>, accessible from the chat icon.</p>
+      <ul>
+        <li>Send text, media, and GIFs in a conversation.</li>
+        <li>Send a Pulse, Bolt, or profile directly into a DM using the paper-plane <strong>Send to DM</strong>/share icon on that content — pick one or more conversations or friends from the share sheet and it's sent instantly.</li>
+      </ul>
+      <div class="callout"><i class="ph ph-info"></i>Only people who can message you (based on your Privacy Settings) can start a new conversation with you.</div>
+    `,
+    related:['bolts','blocking-safety']
   },
   'ai-content-label':{
     cat:'content', icon:'ph-sparkle', title:'What is the "AI" label on AI-generated content',
@@ -504,20 +550,83 @@ const ARTICLES = {
     related:['pulses-articles','community-guidelines']
   },
   'verification':{
-    cat:'content', icon:'ph-seal-check', title:'Verified badge and Organization badge',
-    desc:'How to get the blue tick and org badge, and what they mean.',
-    keywords:['verified','blue tick','badge','organization badge','verification'],
+    cat:'content', icon:'ph-seal-check', title:'Verified badge and Business badge',
+    desc:'How the blue tick and business badge work, and what they mean.',
+    keywords:['verified','blue tick','badge','organization badge','business badge','verification'],
     body:`
-      <p>Nexor Sparks has two types of badges that appear next to a profile's name.</p>
-      <h2>Verified Badge</h2>
-      <p>This badge confirms that the account is authentic and its identity has been verified. It helps distinguish real users from spam/fake accounts.</p>
-      <h2>Organization Badge</h2>
-      <p>This badge appears separately alongside the verified badge and confirms that the account belongs to an official organization/brand.</p>
-      <div class="callout"><i class="ph ph-info"></i>Badges only indicate authenticity — they don't imply any kind of endorsement or priority.</div>
+      <p>Nexor Sparks shows one of two visually distinct badges next to a verified profile's name, depending on the account type.</p>
+      <h2>Verified badge (blue tick)</h2>
+      <p>Shown on verified <strong>Personal</strong> and <strong>Creator</strong> accounts. It confirms the account is authentic and its identity has been verified, helping distinguish real users from spam/fake accounts.</p>
+      <h2>Business badge</h2>
+      <p>Shown instead of the blue tick on verified <strong>Business/Organization</strong> accounts, confirming the account belongs to an official organization or brand.</p>
+      <div class="callout"><i class="ph ph-info"></i>Badges only indicate authenticity — they don't imply any kind of endorsement or priority. Switching your Account Type updates the badge shown on all your past content too.</div>
       <h2>Beware of fake verified badges</h2>
       <p>If an account claims to be verified but doesn't have the real badge, report it via the "Report a Problem" page.</p>
     `,
-    related:['report-content','community-guidelines']
+    related:['get-verified','account-types','report-content']
+  },
+  'get-verified':{
+    cat:'account', icon:'ph-identification-card', title:'How to get verified — identity verification form',
+    desc:'Apply for a verified badge with the identity verification form.',
+    keywords:['get verified','apply verification','verify me','id upload','identity verification','verification form'],
+    body:`
+      <p>To apply for a verified badge, go to <strong>Settings &gt; Get Verified</strong>. This opens a full-page identity verification form. Every field is required:</p>
+      <ul>
+        <li><strong>Legal name</strong> — your full legal name exactly as it appears on your ID.</li>
+        <li><strong>Username</strong> — your current @handle (filled in automatically).</li>
+        <li><strong>Country</strong> — the country that issued your ID.</li>
+        <li><strong>ID document type</strong> — Passport, National ID Card, or Driving License.</li>
+        <li><strong>ID photo</strong> — a clear, unedited photo of that document, with your name and photo readable.</li>
+        <li><strong>Reason</strong> — explain in English, in at least 30 characters, who you are and why you should be verified.</li>
+        <li><strong>Links</strong> — 3 to 10 links (official social profiles and/or news articles) that help prove your identity, one per line.</li>
+      </ul>
+      <p>Finally, tick the confirmation checkbox stating the information and ID are genuine and belong to you, then submit.</p>
+      <div class="callout warn"><i class="ph ph-warning"></i>This is a formal request reviewed manually by our team — it isn't instant, and submitting false information can lead to rejection or account action.</div>
+      <div class="callout"><i class="ph ph-info"></i>Whether you get the blue tick or the business badge depends on your Account Type at the time of approval.</div>
+    `,
+    related:['verification','account-types','username-change-request']
+  },
+  'username-change-request':{
+    cat:'account', icon:'ph-at', title:'Requesting a username change on a verified account',
+    desc:'Verified accounts must submit a request to change their username.',
+    keywords:['username change','change handle','change username','request username','cant change username'],
+    body:`
+      <p>Once your account is verified, you can no longer change your username directly from Edit Profile — this protects verified identities from being reused or impersonated.</p>
+      <h2>How to request a change</h2>
+      <ol>
+        <li>Go to <strong>Settings &gt; Request username change</strong>.</li>
+        <li>Enter your requested new username and your reason.</li>
+        <li>Submit the request for manual review.</li>
+      </ol>
+      <div class="callout"><i class="ph ph-info"></i>You can only have one pending request at a time — check its status before submitting another.</div>
+      <p>Non-verified accounts can still change their username directly and instantly from Edit Profile, with no review needed.</p>
+    `,
+    related:['get-verified','verification']
+  },
+  'account-types':{
+    cat:'account', icon:'ph-briefcase', title:'Account types: Personal, Creator, and Business',
+    desc:'Switch between Personal, Creator, and Business/Organization accounts.',
+    keywords:['account type','business account','creator account','organization account','switch account type'],
+    body:`
+      <p>Nexor Sparks supports three account types, changeable anytime from <strong>Settings &gt; Account Type</strong>:</p>
+      <ul>
+        <li><strong>Personal</strong> — the default account type for everyday users.</li>
+        <li><strong>Creator</strong> — for people building an audience, unlocks the Professional Dashboard with analytics.</li>
+        <li><strong>Business/Organization</strong> — for companies, brands, and official organizations, also unlocks the Professional Dashboard, and shows the distinct business badge instead of the plain blue tick if verified.</li>
+      </ul>
+      <div class="callout"><i class="ph ph-info"></i>Switching your account type automatically updates the badge style shown on all your existing Pulses, Bolts, Articles, and Stories retroactively.</div>
+    `,
+    related:['verification','professional-dashboard','get-verified']
+  },
+  'professional-dashboard':{
+    cat:'account', icon:'ph-chart-line-up', title:'Professional dashboard / analytics',
+    desc:'See insights on your reach, likes, and views.',
+    keywords:['analytics','dashboard','insights','views','professional dashboard','reach'],
+    body:`
+      <p><strong>Settings &gt; Professional Dashboard</strong> gives Creator and Business accounts insights into their reach, likes, and views across their Pulses, Bolts, and Articles, including follower and following counts.</p>
+      <div class="callout"><i class="ph ph-info"></i>This is a good place to track how your content is performing over time.</div>
+    `,
+    related:['account-types','pulses-articles']
   },
   'privacy-policy':{
     cat:'policies', icon:'ph-lock-key', title:'Privacy Policy',
@@ -674,28 +783,80 @@ const ARTICLES = {
     related:['terms-of-service','privacy-policy']
   },
   'blocking-safety':{
-    cat:'safety', icon:'ph-shield-check', title:'Blocking and Safety Tools',
-    desc:'Block/mute a user and control your own safety.',
-    keywords:['block','mute','safety','avoid harassment'],
+    cat:'safety', icon:'ph-shield-check', title:'Blocking, muting, and privacy settings',
+    desc:'Block/mute a user, go private, blur sensitive content, and control your safety.',
+    keywords:['block','mute','safety','avoid harassment','private account','blur sensitive','location sharing'],
     body:`
       <p>Nexor Sparks gives you several tools to control your experience.</p>
+      <h2>Private account</h2>
+      <p><strong>Settings &gt; Private account</strong> — only your approved followers can see your Pulses.</p>
       <h2>Blocking</h2>
       <p>When you block someone, they won't be able to see your profile, Pulses, or messages, and won't be able to contact you.</p>
       <ol>
         <li>Open that user's profile.</li>
-        <li>Select <strong>Block</strong> from the (⋯) menu.</li>
+        <li>Select <strong>Block</strong> from the (⋯) menu, or manage everyone you've blocked from <strong>Settings &gt; Blocked accounts</strong>.</li>
       </ol>
       <h2>Muting</h2>
-      <p>When you mute someone, they can still contact you, but you won't get notifications about their activity — and they won't know you've muted them.</p>
-      <h2>Privacy settings</h2>
+      <p>When you mute someone (<strong>Settings &gt; Muted accounts</strong>), they can still contact you, but you won't get notifications about their activity — and they won't know you've muted them.</p>
+      <h2>Other privacy & safety settings</h2>
       <ul>
-        <li>Control who can see your profile.</li>
-        <li>Control who can message you.</li>
-        <li>Set restrictions on comments and tags.</li>
+        <li><strong>Blur sensitive content</strong> — automatically blurs detected adult/sensitive images until you tap to reveal them.</li>
+        <li><strong>Share location guess</strong> — controls whether an approximate "Account based in" country shows on your About info.</li>
+        <li>Control who can message you and set restrictions on comments and tags.</li>
       </ul>
       <div class="callout"><i class="ph ph-info"></i>If someone is harassing you, be sure to report them in addition to blocking them.</div>
     `,
-    related:['report-content','privacy-policy']
+    related:['report-content','privacy-policy','two-factor-login']
+  },
+  'change-password':{
+    cat:'account', icon:'ph-password', title:'Changing your password while logged in',
+    desc:'Update your password from Settings without needing a reset link.',
+    keywords:['change password','update password','new password'],
+    body:`
+      <p>If you already remember your current password but just want to update it, go to <strong>Settings &gt; Change Password</strong>.</p>
+      <ol>
+        <li>Enter your current password to confirm it's really you.</li>
+        <li>Enter and confirm your new password.</li>
+      </ol>
+      <div class="callout"><i class="ph ph-info"></i>Use a strong, unique password you don't reuse anywhere else.</div>
+      <p>If you don't remember your current password, use the "Forgot Password?" flow from the login screen instead.</p>
+    `,
+    related:['password-forgot','two-factor-login']
+  },
+  'two-factor-login':{
+    cat:'account', icon:'ph-shield-star', title:'Two-factor login and login alerts',
+    desc:'Add an extra layer of security and get notified of new logins.',
+    keywords:['two factor','2fa','login alerts','login activity','active sessions','security'],
+    body:`
+      <ul>
+        <li><strong>Settings &gt; Two-factor login</strong> — requires an email verification code every time anyone tries to log into your account, in addition to your password.</li>
+        <li><strong>Settings &gt; Login alerts</strong> — sends you an email notification any time there's a new login to your account.</li>
+        <li><strong>Settings &gt; Login Activity</strong> — see every device/session currently logged in, and log out anything you don't recognize.</li>
+      </ul>
+      <div class="callout"><i class="ph ph-shield-check"></i>Turning all three on together is the strongest way to protect your account.</div>
+    `,
+    related:['change-password','hacked-account','link-phone']
+  },
+  'link-phone':{
+    cat:'account', icon:'ph-device-mobile', title:'Linking a phone number',
+    desc:'Add a phone number for recovery and verification.',
+    keywords:['link phone','phone number','add phone','otp'],
+    body:`
+      <p>Adding a phone number to your account (<strong>Settings &gt; Link phone number</strong>) gives you another way to recover your account if you ever lose access to your email, and can be used for verification codes.</p>
+      <div class="callout"><i class="ph ph-info"></i>You'll receive an OTP (one-time code) by SMS to confirm the number really belongs to you before it's linked.</div>
+    `,
+    related:['two-factor-login','hacked-account']
+  },
+  'copyright-strikes':{
+    cat:'safety', icon:'ph-warning-octagon', title:'Copyright strikes on your own account',
+    desc:'Check whether your account has any active copyright strikes.',
+    keywords:['copyright strike','my strikes','account strike'],
+    body:`
+      <p><strong>Settings &gt; Copyright Strikes</strong> shows whether your account currently has any active copyright strikes issued after someone filed a valid copyright complaint against your content.</p>
+      <div class="callout warn"><i class="ph ph-warning"></i>Repeated copyright violations can lead to account suspension or a permanent ban.</div>
+      <p>See the Copyright & Intellectual Property Policy for how the reporting/counter-request process works if you believe a strike was a mistake.</p>
+    `,
+    related:['copyright-policy','report-content']
   },
 };
 
@@ -798,8 +959,12 @@ function doSearch(q){
 // ============================================================
 // ACCOUNT CONTEXT — shared from the main Nexor Sparks app (same origin)
 // via localStorage when the user opens Help Center from Settings. Only
-// ever contains non-sensitive display info (name, handle, verified
-// status, account type) — never an email, password, or anything private.
+// ever contains non-sensitive display info (name, handle, bio, verified
+// status, account type, and public followers/following/pulses counts —
+// never an email, password, or anything private. Its presence is what
+// makes the user "automatically logged in" here: whoever is logged into
+// the main app is instantly recognized by Sparky, with no separate Help
+// Center login step.
 // If the user opened this page directly (not from the app), this stays
 // null and everything below just falls back to the generic experience.
 // ============================================================
@@ -816,21 +981,38 @@ try{
   }
 }catch(e){ userCtx = null; }
 function greetName(){ return userCtx && userCtx.name ? userCtx.name.split(' ')[0] : null; }
+function fmtCount(n){
+  n=n||0;
+  if(n>=1000000) return (n/1000000).toFixed(1).replace('.0','')+'M';
+  if(n>=1000) return (n/1000).toFixed(1).replace('.0','')+'K';
+  return String(n);
+}
 
 // ============================================================
 // AI ASSISTANT (rule-based, fully client-side)
 // ============================================================
 const AI_RULES = [
-  {kw:['hack','hacked','compromise','compromised','stolen account','suspicious login','someone logged in','account taken over'], reply:'{name}Sounds like your account may be compromised.{handle} Here\'s what to do right now: (1) If you can still log in, change your password immediately using Password Reset. (2) If you can\'t log in, use "Forgot Password" to get back in. (3) Check Settings for any unknown active sessions and log them out. (4) Verify your recovery email/phone is really yours. (5) Review recent activity and undo anything you didn\'t post. If any of these steps doesn\'t work — for example, the attacker has already changed your recovery email or phone — don\'t worry, you can still submit an account recovery request right here with me, or through the "Report a Problem" page, and we\'ll figure it out from there. Full guide linked below.', link:'hacked-account'},
+  {kw:['hack','hacked','compromise','compromised','stolen account','suspicious login','someone logged in','account taken over'], reply:'{name}Sounds like your account may be compromised.{handle} Here\'s what to do right now: (1) If you can still log in, change your password immediately using Password Reset. (2) If you can\'t log in, use "Forgot Password" to get back in. (3) Check Settings > Login Activity for any unknown active sessions and log them out. (4) Verify your recovery email/phone is really yours. (5) Review recent activity and undo anything you didn\'t post. If any of these steps doesn\'t work — for example, the attacker has already changed your recovery email or phone — don\'t worry, you can still submit an account recovery request right here with me, or through the "Report a Problem" page, and we\'ll figure it out from there. Full guide linked below.', link:'hacked-account'},
+  {kw:['change password','update password','current password','new password'], reply:'You can update your password anytime from Settings > Change Password — just enter your current password, then your new one.', link:'change-password'},
   {kw:['password','forgot','reset password'], reply:'Resetting your password is easy — tap "Forgot Password?" on the login screen and verify your email/phone to set a new one.', link:'password-forgot'},
+  {kw:['two factor','2fa','login alert','login activity','active session','active device'], reply:'You can turn on Two-factor login and Login alerts, and review Login Activity, all from Settings — together they\'re the strongest way to protect your account.', link:'two-factor-login'},
+  {kw:['link phone','phone number','otp'], reply:'You can add a phone number for recovery from Settings > Link phone number — you\'ll get an OTP by SMS to confirm it.', link:'link-phone'},
   {kw:['delete account','deactivate','close account','remove account'], reply:'You can either temporarily deactivate or permanently delete your account. Go to Settings > Account to find the option.', link:'delete-account'},
+  {kw:['get verified','apply verification','verify me','id upload','identity verification','verification form'], reply:'{name}To apply for a verified badge, go to Settings > Get Verified. It\'s a full identity form — legal name, country, ID document photo, your reason, and a few links proving your identity — reviewed manually by our team.', link:'get-verified'},
+  {kw:['username change','change handle','change username','request username','cant change username'], reply:'{name}Since verified accounts can\'t edit their username directly, use Settings > Request username change to submit it for manual review — you can only have one pending request at a time.', link:'username-change-request'},
+  {kw:['verified','blue tick','badge','organization','business badge'], reply:'{name}Verified Personal/Creator accounts show the blue tick, while verified Business/Organization accounts show a separate business badge instead — both just confirm authenticity.', link:'verification'},
+  {kw:['account type','business account','creator account','organization account','switch account'], reply:'{name}You can switch between Personal, Creator, and Business/Organization anytime from Settings > Account Type — it updates your badge everywhere automatically.', link:'account-types'},
+  {kw:['analytics','dashboard','insights','professional dashboard'], reply:'The Professional Dashboard (Settings) shows Creator/Business accounts their reach, likes, and views across Pulses, Bolts, and Articles.', link:'professional-dashboard'},
+  {kw:['bolts','reels','short video'], reply:'Bolts are Nexor Sparks\' short-video feature — scroll the Bolts tab to watch, and tap the paper-plane icon to send one straight into a DM.', link:'bolts'},
+  {kw:['stories','story ring','share to story'], reply:'Stories are short-lived photo/video updates at the top of the app — tap Share to Story to post one, and they disappear after a set time.', link:'stories'},
+  {kw:['dm','direct message','send to dm','chat with'], reply:'You can message anyone via Direct Messages, and use the paper-plane Send to DM icon on any Pulse or Bolt to share it straight into a chat.', link:'direct-messages'},
   {kw:['privacy','data','information collection'], reply:'You can find everything about how we collect and use your data in our Privacy Policy.', link:'privacy-policy'},
   {kw:['guideline','rule','community','behavior'], reply:'Community Guidelines explain what\'s allowed on Nexor Sparks and what isn\'t.', link:'community-guidelines'},
+  {kw:['my strikes','copyright strike on my account','account strike'], reply:'You can check whether your account has any active copyright strikes from Settings > Copyright Strikes.', link:'copyright-strikes'},
   {kw:['copyright','dmca','intellectual property','ip'], reply:'To report copyright infringement, use our dedicated copyright report page.', link:'copyright-policy'},
   {kw:['report','complaint','fake account','abuse','harassment'], reply:'Reporting any content, account, or problem is simple — just select Report from the (⋯) menu.', link:'report-content'},
-  {kw:['block','mute','safety'], reply:'You can block or mute any user to protect your own safety.', link:'blocking-safety'},
+  {kw:['block','mute','safety','private account','blur sensitive','location sharing'], reply:'You can block or mute any user, go Private, blur sensitive content, or control location sharing — all from Settings and each profile\'s (⋯) menu.', link:'blocking-safety'},
   {kw:['ai label','ai generated','ai tag'], reply:'The AI label shows that content was generated or significantly edited using AI tools.', link:'ai-content-label'},
-  {kw:['verified','blue tick','badge','organization'], reply:'The verified badge confirms an account\'s authenticity, and the org badge is for official organizations.', link:'verification'},
   {kw:['terms','tos','condition'], reply:'The rules for using the app are laid out in detail in the Terms of Service.', link:'terms-of-service'},
   {kw:['pulse','post','article','content'], reply:'Posting, editing, or deleting Pulses and Articles is very easy.', link:'pulses-articles'},
   {kw:['start','signup','new account','register','getting started'], reply:'Follow the Getting Started guide to set up your new account.', link:'getting-started'},
@@ -852,14 +1034,35 @@ function personalizeReply(text){
     .replace('{name}', n? `Hey ${n} — ` : '')
     .replace('{handle}', (userCtx&&userCtx.handle)? ` I can see you're logged in as @${userCtx.handle}, so once you're back in the app, double-check that's really your account activity.` : '');
 }
+// Conversation memory: full turn history sent to the AI backend so it
+// keeps answering about the same topic across follow-ups, plus the last
+// matched article id — used as the "current topic" until the user's next
+// message clearly matches a different rule (i.e. changes topic themselves).
+let aiHistory = [];
+let currentTopicId = null;
+
+function renderAccountBanner(){
+  if(!userCtx || !userCtx.handle) return;
+  const body=document.getElementById('ai-body');
+  const bar=document.createElement('div');
+  bar.className='msg-suggestions';
+  bar.style.cssText='background:var(--surface3);border:1px solid var(--border2);border-radius:10px;padding:8px 10px;font-size:11.5px;color:var(--text3);display:block;';
+  const stats=`${fmtCount(userCtx.pulsesCount)} Pulses · ${fmtCount(userCtx.followersCount)} followers · ${fmtCount(userCtx.followingCount)} following`;
+  bar.innerHTML = `<i class="ph ph-check-circle" style="color:var(--cyan);"></i> Logged in as <strong style="color:var(--text);">${userCtx.name||userCtx.handle}</strong> (@${userCtx.handle})${userCtx.verified?' ✓':''} · ${stats}`;
+  body.appendChild(bar);
+}
+
 function toggleAI(open){
   document.getElementById('ai-panel').classList.toggle('hidden', !open);
   document.getElementById('ai-fab').classList.toggle('hidden', open);
   if(open && !window._aiInit){
     window._aiInit = true;
+    renderAccountBanner();
     const n=greetName();
     const handleLine = userCtx && userCtx.handle ? ` I can see you're logged in as @${userCtx.handle}, so I can tailor answers to your account.` : '';
-    addBotMsg((n?`Hi ${n}! `:'Hi! ')+'I\'m Sparky 👋'+handleLine+' What can I help you with?', ['password-forgot','hacked-account','community-guidelines','report-content']);
+    const greeting=(n?`Hi ${n}! `:'Hi! ')+'I\'m Sparky 👋'+handleLine+' What can I help you with?';
+    addBotMsg(greeting, ['password-forgot','hacked-account','community-guidelines','report-content']);
+    aiHistory.push({role:'model', text:greeting});
   }
 }
 function addBotMsg(text, suggestLinks){
@@ -908,33 +1111,53 @@ async function sendAI(){
   const text=input.value.trim();
   if(!text) return;
   addUserMsg(text);
+  aiHistory.push({role:'user', text});
   input.value='';
 
-  // 1) Try instant rule-based match first (free, offline, zero latency)
+  // 1) Try instant rule-based match first (free, offline, zero latency).
+  //    A rule match is treated as the user explicitly changing topic —
+  //    otherwise (below) we keep talking about currentTopicId.
   const match=aiRespond(text);
   if(match){
-    setTimeout(()=>addBotMsg(personalizeReply(match.reply), [match.link]), 300);
+    currentTopicId = match.link;
+    const reply = personalizeReply(match.reply);
+    setTimeout(()=>{ addBotMsg(reply, [match.link]); aiHistory.push({role:'model', text:reply}); }, 300);
     return;
   }
 
-  // 2) No rule matched — ask the real AI model via our secure server proxy
-  //    (the API key lives only on the server, never in this page)
+  // 2) No rule matched — this is a follow-up / off-script question, so
+  //    ask the real AI model via our secure server proxy (the API key
+  //    lives only on the server, never in this page), passing the full
+  //    conversation history plus the topic we were last discussing so
+  //    it keeps answering about that same topic instead of drifting.
   addTypingIndicator();
   try{
+    const topicHint = currentTopicId && ARTICLES[currentTopicId]
+      ? `[The user has been discussing: "${ARTICLES[currentTopicId].title}". Keep answering about this topic unless the message below is clearly about something else.] `
+      : '';
     const res = await fetch('/api/chat', {
       method:'POST',
       headers:{'Content-Type':'application/json'},
       body: JSON.stringify({
-        message: text,
+        message: topicHint + text,
+        history: aiHistory.slice(0,-1).slice(-12),
         // Only ever the non-sensitive fields set in openHelpCenter() on
         // the main app — never an email, password, or other private data.
-        context: userCtx ? { name:userCtx.name, handle:userCtx.handle, verified:userCtx.verified, accountType:userCtx.accountType } : null
+        context: userCtx ? {
+          name:userCtx.name, handle:userCtx.handle, bio:userCtx.bio,
+          verified:userCtx.verified, accountType:userCtx.accountType,
+          followersCount:userCtx.followersCount, followingCount:userCtx.followingCount,
+          pulsesCount:userCtx.pulsesCount
+        } : null
       })
     });
     const data = await res.json();
     removeTypingIndicator();
     if(res.ok && data.reply){
-      addBotMsg(data.reply, ['password-forgot','hacked-account','community-guidelines','report-content']);
+      const link = data.link && ARTICLES[data.link] ? data.link : currentTopicId;
+      if(link) currentTopicId = link;
+      addBotMsg(data.reply, link ? [link] : ['password-forgot','hacked-account','community-guidelines','report-content']);
+      aiHistory.push({role:'model', text:data.reply});
     } else {
       addBotMsg('Couldn\'t connect to the AI right now. Try one of the topics below, or let us know via the "Report a Problem" page.', ['password-forgot','hacked-account','community-guidelines','report-content']);
     }
