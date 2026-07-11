@@ -1734,6 +1734,18 @@ i.spin::before{content:''!important;}
     </div>
   </div>
 
+  <div class="settings-section-title">Account Center</div>
+  <div class="settings-section">
+    <div class="settings-row" onclick="openCopyrightStrikesModal()">
+      <i class="ph ph-scales" style="color:var(--amber);"></i>
+      <div class="settings-row-text">
+        <div class="settings-row-title">Copyright strikes</div>
+        <div class="settings-row-sub" id="settings-strikes-sub">No active strikes</div>
+      </div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+  </div>
+
   <div class="settings-section-title hidden" id="settings-admin-title">Admin</div>
   <div class="settings-section">
     <div class="settings-row hidden" id="settings-admin-row" onclick="openGeoRestrictionsAdmin()">
@@ -1749,6 +1761,14 @@ i.spin::before{content:''!important;}
       <div class="settings-row-text">
         <div class="settings-row-title">Account moderation</div>
         <div class="settings-row-sub">Suspend accounts, review security locks & appeals</div>
+      </div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row hidden" id="settings-copyright-admin-row" onclick="openCopyrightAdmin()">
+      <i class="ph ph-copyright"></i>
+      <div class="settings-row-text">
+        <div class="settings-row-title">Copyright reports</div>
+        <div class="settings-row-sub" id="settings-copyright-admin-sub">Review takedown requests & issue strikes</div>
       </div>
       <i class="ph ph-caret-right" style="font-size:16px;"></i>
     </div>
@@ -2334,6 +2354,32 @@ i.spin::before{content:''!important;}
 
     <div class="sheet-label" style="margin-top:18px;">Currently restricted accounts</div>
     <div id="gr-list" style="max-height:35vh;overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- Copyright Strikes — user-facing, read-only history of strikes issued against this account -->
+<div class="modal-overlay" id="copyright-strikes-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="display:flex;align-items:center;gap:6px;"><i class="ph ph-scales" style="color:var(--amber);"></i> Copyright strikes</div>
+    <p style="font-size:13px;color:var(--text3);margin-bottom:14px;">When we remove a Pulse after a valid copyright complaint, the account that posted it receives a strike here. <strong style="color:var(--text2);">3 strikes will automatically suspend the account.</strong></p>
+    <div id="cs-summary" style="font-size:13px;font-weight:700;margin-bottom:12px;"></div>
+    <div id="cs-list" style="max-height:50vh;overflow-y:auto;"></div>
+    <button class="btn-sheet outline" style="margin-top:12px;" onclick="closeModal('copyright-strikes-modal')">Close</button>
+  </div>
+</div>
+
+<!-- Copyright Reports — admin only. Review takedown submissions from copyright.html and act on them. -->
+<div class="modal-overlay" id="copyright-admin-modal">
+  <div class="modal-sheet" style="max-width:560px;">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="display:flex;align-items:center;gap:6px;"><i class="ph ph-copyright" style="color:var(--cyan);"></i> Copyright reports</div>
+    <p style="font-size:12px;color:var(--text3);margin-bottom:12px;">For each report, resolve the Pulse either by pasting its link or by resolving the poster's @username below, then choose an action.</p>
+    <div class="sheet-label">Pending (<span id="cr-pending-count">0</span>)</div>
+    <div id="cr-pending-list" style="max-height:60vh;overflow-y:auto;"></div>
+    <div class="sheet-label" style="margin-top:16px;">Recently resolved</div>
+    <div id="cr-resolved-list" style="max-height:30vh;overflow-y:auto;"></div>
+    <button class="btn-sheet outline" style="margin-top:14px;" onclick="closeModal('copyright-admin-modal')">Close</button>
   </div>
 </div>
 
@@ -4135,6 +4181,212 @@ async function grRemoveRestriction(uid){
     grRenderList();
   }catch(e){ showToast('Could not remove — check Database Rules.'); }
 }
+
+// ============================================================
+// COPYRIGHT STRIKES — issued by admin after a valid takedown report
+// (submitted separately via copyright.html into copyrightReports/{id}).
+// Data model:
+//   users/{uid}/copyrightStrikes/{strikeId} = {reason, workTitle, postId, issuedAt, issuedBy, reportId}
+//   users/{uid}/copyrightStrikeCount = number
+//   3 strikes -> account is auto-suspended via the same suspensions/{uid} node
+//   that manual moderation uses (see modSuspendUser above).
+// ============================================================
+const COPYRIGHT_STRIKE_SUSPEND_THRESHOLD = 3;
+
+// --- user-facing: view my own strikes ---
+function updateStrikesSettingsSub(){
+  const el=document.getElementById('settings-strikes-sub');
+  if(!el) return;
+  const n = myData.copyrightStrikeCount||0;
+  el.textContent = n===0 ? 'No active strikes' : (n+' of '+COPYRIGHT_STRIKE_SUSPEND_THRESHOLD+' strikes — review for details');
+  el.style.color = n>0 ? 'var(--amber)' : '';
+}
+async function openCopyrightStrikesModal(){
+  openModal('copyright-strikes-modal');
+  const listEl=document.getElementById('cs-list');
+  const sumEl=document.getElementById('cs-summary');
+  listEl.innerHTML='<div class="feed-loader"><i class="ph ph-spinner-gap spin"></i></div>';
+  try{
+    const snap=await db.ref('users/'+me.uid+'/copyrightStrikes').once('value');
+    const data=snap.val()||{};
+    const strikes=Object.values(data).sort((a,b)=>(b.issuedAt||0)-(a.issuedAt||0));
+    const n=strikes.length;
+    sumEl.textContent = n===0 ? 'You have no copyright strikes.' : `${n} of ${COPYRIGHT_STRIKE_SUSPEND_THRESHOLD} strikes`;
+    sumEl.style.color = n>0 ? 'var(--amber)' : 'var(--green)';
+    if(!n){ listEl.innerHTML='<p style="color:var(--text3);font-size:13px;padding:8px 4px;">Nothing here — keep it that way.</p>'; return; }
+    listEl.innerHTML = strikes.map(s=>`
+      <div style="padding:12px 4px;border-bottom:1px solid var(--border,#1c2636);">
+        <div style="font-size:14px;font-weight:700;color:var(--amber);"><i class="ph ph-flag"></i> Pulse removed</div>
+        ${s.workTitle?`<div style="font-size:13px;margin-top:2px;">Copyrighted work: ${ESC(s.workTitle)}</div>`:''}
+        ${s.reason?`<div style="font-size:12px;color:var(--text3);margin-top:2px;">${ESC(s.reason)}</div>`:''}
+        <div style="font-size:12px;color:var(--text3);margin-top:2px;">${s.issuedAt?new Date(s.issuedAt).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}):''}</div>
+      </div>`).join('');
+  }catch(e){ listEl.innerHTML='<p style="color:var(--text3);font-size:13px;padding:8px 4px;">Could not load strikes.</p>'; }
+}
+
+// --- admin: review pending copyright reports, remove posts, issue strikes ---
+function openCopyrightAdmin(){
+  if(!me || me.uid!==ADMIN_UID){ showToast('Not authorized'); return; }
+  openModal('copyright-admin-modal');
+  crRenderAdminList();
+}
+// A report's infringing content can be identified either by a direct post
+// link/ID, or just by the poster's @username (per the complainant's choice) —
+// this parses whatever the admin has typed into the resolve field.
+function crParsePulseId(input){
+  const v=(input||'').trim();
+  if(!v) return null;
+  let m=v.match(/[?&]pulse=([^&]+)/); if(m) return decodeURIComponent(m[1]);
+  m=v.match(/\/p\/([^\/?#]+)/); if(m) return decodeURIComponent(m[1]);
+  if(/^[A-Za-z0-9_-]{10,}$/.test(v)) return v; // looks like a raw Firebase push id already
+  return null;
+}
+async function crResolveHandle(input){
+  const v=(input||'').trim().replace(/^@/,'').toLowerCase();
+  if(!v) return null;
+  const snap=await db.ref('handleIndex/'+v).once('value');
+  const val=snap.val();
+  return val && val.uid ? val.uid : null;
+}
+async function crRenderAdminList(){
+  const pendEl=document.getElementById('cr-pending-list');
+  const resEl=document.getElementById('cr-resolved-list');
+  const countEl=document.getElementById('cr-pending-count');
+  pendEl.innerHTML='<div class="feed-loader"><i class="ph ph-spinner-gap spin"></i></div>';
+  resEl.innerHTML='';
+  try{
+    const snap=await db.ref('copyrightReports').orderByChild('submittedAt').once('value');
+    const data=snap.val()||{};
+    const all=Object.keys(data).map(id=>({id,...data[id]})).sort((a,b)=>(b.submittedAt||0)-(a.submittedAt||0));
+    const pending=all.filter(r=>r.status==='pending'||!r.status);
+    const resolved=all.filter(r=>r.status&&r.status!=='pending').slice(0,20);
+    countEl.textContent=pending.length;
+    pendEl.innerHTML = pending.length ? pending.map(crRenderReportCard).join('') : '<p style="color:var(--text3);font-size:13px;padding:8px 4px;">No pending reports.</p>';
+    resEl.innerHTML = resolved.length ? resolved.map(r=>`
+      <div style="padding:10px 4px;border-bottom:1px solid var(--border,#1c2636);font-size:12px;color:var(--text3);">
+        <strong style="color:var(--text2);">${ESC(r.workTitle||'Untitled work')}</strong> — ${ESC(r.status)}${r.actionTaken?' · '+ESC(r.actionTaken):''}
+        ${r.resolvedAt?' · '+new Date(r.resolvedAt).toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}):''}
+      </div>`).join('') : '<p style="color:var(--text3);font-size:13px;padding:4px;">Nothing resolved yet.</p>';
+  }catch(e){ pendEl.innerHTML='<p style="color:var(--text3);font-size:13px;padding:8px 4px;">Could not load — check Database Rules.</p>'; }
+}
+function crRenderReportCard(r){
+  const prefill = ESC(r.infringingUrl||r.infringingUsername||'');
+  return `<div style="padding:12px 4px;border-bottom:1px solid var(--border,#1c2636);" id="cr-card-${ESC(r.id)}">
+    <div style="font-size:14px;font-weight:700;">${ESC(r.workTitle||'Untitled work')}</div>
+    <div style="font-size:12px;color:var(--text3);margin-top:2px;">${ESC(r.workDescription||'')}</div>
+    <div style="font-size:12px;color:var(--text2);margin-top:6px;">
+      <div><strong>Complainant:</strong> ${ESC(r.complainantName||'—')} (${ESC(r.relationship==='owner'?'copyright owner':'authorized representative')})</div>
+      <div><strong>Email:</strong> ${ESC(r.complainantEmail||'—')} &nbsp; <strong>Phone:</strong> ${ESC(r.complainantPhone||'—')}</div>
+      <div><strong>Address:</strong> ${ESC(r.complainantAddress||'—')}</div>
+      ${r.originalWorkUrl?`<div><strong>Proof of original:</strong> ${ESC(r.originalWorkUrl)}</div>`:''}
+      <div><strong>Reported post link:</strong> ${ESC(r.infringingUrl||'—')} &nbsp; <strong>Reported username:</strong> ${r.infringingUsername?'@'+ESC(r.infringingUsername):'—'}</div>
+      ${r.infringingDescription?`<div><strong>Details:</strong> ${ESC(r.infringingDescription)}</div>`:''}
+      ${r.courtOrderRef||r.courtOrderUrl?`<div><strong>Court order:</strong> ${ESC(r.courtOrderRef||'')} ${r.courtOrderUrl?ESC(r.courtOrderUrl):''}</div>`:''}
+      <div><strong>Digital signature:</strong> ${ESC(r.signature||'—')} &nbsp; <span style="color:var(--text3);">${r.submittedAt?new Date(r.submittedAt).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}):''}</span></div>
+    </div>
+    <div class="sheet-label" style="margin-top:8px;">Resolve post (paste link, or type @username)</div>
+    <input class="sheet-field" id="cr-resolve-${ESC(r.id)}" type="text" value="${prefill}" placeholder="https://.../p/POST_ID or @username">
+    <div class="auth-error" id="cr-err-${ESC(r.id)}" style="margin-bottom:8px;"></div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+      <button class="btn-sheet primary" style="flex:1;min-width:160px;padding:8px 10px;font-size:12px;" onclick="crRemoveAndStrike('${ESC(r.id)}')"><i class="ph ph-trash"></i> Remove post & strike</button>
+      <button class="btn-sheet outline" style="flex:1;min-width:120px;padding:8px 10px;font-size:12px;" onclick="crStrikeOnly('${ESC(r.id)}')"><i class="ph ph-flag"></i> Strike only</button>
+      <button class="btn-sheet outline" style="flex:1;min-width:100px;padding:8px 10px;font-size:12px;" onclick="crDismiss('${ESC(r.id)}')">Dismiss</button>
+    </div>
+  </div>`;
+}
+// Resolves the field the admin typed into a target uid, and — if it was a
+// post link/id — the pulse itself too (so it can be removed).
+async function crResolveTarget(reportId){
+  const raw=document.getElementById('cr-resolve-'+reportId).value.trim();
+  const errEl=document.getElementById('cr-err-'+reportId);
+  const pulseId=crParsePulseId(raw);
+  if(pulseId){
+    const pSnap=await db.ref('pulses/'+pulseId).once('value');
+    const p=pSnap.val();
+    if(!p){ errEl.textContent='No Pulse found at that link.'; return null; }
+    return {uid:p.uid, pulseId, pulse:p};
+  }
+  const uid=await crResolveHandle(raw);
+  if(!uid){ errEl.textContent='Enter a valid post link or an existing @username.'; return null; }
+  return {uid, pulseId:null, pulse:null};
+}
+async function crRemoveAndStrike(reportId){
+  const errEl=document.getElementById('cr-err-'+reportId); errEl.textContent='';
+  const target=await crResolveTarget(reportId);
+  if(!target) return;
+  if(!target.pulseId){ errEl.textContent='No post link resolved — use "Strike only", or ask the complainant for the direct link to remove the Pulse.'; return; }
+  try{
+    await adminRemovePulse(target.pulseId, target.pulse);
+    await crIssueStrike(reportId, target.uid, target.pulseId);
+    await crMarkResolved(reportId, 'removed_and_struck');
+    showToast('Post removed & strike issued ✓');
+    crRenderAdminList();
+  }catch(e){ errEl.textContent=e.message||'Could not complete — check Database Rules.'; }
+}
+async function crStrikeOnly(reportId){
+  const errEl=document.getElementById('cr-err-'+reportId); errEl.textContent='';
+  const target=await crResolveTarget(reportId);
+  if(!target) return;
+  try{
+    await crIssueStrike(reportId, target.uid, target.pulseId);
+    await crMarkResolved(reportId, 'struck_only');
+    showToast('Strike issued ✓');
+    crRenderAdminList();
+  }catch(e){ errEl.textContent=e.message||'Could not complete — check Database Rules.'; }
+}
+async function crDismiss(reportId){
+  if(!confirm('Dismiss this report with no action?')) return;
+  try{ await crMarkResolved(reportId, 'dismissed'); showToast('Report dismissed'); crRenderAdminList(); }
+  catch(e){ showToast('Could not dismiss — check Database Rules.'); }
+}
+async function crMarkResolved(reportId, actionTaken){
+  await db.ref('copyrightReports/'+reportId).update({
+    status: actionTaken==='dismissed' ? 'dismissed' : 'resolved',
+    actionTaken,
+    resolvedAt: firebase.database.ServerValue.TIMESTAMP,
+    resolvedBy: me.uid
+  });
+}
+// Deletes any user's Pulse (admin action — unlike deletePulse() this isn't
+// scoped to me.uid). Mirrors deletePulse()'s cleanup so counts/reply indexes
+// stay consistent.
+async function adminRemovePulse(pulseId, p){
+  p = p || (await db.ref('pulses/'+pulseId).once('value')).val();
+  if(!p) return;
+  await db.ref('pulses/'+pulseId).remove();
+  await db.ref('userPulses/'+p.uid+'/'+pulseId).remove();
+  if(p.isReply && p.parentId){
+    await db.ref('replies/'+p.parentId+'/'+pulseId).remove();
+    await db.ref('pulses/'+p.parentId+'/replies').transaction(c=>Math.max(0,(c||0)-1));
+  } else {
+    await db.ref('users/'+p.uid+'/pulsesCount').transaction(c=>Math.max(0,(c||0)-1));
+  }
+  document.getElementById('pc-'+pulseId)?.remove();
+}
+async function crIssueStrike(reportId, targetUid, pulseId){
+  const rSnap=await db.ref('copyrightReports/'+reportId).once('value');
+  const r=rSnap.val()||{};
+  await db.ref('users/'+targetUid+'/copyrightStrikes').push({
+    reason:'Removed following a copyright complaint'+(r.workTitle?' for "'+r.workTitle+'"':''),
+    workTitle:r.workTitle||null,
+    postId:pulseId||null,
+    reportId,
+    issuedAt: firebase.database.ServerValue.TIMESTAMP,
+    issuedBy: me.uid
+  });
+  const countSnap=await db.ref('users/'+targetUid+'/copyrightStrikeCount').transaction(c=>(c||0)+1);
+  const newCount = countSnap && countSnap.snapshot ? countSnap.snapshot.val() : ((await db.ref('users/'+targetUid+'/copyrightStrikeCount').once('value')).val()||0);
+  if(newCount>=COPYRIGHT_STRIKE_SUSPEND_THRESHOLD){
+    await db.ref('suspensions/'+targetUid).set({
+      type:'permanent',
+      until:null,
+      reason:'Automatically suspended after receiving '+COPYRIGHT_STRIKE_SUSPEND_THRESHOLD+' copyright strikes.',
+      suspendedAt: firebase.database.ServerValue.TIMESTAMP,
+      suspendedBy:'system'
+    });
+  }
+}
+
 async function loadMuted(){ const s=await db.ref('muted/'+me.uid).once('value'); mutedSet=new Set(Object.keys(s.val()||{})); }
 
 // ============================================================
@@ -6242,6 +6494,9 @@ async function loadSettingsScreen(){
   if(adminTitle) adminTitle.classList.toggle('hidden', !isAdminUser);
   const modRow=document.getElementById('settings-moderation-row');
   if(modRow) modRow.classList.toggle('hidden', !isAdminUser);
+  const crRow=document.getElementById('settings-copyright-admin-row');
+  if(crRow) crRow.classList.toggle('hidden', !isAdminUser);
+  updateStrikesSettingsSub();
   refreshVerifySettingsRow();
   const acctType=myData.accountType||'personal';
   const acctLabels={personal:'Personal account',creator:'Creator'+(myData.accountCategory?' · '+myData.accountCategory:''),business:'Business'+(myData.accountCategory?' · '+myData.accountCategory:'')};
