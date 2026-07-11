@@ -37,6 +37,9 @@ Nexor Sparks respects others' intellectual property and expects the same from it
 ### Reporting content, an account, or a problem (id: report-content)
 If you find any content, account, or behavior that goes against our Community Guidelines, it's important to report it. Reporting a Pulse/Article: go to the post and tap the (⋯) menu. Select Report. Choose the most relevant reason (spam, harassment, nudity, hate speech, misinformation, etc.). Reporting an account: go to that user's profile. Choose Report Account from the (⋯) menu. State a reason and submit. Reporting an app bug or technical problem: describe the bug, crash, or technical issue to the AI Assistant (bottom right corner) along with a screenshot. Reports stay anonymous — the user you reported won't know who reported them. Emergency or immediate safety threat: if there is an immediate threat to someone's life or safety, contact your local emergency services first.
 
+### About Nexor Sparks — company info (id: about-nexor)
+Nexor Sparks is built and run by Nexor. Gursharan Singh is the Founder and CEO of Nexor. Anmol Sunda is the Co-Founder.
+
 ### Blocking and Safety Tools (id: blocking-safety)
 Nexor Sparks gives you several tools to control your experience. Blocking: when you block someone, they won't be able to see your profile, Pulses, or messages, and won't be able to contact you. Open that user's profile. Select Block from the (⋯) menu. Muting: when you mute someone, they can still contact you, but you won't get notifications about their activity — and they won't know you've muted them. Privacy settings: control who can see your profile. Control who can message you. Set restrictions on comments and tags. If someone is harassing you, be sure to report them in addition to blocking them.
 
@@ -87,6 +90,25 @@ export async function onRequestPost(context) {
     });
   }
 
+  // Optional, non-sensitive account context passed from the main app
+  // (see openHelpCenter() in index.html). Only ever a display name,
+  // handle, verified flag, and account type — never an email, password,
+  // or any other private data — so it's safe to fold into the prompt.
+  let contextLine = "";
+  const ctx = body.context;
+  if (ctx && typeof ctx === "object") {
+    const safeName = typeof ctx.name === "string" ? ctx.name.slice(0, 60) : null;
+    const safeHandle = typeof ctx.handle === "string" ? ctx.handle.slice(0, 40) : null;
+    const bits = [];
+    if (safeName) bits.push(`display name "${safeName}"`);
+    if (safeHandle) bits.push(`handle "@${safeHandle}"`);
+    if (ctx.verified) bits.push("a verified badge");
+    if (ctx.accountType) bits.push(`account type "${ctx.accountType}"`);
+    if (bits.length) {
+      contextLine = `\n\nThe user asking is currently logged in with ${bits.join(", ")}. You may greet them by name and reference these details naturally, but do not claim to know anything else about their account beyond what's listed here.`;
+    }
+  }
+
   try {
     const resp = await fetch(
       "https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent",
@@ -99,7 +121,7 @@ export async function onRequestPost(context) {
         body: JSON.stringify({
           contents: [
             {
-              parts: [{ text: `${SYSTEM_PROMPT}\n\nUser message: ${userMessage}` }],
+              parts: [{ text: `${SYSTEM_PROMPT}${contextLine}\n\nUser message: ${userMessage}` }],
             },
           ],
         }),
