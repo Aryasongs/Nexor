@@ -1294,6 +1294,15 @@ i.spin::before{content:''!important;}
         <i class="ph ph-cake auth-field-icon"></i>
         <input class="auth-field" id="r-dob" type="date" autocomplete="bday">
       </div>
+      <div style="display:flex;align-items:flex-start;gap:8px;margin:6px 0 16px;">
+        <input type="checkbox" id="r-legal-agree" style="margin-top:3px;width:16px;height:16px;accent-color:var(--cyan);flex-shrink:0;">
+        <label for="r-legal-agree" style="font-size:12.5px;line-height:1.5;color:var(--text2);">
+          I agree to Nexor Sparks'
+          <a onclick="event.preventDefault();window.open('https://aryasongs.github.io/Pulse/Sparkshelp.html#terms-of-service','_blank')" style="color:var(--cyan);font-weight:600;cursor:pointer;">Terms of Service</a>,
+          <a onclick="event.preventDefault();window.open('https://aryasongs.github.io/Pulse/Sparkspp.html','_blank')" style="color:var(--cyan);font-weight:600;cursor:pointer;">Privacy Policy</a>,
+          and <a onclick="event.preventDefault();window.open('https://aryasongs.github.io/Pulse/Sparkscg.html','_blank')" style="color:var(--cyan);font-weight:600;cursor:pointer;">Community Guidelines</a>.
+        </label>
+      </div>
       <button class="btn-primary" id="btn-reg" onclick="doRegister()"><i class="ph ph-user-plus"></i> Create Account</button>
     </div>
     <div class="auth-error" id="auth-err"></div>
@@ -1852,6 +1861,14 @@ i.spin::before{content:''!important;}
       </div>
       <i class="ph ph-caret-right" style="font-size:16px;"></i>
     </div>
+    <div class="settings-row" onclick="window.open('https://aryasongs.github.io/Pulse/Sparkshelp.html#terms-of-service','_blank')">
+      <i class="ph ph-file-text"></i>
+      <div class="settings-row-text">
+        <div class="settings-row-title">Terms of Service</div>
+        <div class="settings-row-sub">The rules and conditions for using Sparks</div>
+      </div>
+      <i class="ph ph-arrow-square-out" style="font-size:16px;"></i>
+    </div>
     <div class="settings-row" onclick="window.open('https://aryasongs.github.io/Pulse/Sparkspp.html','_blank')">
       <i class="ph ph-shield-check"></i>
       <div class="settings-row-text">
@@ -1865,6 +1882,14 @@ i.spin::before{content:''!important;}
       <div class="settings-row-text">
         <div class="settings-row-title">Community Guidelines</div>
         <div class="settings-row-sub">Rules for using Sparks</div>
+      </div>
+      <i class="ph ph-arrow-square-out" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="window.open('https://aryasongs.github.io/Pulse/Sparkshelp.html#copyright-policy','_blank')">
+      <i class="ph ph-copyright"></i>
+      <div class="settings-row-text">
+        <div class="settings-row-title">Copyright &amp; IP Policy</div>
+        <div class="settings-row-sub">How to file or respond to a copyright claim</div>
       </div>
       <i class="ph ph-arrow-square-out" style="font-size:16px;"></i>
     </div>
@@ -2580,6 +2605,13 @@ i.spin::before{content:''!important;}
       <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:14px 16px;">
         <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-bottom:2px;">Co-Founder</div>
         <div style="font-size:15px;font-weight:700;color:var(--text);">Anmol Sunda</div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;">
+        <a onclick="window.open('https://aryasongs.github.io/Pulse/Sparkshelp.html#terms-of-service','_blank')" style="font-size:12px;font-weight:700;color:var(--cyan);cursor:pointer;">Terms of Service</a>
+        <span style="color:var(--text3);">·</span>
+        <a onclick="window.open('https://aryasongs.github.io/Pulse/Sparkspp.html','_blank')" style="font-size:12px;font-weight:700;color:var(--cyan);cursor:pointer;">Privacy Policy</a>
+        <span style="color:var(--text3);">·</span>
+        <a onclick="window.open('https://aryasongs.github.io/Pulse/Sparkscg.html','_blank')" style="font-size:12px;font-weight:700;color:var(--cyan);cursor:pointer;">Community Guidelines</a>
       </div>
     </div>
     <button class="btn-sheet outline" onclick="closeModal('about-nexor-company-modal')">Close</button>
@@ -3367,7 +3399,8 @@ async function doRegister(){
         handle=(document.getElementById('r-handle').value.trim()||'').replace(/^@/,'').replace(/[^a-zA-Z0-9_]/g,'').toLowerCase(),
         e=document.getElementById('r-email').value.trim(),
         p=document.getElementById('r-pass').value,
-        dob=document.getElementById('r-dob').value;
+        dob=document.getElementById('r-dob').value,
+        legalAgree=document.getElementById('r-legal-agree').checked;
   document.getElementById('auth-err').textContent='';
   if(!name||!handle||!e||!p||!dob){document.getElementById('auth-err').textContent='Fill in all fields, including date of birth';return;}
   if(handle.length<3){document.getElementById('auth-err').textContent='Username must be at least 3 characters';return;}
@@ -3377,6 +3410,7 @@ async function doRegister(){
   if(age===null||isNaN(age)){document.getElementById('auth-err').textContent='Enter a valid date of birth';return;}
   if(age<13){document.getElementById('auth-err').textContent='You must be at least 13 years old to create an account';return;}
   if(age>120){document.getElementById('auth-err').textContent='Enter a valid date of birth';return;}
+  if(!legalAgree){document.getElementById('auth-err').textContent='Please agree to the Terms of Service, Privacy Policy, and Community Guidelines to continue';return;}
   setBusy('btn-reg',true,'<i class="ph ph-spinner-gap spin"></i> Please wait…');
   const handleRef = db.ref('handleIndex/'+handle);
   try{
@@ -3421,6 +3455,7 @@ async function doRegister(){
         verified:false, isAI:false, website:'', location:'', pronouns:'', languages:'',
         photoBase64:null, bannerBase64:null,
         dob, age,
+        legalAgreedAt: firebase.database.ServerValue.TIMESTAMP,
         createdAt: firebase.database.ServerValue.TIMESTAMP
       });
     } catch(profileErr){
