@@ -369,183 +369,233 @@ const CATS = [
 const ARTICLES = {
   'getting-started':{
     cat:'account', icon:'ph-rocket-launch', title:'Getting started on Nexor Sparks',
-    desc:'Create a new account, set up your profile, and post your first Pulse.',
+    desc:'Create a new account, set up your profile, and post your first Pulse — full walkthrough.',
     keywords:['signup','create account','new account','getting started','register','profile setup'],
     body:`
-      <p>Welcome to Nexor Sparks. Follow the steps below to create a new account and set up your profile.</p>
-      <h2>Create an account</h2>
+      <p>Welcome to Nexor Sparks! Here's a full, step-by-step walkthrough to get you set up from zero.</p>
+      <h2>Step 1: Create an account</h2>
       <ol>
         <li>Open the app or website and tap the <strong>Sign Up</strong> tab.</li>
-        <li>Enter your email or phone number, a unique username, and a strong password.</li>
-        <li>Confirm your email/phone with the verification code.</li>
-        <li>Enter your age accurately — you must meet the minimum age policy to use Nexor Sparks.</li>
+        <li>Enter your email address or phone number.</li>
+        <li>Choose a unique username — this becomes your @handle and can be changed later (with extra review once you're verified).</li>
+        <li>Set a strong password (mix of letters, numbers, and symbols).</li>
+        <li>Confirm your email/phone using the verification code sent to you.</li>
+        <li>Enter your date of birth accurately — you must meet the minimum age policy to use Nexor Sparks, and this can't easily be changed later.</li>
       </ol>
-      <h2>Complete your profile</h2>
+      <h2>Step 2: Complete your profile</h2>
+      <ol>
+        <li>Add a clear profile photo so people recognize you.</li>
+        <li>Write a short bio describing who you are.</li>
+        <li>Optionally add a banner image to personalize your profile further.</li>
+      </ol>
+      <h2>Step 3: Personalize your experience</h2>
       <ul>
-        <li>Add a clear profile photo and a short bio.</li>
-        <li>Follow people based on your interests so your feed gets personalized.</li>
-        <li>Adjust your notification and privacy settings to your liking.</li>
+        <li>Follow a few accounts based on your interests — this immediately improves your For You feed.</li>
+        <li>Open Settings and review your notification preferences.</li>
+        <li>Decide whether you want a Private account or a public one — see the Privacy & Safety Settings guide.</li>
+        <li>Consider linking a phone number and turning on Two-Factor Login for extra account security.</li>
       </ul>
-      <div class="callout"><i class="ph ph-info"></i>After logging in for the first time, we recommend reading the <strong>Privacy Policy</strong> and <strong>Community Guidelines</strong> at least once.</div>
+      <h2>Step 4: Post your first content</h2>
+      <p>Tap the compose/create button to post your first <strong>Pulse</strong> (a photo, text, or short update) or record a <strong>Bolt</strong> (short video). You can always edit or delete anything you post later.</p>
+      <div class="callout"><i class="ph ph-info"></i>Before you dive in, we strongly recommend reading the <strong>Privacy Policy</strong> and <strong>Community Guidelines</strong> at least once, so you know exactly how your data is handled and what's allowed on the platform.</div>
     `,
     related:['password-forgot','privacy-policy','community-guidelines']
   },
   'password-forgot':{
     cat:'account', icon:'ph-key', title:'Forgot your password? How to reset it',
-    desc:'Can\'t log in? Reset your password step by step.',
+    desc:'Can\'t log in? A full, step-by-step password reset walkthrough.',
     keywords:['password','forgot','forgot password','reset password','cant login','change password'],
     body:`
-      <p>If you've forgotten your password, don't worry — you can get back into your account in a few steps.</p>
-      <h2>Steps to reset your password</h2>
+      <p>If you've forgotten your password, don't worry — you can get back into your account in just a few steps.</p>
+      <h2>Step-by-step: resetting your password</h2>
       <ol>
-        <li>Tap <strong>"Forgot Password?"</strong> on the login screen.</li>
-        <li>Enter your registered email or phone number.</li>
-        <li>You'll be sent a verification code or reset link — open it.</li>
-        <li>Set a new, strong password (use a mix of letters, numbers, and symbols).</li>
-        <li>Log in again with your new password.</li>
+        <li>On the login screen, tap <strong>"Forgot Password?"</strong>.</li>
+        <li>Enter the email address or phone number registered to your account.</li>
+        <li>You'll receive a verification code or reset link — open it right away, as it usually expires after a short time.</li>
+        <li>Enter the code (or follow the link) to confirm it's really you.</li>
+        <li>Set a new, strong password — use a mix of upper/lowercase letters, numbers, and symbols, and avoid anything you've used before.</li>
+        <li>Confirm the new password, then log back in with it.</li>
       </ol>
       <h2>If you're not receiving the reset code</h2>
       <ul>
-        <li>Check your spam/junk folder.</li>
-        <li>Confirm you entered the same email/number linked to your account.</li>
-        <li>Wait a few minutes and try again.</li>
+        <li>Check your spam, junk, or promotions folder — codes sometimes land there.</li>
+        <li>Double-check you entered the exact same email/number linked to your account.</li>
+        <li>Wait a few minutes — delivery can occasionally be delayed — and then try again.</li>
+        <li>If it still doesn't arrive after several tries, try the alternate method (email if you tried phone, or vice versa) if you have one linked.</li>
       </ul>
-      <div class="callout"><i class="ph ph-shield-check"></i>After resetting your password, if you think someone else may have had access to your account, be sure to read the <strong>Hacked Account</strong> guide.</div>
+      <h2>After you're back in</h2>
+      <p>If you think someone else may have had access to your account before you reset your password — for example, you noticed unfamiliar activity — be sure to read the <strong>Hacked Account</strong> guide and follow its full checklist.</p>
+      <div class="callout"><i class="ph ph-shield-check"></i>Once you're logged in, consider turning on Two-Factor Login and Login Alerts from Settings so this is much harder to happen again.</div>
     `,
-    related:['hacked-account','delete-account']
+    related:['hacked-account','change-password','two-factor-login']
   },
   'hacked-account':{
     urgent:true, cat:'account', icon:'ph-shield-warning', title:'Your account has been hacked or compromised',
-    desc:'If you think someone else is using your account, follow these steps immediately.',
+    desc:'If you think someone else is using your account, follow this full checklist immediately.',
     keywords:['hack','hacked','compromise','compromised','account stolen','someone logged in','suspicious activity','unauthorized'],
     body:`
-      <p>If you think someone else has accessed your account, immediately follow the steps below.</p>
-      <h2>Signs of compromise</h2>
+      <p>If you think someone else has accessed your account, don't panic — but act immediately and work through the checklist below in order.</p>
+      <h2>Signs your account may be compromised</h2>
       <ul>
-        <li>Pulses or messages are going out from your account that you didn't post.</li>
-        <li>Your profile info (bio, photo, email, password) has changed on its own.</li>
-        <li>You received a login/password change notification that you didn't make yourself.</li>
-        <li>You're unable to log into your own account.</li>
+        <li>Pulses, Bolts, Stories, or messages are going out from your account that you didn't post or send.</li>
+        <li>Your profile info (bio, photo, email, password, username) has changed on its own.</li>
+        <li>You received a login/password-change notification that you didn't trigger yourself.</li>
+        <li>You're suddenly unable to log into your own account with your usual password.</li>
+        <li>People are reporting they received odd messages or links from you.</li>
       </ul>
-      <h2>What to do immediately</h2>
+      <h2>What to do immediately — full checklist</h2>
       <ol>
-        <li><strong>Change your password right away</strong> — if you can still log in, follow the "Password Reset" guide to set a new, strong, and unique password.</li>
-        <li><strong>If you can't log in</strong> — use the "Forgot Password" reset link to regain access.</li>
-        <li><strong>Check active sessions</strong> — go to settings and check whether any unknown device is logged in, and log them out.</li>
-        <li><strong>Verify your connected email/phone</strong> — confirm the recovery email/number is really yours.</li>
-        <li><strong>Review recent activity</strong> — delete/undo any unauthorized Pulse, message, or profile change.</li>
+        <li><strong>Change your password right away.</strong> If you can still log in, go to Settings > Change Password and set a new, strong, unique one immediately.</li>
+        <li><strong>If you can't log in,</strong> use the "Forgot Password" link on the login screen to regain access first.</li>
+        <li><strong>Check active sessions.</strong> Go to Settings > Login Activity and log out any device/session you don't recognize.</li>
+        <li><strong>Verify your recovery email/phone.</strong> Confirm the email and phone number linked to your account are really yours and haven't been swapped out.</li>
+        <li><strong>Review recent activity.</strong> Go through your recent Pulses, Bolts, Stories, comments, and DMs and delete/undo anything you didn't post.</li>
+        <li><strong>Turn on extra protection.</strong> Enable Two-Factor Login and Login Alerts from Settings so future attempts are blocked or immediately flagged to you.</li>
       </ol>
-      <div class="callout warn"><i class="ph ph-warning"></i>If you can't reset your password because the attacker has also changed your recovery email/phone, submit an account recovery request via the AI Assistant (bottom right corner) or the "Report a Problem" page.</div>
-      <h2>Tips to keep your account safe in the future</h2>
+      <div class="callout warn"><i class="ph ph-warning"></i>If you can't reset your password because the attacker has also changed your recovery email/phone, don't worry — submit an account recovery request via the AI Assistant (bottom right corner) or the "Report a Problem" page, and our team will help you regain access.</div>
+      <h2>Keeping your account safe going forward</h2>
       <ul>
-        <li>Use a unique password everywhere — never repeat the same password on another website.</li>
-        <li>Never enter your password on unfamiliar links or messages (avoid phishing).</li>
-        <li>Keep checking your login activity regularly.</li>
+        <li>Use a unique password for Nexor Sparks — never reuse a password from another website.</li>
+        <li>Never enter your password after clicking a link from an unfamiliar message or email (this is phishing).</li>
+        <li>Turn on Two-Factor Login and Login Alerts, and check Login Activity every so often.</li>
+        <li>Be cautious about which third-party apps or sites you ever give your login details to — Nexor Sparks will never ask for your password outside the official app.</li>
       </ul>
     `,
-    related:['password-forgot','report-content','privacy-policy']
+    related:['change-password','two-factor-login','report-content']
   },
   'delete-account':{
     cat:'account', icon:'ph-trash', title:'Deactivating or deleting your account',
-    desc:'Temporarily pause your account or permanently delete it.',
+    desc:'Temporarily pause your account or permanently delete it, step by step.',
     keywords:['delete account','deactivate','close account','remove account'],
     body:`
-      <p>You can either temporarily deactivate or permanently delete your account.</p>
-      <h2>Deactivate (temporary)</h2>
-      <p>When you deactivate, your profile, Pulses, and messages are all hidden, but no data is deleted. Everything becomes active again as soon as you log back in.</p>
-      <h2>Delete (permanent)</h2>
-      <p>Permanently deleting removes your profile, Pulses, articles, messages, and data forever. This action <strong>cannot be undone</strong>, so save/download any important data first if needed.</p>
+      <p>You have two options if you want to step away from Nexor Sparks — temporarily deactivating, or permanently deleting your account.</p>
+      <h2>Option 1: Deactivate (temporary)</h2>
+      <p>When you deactivate, your profile, Pulses, Bolts, Stories, Articles, and messages are all hidden from other users — but nothing is deleted. The moment you log back in, everything is restored exactly as it was.</p>
+      <p>This is the better choice if you just want a break, are unsure, or might come back.</p>
+      <h2>Option 2: Delete (permanent)</h2>
+      <p>Permanently deleting your account removes your profile, Pulses, Bolts, Stories, Articles, messages, and associated data forever. <strong>This action cannot be undone</strong> — make sure to save or download anything important first, since there is no way to recover it afterward.</p>
+      <h2>How to deactivate or delete — steps</h2>
       <ol>
         <li>Go to the <strong>Account</strong> section in Settings.</li>
-        <li>Choose the <strong>Deactivate</strong> or <strong>Delete Account</strong> option.</li>
-        <li>Enter your password to confirm.</li>
+        <li>Choose either the <strong>Deactivate</strong> or <strong>Delete Account</strong> option.</li>
+        <li>Enter your password to confirm it's really you.</li>
+        <li>Confirm the action — for Delete, you'll typically see one final warning since it can't be reversed.</li>
       </ol>
-      <div class="callout"><i class="ph ph-info"></i>If you just want a break, it's better to use Deactivate instead of Delete.</div>
+      <div class="callout"><i class="ph ph-info"></i>Still unsure? Deactivate first — you can always come back and permanently delete later, but you can't undo a permanent delete.</div>
     `,
     related:['password-forgot','privacy-policy']
   },
   'pulses-articles':{
     cat:'content', icon:'ph-lightning', title:'Posting Pulses and Articles',
-    desc:'Post, edit, and delete your content.',
+    desc:'A full guide to posting, editing, and deleting Pulses and Articles.',
     keywords:['pulse','post','article','post content','delete post','edit post'],
     body:`
-      <p>On Nexor Sparks, you can share your moments as <strong>Pulses</strong>, or write longer content in the <strong>Articles</strong> format.</p>
-      <h2>Posting a Pulse</h2>
-      <ul>
-        <li>Create your Pulse by adding a photo, text, or media.</li>
-        <li>Be sure to preview it before posting.</li>
-        <li>You can edit or delete it even after posting.</li>
-      </ul>
-      <h2>Editing/deleting your content</h2>
+      <p>On Nexor Sparks, you can share quick moments as <strong>Pulses</strong>, or write longer-form content as <strong>Articles</strong>.</p>
+      <h2>Posting a Pulse — step by step</h2>
       <ol>
-        <li>Go to your Pulse/Article and tap the (⋯) menu.</li>
-        <li>Choose <strong>Edit</strong> or <strong>Delete</strong>.</li>
+        <li>Tap the compose/create button.</li>
+        <li>Add a photo, video, or just write text.</li>
+        <li>Preview exactly how it will look before posting.</li>
+        <li>Tap Post to publish it to your followers/public feed, depending on your privacy setting.</li>
       </ol>
-      <div class="callout"><i class="ph ph-info"></i>Once deleted, content cannot be restored.</div>
+      <h2>Editing or deleting your content</h2>
+      <ol>
+        <li>Go to your Pulse or Article.</li>
+        <li>Tap the (⋯) menu on it.</li>
+        <li>Choose <strong>Edit</strong> to change it, or <strong>Delete</strong> to remove it permanently.</li>
+      </ol>
+      <div class="callout"><i class="ph ph-info"></i>Once deleted, content cannot be restored — make sure before confirming.</div>
       <h2>Unlocking Articles</h2>
-      <p>The Articles tab unlocks once your total views across your Pulses and Bolts reach a certain threshold, shown on the locked-Articles screen. Keep posting Pulses/Bolts to grow your view count and it'll unlock automatically.</p>
-      <h2>Keep in mind while posting content</h2>
-      <p>Every Pulse and Article must follow our <strong>Community Guidelines</strong>. Content that violates the guidelines may be removed.</p>
+      <p>The Articles tab is locked by default and unlocks once your total views across your Pulses and Bolts reach a certain threshold, shown right on the locked-Articles screen along with your current progress. Keep posting engaging Pulses and Bolts to grow your view count, and Articles will unlock automatically — no manual request needed.</p>
+      <h2>Keep in mind while posting</h2>
+      <p>Every Pulse and Article must follow our <strong>Community Guidelines</strong>. Content that violates them may be removed, and if you're using AI tools to help create it, label it honestly — see the AI Content Label guide.</p>
     `,
     related:['bolts','community-guidelines','ai-content-label']
   },
   'bolts':{
     cat:'content', icon:'ph-play-circle', title:'Bolts — short-form videos/reels',
-    desc:'Watch, post, and share Bolts, Nexor Sparks\' short video feature.',
+    desc:'A full guide to watching, posting, and sharing Bolts.',
     keywords:['bolts','reels','short video','video feed'],
     body:`
       <p>Bolts are Nexor Sparks' short-form vertical video feature (like Reels), found in the <strong>Bolts</strong> tab of the bottom navigation.</p>
+      <h2>Watching Bolts</h2>
       <ul>
-        <li>Scroll through the full-screen Bolts feed to discover short videos from creators.</li>
-        <li>Like, comment, and share any Bolt.</li>
-        <li>Tap the paper-plane <strong>Send to DM</strong> icon on a Bolt to send it straight into a chat, Instagram-style.</li>
-        <li>Bolts are muted by default — just tap the video to unmute.</li>
+        <li>Scroll vertically through the full-screen Bolts feed to discover short videos from creators.</li>
+        <li>Bolts are muted by default when the feed opens — just tap the video once to unmute.</li>
+        <li>Like, comment, or share any Bolt you enjoy.</li>
       </ul>
-      <div class="callout"><i class="ph ph-info"></i>Views on your own Bolts count toward unlocking the Articles feature.</div>
+      <h2>Sharing a Bolt</h2>
+      <ol>
+        <li>Open the Bolt you want to share.</li>
+        <li>Tap the paper-plane <strong>Send to DM</strong> icon.</li>
+        <li>Pick one or more conversations or friends from the share sheet.</li>
+        <li>It's delivered straight into that chat instantly, Instagram-style.</li>
+      </ol>
+      <h2>Posting your own Bolt</h2>
+      <p>Record or upload a short vertical video from the compose/create button, add a caption, and post it — you can edit the caption or delete it later just like a Pulse.</p>
+      <div class="callout"><i class="ph ph-info"></i>Views on your own Bolts (and Pulses) count toward unlocking the Articles feature.</div>
     `,
     related:['pulses-articles','direct-messages']
   },
   'stories':{
     cat:'content', icon:'ph-circles-three', title:'Stories',
-    desc:'Post and view short-lived photo/video Stories.',
+    desc:'A full guide to posting and viewing short-lived Stories.',
     keywords:['stories','story','share to story'],
     body:`
       <p>Stories are short-lived photo/video updates that appear at the top of the app and disappear after a set time, similar to Instagram Stories.</p>
+      <h2>Posting a Story</h2>
+      <ol>
+        <li>Tap <strong>Share to Story</strong> from the top of your feed, or from an existing Pulse/Bolt's share sheet.</li>
+        <li>Choose or capture a photo/video.</li>
+        <li>Post it — it appears at the top of your followers' app for everyone to see until it expires.</li>
+      </ol>
+      <h2>Viewing and replying to Stories</h2>
       <ul>
-        <li>Tap <strong>Share to Story</strong> to post one from a photo/video, or from an existing Pulse/Bolt via the share sheet.</li>
-        <li>A story ring around a profile photo means that user has an active Story — tap it to view.</li>
-        <li>Reply directly to someone's Story using the reply box at the bottom of the Story viewer.</li>
+        <li>A colored ring around someone's profile photo means they have an active Story — tap it to view.</li>
+        <li>Use the reply box at the bottom of the Story viewer to reply directly, which sends them a Direct Message.</li>
+        <li>Tap through or swipe to move between multiple Stories from the same person or the next person in line.</li>
       </ul>
     `,
     related:['pulses-articles','bolts']
   },
   'direct-messages':{
     cat:'content', icon:'ph-paper-plane-tilt', title:'Direct Messages (DMs)',
-    desc:'Message people privately and send them Pulses or Bolts.',
+    desc:'A full guide to messaging privately and sharing Pulses/Bolts into a chat.',
     keywords:['dm','direct message','chat','messages','send to dm'],
     body:`
       <p>Nexor Sparks lets you message people privately via <strong>Direct Messages</strong>, accessible from the chat icon.</p>
+      <h2>Starting and using a conversation</h2>
       <ul>
-        <li>Send text, media, and GIFs in a conversation.</li>
-        <li>Send a Pulse, Bolt, or profile directly into a DM using the paper-plane <strong>Send to DM</strong>/share icon on that content — pick one or more conversations or friends from the share sheet and it's sent instantly.</li>
+        <li>Tap the chat icon and start a new conversation, or open an existing one.</li>
+        <li>Send text, photos, videos, and GIFs freely within a chat.</li>
+        <li>Only people who can message you (based on your Privacy Settings) can start a brand-new conversation with you — this protects you from unwanted messages.</li>
       </ul>
-      <div class="callout"><i class="ph ph-info"></i>Only people who can message you (based on your Privacy Settings) can start a new conversation with you.</div>
+      <h2>Sending a Pulse or Bolt into a DM</h2>
+      <ol>
+        <li>Find the Pulse, Bolt, or profile you want to share.</li>
+        <li>Tap its paper-plane <strong>Send to DM</strong>/share icon.</li>
+        <li>Pick one or more conversations or friends from the share sheet that opens.</li>
+        <li>It's delivered instantly into that chat.</li>
+      </ol>
+      <div class="callout"><i class="ph ph-info"></i>If someone is bothering you over DM, you can block or mute them anytime — see the Privacy & Safety Settings guide.</div>
     `,
     related:['bolts','blocking-safety']
   },
   'ai-content-label':{
     cat:'content', icon:'ph-sparkle', title:'What is the "AI" label on AI-generated content',
-    desc:'Understand why some Pulses/Articles show an AI label.',
+    desc:'Understand why some Pulses/Bolts/Articles show an AI label, and how to label your own.',
     keywords:['ai label','ai generated','ai badge','ai tag'],
     body:`
-      <p>When content has been fully or significantly generated or edited with AI tools, you may see a golden <strong>"AI"</strong> label on it.</p>
+      <p>When content has been fully or significantly generated or edited with AI tools, you'll see a golden <strong>"AI"</strong> label on it, right next to the content.</p>
       <h2>Why this label matters</h2>
       <ul>
-        <li>It keeps the community transparent about how content was made.</li>
-        <li>It builds trust — people know whether content is a real photo/video or AI-generated.</li>
+        <li>It keeps the community transparent about exactly how content was made.</li>
+        <li>It builds trust — people can immediately tell whether a photo or video is real or AI-generated, which matters more and more as AI tools improve.</li>
+        <li>It protects creators too, since honestly-labeled AI content is treated fairly rather than assumed to be deceptive.</li>
       </ul>
-      <h2>Labeling your own AI-generated content</h2>
-      <p>If you're creating content with AI tools, label it honestly when posting. Posting misleading AI content without a label is considered a violation of the Community Guidelines.</p>
+      <h2>How to label your own AI-generated content</h2>
+      <p>When you're creating a Pulse, Bolt, or Article using AI tools (image generation, video generation, or significant AI editing), mark it as AI-generated at posting time so the label shows automatically.</p>
+      <div class="callout warn"><i class="ph ph-warning"></i>Posting misleading AI content <em>without</em> labeling it honestly is considered a violation of the Community Guidelines and may lead to content removal or account action.</div>
     `,
     related:['pulses-articles','community-guidelines']
   },
@@ -630,231 +680,334 @@ const ARTICLES = {
   },
   'privacy-policy':{
     cat:'policies', icon:'ph-lock-key', title:'Privacy Policy',
-    desc:'How we collect, use, and protect your data.',
-    keywords:['privacy','data','policy','information collection'],
+    desc:'A full, detailed breakdown of how we collect, use, share, and protect your data.',
+    keywords:['privacy','data','policy','information collection','gdpr','my data','cookies'],
     body:`
-      <p>This Privacy Policy explains how Nexor Sparks collects, uses, stores, and protects your information.</p>
-      <h2>What we collect</h2>
+      <p>This Privacy Policy explains, in detail, how Nexor Sparks collects, uses, stores, shares, and protects your information when you use our app and website. By using Nexor Sparks, you agree to the practices described here.</p>
+
+      <h2>1. Information we collect</h2>
+      <p>We collect information in three broad categories:</p>
       <ul>
-        <li><strong>Account info:</strong> username, email/phone, password (encrypted), profile details.</li>
-        <li><strong>Content:</strong> your Pulses, articles, messages, comments.</li>
-        <li><strong>Usage data:</strong> how you use the app, device and log information.</li>
+        <li><strong>Account information</strong> — your username/handle, display name, email address and/or phone number, password (always stored encrypted, never in plain text), date of birth, profile photo, banner image, and bio.</li>
+        <li><strong>Content you create</strong> — every Pulse, Bolt (video), Story, Article, comment, reply, like, and Direct Message you send, along with any media (photos/videos) attached to them.</li>
+        <li><strong>Verification data (only if you apply)</strong> — your legal name, country, ID document type and photo, and the proof links you submit through the "Get Verified" form. This is used strictly for the manual review process and is not shown publicly.</li>
+        <li><strong>Usage & device data</strong> — how you interact with the app (what you view, tap, and for how long), your approximate device type, app version, IP address, and general log information, used mainly for security and reliability.</li>
+        <li><strong>Social graph</strong> — who you follow, who follows you, who you've blocked or muted.</li>
       </ul>
-      <h2>How we use it</h2>
+
+      <h2>2. How we use your information</h2>
       <ul>
-        <li>To provide and personalize app services for you.</li>
-        <li>For account safety and fraud prevention.</li>
-        <li>To improve the app and fix bugs.</li>
+        <li>To create, run, and personalize your account and feed — for example, ranking your For You feed based on what you engage with.</li>
+        <li>To let you communicate with others via Pulses, Bolts, Stories, Articles, and Direct Messages.</li>
+        <li>For account safety, spam prevention, and fraud detection — including automated checks and, when needed, human review of reported content.</li>
+        <li>To send you important notifications (security alerts, login alerts, policy updates) and, if you've opted in, product updates.</li>
+        <li>To review Get Verified and Username Change requests submitted through Settings.</li>
+        <li>To investigate and enforce our Community Guidelines and Terms of Service when content or accounts are reported.</li>
+        <li>To measure and improve the app — fixing bugs, understanding what features are used, and building new ones.</li>
       </ul>
-      <h2>Data sharing</h2>
-      <p>We do not sell your personal data to third parties without consent. Data is only shared when legally required, or with service providers (like hosting) who work on our behalf.</p>
-      <h2>Your rights</h2>
+
+      <h2>3. How your data is shared</h2>
+      <p>We do <strong>not</strong> sell your personal data to third parties, and we never share your password with anyone, including our own staff (it's encrypted end to end).</p>
       <ul>
-        <li>The right to access, correct, or delete your data.</li>
-        <li>The right to deactivate/delete your account at any time.</li>
-        <li>Control who can see your content via privacy settings.</li>
+        <li><strong>Public content:</strong> anything you post publicly (Pulses, Bolts, Stories set to public, Articles, public profile info) is visible to anyone who can see your profile, based on your privacy settings.</li>
+        <li><strong>Service providers:</strong> we share the minimum data necessary with providers who help us run the app, such as cloud hosting and storage, purely to operate the service on our behalf — they are not permitted to use your data for their own purposes.</li>
+        <li><strong>Legal requirements:</strong> we may disclose information if required by law, court order, or a valid governmental request, or where necessary to protect the rights, property, or safety of Nexor Sparks, our users, or the public.</li>
+        <li><strong>Business transfers:</strong> if Nexor is ever involved in a merger, acquisition, or sale of assets, user information may be transferred as part of that transaction, subject to this same policy (or an equally protective one).</li>
       </ul>
-      <h2>Data retention</h2>
-      <p>We retain data as long as your account is active. When you delete your account, data is deleted or anonymized in accordance with applicable law.</p>
-      <div class="callout"><i class="ph ph-info"></i>For any privacy-related questions, talk to the AI Assistant or use the "Report a Problem" page.</div>
+
+      <h2>4. Your rights and choices</h2>
+      <p>You are always in control of your own data:</p>
+      <ul>
+        <li><strong>Access & correction:</strong> you can view and edit most of your account info anytime from Edit Profile.</li>
+        <li><strong>Deletion:</strong> you can request deletion of your account and associated data at any time — see the Deactivating/Deleting Your Account guide.</li>
+        <li><strong>Visibility control:</strong> use Private Account, Blocking, and Muting to control exactly who can see and contact you — see the Privacy & Safety Settings guide.</li>
+        <li><strong>Marketing communications:</strong> you can opt out of non-essential notifications from your device/app notification settings — you cannot opt out of critical security notices (e.g. login alerts, password changes).</li>
+      </ul>
+
+      <h2>5. Data retention</h2>
+      <p>We retain your data for as long as your account remains active and as needed to provide the service to you. When you <strong>deactivate</strong> your account, your data is preserved but hidden, and restored the moment you log back in. When you <strong>permanently delete</strong> your account, your personal data is deleted or anonymized within a reasonable period, in line with applicable law — except where we're legally required to retain certain records (for example, to comply with a law enforcement request already in progress).</p>
+
+      <h2>6. Security measures</h2>
+      <p>We use industry-standard safeguards to protect your information, including encrypted password storage, secure transmission (HTTPS) for all traffic, and restricted internal access to sensitive data such as verification documents. No system is 100% secure, so we also strongly recommend enabling Two-Factor Login and Login Alerts in Settings.</p>
+
+      <h2>7. Children's privacy</h2>
+      <p>Nexor Sparks has a minimum age policy and is not directed at children under that age. We do not knowingly collect data from underage users; if we become aware that an underage account exists, it will be actioned in line with our policies.</p>
+
+      <h2>8. International users</h2>
+      <p>If you use Nexor Sparks from outside the country where our servers/service providers are located, your information may be transferred to, stored, and processed in a different country. We take steps to make sure it remains protected wherever it is processed.</p>
+
+      <h2>9. Changes to this policy</h2>
+      <p>We may update this Privacy Policy from time to time as our app evolves or as laws change. When we make material changes, we'll do our best to notify you through the app before they take effect.</p>
+
+      <div class="callout"><i class="ph ph-info"></i>For any privacy-related question that isn't answered here, talk to the AI Assistant (bottom right corner) or use the "Report a Problem" page.</div>
     `,
     related:['delete-account','terms-of-service','blocking-safety']
   },
   'terms-of-service':{
     cat:'policies', icon:'ph-file-text', title:'Terms of Service',
-    desc:'Rules and conditions for using Nexor Sparks.',
-    keywords:['terms','tos','conditions','agreement'],
+    desc:'The full rules and conditions for using Nexor Sparks.',
+    keywords:['terms','tos','conditions','agreement','legal'],
     body:`
-      <p>By using Nexor Sparks, you agree to these Terms of Service.</p>
-      <h2>Eligibility</h2>
-      <p>You must meet the minimum age requirement to use this app and must provide accurate information.</p>
-      <h2>Your responsibility</h2>
+      <p>By creating an account or using Nexor Sparks in any way, you agree to these Terms of Service. Please read them alongside our Privacy Policy and Community Guidelines.</p>
+
+      <h2>1. Eligibility</h2>
       <ul>
-        <li>You are responsible for the security of your account and password.</li>
-        <li>You are responsible for the accuracy and legality of the content you post.</li>
-        <li>Creating multiple fake or impersonation accounts is not allowed.</li>
+        <li>You must meet the minimum age requirement to use Nexor Sparks and must provide accurate information (real date of birth, working email/phone) when signing up.</li>
+        <li>You may not use Nexor Sparks if you've been previously banned, unless we've given you explicit permission to return.</li>
       </ul>
-      <h2>Content ownership</h2>
-      <p>You remain the owner of the content you create. By posting, you grant Nexor Sparks only enough license to display and distribute the content on the app.</p>
-      <h2>Prohibited conduct</h2>
-      <p>Harassment, hate speech, spam, fraud, illegal content, and intellectual property violations are strictly prohibited — see Community Guidelines for details.</p>
-      <h2>Suspension and termination</h2>
-      <p>Repeated or serious violations of the Terms or Community Guidelines may result in account suspension or termination.</p>
-      <h2>Changes to Terms</h2>
-      <p>We may update these Terms from time to time. Major changes will be communicated through the app.</p>
+
+      <h2>2. Your account & responsibilities</h2>
+      <ul>
+        <li>You are responsible for keeping your password secret and for all activity that happens under your account.</li>
+        <li>You are responsible for the accuracy and legality of everything you post.</li>
+        <li>Creating multiple fake, spam, or impersonation accounts is not allowed.</li>
+        <li>You must notify us (via the AI Assistant or Report a Problem) as soon as you suspect unauthorized access to your account.</li>
+      </ul>
+
+      <h2>3. Content ownership & license</h2>
+      <p>You keep full ownership of everything you create and post — your Pulses, Bolts, Stories, and Articles are yours. By posting, you grant Nexor Sparks a limited, non-exclusive license to host, display, and distribute that content within the app so we can actually show it to other users (for example, in feeds, search, and shares). This license ends when you delete the content or your account, except where content has already been shared by others in ways outside our control (e.g. a screenshot).</p>
+
+      <h2>4. Prohibited conduct</h2>
+      <p>Harassment, hate speech, spam, fraud, illegal content, impersonation, and intellectual property violations are strictly prohibited — see the Community Guidelines and the Copyright & Intellectual Property Policy for the full details on each.</p>
+
+      <h2>5. Suspension and termination</h2>
+      <ul>
+        <li>We may remove content, issue a warning, or suspend/terminate an account for violating these Terms or the Community Guidelines.</li>
+        <li>Serious violations (illegal activity, endangering someone's safety, severe or repeated abuse) can result in immediate permanent termination without a prior warning.</li>
+        <li>You may also delete your own account at any time — see the Deactivating/Deleting Your Account guide.</li>
+      </ul>
+
+      <h2>6. Disclaimers & limitation of liability</h2>
+      <p>Nexor Sparks is provided "as is." We work hard to keep the app reliable and safe, but we can't guarantee it will always be error-free, uninterrupted, or that content posted by other users will always be accurate or appropriate — that's why reporting tools exist.</p>
+
+      <h2>7. Changes to these Terms</h2>
+      <p>We may update these Terms from time to time as the app evolves or laws change. We'll do our best to communicate major changes through the app before they take effect. Continuing to use Nexor Sparks after changes take effect means you accept the updated Terms.</p>
     `,
-    related:['community-guidelines','copyright-policy']
+    related:['community-guidelines','copyright-policy','privacy-policy']
   },
   'community-guidelines':{
     cat:'policies', icon:'ph-users-three', title:'Community Guidelines',
-    desc:'Rules for building a safe and respectful community.',
-    keywords:['guidelines','rules','community rules','behavior','conduct'],
+    desc:'A full, detailed breakdown of every rule for a safe, authentic community.',
+    keywords:['guidelines','rules','community rules','behavior','conduct','hate speech','harassment','nudity','spam'],
     body:`
-      <p>Nexor Sparks believes in building a safe, respectful, and authentic community. These guidelines apply to every user.</p>
-      <h2>Be authentic</h2>
+      <p>Nexor Sparks believes in building a safe, respectful, and authentic community. These guidelines apply to every user, on every part of the app — Pulses, Bolts, Stories, Articles, comments, and Direct Messages.</p>
+
+      <h2>1. Be authentic</h2>
       <ul>
-        <li>Use your real identity — impersonation is not allowed.</li>
-        <li>Honestly label AI-generated content.</li>
-        <li>Fake engagement (bots, bought followers) is not allowed.</li>
+        <li><strong>Use your real identity.</strong> Impersonating another person, brand, or organization is not allowed, whether as a joke, a "fan account" pretending to be official, or with malicious intent.</li>
+        <li><strong>No fake accounts.</strong> Creating multiple accounts to evade a ban, manipulate engagement, or deceive others is prohibited.</li>
+        <li><strong>Label AI-generated content.</strong> If a Pulse, Bolt, or Article was fully or significantly created with AI tools, mark it honestly — see the AI Content Label guide.</li>
+        <li><strong>No fake engagement.</strong> Buying followers, using bots, or running like/comment exchange schemes to artificially inflate your numbers is not allowed.</li>
       </ul>
-      <h2>Be respectful</h2>
+
+      <h2>2. Be respectful</h2>
       <ul>
-        <li>Harassment, bullying, or threats are absolutely not allowed.</li>
-        <li>Hate speech — based on race, religion, gender, sexuality, disability — is not allowed.</li>
-        <li>Violating anyone's privacy (sharing personal info) is not allowed.</li>
+        <li><strong>No harassment, bullying, or threats.</strong> This includes repeated unwanted contact, threatening someone's safety, encouraging others to pile on a person, and sexual harassment.</li>
+        <li><strong>No hate speech.</strong> Attacking, demeaning, or dehumanizing people based on race, ethnicity, national origin, religion, gender, gender identity, sexual orientation, disability, or serious disease is strictly not allowed — including hateful symbols, slurs, and conspiracy theories that target a protected group.</li>
+        <li><strong>Respect people's privacy.</strong> Sharing someone else's private information without consent — home address, phone number, private photos, financial details — ("doxxing") is not allowed, even if you believe it's true.</li>
+        <li><strong>No coordinated harassment.</strong> Organizing or participating in a group effort to target, dogpile, or intimidate a specific person or account is prohibited.</li>
       </ul>
-      <h2>Post safe content</h2>
+
+      <h2>3. Post safe content</h2>
       <ul>
-        <li>Graphic violence, gore, or disturbing content is not allowed.</li>
-        <li>Nudity or sexually explicit content is not allowed.</li>
-        <li>Content promoting self-harm is not allowed — if you're struggling, please talk to a trusted person or a local helpline right away.</li>
-        <li>Promoting illegal activities (drugs, weapons, fraud) is not allowed.</li>
+        <li><strong>No graphic violence or gore.</strong> Content that glorifies or gratuitously depicts extreme violence, death, or serious injury is not allowed, even if labeled with a warning.</li>
+        <li><strong>No nudity or sexual content.</strong> Sexually explicit imagery, pornography, and non-consensual intimate imagery are not allowed anywhere on the platform, including Bolts, Stories, and DMs.</li>
+        <li><strong>No content that promotes self-harm.</strong> This includes content that encourages, glorifies, or gives instructions for suicide, self-harm, or eating disorders. If you or someone you know is struggling, please reach out to a trusted person or a local mental-health helpline right away — you deserve support.</li>
+        <li><strong>No illegal activity.</strong> Content that promotes or facilitates the sale of drugs, weapons, or other illegal goods, or that promotes fraud/scams, is not allowed.</li>
+        <li><strong>Sensitive content should be handled responsibly.</strong> Even where technically allowed, sensitive imagery should be used thoughtfully — the "Blur sensitive content" setting is there to protect other users by default.</li>
       </ul>
-      <h2>Spam and misinformation</h2>
-      <p>Repetitive spam, misleading links, and deliberately spreading false information are not allowed.</p>
-      <h2>What happens when you violate</h2>
+
+      <h2>4. Spam and misinformation</h2>
+      <ul>
+        <li><strong>No spam.</strong> Repetitive, unsolicited, or bulk-posted content — including mass-following/unfollowing to farm attention — is not allowed.</li>
+        <li><strong>No misleading links.</strong> Links to phishing sites, malware, or deceptive landing pages are prohibited.</li>
+        <li><strong>No deliberate misinformation.</strong> Knowingly spreading false information designed to deceive people, especially around elections, public health, or emergencies, is not allowed.</li>
+      </ul>
+
+      <h2>5. Respect intellectual property</h2>
+      <p>Only post content you own or have permission to use. Using someone else's photos, videos, music, or writing without a license is copyright infringement — see the Copyright & Intellectual Property Policy for the full rules and how to file a report.</p>
+
+      <h2>6. What happens when you violate a guideline</h2>
       <ol>
-        <li>Content may be removed.</li>
-        <li>A warning may be issued.</li>
-        <li>Repeated or serious violations may result in temporary or permanent account suspension.</li>
+        <li><strong>Content removal</strong> — the specific Pulse, Bolt, Story, Article, or comment that broke a rule is taken down.</li>
+        <li><strong>A warning</strong> — for a first or minor violation, you may simply receive a warning explaining what happened and why.</li>
+        <li><strong>Temporary suspension</strong> — repeated or more serious violations can lead to a temporary account suspension.</li>
+        <li><strong>Permanent ban</strong> — severe violations (e.g. content that endangers someone's safety) or a pattern of repeated violations can result in permanent removal from Nexor Sparks.</li>
       </ol>
-      <div class="callout"><i class="ph ph-flag"></i>If you see any content or user breaking the guidelines, report it right away via the "Report a Problem" page.</div>
+      <div class="callout"><i class="ph ph-info"></i>Enforcement generally scales with severity and history — a first small mistake is treated very differently from a deliberate, repeated, or dangerous violation.</div>
+
+      <h2>7. Reporting a violation</h2>
+      <p>If you see any content or user breaking these guidelines, please report it right away — see the Reporting Content, an Account, or a Problem guide for the exact steps. Reports are always anonymous.</p>
+
+      <div class="callout warn"><i class="ph ph-warning"></i>If there is an immediate threat to someone's life or physical safety, contact your local emergency services first, before reporting in-app.</div>
     `,
     related:['report-content','ai-content-label','terms-of-service']
   },
   'copyright-policy':{
     cat:'policies', icon:'ph-copyright', title:'Copyright & Intellectual Property Policy',
-    desc:'How to report copyright infringement and protect your rights.',
+    desc:'How to report copyright infringement and protect your rights, step by step.',
     keywords:['copyright','ip','intellectual property','dmca','infringement'],
     body:`
-      <p>Nexor Sparks respects others' intellectual property and expects the same from its users.</p>
+      <p>Nexor Sparks respects others' intellectual property and expects the same from every user.</p>
+
       <h2>Copyright rules</h2>
       <ul>
-        <li>Only post content you own, or that you have permission/license to post.</li>
-        <li>Using others' photos, videos, music, or writing without permission is copyright infringement.</li>
+        <li>Only post content you own, or that you have clear permission/license to post.</li>
+        <li>Using someone else's photos, videos, music, or writing without permission is copyright infringement — even if you credit them, and even if you edited it.</li>
+        <li>This applies across Pulses, Bolts, Stories, and Articles.</li>
       </ul>
+
       <h2>If your copyrighted content has been used without permission</h2>
-      <p>You can file a complaint through our dedicated copyright report page. You'll need to submit a link to the infringing content, proof of your ownership, and your contact details.</p>
+      <ol>
+        <li>Open our dedicated copyright report page (linked below).</li>
+        <li>Submit a direct link to the infringing content on Nexor Sparks.</li>
+        <li>Provide proof of your ownership (e.g. the original file, an earlier publish date, or a license document).</li>
+        <li>Add your contact details so our team can follow up if needed.</li>
+      </ol>
       <a class="ext-link-btn" href="https://nexor-f4d.pages.dev/filecopyright" target="_blank"><i class="ph ph-arrow-square-out"></i> File a Copyright Report</a>
+
       <h2>If your content was removed due to a copyright claim</h2>
-      <p>If you believe the removal was a mistake (e.g. the content is your original work), you can submit a counter-request through the same report page.</p>
-      <div class="callout warn"><i class="ph ph-warning"></i>Accounts with repeated copyright violations may be suspended or permanently banned.</div>
+      <p>If you believe the removal was a mistake — for example, the content is genuinely your own original work — you can submit a counter-request through the same report page, explaining why the claim was incorrect.</p>
+
+      <h2>Consequences of repeated violations</h2>
+      <div class="callout warn"><i class="ph ph-warning"></i>Accounts with repeated, valid copyright violations against them may be suspended or permanently banned. You can check your own account's status anytime from Settings > Copyright Strikes.</div>
     `,
-    related:['terms-of-service','report-content']
+    related:['copyright-strikes','terms-of-service','report-content']
   },
   'report-content':{
     cat:'safety', icon:'ph-flag-banner', title:'Reporting content, an account, or a problem',
-    desc:'Report content, fake accounts, or bugs that break the guidelines.',
+    desc:'A full guide to reporting content, fake accounts, or app bugs.',
     keywords:['report','complaint','problem','bug','fake account','abuse'],
     body:`
-      <p>If you find any content, account, or behavior that goes against our Community Guidelines, it's important to report it.</p>
-      <h2>Reporting a Pulse/Article</h2>
+      <p>If you find any content, account, or behavior that goes against our Community Guidelines, it's important to report it — reporting is quick and always confidential.</p>
+      <h2>Reporting a Pulse, Bolt, or Article</h2>
       <ol>
-        <li>Go to the post and tap the (⋯) menu.</li>
+        <li>Go to the specific post you want to report.</li>
+        <li>Tap the (⋯) menu on it.</li>
         <li>Select <strong>Report</strong>.</li>
-        <li>Choose the most relevant reason (spam, harassment, nudity, hate speech, misinformation, etc.).</li>
+        <li>Choose the most relevant reason — spam, harassment, nudity, hate speech, misinformation, self-harm content, illegal activity, or copyright — and add any extra detail if asked.</li>
+        <li>Submit — our team reviews it from there.</li>
       </ol>
       <h2>Reporting an account</h2>
       <ol>
         <li>Go to that user's profile.</li>
         <li>Choose <strong>Report Account</strong> from the (⋯) menu.</li>
-        <li>State a reason and submit.</li>
+        <li>Select or state a reason (impersonation, fake account, harassment, etc.).</li>
+        <li>Submit.</li>
       </ol>
       <h2>Reporting an app bug or technical problem</h2>
-      <p>Describe the bug, crash, or technical issue to the AI Assistant (bottom right corner) along with a screenshot.</p>
-      <div class="callout"><i class="ph ph-shield-check"></i>Reports stay anonymous — the user you reported won't know who reported them.</div>
+      <p>Open the AI Assistant (bottom right corner) and describe the bug, crash, or technical issue you're seeing, along with a screenshot if possible — this helps our team reproduce and fix it faster.</p>
+      <div class="callout"><i class="ph ph-shield-check"></i>Reports stay completely anonymous — the person or content you reported will never know who reported them.</div>
       <h2>Emergency or immediate safety threat</h2>
-      <p>If there is an immediate threat to someone's life or safety, contact your local emergency services first.</p>
+      <p>If there is an immediate threat to someone's life or physical safety, contact your local emergency services first — reporting in-app is not a substitute for emergency help.</p>
     `,
     related:['community-guidelines','blocking-safety','hacked-account']
   },
   'about-nexor':{
     cat:'policies', icon:'ph-info', title:'About Nexor Sparks',
-    desc:'Who built Nexor Sparks and who leads the company.',
+    desc:'Who built Nexor Sparks, who leads the company, and what it stands for.',
     keywords:['founder','who founded','who made this','who owns','ceo','co-founder','cofounder','who created nexor','about nexor'],
     body:`
-      <p>Nexor Sparks is built and run by Nexor.</p>
+      <p>Nexor Sparks is a social app for sharing quick moments (Pulses), short-form videos (Bolts), Stories, and longer-form writing (Articles) — built and run by Nexor.</p>
       <h2>Leadership</h2>
       <ul>
         <li><strong>Founder & CEO:</strong> Gursharan Singh</li>
         <li><strong>Co-Founder:</strong> Anmol Sunda</li>
       </ul>
+      <div class="callout"><i class="ph ph-info"></i>For legal terms and how we handle your data, see the Terms of Service and Privacy Policy.</div>
     `,
     related:['terms-of-service','privacy-policy']
   },
   'blocking-safety':{
     cat:'safety', icon:'ph-shield-check', title:'Blocking, muting, and privacy settings',
-    desc:'Block/mute a user, go private, blur sensitive content, and control your safety.',
+    desc:'A full guide to going private, blocking, muting, and other safety tools.',
     keywords:['block','mute','safety','avoid harassment','private account','blur sensitive','location sharing'],
     body:`
-      <p>Nexor Sparks gives you several tools to control your experience.</p>
+      <p>Nexor Sparks gives you several tools, all in Settings and on each profile's (⋯) menu, to control exactly who can see you and reach you.</p>
       <h2>Private account</h2>
-      <p><strong>Settings &gt; Private account</strong> — only your approved followers can see your Pulses.</p>
-      <h2>Blocking</h2>
-      <p>When you block someone, they won't be able to see your profile, Pulses, or messages, and won't be able to contact you.</p>
+      <p><strong>Settings &gt; Private account</strong> — toggle this on and only your approved followers can see your Pulses. New follow requests will need your approval first.</p>
+      <h2>Blocking someone</h2>
+      <p>When you block someone, they can no longer see your profile, Pulses, or messages, and can't contact you at all.</p>
       <ol>
         <li>Open that user's profile.</li>
-        <li>Select <strong>Block</strong> from the (⋯) menu, or manage everyone you've blocked from <strong>Settings &gt; Blocked accounts</strong>.</li>
+        <li>Select <strong>Block</strong> from the (⋯) menu.</li>
+        <li>Manage everyone you've ever blocked anytime from <strong>Settings &gt; Blocked accounts</strong>, including unblocking them.</li>
       </ol>
-      <h2>Muting</h2>
-      <p>When you mute someone (<strong>Settings &gt; Muted accounts</strong>), they can still contact you, but you won't get notifications about their activity — and they won't know you've muted them.</p>
+      <h2>Muting someone</h2>
+      <p>When you mute someone (<strong>Settings &gt; Muted accounts</strong>), they can still contact and follow you as normal, but you simply stop seeing notifications about their activity — and importantly, they are never told you've muted them.</p>
       <h2>Other privacy & safety settings</h2>
       <ul>
-        <li><strong>Blur sensitive content</strong> — automatically blurs detected adult/sensitive images until you tap to reveal them.</li>
-        <li><strong>Share location guess</strong> — controls whether an approximate "Account based in" country shows on your About info.</li>
-        <li>Control who can message you and set restrictions on comments and tags.</li>
+        <li><strong>Blur sensitive content</strong> — automatically blurs detected adult/sensitive images across the app until you deliberately tap to reveal them.</li>
+        <li><strong>Share location guess</strong> — controls whether an approximate "Account based in" country shows on your About info; turn this off for extra privacy.</li>
+        <li><strong>Message & tag controls</strong> — restrict who can message you and set restrictions on who can comment or tag you.</li>
       </ul>
-      <div class="callout"><i class="ph ph-info"></i>If someone is harassing you, be sure to report them in addition to blocking them.</div>
+      <div class="callout"><i class="ph ph-info"></i>If someone is harassing you, don't just block them — report them too, so our team can take broader action if needed.</div>
     `,
     related:['report-content','privacy-policy','two-factor-login']
   },
   'change-password':{
     cat:'account', icon:'ph-password', title:'Changing your password while logged in',
-    desc:'Update your password from Settings without needing a reset link.',
+    desc:'Update your password from Settings, step by step, without a reset link.',
     keywords:['change password','update password','new password'],
     body:`
-      <p>If you already remember your current password but just want to update it, go to <strong>Settings &gt; Change Password</strong>.</p>
+      <p>If you already remember your current password but just want to update it — for routine security or because you suspect it may be exposed — this is the quickest path.</p>
+      <h2>Steps</h2>
       <ol>
-        <li>Enter your current password to confirm it's really you.</li>
-        <li>Enter and confirm your new password.</li>
+        <li>Go to <strong>Settings &gt; Change Password</strong>.</li>
+        <li>Enter your current password, to confirm it's really you.</li>
+        <li>Enter your new password, then confirm it a second time.</li>
+        <li>Save — you'll typically remain logged in on this device, but other sessions may be signed out for security.</li>
       </ol>
-      <div class="callout"><i class="ph ph-info"></i>Use a strong, unique password you don't reuse anywhere else.</div>
-      <p>If you don't remember your current password, use the "Forgot Password?" flow from the login screen instead.</p>
+      <div class="callout"><i class="ph ph-info"></i>Use a strong, unique password you don't reuse on any other website or app.</div>
+      <p>If you don't remember your current password at all, use the "Forgot Password?" flow from the login screen instead — see the Password Reset guide.</p>
     `,
     related:['password-forgot','two-factor-login']
   },
   'two-factor-login':{
     cat:'account', icon:'ph-shield-star', title:'Two-factor login and login alerts',
-    desc:'Add an extra layer of security and get notified of new logins.',
+    desc:'A full guide to the three key account-security settings.',
     keywords:['two factor','2fa','login alerts','login activity','active sessions','security'],
     body:`
-      <ul>
-        <li><strong>Settings &gt; Two-factor login</strong> — requires an email verification code every time anyone tries to log into your account, in addition to your password.</li>
-        <li><strong>Settings &gt; Login alerts</strong> — sends you an email notification any time there's a new login to your account.</li>
-        <li><strong>Settings &gt; Login Activity</strong> — see every device/session currently logged in, and log out anything you don't recognize.</li>
-      </ul>
-      <div class="callout"><i class="ph ph-shield-check"></i>Turning all three on together is the strongest way to protect your account.</div>
+      <p>Nexor Sparks gives you three complementary settings, all found in Settings, to keep your account secure:</p>
+      <h2>Two-factor login</h2>
+      <p>Once turned on, every login attempt to your account — from you or anyone else — requires an email verification code in addition to your password. This is the single strongest protection against someone logging in even if they somehow get your password.</p>
+      <h2>Login alerts</h2>
+      <p>Sends you an email notification the moment there's a new login to your account, so you're immediately aware of any access you didn't expect.</p>
+      <h2>Login Activity</h2>
+      <p>Shows every device/session currently logged into your account. Review the list periodically and tap to log out anything you don't recognize.</p>
+      <div class="callout"><i class="ph ph-shield-check"></i>Turning all three on together is the strongest way to protect your account — we recommend enabling them right after signing up.</div>
     `,
     related:['change-password','hacked-account','link-phone']
   },
   'link-phone':{
     cat:'account', icon:'ph-device-mobile', title:'Linking a phone number',
-    desc:'Add a phone number for recovery and verification.',
+    desc:'Add a phone number for account recovery and verification, step by step.',
     keywords:['link phone','phone number','add phone','otp'],
     body:`
-      <p>Adding a phone number to your account (<strong>Settings &gt; Link phone number</strong>) gives you another way to recover your account if you ever lose access to your email, and can be used for verification codes.</p>
-      <div class="callout"><i class="ph ph-info"></i>You'll receive an OTP (one-time code) by SMS to confirm the number really belongs to you before it's linked.</div>
+      <p>Adding a phone number gives you a second way to recover your account if you ever lose access to your email, and can also be used to receive verification codes.</p>
+      <h2>Steps</h2>
+      <ol>
+        <li>Go to <strong>Settings &gt; Link phone number</strong>.</li>
+        <li>Enter your phone number, including country code.</li>
+        <li>You'll receive an OTP (one-time code) by SMS — enter it to confirm the number really belongs to you.</li>
+        <li>Once verified, the number is linked and can be used for recovery and verification going forward.</li>
+      </ol>
+      <div class="callout"><i class="ph ph-info"></i>Keep your linked phone number up to date — it's one of the fastest ways to recover a compromised or locked account.</div>
     `,
     related:['two-factor-login','hacked-account']
   },
   'copyright-strikes':{
     cat:'safety', icon:'ph-warning-octagon', title:'Copyright strikes on your own account',
-    desc:'Check whether your account has any active copyright strikes.',
+    desc:'Check your account\'s copyright-strike status and what it means.',
     keywords:['copyright strike','my strikes','account strike'],
     body:`
-      <p><strong>Settings &gt; Copyright Strikes</strong> shows whether your account currently has any active copyright strikes issued after someone filed a valid copyright complaint against your content.</p>
-      <div class="callout warn"><i class="ph ph-warning"></i>Repeated copyright violations can lead to account suspension or a permanent ban.</div>
-      <p>See the Copyright & Intellectual Property Policy for how the reporting/counter-request process works if you believe a strike was a mistake.</p>
+      <p><strong>Settings &gt; Copyright Strikes</strong> shows whether your account currently has any active copyright strikes, issued after someone filed a valid copyright complaint against content you posted.</p>
+      <h2>What a strike means</h2>
+      <p>A strike is recorded against your account each time a valid copyright claim is upheld. It's a signal that your account has posted infringing content — even one strike is worth taking seriously.</p>
+      <h2>What happens with repeated strikes</h2>
+      <div class="callout warn"><i class="ph ph-warning"></i>Repeated copyright violations can lead to temporary suspension, and ultimately a permanent ban for accounts that keep re-offending.</div>
+      <h2>If you think a strike was a mistake</h2>
+      <p>If you believe a strike was issued incorrectly — for example, the content was genuinely your own original work — see the Copyright & Intellectual Property Policy for how to submit a counter-request through the copyright report page.</p>
     `,
     related:['copyright-policy','report-content']
   },
