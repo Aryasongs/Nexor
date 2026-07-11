@@ -3614,8 +3614,10 @@ function doLogout(){ unsubAll(); feedUnsub&&feedUnsub(); auth.signOut(); }
 // ============================================================
 // Shares a small, non-sensitive snapshot of the logged-in account with
 // the Help Center (same origin: aryasongs.github.io/Pulse) via
-// localStorage, so its AI assistant (Sparky) can greet the user by name
-// and tailor its answers to their account — WITHOUT ever sending their
+// localStorage, so its AI assistant (Sparky) can greet the user by name,
+// automatically treat them as "logged in" on the Help Center too, and
+// tailor its answers using their handle, bio, verified/account type, and
+// public follower/following/pulse counts — WITHOUT ever sending their
 // email, password, or any other private data. Sparky only ever sees
 // what's written here.
 function openHelpCenter(){
@@ -3624,8 +3626,12 @@ function openHelpCenter(){
       loggedIn: !!(me&&me.uid),
       name: myData.name||null,
       handle: myData.handle||null,
+      bio: myData.bio||null,
       verified: !!myData.verified,
       accountType: myData.accountType||'personal',
+      followersCount: myData.followersCount||0,
+      followingCount: myData.followingCount||0,
+      pulsesCount: myData.pulsesCount||0,
       updatedAt: Date.now()
     };
     localStorage.setItem('nexorUserContext', JSON.stringify(ctx));
