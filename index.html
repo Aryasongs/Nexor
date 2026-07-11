@@ -2283,7 +2283,7 @@ i.spin::before{content:''!important;}
       <input class="sheet-field" id="ce-new-email" type="email" placeholder="you@example.com" autocomplete="email">
       <div class="auth-error" id="ce-err1" style="margin-bottom:10px;"></div>
       <button class="btn-sheet primary" id="ce-send-btn" onclick="ceSendOtp()"><i class="ph ph-paper-plane-tilt"></i> Send code</button>
-      <button class="btn-sheet outline" style="margin-top:8px;" onclick="closeModal('change-email-modal')">Cancel</button>
+      <button class="btn-sheet outline" style="margin-top:8px;" onclick="ceCachedPassword='';closeModal('change-email-modal')">Cancel</button>
     </div>
 
     <div id="ce-step2" class="hidden">
@@ -2293,12 +2293,12 @@ i.spin::before{content:''!important;}
       <div class="auth-error" id="ce-err2" style="margin-bottom:10px;"></div>
       <button class="btn-sheet primary" id="ce-verify-btn" onclick="ceVerifyOtp()"><i class="ph ph-check-circle"></i> Verify code</button>
       <button class="btn-sheet outline" style="margin-top:8px;" onclick="ceResendOtp()">Resend code</button>
-      <button class="btn-sheet outline" style="margin-top:8px;" onclick="closeModal('change-email-modal')">Cancel</button>
+      <button class="btn-sheet outline" style="margin-top:8px;" onclick="ceCachedPassword='';closeModal('change-email-modal')">Cancel</button>
     </div>
 
     <div id="ce-step3" class="hidden">
-      <p style="font-size:13px;color:var(--text3);margin-bottom:14px;"><i class="ph ph-link" style="color:var(--cyan);"></i> Code verified. We've also sent a confirmation link from Firebase to <strong id="ce-target-email2"></strong> — open that email and tap the link to finish updating your address. Your email won't change until you confirm it there.</p>
-      <button class="btn-sheet primary" onclick="closeModal('change-email-modal')">Got it</button>
+      <p style="font-size:13px;color:var(--text3);margin-bottom:14px;"><i class="ph ph-link" style="color:var(--cyan);"></i> Code verified. We've sent one more confirmation link to <strong id="ce-target-email2"></strong> — open that email and tap the link to finish updating your address. Your email won't change until you confirm it there.</p>
+      <button class="btn-sheet primary" onclick="ceCachedPassword='';closeModal('change-email-modal')">Got it</button>
     </div>
   </div>
 </div>
@@ -9324,6 +9324,12 @@ async function lpVerifyOtp(){
 // (finalized in finalizePendingEmailChangeIfVerified(), called on sign-in).
 // ============================================================
 let ceNewEmail = '';
+let ceCachedPassword = ''; // held only in memory, only for the duration of this flow — needed to
+                            // re-authenticate right before verifyBeforeUpdateEmail (see ceVerifyOtp).
+                            // Without a FRESH reauth at that exact moment, Firebase silently refuses
+                            // to send its verification link once the initial reauth (done when the
+                            // OTP was sent) goes stale — which easily happens while the user is busy
+                            // checking their inbox for the OTP.
 function openChangeEmailModal(){
   document.getElementById('ce-password').value='';
   document.getElementById('ce-new-email').value='';
@@ -9333,6 +9339,7 @@ function openChangeEmailModal(){
   document.getElementById('ce-step1').classList.remove('hidden');
   document.getElementById('ce-step2').classList.add('hidden');
   document.getElementById('ce-step3').classList.add('hidden');
+  ceCachedPassword='';
   openModal('change-email-modal');
 }
 function ceOtpKey(){ return 'otpRequests/'+me.uid+'/changeEmail'; }
@@ -9364,6 +9371,7 @@ async function ceSendOtp(){
     await emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, {email:newEmail, passcode:otp, time:timeStr});
 
     ceNewEmail=newEmail;
+    ceCachedPassword=password; // needed again just before verifyBeforeUpdateEmail — see note above
     document.getElementById('ce-target-email').textContent=newEmail;
     document.getElementById('ce-otp').value='';
     document.getElementById('ce-err2').textContent='';
@@ -9403,8 +9411,33 @@ async function ceVerifyOtp(){
     // email-verification LINK — the actual auth email only changes once the
     // user opens that email and taps the link (Firebase does this on its own,
     // even in a later session — see finalizePendingEmailChangeIfVerified()).
+    //
+    // IMPORTANT: Firebase refuses to send that link unless the session is
+    // "recently" authenticated. The reauth done back in ceSendOtp() can go
+    // stale by the time the user finishes checking their inbox for the OTP,
+    // so we reauthenticate ONE more time, right here, immediately before
+    // calling verifyBeforeUpdateEmail — that's what actually triggers Firebase
+    // to send the email.
     const oldEmail=(auth.currentUser.email||'').toLowerCase();
-    await auth.currentUser.verifyBeforeUpdateEmail(data.newEmail);
+    if(!ceCachedPassword){ errEl.textContent='Session expired — close this and start over from "Send code".'; btn.disabled=false; btn.innerHTML='<i class="ph ph-check-circle"></i> Verify code'; return; }
+    try{
+      const cred=firebase.auth.EmailAuthProvider.credential(oldEmail, ceCachedPassword);
+      await auth.currentUser.reauthenticateWithCredential(cred);
+    }catch(reauthErr){
+      console.error('Re-auth before verifyBeforeUpdateEmail failed:', reauthErr);
+      errEl.textContent='Could not confirm your password — close this and start over from "Send code".';
+      btn.disabled=false; btn.innerHTML='<i class="ph ph-check-circle"></i> Verify code';
+      return;
+    }
+    try{
+      await auth.currentUser.verifyBeforeUpdateEmail(data.newEmail);
+    }catch(linkErr){
+      console.error('verifyBeforeUpdateEmail failed:', linkErr.code, linkErr.message);
+      errEl.textContent = '['+(linkErr.code||'error')+'] '+(linkErr.message||'Could not send the verification link.');
+      btn.disabled=false; btn.innerHTML='<i class="ph ph-check-circle"></i> Verify code';
+      return;
+    }
+    ceCachedPassword=''; // done with it — clear from memory
     await db.ref('users/'+me.uid+'/pendingEmailChange').set({oldEmail, newEmail:data.newEmail, requestedAt: firebase.database.ServerValue.TIMESTAMP});
     await db.ref(ceOtpKey()).remove().catch(()=>{});
 
@@ -9412,7 +9445,8 @@ async function ceVerifyOtp(){
     document.getElementById('ce-step2').classList.add('hidden');
     document.getElementById('ce-step3').classList.remove('hidden');
   }catch(err){
-    errEl.textContent = err.code==='auth/requires-recent-login' ? 'Session expired, please log out and back in, then retry.' : (err.message||'Could not send verification link.');
+    console.error('ceVerifyOtp failed:', err.code, err.message);
+    errEl.textContent = err.code==='auth/requires-recent-login' ? 'Session expired, please log out and back in, then retry.' : ('['+(err.code||'error')+'] '+(err.message||'Could not send verification link.'));
   }
   btn.disabled=false; btn.innerHTML='<i class="ph ph-check-circle"></i> Verify code';
 }
