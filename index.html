@@ -1836,13 +1836,21 @@ i.spin::before{content:''!important;}
 
   <div class="settings-section-title">Support & Legal</div>
   <div class="settings-section">
-    <div class="settings-row" onclick="window.open('https://aryasongs.github.io/Pulse/Sparkshelp.html','_blank')">
+    <div class="settings-row" onclick="openHelpCenter()">
       <i class="ph ph-question"></i>
       <div class="settings-row-text">
         <div class="settings-row-title">Help Center</div>
-        <div class="settings-row-sub">Get answers and support</div>
+        <div class="settings-row-sub">Get answers and support, personalized to your account</div>
       </div>
       <i class="ph ph-arrow-square-out" style="font-size:16px;"></i>
+    </div>
+    <div class="settings-row" onclick="openModal('about-nexor-company-modal')">
+      <i class="ph ph-info"></i>
+      <div class="settings-row-text">
+        <div class="settings-row-title">About Nexor Sparks</div>
+        <div class="settings-row-sub">Company info, founder & team</div>
+      </div>
+      <i class="ph ph-caret-right" style="font-size:16px;"></i>
     </div>
     <div class="settings-row" onclick="window.open('https://aryasongs.github.io/Pulse/Sparkspp.html','_blank')">
       <i class="ph ph-shield-check"></i>
@@ -2555,6 +2563,26 @@ i.spin::before{content:''!important;}
       <span class="char-counter" id="edit-pulse-counter">200</span>
       <button class="btn-post" id="edit-pulse-save-btn" onclick="saveEditPulse()">Save</button>
     </div>
+  </div>
+</div>
+
+<!-- About Nexor Sparks (the company, not a user account) -->
+<div class="modal-overlay" id="about-nexor-company-modal">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title" style="display:flex;align-items:center;gap:6px;"><i class="ph ph-info" style="color:var(--cyan);"></i> About Nexor Sparks</div>
+    <div style="padding:4px 0 8px;font-size:14px;color:var(--text2);line-height:1.7;">
+      <p style="margin-bottom:14px;">Nexor Sparks is built and run by Nexor.</p>
+      <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:10px;">
+        <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-bottom:2px;">Founder & CEO</div>
+        <div style="font-size:15px;font-weight:700;color:var(--text);">Gursharan Singh</div>
+      </div>
+      <div style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:14px 16px;">
+        <div style="font-size:12px;color:var(--text3);text-transform:uppercase;letter-spacing:.4px;font-weight:700;margin-bottom:2px;">Co-Founder</div>
+        <div style="font-size:15px;font-weight:700;color:var(--text);">Anmol Sunda</div>
+      </div>
+    </div>
+    <button class="btn-sheet outline" onclick="closeModal('about-nexor-company-modal')">Close</button>
   </div>
 </div>
 
@@ -3580,6 +3608,30 @@ function friendlyErr(err){
   return m[err.code]||err.message||'Something went wrong.';
 }
 function doLogout(){ unsubAll(); feedUnsub&&feedUnsub(); auth.signOut(); }
+
+// ============================================================
+// HELP CENTER HANDOFF
+// ============================================================
+// Shares a small, non-sensitive snapshot of the logged-in account with
+// the Help Center (same origin: aryasongs.github.io/Pulse) via
+// localStorage, so its AI assistant (Sparky) can greet the user by name
+// and tailor its answers to their account — WITHOUT ever sending their
+// email, password, or any other private data. Sparky only ever sees
+// what's written here.
+function openHelpCenter(){
+  try{
+    const ctx={
+      loggedIn: !!(me&&me.uid),
+      name: myData.name||null,
+      handle: myData.handle||null,
+      verified: !!myData.verified,
+      accountType: myData.accountType||'personal',
+      updatedAt: Date.now()
+    };
+    localStorage.setItem('nexorUserContext', JSON.stringify(ctx));
+  }catch(e){ /* best-effort — Help Center still works fully without this */ }
+  window.open('https://aryasongs.github.io/Pulse/Sparkshelp.html','_blank');
+}
 
 auth.onAuthStateChanged(async user => {
   me = user;
@@ -5561,7 +5613,9 @@ const NEXOR_KNOWLEDGE = [
   { keywords:['notification','alert','notify'],
     answer:"You get notifications for likes, replies, reposts, follows, and mentions — check the Alerts tab in the sidebar." },
   { keywords:['private','privacy','data','password','email','phone number'],
-    answer:"I can't share any private account information — emails, passwords, locations, or anyone's personal data. Happy to answer general questions about how Sparks works instead!" },
+    answer:"I can't share anyone else's private account information — emails, passwords, locations, or other people's personal data. But feel free to ask me about your OWN account (like your handle, follower count, verified status, or join date), or general questions about how Sparks works!" },
+  { keywords:['founder','who founded','who made sparks','who created','who owns','ceo','chief executive','co-founder','cofounder'],
+    answer:"Nexor Sparks was founded by Gursharan Singh, who's also the CEO. Anmol Sunda is the Co-Founder. The two of them lead Nexor." },
   { keywords:['search kaise','search','find'],
     answer:"Use the search bar to look up people, hashtags, or Pulses across the app." },
   { keywords:['for you feed','feed','timeline','for you'],
@@ -5584,6 +5638,52 @@ const NEXOR_KNOWLEDGE = [
     answer:"My name's Nexor — you can always find me at @nexor." },
 ];
 
+// ------------------------------------------------------------------
+// PERSONALIZED ANSWERS — about the ASKER'S OWN account only.
+// Since @nexor is always triggered by the tagging user's own action
+// (their own post/reply), `myData`/`me` at call time IS that user's own
+// profile — never someone else's. This lets @nexor answer "my account"
+// style questions with real data, while still never revealing anyone
+// ELSE'S private info (see the 'private' knowledge entry above).
+// ------------------------------------------------------------------
+function nexorFormatDate(ts){
+  if(!ts) return null;
+  try{ return new Date(ts).toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'}); }catch(e){ return null; }
+}
+function findPersonalNexorAnswer(question, asker){
+  if(!asker || !Object.keys(asker).length) return null;
+  const q=' '+question.toLowerCase().replace(/[?.,!]/g,' ')+' ';
+  const name=asker.name||'there';
+  if(/\bmy handle\b|\bmy username\b|what.?s my handle|who am i\b/.test(q)){
+    return `Hey ${name}! Your handle is @${asker.handle||'—'}.`;
+  }
+  if(/\bmy followers\b|how many followers/.test(q)){
+    return `You currently have ${asker.followersCount||0} follower${asker.followersCount===1?'':'s'}, ${name}.`;
+  }
+  if(/\bmy following\b|how many (people|accounts).*follow|following count/.test(q)){
+    return `You're following ${asker.followingCount||0} account${asker.followingCount===1?'':'s'} right now.`;
+  }
+  if(/am i verified|my verified|do i have.*(badge|tick)/.test(q)){
+    return asker.verified ? `Yes ${name}, your account is verified! ✅` : `Not yet, ${name} — you don't currently have a verified badge on your account.`;
+  }
+  if(/when did i join|my join date|how long have i (been|had)/.test(q)){
+    const d=nexorFormatDate(asker.createdAt);
+    return d ? `You joined Sparks on ${d}, ${name}.` : `I don't have your exact join date handy, but I can tell you anything else about your account!`;
+  }
+  if(/\bmy bio\b|what.?s my bio/.test(q)){
+    return asker.bio ? `Your bio currently says: "${asker.bio}"` : `You don't have a bio set yet, ${name} — you can add one from Edit Profile.`;
+  }
+  if(/my account type|am i (a )?business account|am i an? organi[sz]ation/.test(q)){
+    return `Your account type is currently set to "${asker.accountType||'personal'}".`;
+  }
+  if(/about my account|my account info|my profile info/.test(q)){
+    const parts=[`Handle: @${asker.handle||'—'}`, `Verified: ${asker.verified?'Yes':'No'}`, `Followers: ${asker.followersCount||0}`, `Following: ${asker.followingCount||0}`];
+    const d=nexorFormatDate(asker.createdAt); if(d) parts.push(`Joined: ${d}`);
+    return `Here's your account, point by point:\n• ${parts.join('\n• ')}`;
+  }
+  return null;
+}
+
 // Lightweight greeting detector — checked separately from the topic-based
 // knowledge base above so a plain "hi" doesn't accidentally match some
 // unrelated keyword.
@@ -5594,11 +5694,12 @@ const NEXOR_GREETINGS = ['hi','hii','hiii','hello','hey','heya','namaste','yo','
 // only needs to appear as a substring (so plurals / Hinglish spelling
 // variants still match). The highest-scoring entry wins; ties keep the
 // earlier (more specific, since list is ordered specific→general) entry.
-function findNexorAnswer(question){
+function findNexorAnswer(question, asker){
   const q=' '+question.toLowerCase().replace(/[?.,!]/g,' ')+' ';
   const qWords=q.trim().split(/\s+/);
+  const name=asker&&asker.name;
   if(qWords.length<=2 && NEXOR_GREETINGS.some(g=>qWords.includes(g))){
-    return "Hey there! 👋 I'm @nexor, Sparks' AI account. Ask me anything about how the app works — posting, badges, follows, you name it.";
+    return (name?`Hey ${name}! 👋`:"Hey there! 👋")+" I'm @nexor, Sparks' AI account. Ask me anything about how the app works — posting, badges, follows, or even questions about your own account.";
   }
   let best=null, bestScore=0;
   for(const entry of NEXOR_KNOWLEDGE){
@@ -5609,7 +5710,7 @@ function findNexorAnswer(question){
     if(score>bestScore){ bestScore=score; best=entry; }
   }
   if(best) return best.answer;
-  return "Hi! I'm the official @nexor account. I can answer questions about how Sparks works — posting, badges, follows, notifications, and more. Ask away!";
+  return (name?`Hi ${name}! `:"Hi! ")+"I'm the official @nexor account. I can answer questions about how Sparks works — posting, badges, follows, notifications, and more — or about your own account. Ask away!";
 }
 
 // ------------------------------------------------------------------
@@ -5991,7 +6092,15 @@ async function triggerNexorAIReply(rawText, pulseId, nexorUid){
       imagePromptToGenerate=req.prompt;
     }
   }else{ // req.mode==='text'
-    answer=req.prompt ? findNexorAnswer(req.prompt) : NEXOR_OPTIONS_PROMPT;
+    if(req.prompt){
+      // `myData`/`me` reflect whoever is CURRENTLY tagging @nexor with
+      // their own post/reply — i.e. the asker's own account, never
+      // someone else's — so it's safe to use for personalized answers.
+      const asker=(me&&me.uid)?{...myData, uid:me.uid}:null;
+      answer = findPersonalNexorAnswer(req.prompt, asker) || findNexorAnswer(req.prompt, asker);
+    } else {
+      answer = NEXOR_OPTIONS_PROMPT;
+    }
   }
   try{
     const uSnap=await db.ref('users/'+nexorUid).once('value');
