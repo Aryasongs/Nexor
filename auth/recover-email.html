@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Recover Email — Nexor Sparks</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23050A14'/%3E%3Cpath d='M7 2v11h3v9l7-12h-4l4-8z' fill='%2300C8FF'/%3E%3C/svg%3E">
+<meta name="robots" content="noindex,nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+<div class="auth-action-screen">
+  <div class="auth-brand" id="brand-mount"></div>
+
+  <div class="auth-card" style="text-align:center;">
+    <div id="view-loading">
+      <div class="state-icon-wrap"><div class="state-icon loading"><i class="ph ph-circle-notch spin"></i></div></div>
+      <div class="state-title">Checking your link&hellip;</div>
+      <div class="state-desc">Please wait a moment.</div>
+    </div>
+
+    <div id="view-invalid" class="hidden">
+      <div class="state-icon-wrap"><div class="state-icon error"><i class="ph ph-x-circle"></i></div></div>
+      <div class="state-title">Link invalid or expired</div>
+      <div class="state-desc" id="invalid-desc">This email recovery link is no longer valid.</div>
+      <div class="btn-row"><a class="btn btn-secondary" href="#" id="btn-invalid-login">Go to Login</a></div>
+    </div>
+
+    <div id="view-success" class="hidden">
+      <div class="state-icon-wrap"><div class="state-icon success"><i class="ph ph-shield-check"></i></div></div>
+      <div class="state-title">Email address restored</div>
+      <div class="state-desc">
+        The change to your account email has been reversed. Your sign-in email is now:
+      </div>
+      <div class="email-pill"><i class="ph ph-envelope-simple"></i><span id="restored-email-text"></span></div>
+      <div class="state-desc" style="margin-top:4px;">
+        If you didn't request this change, we strongly recommend securing your account with a new password right away.
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="btn-secure-account"><i class="ph ph-lock-key"></i>&nbsp; Secure my account</button>
+        <a class="btn btn-secondary" href="#" id="btn-continue-login">This was me, continue to Login</a>
+      </div>
+    </div>
+  </div>
+
+  <div class="auth-footer" id="footer-mount"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="auth.js"></script>
+<script>
+(function () {
+  var N = window.NexorAuth;
+  var auth = N.auth;
+
+  N.renderBrand(document.getElementById('brand-mount'), 'Email recovery');
+  N.renderFooter(document.getElementById('footer-mount'));
+  document.getElementById('btn-invalid-login').href = N.LOGIN_URL;
+  document.getElementById('btn-continue-login').href = N.LOGIN_URL;
+
+  var views = {
+    loading: document.getElementById('view-loading'),
+    invalid: document.getElementById('view-invalid'),
+    success: document.getElementById('view-success')
+  };
+  function show(name) {
+    Object.keys(views).forEach(function (k) { views[k].classList.toggle('hidden', k !== name); });
+  }
+
+  var params = N.getParams();
+
+  if (params.mode !== 'recoverEmail' || !N.isPlausibleOobCode(params.oobCode)) {
+    document.getElementById('invalid-desc').textContent = 'This link is malformed or incomplete. Please request a new one.';
+    show('invalid');
+    return;
+  }
+
+  var restoredEmail = null;
+
+  // checkActionCode first so we can read the restored email address,
+  // then applyActionCode to actually perform the recovery (revert the
+  // email change on the account).
+  auth.checkActionCode(params.oobCode)
+    .then(function (info) {
+      restoredEmail = (info && info.data && info.data.email) || '';
+      return auth.applyActionCode(params.oobCode);
+    })
+    .then(function () {
+      document.getElementById('restored-email-text').textContent = restoredEmail || 'your account';
+      show('success');
+    })
+    .catch(function (err) {
+      document.getElementById('invalid-desc').textContent = N.friendlyAuthError(err);
+      show('invalid');
+    });
+
+  document.getElementById('btn-secure-account').addEventListener('click', function () {
+    if (!restoredEmail) { N.showToast('Unable to determine your email address.'); return; }
+    var btn = this;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="ph ph-circle-notch spin"></i>&nbsp; Sending&hellip;';
+    auth.sendPasswordResetEmail(restoredEmail)
+      .then(function () {
+        N.showToast('Password reset email sent to ' + restoredEmail);
+        btn.innerHTML = '<i class="ph ph-check"></i>&nbsp; Reset email sent';
+      })
+      .catch(function (err) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ph ph-lock-key"></i>&nbsp; Secure my account';
+        N.showToast(N.friendlyAuthError(err));
+      });
+  });
+})();
+</script>
+</body>
+</html>
