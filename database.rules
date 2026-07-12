@@ -1,0 +1,445 @@
+{
+  "rules": {
+    ".read": false,
+    ".write": false,
+
+    "users": {
+      ".read": true,
+      ".indexOn": [
+        "handle",
+        "followersCount"
+      ],
+
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid",
+
+        "totalLikes": {
+          ".write": "auth != null && (auth.uid === $uid || (newData.isNumber() && newData.val() >= 0 && (newData.val() === (data.exists() ? data.val() : 0) + 1 || newData.val() === (data.exists() ? data.val() : 0) - 1)))",
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+
+        "followersCount": {
+          ".write": "auth != null && (auth.uid === $uid || (newData.isNumber() && newData.val() >= 0 && (newData.val() === (data.exists() ? data.val() : 0) + 1 || newData.val() === (data.exists() ? data.val() : 0) - 1)))",
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+
+        "followingCount": {
+          ".write": "auth != null && (auth.uid === $uid || (newData.isNumber() && newData.val() >= 0 && (newData.val() === (data.exists() ? data.val() : 0) + 1 || newData.val() === (data.exists() ? data.val() : 0) - 1)))",
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+
+        "totalViews": {
+          ".write": "auth != null && (auth.uid === $uid || (newData.isNumber() && newData.val() >= 0 && newData.val() === (data.exists() ? data.val() : 0) + 1))",
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+
+        "pulsesCount": {
+          ".write": "auth != null && (auth.uid === $uid || auth.uid === 'aRq9nXHH63R90c5MC6DZ5wXD3r93')",
+          ".validate": "newData.isNumber() && newData.val() >= 0"
+        },
+
+        "copyrightStrikes": {
+          ".read": "auth != null && (auth.uid === $uid || auth.uid === 'aRq9nXHH63R90c5MC6DZ5wXD3r93')",
+
+          "$strikeId": {
+            ".write": "auth != null && auth.uid === 'aRq9nXHH63R90c5MC6DZ5wXD3r93'",
+
+            ".validate": "newData.hasChildren(['reason', 'issuedAt', 'issuedBy', 'reportId'])",
+
+            "reason": {
+              ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 1000"
+            },
+
+            "workTitle": {
+              ".validate": "!newData.exists() || newData.isString()"
+            },
+
+            "postId": {
+              ".validate": "!newData.exists() || newData.isString()"
+            },
+
+            "reportId": {
+              ".validate": "newData.isString() && newData.val().length > 0"
+            },
+
+            "issuedAt": {
+              ".validate": "newData.isNumber()"
+            },
+
+            "issuedBy": {
+              ".validate": "newData.val() === 'aRq9nXHH63R90c5MC6DZ5wXD3r93'"
+            },
+
+            "$other": {
+              ".validate": false
+            }
+          }
+        },
+
+        "copyrightStrikeCount": {
+          ".read": "auth != null && (auth.uid === $uid || auth.uid === 'aRq9nXHH63R90c5MC6DZ5wXD3r93')",
+          ".write": "auth != null && auth.uid === 'aRq9nXHH63R90c5MC6DZ5wXD3r93'",
+          ".validate": "newData.isNumber() && newData.val() >= 0 && newData.val() <= 100"
+        }
+      }
+    },
+
+    "handleIndex": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+
+    "emailIndex": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    "chats": {
+      "$chatId": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    },
+
+    "messages": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      ".indexOn": "chatId"
+    },
+
+    "userChats": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null"
+      }
+    },
+
+    "pulses": {
+      ".read": true,
+      ".write": "auth != null",
+      ".indexOn": [
+        "uid",
+        "createdAt",
+        "likes",
+        "collaboratorUid"
+      ]
+    },
+
+    "userPulses": {
+      "$uid": {
+        ".read": true,
+        ".write": "auth != null"
+      }
+    },
+
+    "userLikes": {
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "userReposts": {
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "pulseViews": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    "replies": {
+      ".read": true,
+      ".write": "auth != null"
+    },
+
+    "stories": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      ".indexOn": "uid"
+    },
+
+    "userStories": {
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    },
+
+    "storyViews": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    "storyLikes": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    "articles": {
+      ".read": "auth != null",
+      ".write": "auth != null",
+      ".indexOn": "uid"
+    },
+
+    "userArticles": {
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    },
+
+    "userArticleLikes": {
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "articleViews": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    "lists": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    "listMembers": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    "following": {
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "closeFriends": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "favorites": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "hiddenWords": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "restrictedByMe": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "followers": {
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    },
+
+    "followRequests": {
+      "$uid": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    },
+
+    "sentRequests": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null"
+      }
+    },
+
+    "collabRequests": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    "blocked": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "muted": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "bookmarks": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
+"notifications": {
+  "$uid": {
+    ".read": "auth != null && auth.uid === $uid",
+    ".indexOn": ["createdAt"],
+
+    "$notificationId": {
+      ".write": "auth != null && ((!data.exists() && newData.exists() && newData.child('fromUid').val() === auth.uid) || (data.exists() && auth.uid === $uid))",
+
+      ".validate": "!newData.exists() || newData.hasChildren(['type', 'fromUid', 'createdAt', 'read'])",
+
+      "type": {
+        ".validate": "newData.isString() && newData.val().length > 0 && newData.val().length <= 50"
+      },
+
+      "fromUid": {
+        ".validate": "newData.isString() && newData.val().length > 0"
+      },
+
+      "fromName": {
+        ".validate": "!newData.exists() || (newData.isString() && newData.val().length <= 100)"
+      },
+
+      "pulseId": {
+        ".validate": "!newData.exists() || newData.isString()"
+      },
+
+      "storyId": {
+        ".validate": "!newData.exists() || newData.isString()"
+      },
+
+      "createdAt": {
+        ".validate": "newData.isNumber()"
+      },
+
+      "read": {
+        ".validate": "newData.isBoolean()"
+      },
+
+      "$other": {
+        ".validate": true
+      }
+    }
+  }
+},
+
+    "otpRequests": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "loginHistory": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid",
+        ".indexOn": "time"
+      }
+    },
+
+    "smsRateLimit": {
+      "$phoneKey": {
+        ".read": "auth != null",
+        ".write": "auth != null"
+      }
+    },
+
+    "restrictions": {
+      ".read": "auth != null",
+
+      "$uid": {
+        ".write": "auth != null && auth.uid === 'aRq9nXHH63R90c5MC6DZ5wXD3r93'"
+      }
+    },
+
+    "restrictionDetails": {
+      ".read": "auth != null && auth.uid === 'aRq9nXHH63R90c5MC6DZ5wXD3r93'",
+
+      "$uid": {
+        ".write": "auth != null && auth.uid === 'aRq9nXHH63R90c5MC6DZ5wXD3r93'"
+      }
+    },
+
+    "reports": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    "verificationRequests": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+    "usernameChangeRequests": {
+      ".read": "auth != null",
+      ".write": "auth != null"
+    },
+
+"copyrightReports": {
+  ".read": "auth != null && auth.uid === 'aRq9nXHH63R90c5MC6DZ5wXD3r93'",
+  ".write": true
+},
+  
+    "suspensions": {
+      ".read": "auth != null && auth.uid === 'aRq9nXHH63R90c5MC6DZ5wXD3r93'",
+
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+
+        ".write": "auth != null && auth.uid === 'aRq9nXHH63R90c5MC6DZ5wXD3r93'"
+      }
+    },
+
+    "accountLocks": {
+      ".read": "auth != null && auth.uid === 'aRq9nXHH63R90c5MC6DZ5wXD3r93'",
+
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+
+        ".write": "auth != null && (auth.uid === 'aRq9nXHH63R90c5MC6DZ5wXD3r93' || (auth.uid === $uid && (!data.exists() || data.child('lockedUntil').val() <= now) && newData.child('lockedUntil').val() > now))",
+
+        "changedFields": {
+          ".write": "auth != null && auth.uid === $uid"
+        },
+
+        "appealed": {
+          ".write": "auth != null && auth.uid === $uid"
+        }
+      }
+    },
+
+    "appeals": {
+      ".read": "auth != null && auth.uid === 'aRq9nXHH63R90c5MC6DZ5wXD3r93'",
+
+      "$uid": {
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    },
+
+    "knownDevices": {
+      "$uid": {
+        ".read": "auth != null && auth.uid === $uid",
+        ".write": "auth != null && auth.uid === $uid"
+      }
+    }
+  }
+}
