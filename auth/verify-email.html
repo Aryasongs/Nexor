@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Verify Email — Nexor Sparks</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23050A14'/%3E%3Cpath d='M7 2v11h3v9l7-12h-4l4-8z' fill='%2300C8FF'/%3E%3C/svg%3E">
+<meta name="robots" content="noindex,nofollow">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<link rel="stylesheet" href="auth.css">
+</head>
+<body>
+<div class="auth-action-screen">
+  <div class="auth-brand" id="brand-mount"></div>
+
+  <div class="auth-card" style="text-align:center;">
+    <div class="state-icon-wrap"><div class="state-icon loading" id="state-icon"><i class="ph ph-circle-notch spin"></i></div></div>
+    <div class="state-title" id="state-title">Verifying your email&hellip;</div>
+    <div class="state-desc" id="state-desc">This will only take a moment.</div>
+    <div class="btn-row" id="action-row"></div>
+  </div>
+
+  <div class="auth-footer" id="footer-mount"></div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="auth.js"></script>
+<script>
+(function () {
+  var N = window.NexorAuth;
+  var auth = N.auth;
+
+  N.renderBrand(document.getElementById('brand-mount'), 'Email verification');
+  N.renderFooter(document.getElementById('footer-mount'));
+
+  var iconEl = document.getElementById('state-icon');
+  var titleEl = document.getElementById('state-title');
+  var descEl = document.getElementById('state-desc');
+  var rowEl = document.getElementById('action-row');
+
+  function setIcon(kind, ph) {
+    iconEl.className = 'state-icon ' + kind;
+    iconEl.innerHTML = '<i class="ph ' + ph + '"></i>';
+  }
+
+  function primaryButton(label, href) {
+    return '<a class="btn btn-primary" href="' + href + '">' + N.escapeHtml(label) + '</a>';
+  }
+  function secondaryButton(label, href) {
+    return '<a class="btn btn-secondary" href="' + href + '">' + N.escapeHtml(label) + '</a>';
+  }
+
+  function showInvalid(message) {
+    setIcon('error', 'ph-x-circle');
+    titleEl.textContent = 'Verification link invalid';
+    descEl.textContent = message;
+    rowEl.innerHTML =
+      secondaryButton('Go to Login', N.LOGIN_URL) +
+      primaryButton('Resend verification email', N.LOGIN_URL);
+  }
+
+  function showSuccess(continueHref) {
+    setIcon('success', 'ph-check-circle');
+    titleEl.textContent = 'Email verified!';
+    descEl.innerHTML = 'Your email address has been successfully verified. You can now enjoy full access to <b>Nexor Sparks</b>.';
+    rowEl.innerHTML = primaryButton('Continue to Nexor Sparks', continueHref);
+  }
+
+  var params = N.getParams();
+
+  if (params.mode !== 'verifyEmail' || !N.isPlausibleOobCode(params.oobCode)) {
+    showInvalid('This verification link is malformed or incomplete. Please request a new one.');
+    return;
+  }
+
+  auth.applyActionCode(params.oobCode)
+    .then(function () {
+      var dest = params.continueUrl || N.HOME_URL;
+      showSuccess(dest);
+    })
+    .catch(function (err) {
+      showInvalid(N.friendlyAuthError(err));
+    });
+})();
+</script>
+</body>
+</html>
