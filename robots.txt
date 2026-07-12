@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://nexor-f4d.pages.dev/sitemap.xml
