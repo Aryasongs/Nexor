@@ -1,414 +1,2198 @@
 <!DOCTYPE html>
-<html lang="hi">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nexor Sparks</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
-<style>
-  :root{
-    --bg-deep:#0A0A12;
-    --bg-panel:#14141F;
-    --bg-panel-2:#1B1B29;
-    --violet:#7C5CFF;
-    --cyan:#33E6E0;
-    --gold:#FFC857;
-    --text-primary:#F5F4FF;
-    --text-muted:#9694B0;
-    --line:#26263A;
-  }
-  *{box-sizing:border-box; margin:0; padding:0;}
-  body{
-    background:var(--bg-deep);
-    color:var(--text-primary);
-    font-family:'Inter',sans-serif;
-    min-height:100vh;
-    -webkit-font-smoothing:antialiased;
-  }
-  a{color:inherit; text-decoration:none;}
+  <meta charset="UTF-8">
 
-  /* Sticky mini nav */
-  .navbar{
-    position:sticky; top:0; z-index:50;
-    display:flex; align-items:center; gap:12px;
-    padding:12px 20px;
-    background:rgba(10,10,18,0.7);
-    backdrop-filter:blur(14px);
-    border-bottom:1px solid var(--line);
-    opacity:0; transform:translateY(-100%);
-    transition:opacity .3s ease, transform .3s ease;
-  }
-  .navbar.show{opacity:1; transform:translateY(0);}
-  .navbar img{width:34px; height:34px; border-radius:9px; object-fit:cover;}
-  .navbar .nav-name{font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:14px;}
-  .navbar .nav-btn{margin-left:auto;}
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0"
+  >
 
-  .wrap{max-width:760px; margin:0 auto; padding:0 20px 80px;}
+  <meta
+    name="theme-color"
+    content="#0A0A12"
+  >
 
-  /* Hero */
-  .hero{
-    display:flex; gap:22px; align-items:flex-start;
-    padding:40px 0 28px;
-    position:relative;
-  }
-  .icon-holder{position:relative; flex-shrink:0;}
-  .icon-holder::before{
-    content:'';
-    position:absolute; inset:-14px;
-    border-radius:34px;
-    background:radial-gradient(circle, rgba(124,92,255,0.35), transparent 70%);
-    animation:pulse 3.2s ease-in-out infinite;
-  }
-  @keyframes pulse{
-    0%,100%{transform:scale(0.92); opacity:.55;}
-    50%{transform:scale(1.08); opacity:1;}
-  }
-  .app-icon{
-    width:104px; height:104px; border-radius:24px; object-fit:cover;
-    position:relative; z-index:1;
-    box-shadow:0 12px 30px rgba(0,0,0,0.5);
-    border:1px solid rgba(255,255,255,0.08);
-  }
-  .hero-info{flex:1; min-width:0; padding-top:4px;}
-  .app-name{font-family:'Space Grotesk',sans-serif; font-size:26px; font-weight:700; line-height:1.2;}
-  .app-tagline{color:var(--text-muted); font-size:14px; margin-top:4px;}
-  .app-dev{color:var(--cyan); font-size:13px; margin-top:8px; font-weight:500;}
+  <title>Nexor Sparks — Download for Android</title>
 
-  .get-btn{
-    margin-top:16px;
-    display:inline-flex; align-items:center; justify-content:center;
-    gap:8px;
-    min-width:104px;
-    padding:9px 22px;
-    border-radius:999px;
-    background:var(--violet);
-    color:#fff;
-    font-weight:700; font-size:14px;
-    letter-spacing:.03em;
-    border:none; cursor:pointer;
-    transition:background .2s ease, transform .15s ease;
-    position:relative;
-    overflow:hidden;
-  }
-  .get-btn:hover{background:#8f74ff;}
-  .get-btn:active{transform:scale(.97);}
-  .get-btn.update{background:var(--cyan); color:#042220;}
-  .get-btn.update:hover{background:#5cf0ea;}
-  .get-btn.open{background:var(--bg-panel-2); color:var(--text-primary); border:1px solid var(--line);}
-  .get-btn .progress-fill{
-    position:absolute; left:0; top:0; bottom:0;
-    background:rgba(255,255,255,0.28);
-    width:0%;
-    transition:width .12s linear;
-  }
-  .get-btn span{position:relative; z-index:1;}
+  <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com"
+  >
 
-  .reset-link{
-    display:block; margin-top:8px; font-size:11px; color:var(--text-muted);
-    cursor:pointer; width:fit-content; border-bottom:1px dashed transparent;
-  }
-  .reset-link:hover{color:var(--text-primary); border-bottom-color:var(--text-muted);}
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  >
 
-  /* Stat strip */
-  .stats{
-    display:flex; border-top:1px solid var(--line); border-bottom:1px solid var(--line);
-    padding:16px 0; margin-top:8px;
-  }
-  .stat{flex:1; text-align:center; padding:0 8px; border-right:1px solid var(--line);}
-  .stat:last-child{border-right:none;}
-  .stat .val{font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:16px;}
-  .stat .lbl{color:var(--text-muted); font-size:11px; margin-top:3px; text-transform:uppercase; letter-spacing:.05em;}
-  .stars{color:var(--gold); letter-spacing:1px;}
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap"
+    rel="stylesheet"
+  >
 
-  /* Section */
-  .section{padding:30px 0; border-bottom:1px solid var(--line);}
-  .section-title{
-    font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:17px;
-    margin-bottom:12px;
-  }
-  .desc{color:var(--text-muted); font-size:14px; line-height:1.7;}
-  .desc strong{color:var(--text-primary);}
+  <style>
+    :root {
+      --bg-deep: #0A0A12;
+      --bg-panel: #14141F;
+      --bg-panel-2: #1B1B29;
+      --violet: #7C5CFF;
+      --violet-light: #9A83FF;
+      --cyan: #33E6E0;
+      --gold: #FFC857;
+      --green: #38D996;
+      --red: #FF5C7A;
+      --text-primary: #F5F4FF;
+      --text-muted: #9694B0;
+      --line: #26263A;
+    }
 
-  .feature-grid{
-    display:grid; grid-template-columns:repeat(2,1fr); gap:12px; margin-top:16px;
-  }
-  .feature{
-    background:var(--bg-panel); border:1px solid var(--line); border-radius:14px;
-    padding:16px;
-  }
-  .feature .f-icon{
-    width:30px; height:30px; border-radius:9px;
-    background:linear-gradient(135deg, var(--violet), var(--cyan));
-    margin-bottom:10px;
-  }
-  .feature .f-title{font-size:13px; font-weight:600;}
-  .feature .f-text{font-size:12px; color:var(--text-muted); margin-top:4px; line-height:1.5;}
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-  .whats-new{
-    background:var(--bg-panel); border:1px solid var(--line); border-radius:14px; padding:16px;
-  }
-  .wn-version{
-    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--cyan);
-  }
-  .wn-list{margin-top:10px; padding-left:18px; color:var(--text-muted); font-size:13px; line-height:1.8;}
+    html {
+      scroll-behavior: smooth;
+    }
 
-  .info-grid{
-    display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin-top:4px;
-  }
-  .info-item .i-lbl{font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em;}
-  .info-item .i-val{font-size:13px; margin-top:5px; font-weight:500;}
+    body {
+      min-height: 100vh;
 
-  .note{
-    margin-top:14px; font-size:12px; color:var(--text-muted);
-    border-left:2px solid var(--violet); padding-left:12px; line-height:1.6;
-  }
+      background:
+        radial-gradient(
+          circle at 15% 0%,
+          rgba(124, 92, 255, 0.18),
+          transparent 32%
+        ),
+        radial-gradient(
+          circle at 90% 10%,
+          rgba(51, 230, 224, 0.08),
+          transparent 30%
+        ),
+        var(--bg-deep);
 
-  .toast{
-    position:fixed; left:50%; bottom:28px; transform:translate(-50%, 20px);
-    background:var(--bg-panel-2); border:1px solid var(--line);
-    padding:12px 18px; border-radius:12px; font-size:13px;
-    opacity:0; pointer-events:none; transition:opacity .25s ease, transform .25s ease;
-    max-width:90%; text-align:center; z-index:100;
-  }
-  .toast.show{opacity:1; transform:translate(-50%, 0);}
+      color: var(--text-primary);
+      font-family: "Inter", sans-serif;
 
-  footer{padding:26px 0 10px; text-align:center; color:var(--text-muted); font-size:11px;}
-</style>
+      -webkit-font-smoothing: antialiased;
+    }
+
+    button,
+    a {
+      font: inherit;
+    }
+
+    button {
+      border: none;
+    }
+
+    a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 50;
+
+      display: flex;
+      align-items: center;
+      gap: 12px;
+
+      padding: 11px 20px;
+
+      background: rgba(10, 10, 18, 0.76);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+
+      border-bottom: 1px solid var(--line);
+
+      opacity: 0;
+      transform: translateY(-100%);
+
+      transition:
+        opacity 0.3s ease,
+        transform 0.3s ease;
+    }
+
+    .navbar.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .navbar img {
+      width: 36px;
+      height: 36px;
+
+      border-radius: 10px;
+      object-fit: cover;
+    }
+
+    .nav-app-info {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .nav-name {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+    }
+
+    .nav-version {
+      margin-top: 2px;
+
+      color: var(--text-muted);
+      font-size: 11px;
+    }
+
+    .nav-btn {
+      margin-left: auto;
+    }
+
+    .wrap {
+      max-width: 790px;
+      margin: 0 auto;
+      padding: 0 20px 80px;
+    }
+
+    .hero {
+      position: relative;
+
+      display: flex;
+      align-items: flex-start;
+      gap: 24px;
+
+      padding: 44px 0 30px;
+    }
+
+    .icon-holder {
+      position: relative;
+      flex-shrink: 0;
+    }
+
+    .icon-holder::before {
+      content: "";
+
+      position: absolute;
+      inset: -16px;
+
+      border-radius: 36px;
+
+      background: radial-gradient(
+        circle,
+        rgba(124, 92, 255, 0.38),
+        transparent 70%
+      );
+
+      animation: pulse 3.2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%,
+      100% {
+        transform: scale(0.92);
+        opacity: 0.55;
+      }
+
+      50% {
+        transform: scale(1.08);
+        opacity: 1;
+      }
+    }
+
+    .app-icon {
+      position: relative;
+      z-index: 1;
+
+      width: 108px;
+      height: 108px;
+
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 25px;
+
+      object-fit: cover;
+
+      box-shadow:
+        0 15px 34px rgba(0, 0, 0, 0.5),
+        0 0 30px rgba(124, 92, 255, 0.15);
+    }
+
+    .hero-info {
+      flex: 1;
+      min-width: 0;
+      padding-top: 4px;
+    }
+
+    .app-name {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 28px;
+      font-weight: 700;
+      line-height: 1.15;
+    }
+
+    .app-tagline {
+      margin-top: 5px;
+
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .app-dev {
+      margin-top: 8px;
+
+      color: var(--cyan);
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .version-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+
+      margin-top: 10px;
+      padding: 5px 9px;
+
+      border: 1px solid rgba(51, 230, 224, 0.25);
+      border-radius: 999px;
+
+      background: rgba(51, 230, 224, 0.06);
+      color: var(--cyan);
+
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+    }
+
+    .version-badge.ios-badge {
+      border-color: rgba(255, 92, 122, 0.25);
+
+      background: rgba(255, 92, 122, 0.07);
+      color: var(--red);
+    }
+
+    .get-btn {
+      position: relative;
+      overflow: hidden;
+
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+
+      min-width: 120px;
+      min-height: 40px;
+
+      margin-top: 17px;
+      padding: 10px 22px;
+
+      border-radius: 999px;
+
+      background: var(--violet);
+      color: #ffffff;
+
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+
+      cursor: pointer;
+
+      transition:
+        background 0.2s ease,
+        transform 0.15s ease,
+        opacity 0.2s ease;
+    }
+
+    .get-btn:hover {
+      background: var(--violet-light);
+    }
+
+    .get-btn:active {
+      transform: scale(0.97);
+    }
+
+    .get-btn:disabled {
+      cursor: not-allowed;
+    }
+
+    .get-btn.update {
+      background: var(--cyan);
+      color: #042220;
+    }
+
+    .get-btn.open {
+      border: 1px solid var(--line);
+
+      background: var(--bg-panel-2);
+      color: var(--text-primary);
+    }
+
+    .get-btn.retry {
+      background: var(--red);
+      color: #ffffff;
+    }
+
+    .get-btn.ios-unavailable {
+      min-width: 215px;
+
+      border: 1px solid var(--line);
+
+      background: var(--bg-panel-2);
+      color: var(--text-muted);
+
+      cursor: not-allowed;
+      opacity: 1;
+    }
+
+    .get-btn.ios-unavailable:hover {
+      background: var(--bg-panel-2);
+    }
+
+    .get-btn.ios-unavailable:active {
+      transform: none;
+    }
+
+    .navbar .get-btn.ios-unavailable {
+      min-width: auto;
+      max-width: 165px;
+      padding: 9px 14px;
+
+      font-size: 10px;
+      line-height: 1.2;
+    }
+
+    .progress-fill {
+      position: absolute;
+      inset: 0 auto 0 0;
+
+      width: 0%;
+
+      background: rgba(255, 255, 255, 0.24);
+
+      transition: width 0.15s linear;
+      pointer-events: none;
+    }
+
+    .btn-label {
+      position: relative;
+      z-index: 1;
+
+      white-space: nowrap;
+    }
+
+    .ios-message {
+      display: none;
+
+      margin-top: 14px;
+      padding: 13px 14px;
+
+      border: 1px solid rgba(255, 92, 122, 0.2);
+      border-radius: 12px;
+
+      background: rgba(255, 92, 122, 0.06);
+    }
+
+    .ios-message.show {
+      display: block;
+    }
+
+    .ios-message-title {
+      color: var(--red);
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .ios-message-text {
+      margin-top: 5px;
+
+      color: var(--text-muted);
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    .download-panel {
+      display: none;
+
+      margin-top: 15px;
+      padding: 14px;
+
+      border: 1px solid var(--line);
+      border-radius: 14px;
+
+      background: rgba(20, 20, 31, 0.78);
+    }
+
+    .download-panel.show {
+      display: block;
+    }
+
+    .download-top {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11px;
+    }
+
+    .download-status {
+      color: var(--text-primary);
+    }
+
+    .download-percent {
+      color: var(--cyan);
+    }
+
+    .progress-track {
+      width: 100%;
+      height: 8px;
+
+      margin-top: 11px;
+
+      overflow: hidden;
+
+      border-radius: 999px;
+      background: var(--bg-panel-2);
+    }
+
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+
+      border-radius: inherit;
+
+      background: linear-gradient(
+        90deg,
+        var(--violet),
+        var(--cyan)
+      );
+
+      transition: width 0.18s linear;
+    }
+
+    .download-meta {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+
+      margin-top: 11px;
+    }
+
+    .download-meta-item {
+      padding: 8px;
+
+      border-radius: 9px;
+      background: var(--bg-panel-2);
+    }
+
+    .download-meta-label {
+      color: var(--text-muted);
+      font-size: 9px;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+
+    .download-meta-value {
+      margin-top: 4px;
+
+      color: var(--text-primary);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 10px;
+    }
+
+    .cancel-btn {
+      margin-top: 10px;
+
+      background: transparent;
+      color: var(--text-muted);
+
+      font-size: 11px;
+      cursor: pointer;
+    }
+
+    .cancel-btn:hover {
+      color: var(--red);
+    }
+
+    .reset-link {
+      display: none;
+
+      width: fit-content;
+      margin-top: 9px;
+
+      border-bottom: 1px dashed transparent;
+
+      color: var(--text-muted);
+      font-size: 11px;
+
+      cursor: pointer;
+    }
+
+    .reset-link:hover {
+      border-bottom-color: var(--text-muted);
+      color: var(--text-primary);
+    }
+
+    .stats {
+      display: flex;
+
+      margin-top: 8px;
+      padding: 17px 0;
+
+      border-top: 1px solid var(--line);
+      border-bottom: 1px solid var(--line);
+    }
+
+    .stat {
+      flex: 1;
+      padding: 0 8px;
+
+      border-right: 1px solid var(--line);
+
+      text-align: center;
+    }
+
+    .stat:last-child {
+      border-right: none;
+    }
+
+    .stat .val {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .stat .lbl {
+      margin-top: 4px;
+
+      color: var(--text-muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stars {
+      color: var(--gold);
+      letter-spacing: 1px;
+    }
+
+    .section {
+      padding: 30px 0;
+
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-title {
+      margin-bottom: 13px;
+
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .desc {
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.75;
+    }
+
+    .desc strong {
+      color: var(--text-primary);
+    }
+
+    .feature-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 12px;
+
+      margin-top: 17px;
+    }
+
+    .feature {
+      padding: 16px;
+
+      border: 1px solid var(--line);
+      border-radius: 14px;
+
+      background: rgba(20, 20, 31, 0.8);
+
+      transition:
+        transform 0.2s ease,
+        border-color 0.2s ease;
+    }
+
+    .feature:hover {
+      border-color: rgba(124, 92, 255, 0.55);
+
+      transform: translateY(-2px);
+    }
+
+    .f-icon {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      width: 32px;
+      height: 32px;
+
+      margin-bottom: 11px;
+
+      border-radius: 9px;
+
+      background: linear-gradient(
+        135deg,
+        var(--violet),
+        var(--cyan)
+      );
+
+      color: #ffffff;
+      font-size: 14px;
+      font-weight: 700;
+    }
+
+    .f-title {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .f-text {
+      margin-top: 5px;
+
+      color: var(--text-muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .whats-new {
+      padding: 17px;
+
+      border: 1px solid var(--line);
+      border-radius: 14px;
+
+      background: rgba(20, 20, 31, 0.8);
+    }
+
+    .wn-version {
+      color: var(--cyan);
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .wn-list {
+      margin-top: 11px;
+      padding-left: 19px;
+
+      color: var(--text-muted);
+      font-size: 13px;
+      line-height: 1.9;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+
+      margin-top: 4px;
+    }
+
+    .info-item {
+      padding: 13px;
+
+      border: 1px solid var(--line);
+      border-radius: 12px;
+
+      background: rgba(20, 20, 31, 0.55);
+    }
+
+    .i-lbl {
+      color: var(--text-muted);
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .i-val {
+      margin-top: 6px;
+
+      font-size: 13px;
+      font-weight: 600;
+
+      word-break: break-word;
+    }
+
+    .security-card {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+
+      margin-top: 15px;
+      padding: 14px;
+
+      border: 1px solid rgba(56, 217, 150, 0.2);
+      border-radius: 13px;
+
+      background: rgba(56, 217, 150, 0.06);
+    }
+
+    .security-icon {
+      flex-shrink: 0;
+
+      display: flex;
+      align-items: center;
+      justify-content: center;
+
+      width: 32px;
+      height: 32px;
+
+      border-radius: 9px;
+
+      background: rgba(56, 217, 150, 0.14);
+      color: var(--green);
+
+      font-size: 15px;
+    }
+
+    .security-title {
+      color: var(--green);
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .security-text {
+      margin-top: 4px;
+
+      color: var(--text-muted);
+      font-size: 11px;
+      line-height: 1.6;
+    }
+
+    .note {
+      margin-top: 15px;
+      padding-left: 12px;
+
+      border-left: 2px solid var(--violet);
+
+      color: var(--text-muted);
+      font-size: 12px;
+      line-height: 1.65;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      z-index: 100;
+
+      max-width: 90%;
+      padding: 12px 18px;
+
+      border: 1px solid var(--line);
+      border-radius: 12px;
+
+      background: var(--bg-panel-2);
+      color: var(--text-primary);
+
+      font-size: 13px;
+      text-align: center;
+
+      opacity: 0;
+      pointer-events: none;
+
+      transform: translate(-50%, 20px);
+
+      transition:
+        opacity 0.25s ease,
+        transform 0.25s ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+
+      transform: translate(-50%, 0);
+    }
+
+    footer {
+      padding: 27px 0 10px;
+
+      color: var(--text-muted);
+      font-size: 11px;
+      line-height: 1.7;
+      text-align: center;
+    }
+
+    @media (max-width: 640px) {
+      .hero {
+        gap: 17px;
+        padding-top: 32px;
+      }
+
+      .app-icon {
+        width: 88px;
+        height: 88px;
+
+        border-radius: 21px;
+      }
+
+      .app-name {
+        font-size: 23px;
+      }
+
+      .app-tagline {
+        font-size: 12px;
+      }
+
+      .get-btn {
+        min-width: 105px;
+        min-height: 38px;
+
+        padding: 9px 18px;
+      }
+
+      .get-btn.ios-unavailable {
+        min-width: 190px;
+        padding: 9px 14px;
+
+        font-size: 11px;
+      }
+
+      .stats {
+        overflow-x: auto;
+      }
+
+      .stat {
+        min-width: 105px;
+      }
+
+      .feature-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .download-meta {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .wrap {
+        padding-right: 16px;
+        padding-left: 16px;
+      }
+
+      .navbar {
+        padding-right: 16px;
+        padding-left: 16px;
+      }
+
+      .hero {
+        gap: 14px;
+      }
+
+      .app-icon {
+        width: 78px;
+        height: 78px;
+
+        border-radius: 19px;
+      }
+
+      .app-name {
+        font-size: 21px;
+      }
+
+      .version-badge {
+        font-size: 10px;
+      }
+
+      .get-btn.ios-unavailable {
+        min-width: 175px;
+        white-space: normal;
+      }
+
+      .navbar .get-btn.ios-unavailable {
+        max-width: 130px;
+        padding: 8px 10px;
+      }
+
+      .info-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-  <div class="navbar" id="navbar">
-    <img src="https://nexor-f4d.pages.dev/download.jpg" alt="Nexor Sparks">
-    <div class="nav-name">Nexor Sparks</div>
-    <button class="get-btn nav-btn" id="btnNav"><span class="progress-fill"></span><span class="btn-label">GET</span></button>
+  <div
+    class="navbar"
+    id="navbar"
+  >
+
+    <img
+      src="https://nexor-f4d.pages.dev/download.jpg"
+      alt="Nexor Sparks app icon"
+    >
+
+    <div class="nav-app-info">
+
+      <div class="nav-name">
+        Nexor Sparks
+      </div>
+
+      <div
+        class="nav-version"
+        id="navVersion"
+      >
+        Version 20.5.10
+      </div>
+
+    </div>
+
+    <button
+      class="get-btn nav-btn"
+      id="btnNav"
+      type="button"
+    >
+
+      <span class="progress-fill"></span>
+
+      <span class="btn-label">
+        GET
+      </span>
+
+    </button>
+
   </div>
 
-  <div class="wrap">
-    <div class="hero">
+  <main class="wrap">
+
+    <section class="hero">
+
       <div class="icon-holder">
-        <img class="app-icon" src="https://nexor-f4d.pages.dev/download.jpg" alt="Nexor Sparks icon">
+
+        <img
+          class="app-icon"
+          src="https://nexor-f4d.pages.dev/download.jpg"
+          alt="Nexor Sparks icon"
+        >
+
       </div>
+
       <div class="hero-info">
-        <div class="app-name">Nexor Sparks</div>
-        <div class="app-tagline">Aapke roz ke kaam, ek jagah, tez raftaar se</div>
-        <div class="app-dev">Nexor</div>
-        <button class="get-btn" id="btnMain"><span class="progress-fill"></span><span class="btn-label">GET</span></button>
-        <span class="reset-link" id="resetLink" style="display:none;">App hata kar dobara dekhein (uninstall / reset)</span>
-      </div>
-    </div>
 
-    <div class="stats">
-      <div class="stat">
-        <div class="val stars">★★★★☆</div>
-        <div class="lbl">4.6 · 2.1K Ratings</div>
-      </div>
-      <div class="stat">
-        <div class="val">4+</div>
-        <div class="lbl">Age</div>
-      </div>
-      <div class="stat">
-        <div class="val" id="statSize">18 MB</div>
-        <div class="lbl">Size</div>
-      </div>
-      <div class="stat">
-        <div class="val">Productivity</div>
-        <div class="lbl">Category</div>
-      </div>
-    </div>
+        <h1 class="app-name">
+          Nexor Sparks
+        </h1>
 
-    <div class="section">
-      <div class="section-title">Nexor Sparks ke baare mein</div>
+        <div class="app-tagline">
+          Connect, share ideas, discover content and stay close to your community.
+        </div>
+
+        <div class="app-dev">
+          Nexor Technologies
+        </div>
+
+        <div
+          class="version-badge"
+          id="platformBadge"
+        >
+          Android · Version 20.5.10
+        </div>
+
+        <br>
+
+        <button
+          class="get-btn"
+          id="btnMain"
+          type="button"
+        >
+
+          <span class="progress-fill"></span>
+
+          <span class="btn-label">
+            GET
+          </span>
+
+        </button>
+
+        <div
+          class="ios-message"
+          id="iosMessage"
+        >
+
+          <div class="ios-message-title">
+            This app is not available for iOS
+          </div>
+
+          <div class="ios-message-text">
+            Nexor Sparks is currently available only as an Android APK.
+            An iPhone or iPad version is not available right now.
+          </div>
+
+        </div>
+
+        <div
+          class="download-panel"
+          id="downloadPanel"
+        >
+
+          <div class="download-top">
+
+            <span
+              class="download-status"
+              id="downloadStatus"
+            >
+              Preparing download
+            </span>
+
+            <span
+              class="download-percent"
+              id="downloadPercent"
+            >
+              0%
+            </span>
+
+          </div>
+
+          <div class="progress-track">
+
+            <div
+              class="progress-bar"
+              id="progressBar"
+            ></div>
+
+          </div>
+
+          <div class="download-meta">
+
+            <div class="download-meta-item">
+
+              <div class="download-meta-label">
+                Downloaded
+              </div>
+
+              <div
+                class="download-meta-value"
+                id="downloadedSize"
+              >
+                0 MB / 101 MB
+              </div>
+
+            </div>
+
+            <div class="download-meta-item">
+
+              <div class="download-meta-label">
+                Speed
+              </div>
+
+              <div
+                class="download-meta-value"
+                id="downloadSpeed"
+              >
+                Calculating...
+              </div>
+
+            </div>
+
+            <div class="download-meta-item">
+
+              <div class="download-meta-label">
+                Time remaining
+              </div>
+
+              <div
+                class="download-meta-value"
+                id="remainingTime"
+              >
+                Calculating...
+              </div>
+
+            </div>
+
+          </div>
+
+          <button
+            class="cancel-btn"
+            id="cancelBtn"
+            type="button"
+          >
+            Cancel download
+          </button>
+
+        </div>
+
+        <span
+          class="reset-link"
+          id="resetLink"
+        >
+          Reset download status
+        </span>
+
+      </div>
+
+    </section>
+
+    <section class="stats">
+
+      <div class="stat">
+
+        <div class="val stars">
+          ★★★★☆
+        </div>
+
+        <div class="lbl">
+          4.6 · 2.1K Ratings
+        </div>
+
+      </div>
+
+      <div class="stat">
+
+        <div class="val">
+          13+
+        </div>
+
+        <div class="lbl">
+          Age Rating
+        </div>
+
+      </div>
+
+      <div class="stat">
+
+        <div class="val">
+          101 MB
+        </div>
+
+        <div class="lbl">
+          Download Size
+        </div>
+
+      </div>
+
+      <div class="stat">
+
+        <div class="val">
+          Social
+        </div>
+
+        <div class="lbl">
+          Category
+        </div>
+
+      </div>
+
+    </section>
+
+    <section class="section">
+
+      <h2 class="section-title">
+        About Nexor Sparks
+      </h2>
+
       <div class="desc">
-        <strong>Nexor Sparks</strong> ek halka-fulka productivity app hai jo aapke ideas, tasks aur notes ko ek jagah rakhta hai — bina kisi jhanjhat ke. Quick capture, smart reminders aur clean interface ke saath, roz ka kaam thoda aasan ban jaata hai.
+
+        <strong>Nexor Sparks</strong> is a social platform built for sharing
+        ideas, posts, photos, videos and conversations. Discover new content,
+        connect with people, join communities and manage your digital profile
+        from one clean and fast application.
+
       </div>
+
       <div class="feature-grid">
-        <div class="feature">
-          <div class="f-icon"></div>
-          <div class="f-title">Quick Capture</div>
-          <div class="f-text">Ek tap mein idea ya task note karein</div>
-        </div>
-        <div class="feature">
-          <div class="f-icon"></div>
-          <div class="f-title">Smart Reminders</div>
-          <div class="f-text">Sahi waqt par sahi yaad dilaye</div>
-        </div>
-        <div class="feature">
-          <div class="f-icon"></div>
-          <div class="f-title">Offline First</div>
-          <div class="f-text">Bina internet ke bhi kaam chale</div>
-        </div>
-        <div class="feature">
-          <div class="f-icon"></div>
-          <div class="f-title">Clean Design</div>
-          <div class="f-text">Distraction-free, tez interface</div>
-        </div>
-      </div>
-    </div>
 
-    <div class="section">
-      <div class="section-title">What's New</div>
+        <div class="feature">
+
+          <div class="f-icon">
+            S
+          </div>
+
+          <div class="f-title">
+            Create Sparks
+          </div>
+
+          <div class="f-text">
+            Share text, images, videos, polls, GIFs and voice posts.
+          </div>
+
+        </div>
+
+        <div class="feature">
+
+          <div class="f-icon">
+            B
+          </div>
+
+          <div class="f-title">
+            Watch Bolt
+          </div>
+
+          <div class="f-text">
+            Discover and watch short-form videos from creators.
+          </div>
+
+        </div>
+
+        <div class="feature">
+
+          <div class="f-icon">
+            C
+          </div>
+
+          <div class="f-title">
+            Private Chat
+          </div>
+
+          <div class="f-text">
+            Send messages, reactions and voice notes securely.
+          </div>
+
+        </div>
+
+        <div class="feature">
+
+          <div class="f-icon">
+            A
+          </div>
+
+          <div class="f-title">
+            Nexor AI
+          </div>
+
+          <div class="f-text">
+            Use AI-powered features for content and assistance.
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <section class="section">
+
+      <h2 class="section-title">
+        What's New
+      </h2>
+
       <div class="whats-new">
-        <div class="wn-version">Version 1.4.0</div>
+
+        <div class="wn-version">
+          Version 20.5.10
+        </div>
+
         <ul class="wn-list">
-          <li>Naya dark theme accent</li>
-          <li>Faster app launch</li>
-          <li>Chhote bugs theek kiye gaye</li>
+          <li>Improved application performance and loading speed.</li>
+          <li>Updated user interface and navigation experience.</li>
+          <li>Improved feed, notifications and profile stability.</li>
+          <li>Added security and account protection improvements.</li>
+          <li>Fixed minor bugs and application crashes.</li>
         </ul>
-      </div>
-    </div>
 
-    <div class="section">
-      <div class="section-title">Information</div>
+      </div>
+
+    </section>
+
+    <section class="section">
+
+      <h2 class="section-title">
+        App Information
+      </h2>
+
       <div class="info-grid">
+
         <div class="info-item">
-          <div class="i-lbl">Developer</div>
-          <div class="i-val">Nexor</div>
+
+          <div class="i-lbl">
+            Developer
+          </div>
+
+          <div class="i-val">
+            Nexor Technologies
+          </div>
+
         </div>
+
         <div class="info-item">
-          <div class="i-lbl">Version</div>
-          <div class="i-val">1.4.0</div>
+
+          <div class="i-lbl">
+            Version
+          </div>
+
+          <div class="i-val">
+            20.5.10
+          </div>
+
         </div>
+
         <div class="info-item">
-          <div class="i-lbl">Platform</div>
-          <div class="i-val">Android (APK)</div>
+
+          <div class="i-lbl">
+            Build Number
+          </div>
+
+          <div class="i-val">
+            20510
+          </div>
+
         </div>
+
+        <div class="info-item">
+
+          <div class="i-lbl">
+            Platform
+          </div>
+
+          <div class="i-val">
+            Android
+          </div>
+
+        </div>
+
+        <div class="info-item">
+
+          <div class="i-lbl">
+            File Format
+          </div>
+
+          <div class="i-val">
+            APK
+          </div>
+
+        </div>
+
+        <div class="info-item">
+
+          <div class="i-lbl">
+            File Size
+          </div>
+
+          <div class="i-val">
+            101 MB
+          </div>
+
+        </div>
+
       </div>
+
+      <div class="security-card">
+
+        <div class="security-icon">
+          ✓
+        </div>
+
+        <div>
+
+          <div class="security-title">
+            Official Nexor Download
+          </div>
+
+          <div class="security-text">
+            This APK is downloaded directly from the official Nexor server.
+            Always verify that the website address is nexor-f4d.pages.dev
+            before downloading.
+          </div>
+
+        </div>
+
+      </div>
+
       <div class="note">
-        Yeh app official Google Play/App Store se nahi, seedha developer ke server se APK ke roop mein milta hai. Install karne se pehle apne phone mein "Unknown sources" install permission dena hoga. Install/Update/Open button ka status is browser tab tak simulate hota hai — kisi bhi browser ke liye ye technically possible nahi ki wo aapke phone mein real app install-status ko check kare.
+        This application is distributed as an Android APK file and is not
+        currently downloaded through Google Play. Android may ask you to allow
+        installation from your browser or file manager. Download progress
+        depends on whether the server provides the file size and allows
+        cross-origin streaming.
       </div>
-    </div>
 
-    <footer>Yeh ek unofficial download page hai, Apple App Store se koi sambandh nahi.</footer>
-  </div>
+    </section>
 
-  <div class="toast" id="toast"></div>
+    <footer>
+      © 2026 Nexor Technologies. All rights reserved.
+      <br>
+      Nexor Sparks is an independent Android application.
+    </footer>
 
-<script>
-(function(){
-  const APK_URL = "https://nexor-f4d.pages.dev/app-release.apk";
-  const LATEST_VERSION = "1.4.0";
-  const STORAGE_KEY = "nexor_sparks_installed_version";
+  </main>
 
-  const btnMain = document.getElementById('btnMain');
-  const btnNav = document.getElementById('btnNav');
-  const resetLink = document.getElementById('resetLink');
-  const navbar = document.getElementById('navbar');
-  const toastEl = document.getElementById('toast');
+  <div
+    class="toast"
+    id="toast"
+  ></div>
 
-  let installedVersion = null;
-  let busy = false;
+  <script>
+    (() => {
+      "use strict";
 
-  function showToast(msg){
-    toastEl.textContent = msg;
-    toastEl.classList.add('show');
-    clearTimeout(showToast._t);
-    showToast._t = setTimeout(()=> toastEl.classList.remove('show'), 2600);
-  }
+      const APK_URL =
+        "https://nexor-f4d.pages.dev/app-release.apk";
 
-  function versionLess(a, b){
-    const pa = a.split('.').map(Number), pb = b.split('.').map(Number);
-    for(let i=0;i<Math.max(pa.length,pb.length);i++){
-      const x = pa[i]||0, y = pb[i]||0;
-      if(x<y) return true;
-      if(x>y) return false;
-    }
-    return false;
-  }
+      const APK_FILE_NAME =
+        "Nexor-Sparks-20.5.10.apk";
 
-  function render(){
-    [btnMain, btnNav].forEach(btn=>{
-      const label = btn.querySelector('.btn-label');
-      btn.classList.remove('update','open');
-      btn.disabled = busy;
-      if(!installedVersion){
-        label.textContent = 'GET';
-      } else if(versionLess(installedVersion, LATEST_VERSION)){
-        btn.classList.add('update');
-        label.textContent = 'UPDATE';
-      } else {
-        btn.classList.add('open');
-        label.textContent = 'OPEN';
+      const LATEST_VERSION =
+        "20.5.10";
+
+      const FALLBACK_FILE_SIZE =
+        101 * 1024 * 1024;
+
+      const STORAGE_KEY =
+        "nexor_sparks_downloaded_version";
+
+      const btnMain =
+        document.getElementById("btnMain");
+
+      const btnNav =
+        document.getElementById("btnNav");
+
+      const navbar =
+        document.getElementById("navbar");
+
+      const toastEl =
+        document.getElementById("toast");
+
+      const resetLink =
+        document.getElementById("resetLink");
+
+      const downloadPanel =
+        document.getElementById("downloadPanel");
+
+      const downloadStatus =
+        document.getElementById("downloadStatus");
+
+      const downloadPercent =
+        document.getElementById("downloadPercent");
+
+      const progressBar =
+        document.getElementById("progressBar");
+
+      const downloadedSize =
+        document.getElementById("downloadedSize");
+
+      const downloadSpeed =
+        document.getElementById("downloadSpeed");
+
+      const remainingTime =
+        document.getElementById("remainingTime");
+
+      const cancelBtn =
+        document.getElementById("cancelBtn");
+
+      const platformBadge =
+        document.getElementById("platformBadge");
+
+      const iosMessage =
+        document.getElementById("iosMessage");
+
+      const navVersion =
+        document.getElementById("navVersion");
+
+      let isDownloading = false;
+
+      let downloadedVersion =
+        localStorage.getItem(STORAGE_KEY);
+
+      let abortController = null;
+
+      let iosDevice = false;
+
+      function isIOSDevice() {
+        const userAgent =
+          navigator.userAgent ||
+          navigator.vendor ||
+          window.opera;
+
+        const standardIOS =
+          /iPhone|iPad|iPod/i.test(userAgent);
+
+        const iPadDesktopMode =
+          navigator.platform === "MacIntel" &&
+          navigator.maxTouchPoints > 1;
+
+        return standardIOS || iPadDesktopMode;
       }
-    });
-    resetLink.style.display = installedVersion ? 'block' : 'none';
-  }
 
-  async function loadState(){
-    try{
-      const res = await window.storage.get(STORAGE_KEY, false);
-      installedVersion = res ? res.value : null;
-    }catch(e){
-      installedVersion = null;
-    }
-    render();
-  }
+      function showToast(message) {
+        toastEl.textContent = message;
 
-  function animateProgress(btn, onDone){
-    const fill = btn.querySelector('.progress-fill');
-    const label = btn.querySelector('.btn-label');
-    let pct = 0;
-    busy = true;
-    render();
-    label.textContent = 'Downloading';
-    const iv = setInterval(()=>{
-      pct += Math.random()*18 + 8;
-      if(pct >= 100){
-        pct = 100;
-        clearInterval(iv);
-        fill.style.width = '100%';
-        setTimeout(()=>{
-          fill.style.width = '0%';
-          busy = false;
-          onDone();
-        }, 250);
-        return;
+        toastEl.classList.add("show");
+
+        clearTimeout(showToast.timeout);
+
+        showToast.timeout =
+          setTimeout(() => {
+            toastEl.classList.remove("show");
+          }, 3000);
       }
-      fill.style.width = pct + '%';
-    }, 160);
-  }
 
-  async function handleClick(){
-    if(busy) return;
-    if(!installedVersion || versionLess(installedVersion, LATEST_VERSION)){
-      const wasUpdate = !!installedVersion;
-      animateProgress(btnMain, async ()=>{
-        try{
-          await window.storage.set(STORAGE_KEY, LATEST_VERSION, false);
-        }catch(e){}
-        installedVersion = LATEST_VERSION;
-        render();
-        showToast(wasUpdate ? 'Update download shuru — APK file save ho rahi hai' : 'APK download shuru ho gaya');
-        const a = document.createElement('a');
-        a.href = APK_URL;
-        a.download = '';
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-      });
-      animateProgress(btnNav, ()=>{});
-    } else {
-      showToast('Nexor Sparks pehle se download ho chuka hai. App kholne ke liye apne phone par icon tap karein.');
-    }
-  }
+      function formatBytes(bytes) {
+        if (
+          !Number.isFinite(bytes) ||
+          bytes <= 0
+        ) {
+          return "0 MB";
+        }
 
-  btnMain.addEventListener('click', handleClick);
-  btnNav.addEventListener('click', handleClick);
+        const units = [
+          "B",
+          "KB",
+          "MB",
+          "GB"
+        ];
 
-  resetLink.addEventListener('click', async ()=>{
-    try{ await window.storage.delete(STORAGE_KEY, false); }catch(e){}
-    installedVersion = null;
-    render();
-    showToast('Status reset ho gaya — GET dobara dikhega');
-  });
+        const index =
+          Math.min(
+            Math.floor(
+              Math.log(bytes) /
+              Math.log(1024)
+            ),
+            units.length - 1
+          );
 
-  window.addEventListener('scroll', ()=>{
-    if(window.scrollY > 140) navbar.classList.add('show');
-    else navbar.classList.remove('show');
-  });
+        const value =
+          bytes /
+          Math.pow(1024, index);
 
-  loadState();
-})();
-</script>
+        const decimals =
+          index >= 2 ? 1 : 0;
+
+        return (
+          value.toFixed(decimals) +
+          " " +
+          units[index]
+        );
+      }
+
+      function formatSpeed(bytesPerSecond) {
+        if (
+          !Number.isFinite(bytesPerSecond) ||
+          bytesPerSecond <= 0
+        ) {
+          return "Calculating...";
+        }
+
+        return (
+          formatBytes(bytesPerSecond) +
+          "/s"
+        );
+      }
+
+      function formatTime(seconds) {
+        if (
+          !Number.isFinite(seconds) ||
+          seconds < 0
+        ) {
+          return "Calculating...";
+        }
+
+        if (seconds < 1) {
+          return "Less than 1 sec";
+        }
+
+        if (seconds < 60) {
+          return (
+            Math.ceil(seconds) +
+            " sec"
+          );
+        }
+
+        const minutes =
+          Math.floor(seconds / 60);
+
+        const remainingSeconds =
+          Math.ceil(seconds % 60);
+
+        if (minutes < 60) {
+          return (
+            minutes +
+            " min " +
+            remainingSeconds +
+            " sec"
+          );
+        }
+
+        const hours =
+          Math.floor(minutes / 60);
+
+        const remainingMinutes =
+          minutes % 60;
+
+        return (
+          hours +
+          " hr " +
+          remainingMinutes +
+          " min"
+        );
+      }
+
+      function setButtonState(state, text) {
+        [btnMain, btnNav].forEach((button) => {
+          button.classList.remove(
+            "update",
+            "open",
+            "retry",
+            "ios-unavailable"
+          );
+
+          const label =
+            button.querySelector(".btn-label");
+
+          label.textContent = text;
+
+          if (state === "update") {
+            button.classList.add("update");
+          }
+
+          if (state === "open") {
+            button.classList.add("open");
+          }
+
+          if (state === "retry") {
+            button.classList.add("retry");
+          }
+
+          if (state === "ios") {
+            button.classList.add(
+              "ios-unavailable"
+            );
+          }
+
+          button.disabled =
+            state === "downloading" ||
+            state === "ios";
+        });
+      }
+
+      function applyPlatformAvailability() {
+        iosDevice = isIOSDevice();
+
+        if (!iosDevice) {
+          return false;
+        }
+
+        setButtonState(
+          "ios",
+          "NOT AVAILABLE ON iOS"
+        );
+
+        platformBadge.textContent =
+          "This app is not available for iOS";
+
+        platformBadge.classList.add(
+          "ios-badge"
+        );
+
+        navVersion.textContent =
+          "Not available for iOS";
+
+        iosMessage.classList.add("show");
+
+        downloadPanel.classList.remove(
+          "show"
+        );
+
+        resetLink.style.display =
+          "none";
+
+        return true;
+      }
+
+      function renderInitialState() {
+        if (iosDevice) {
+          return;
+        }
+
+        if (
+          downloadedVersion ===
+          LATEST_VERSION
+        ) {
+          setButtonState(
+            "open",
+            "DOWNLOADED"
+          );
+
+          resetLink.style.display =
+            "block";
+        } else {
+          setButtonState(
+            "get",
+            "GET"
+          );
+
+          resetLink.style.display =
+            "none";
+        }
+      }
+
+      function updateProgressUI(
+        receivedBytes,
+        totalBytes,
+        speed
+      ) {
+        const validTotal =
+          totalBytes > 0
+            ? totalBytes
+            : FALLBACK_FILE_SIZE;
+
+        const percentage =
+          Math.min(
+            100,
+            Math.max(
+              0,
+              Math.floor(
+                (
+                  receivedBytes /
+                  validTotal
+                ) * 100
+              )
+            )
+          );
+
+        const remainingBytes =
+          Math.max(
+            0,
+            validTotal - receivedBytes
+          );
+
+        const secondsRemaining =
+          speed > 0
+            ? remainingBytes / speed
+            : Infinity;
+
+        downloadPercent.textContent =
+          percentage + "%";
+
+        progressBar.style.width =
+          percentage + "%";
+
+        downloadedSize.textContent =
+          formatBytes(receivedBytes) +
+          " / " +
+          formatBytes(validTotal);
+
+        downloadSpeed.textContent =
+          formatSpeed(speed);
+
+        remainingTime.textContent =
+          formatTime(secondsRemaining);
+
+        downloadStatus.textContent =
+          percentage < 100
+            ? "Downloading Nexor Sparks"
+            : "Download complete";
+
+        [btnMain, btnNav].forEach(
+          (button) => {
+            const fill =
+              button.querySelector(
+                ".progress-fill"
+              );
+
+            const label =
+              button.querySelector(
+                ".btn-label"
+              );
+
+            fill.style.width =
+              percentage + "%";
+
+            label.textContent =
+              percentage + "%";
+          }
+        );
+      }
+
+      function resetProgressUI() {
+        downloadPercent.textContent =
+          "0%";
+
+        progressBar.style.width =
+          "0%";
+
+        downloadedSize.textContent =
+          "0 MB / 101 MB";
+
+        downloadSpeed.textContent =
+          "Calculating...";
+
+        remainingTime.textContent =
+          "Calculating...";
+
+        downloadStatus.textContent =
+          "Preparing download";
+
+        [btnMain, btnNav].forEach(
+          (button) => {
+            const fill =
+              button.querySelector(
+                ".progress-fill"
+              );
+
+            fill.style.width =
+              "0%";
+          }
+        );
+      }
+
+      async function downloadAPK() {
+        if (
+          isDownloading ||
+          iosDevice
+        ) {
+          return;
+        }
+
+        isDownloading = true;
+
+        abortController =
+          new AbortController();
+
+        downloadPanel.classList.add(
+          "show"
+        );
+
+        resetProgressUI();
+
+        setButtonState(
+          "downloading",
+          "0%"
+        );
+
+        let objectUrl = null;
+
+        try {
+          const response =
+            await fetch(APK_URL, {
+              method: "GET",
+              cache: "no-store",
+              signal:
+                abortController.signal
+            });
+
+          if (!response.ok) {
+            throw new Error(
+              "Server returned HTTP " +
+              response.status
+            );
+          }
+
+          if (!response.body) {
+            throw new Error(
+              "Streaming download is not supported by this browser."
+            );
+          }
+
+          const contentLengthHeader =
+            response.headers.get(
+              "content-length"
+            );
+
+          const totalBytes =
+            contentLengthHeader
+              ? Number(contentLengthHeader)
+              : FALLBACK_FILE_SIZE;
+
+          const reader =
+            response.body.getReader();
+
+          const chunks = [];
+
+          let receivedBytes = 0;
+
+          let lastBytes = 0;
+
+          let lastTime =
+            performance.now();
+
+          let smoothedSpeed = 0;
+
+          while (true) {
+            const result =
+              await reader.read();
+
+            if (result.done) {
+              break;
+            }
+
+            chunks.push(result.value);
+
+            receivedBytes +=
+              result.value.length;
+
+            const currentTime =
+              performance.now();
+
+            const elapsedSeconds =
+              (
+                currentTime -
+                lastTime
+              ) / 1000;
+
+            if (elapsedSeconds >= 0.25) {
+              const bytesSinceLastUpdate =
+                receivedBytes -
+                lastBytes;
+
+              const instantSpeed =
+                bytesSinceLastUpdate /
+                elapsedSeconds;
+
+              if (smoothedSpeed === 0) {
+                smoothedSpeed =
+                  instantSpeed;
+              } else {
+                smoothedSpeed =
+                  smoothedSpeed * 0.7 +
+                  instantSpeed * 0.3;
+              }
+
+              updateProgressUI(
+                receivedBytes,
+                totalBytes,
+                smoothedSpeed
+              );
+
+              lastBytes =
+                receivedBytes;
+
+              lastTime =
+                currentTime;
+            }
+          }
+
+          updateProgressUI(
+            receivedBytes,
+            receivedBytes,
+            smoothedSpeed
+          );
+
+          const apkBlob =
+            new Blob(chunks, {
+              type:
+                "application/vnd.android.package-archive"
+            });
+
+          objectUrl =
+            URL.createObjectURL(apkBlob);
+
+          const downloadLink =
+            document.createElement("a");
+
+          downloadLink.href =
+            objectUrl;
+
+          downloadLink.download =
+            APK_FILE_NAME;
+
+          downloadLink.style.display =
+            "none";
+
+          document.body.appendChild(
+            downloadLink
+          );
+
+          downloadLink.click();
+
+          downloadLink.remove();
+
+          localStorage.setItem(
+            STORAGE_KEY,
+            LATEST_VERSION
+          );
+
+          downloadedVersion =
+            LATEST_VERSION;
+
+          downloadStatus.textContent =
+            "APK saved successfully";
+
+          downloadPercent.textContent =
+            "100%";
+
+          progressBar.style.width =
+            "100%";
+
+          remainingTime.textContent =
+            "Complete";
+
+          setButtonState(
+            "open",
+            "DOWNLOADED"
+          );
+
+          resetLink.style.display =
+            "block";
+
+          showToast(
+            "Nexor Sparks APK downloaded successfully."
+          );
+
+          setTimeout(() => {
+            downloadPanel.classList.remove(
+              "show"
+            );
+          }, 2500);
+        } catch (error) {
+          if (error.name === "AbortError") {
+            downloadStatus.textContent =
+              "Download cancelled";
+
+            showToast(
+              "Download cancelled."
+            );
+
+            setButtonState(
+              "get",
+              "GET"
+            );
+          } else {
+            console.error(error);
+
+            downloadStatus.textContent =
+              "Download failed";
+
+            downloadSpeed.textContent =
+              "Connection error";
+
+            remainingTime.textContent =
+              "Try again";
+
+            setButtonState(
+              "retry",
+              "RETRY"
+            );
+
+            showToast(
+              "Download failed. Check your internet connection and server settings."
+            );
+          }
+        } finally {
+          isDownloading = false;
+
+          abortController = null;
+
+          if (objectUrl) {
+            setTimeout(() => {
+              URL.revokeObjectURL(
+                objectUrl
+              );
+            }, 5000);
+          }
+
+          if (!iosDevice) {
+            [btnMain, btnNav].forEach(
+              (button) => {
+                button.disabled = false;
+              }
+            );
+          }
+        }
+      }
+
+      function handleDownloadClick() {
+        if (iosDevice) {
+          showToast(
+            "Nexor Sparks is not available for iOS."
+          );
+
+          return;
+        }
+
+        if (isDownloading) {
+          return;
+        }
+
+        if (
+          downloadedVersion ===
+          LATEST_VERSION
+        ) {
+          showToast(
+            "The APK has already been downloaded. Open your Downloads folder to install it."
+          );
+
+          return;
+        }
+
+        downloadAPK();
+      }
+
+      btnMain.addEventListener(
+        "click",
+        handleDownloadClick
+      );
+
+      btnNav.addEventListener(
+        "click",
+        handleDownloadClick
+      );
+
+      cancelBtn.addEventListener(
+        "click",
+        () => {
+          if (
+            abortController &&
+            isDownloading
+          ) {
+            abortController.abort();
+          }
+        }
+      );
+
+      resetLink.addEventListener(
+        "click",
+        () => {
+          if (iosDevice) {
+            return;
+          }
+
+          localStorage.removeItem(
+            STORAGE_KEY
+          );
+
+          downloadedVersion = null;
+
+          resetProgressUI();
+
+          downloadPanel.classList.remove(
+            "show"
+          );
+
+          renderInitialState();
+
+          showToast(
+            "Download status has been reset."
+          );
+        }
+      );
+
+      window.addEventListener(
+        "scroll",
+        () => {
+          if (window.scrollY > 140) {
+            navbar.classList.add(
+              "show"
+            );
+          } else {
+            navbar.classList.remove(
+              "show"
+            );
+          }
+        }
+      );
+
+      if (!applyPlatformAvailability()) {
+        renderInitialState();
+      }
+    })();
+  </script>
+
 </body>
 </html>
