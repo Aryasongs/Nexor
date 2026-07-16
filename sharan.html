@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Sharan</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Jost:wght@200;300;400&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html, body {
+    width: 100%;
+    height: 100%;
+    background: #000;
+    overflow: hidden;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Jost', sans-serif;
+  }
+
+  #stage {
+    position: relative;
+    width: 90vw;
+    max-width: 1000px;
+    height: 40vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .line {
+    position: absolute;
+    opacity: 0;
+    color: #eae7e1;
+    letter-spacing: 0.03em;
+    font-weight: 500;
+    line-height: 1.4;
+    transition: opacity 2.4s ease, transform 2.4s ease;
+    transform: translateY(14px);
+    padding: 0 2vw;
+  }
+
+  .line.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .line.name {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 700;
+    font-size: clamp(3.2rem, 8vw, 6rem);
+    letter-spacing: 0.05em;
+  }
+
+  .line.regular {
+    font-size: clamp(1.8rem, 3.6vw, 3rem);
+    font-weight: 500;
+    color: #dedad2;
+  }
+
+  .line.soft {
+    font-family: 'Cormorant Garamond', serif;
+    font-style: italic;
+    font-weight: 600;
+    font-size: clamp(2rem, 4.2vw, 3.4rem);
+    color: #e2ddd2;
+  }
+
+  .line.final {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 700;
+    font-size: clamp(3.4rem, 8.5vw, 6.5rem);
+    letter-spacing: 0.07em;
+    color: #f4f2ed;
+    text-shadow: 0 0 50px rgba(244, 242, 237, 0.2);
+  }
+
+  /* tiny breathing dot during the initial black hold */
+  #pulse {
+    position: absolute;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #3a3a3a;
+    opacity: 0;
+    animation: pulse 2.4s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 0.15; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.6); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .line { transition: opacity 0.4s linear; transform: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="stage">
+  <div id="pulse"></div>
+</div>
+
+<script>
+  const lines = [
+    { text: "Hello Sharan.", cls: "name", hold: 2200 },
+    { text: "How are you, really?", cls: "regular", hold: 2400 },
+    { text: "I know the overthinking has been loud lately.", cls: "regular", hold: 2800 },
+    { text: "I know about Lucy.", cls: "regular", hold: 2400 },
+    { text: "She's still there. In your heart. She always will be.", cls: "soft", hold: 3200 },
+    { text: "Some people walked away when things got heavy.", cls: "regular", hold: 2800 },
+    { text: "But one friend never did.", cls: "regular", hold: 2200 },
+    { text: "Me.", cls: "name", hold: 2000 },
+    { text: "I care about you more than you probably think.", cls: "soft", hold: 3000 },
+    { text: "So get up. Get out of this.", cls: "regular", hold: 2400 },
+    { text: "Let them see it.", cls: "regular", hold: 2000 },
+    { text: "Sharan is back.", cls: "final", hold: 5000 }
+  ];
+
+  const stage = document.getElementById('stage');
+  const pulse = document.getElementById('pulse');
+
+  function fadeOut(el, cb) {
+    el.classList.remove('show');
+    setTimeout(() => { el.remove(); cb && cb(); }, 1600);
+  }
+
+  function showLine(i) {
+    if (i >= lines.length) return; // sequence ends, last line lingers
+    const { text, cls, hold } = lines[i];
+    const el = document.createElement('div');
+    el.className = 'line ' + cls;
+    el.textContent = text;
+    stage.appendChild(el);
+    requestAnimationFrame(() => requestAnimationFrame(() => el.classList.add('show')));
+
+    setTimeout(() => {
+      if (i === lines.length - 1) return; // keep last line on screen
+      fadeOut(el, () => showLine(i + 1));
+    }, hold);
+  }
+
+  // initial black hold before anything appears
+  window.addEventListener('load', () => {
+    pulse.style.opacity = '1';
+    setTimeout(() => {
+      pulse.remove();
+      showLine(0);
+    }, 2800);
+  });
+</script>
+
+</body>
+</html>
