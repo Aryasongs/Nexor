@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Public Records & Verification - U.S. Government</title>
+    
+    <!-- US Government Official Style Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        :root {
+            --primary-blue: #005ea2;
+            --dark-blue: #112e51;
+            --bg-gray: #f0f0f0;
+            --text-dark: #1b1b1b;
+            --success-green: #00a91c;
+            --error-red: #d83933;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            color: var(--text-dark);
+            line-height: 1.5;
+        }
+
+        /* Official Government Banner */
+        .usa-banner {
+            background-color: var(--bg-gray);
+            padding: 8px 20px;
+            font-size: 13px;
+            border-bottom: 1px solid #dfe1e2;
+        }
+
+        .usa-banner-inner {
+            max-width: 1040px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .usa-banner-inner img {
+            width: 16px;
+            height: 11px;
+        }
+
+        .usa-banner a {
+            color: #005ea2;
+            margin-left: auto;
+            text-decoration: none;
+        }
+
+        .usa-banner a:hover {
+            text-decoration: underline;
+        }
+
+        /* Official Header & Logo */
+        header {
+            background-color: #ffffff;
+            border-bottom: 4px solid var(--dark-blue);
+            padding: 25px 20px;
+        }
+
+        .header-container {
+            max-width: 1040px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .seal-placeholder {
+            width: 65px;
+            height: 65px;
+            background-color: var(--dark-blue);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px dashed #d1d1d1;
+            outline: 3px solid var(--dark-blue);
+            outline-offset: -5px;
+        }
+
+        .seal-inner {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #ffffff;
+            border-radius: 50%;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-text h1 {
+            font-family: 'Merriweather', serif;
+            font-size: 26px;
+            color: var(--dark-blue);
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 2px;
+        }
+
+        .logo-text span {
+            font-size: 14px;
+            color: #5b616b;
+            font-weight: 400;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Main Content Layout */
+        main {
+            max-width: 1040px;
+            margin: 40px auto;
+            padding: 0 20px;
+            min-height: 60vh;
+        }
+
+        .search-section {
+            background: #f4f6f9;
+            padding: 40px;
+            border-radius: 2px;
+            border-left: 5px solid var(--primary-blue);
+            margin-bottom: 40px;
+        }
+
+        .search-section h2 {
+            font-family: 'Merriweather', serif;
+            color: var(--dark-blue);
+            margin-bottom: 10px;
+            font-size: 24px;
+        }
+
+        .search-section p {
+            margin-bottom: 20px;
+            color: #5b616b;
+            font-size: 16px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 15px;
+            max-width: 600px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #5b616b;
+            border-radius: 4px;
+            font-size: 16px;
+            color: var(--text-dark);
+            box-shadow: inset 0 0 0 1px transparent;
+            transition: border-color 0.1s;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-blue);
+            box-shadow: inset 0 0 0 2px var(--primary-blue);
+        }
+
+        .search-btn {
+            background-color: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 0 30px;
+            border-radius: 4px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .search-btn:hover {
+            background-color: var(--dark-blue);
+        }
+
+        /* Results Panel */
+        .results-section {
+            display: none;
+            border: 1px solid #dfe1e2;
+            border-radius: 4px;
+        }
+
+        .results-header {
+            background-color: #f0f0f0;
+            padding: 15px 25px;
+            border-bottom: 1px solid #dfe1e2;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .results-header h3 {
+            font-family: 'Merriweather', serif;
+            color: var(--dark-blue);
+            font-size: 18px;
+        }
+
+        .status-badge {
+            background: #e6f6eb;
+            color: var(--success-green);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            border: 1px solid var(--success-green);
+        }
+
+        .results-body {
+            padding: 30px;
+            background-color: #ffffff;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+        }
+
+        .info-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .info-group.full-width {
+            grid-column: span 2;
+        }
+
+        .label {
+            font-size: 13px;
+            color: #5b616b;
+            font-weight: 600;
+        }
+
+        .value {
+            font-size: 17px;
+            color: var(--text-dark);
+            font-weight: 400;
+        }
+
+        .error-message {
+            display: none;
+            background-color: #fbf3f2;
+            color: var(--text-dark);
+            padding: 20px;
+            border-left: 5px solid var(--error-red);
+            font-weight: 500;
+            margin-bottom: 30px;
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--bg-gray);
+            padding: 40px 20px;
+            margin-top: 50px;
+            border-top: 1px solid #dfe1e2;
+        }
+        .footer-content {
+            max-width: 1040px;
+            margin: 0 auto;
+            font-size: 14px;
+            color: #5b616b;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Official Gov Banner -->
+    <div class="usa-banner">
+        <div class="usa-banner-inner">
+            <!-- Inline SVG for US Flag -->
+            <svg class="usa-banner__header-flag" aria-hidden="true" alt="U.S. flag" height="11" width="16" xmlns="http://www.w3.org/2000/svg">
+                <g fill="none" fill-rule="evenodd"><path d="M0 0h16v11H0z" fill="#fff"></path><path d="M0 0h16v1.22H0zM0 2.44h16v1.23H0zM0 4.89h16v1.22H0zM0 7.33h16v1.23H0zM0 9.78h16v1.22H0z" fill="#db1c35"></path><path d="M0 0h6.3v5.5H0z" fill="#1f2c5d"></path><path d="M.76 4.7l-.23-.7h-.73l.6-.45-.23-.7.59.45.6-.45-.23.7.6.45h-.73l-.24.7zM2.02 3.48l-.23-.7h-.74l.6-.45-.23-.7.6.45.59-.45-.23.7.6.45h-.74l-.22.7zM3.28 4.7l-.23-.7h-.74l.6-.45-.23-.7.6.45.59-.45-.23.7.6.45h-.74l-.22.7zM4.54 3.48l-.23-.7h-.74l.6-.45-.23-.7.6.45.6-.45-.24.7.6.45h-.74l-.22.7zM5.8 4.7l-.23-.7h-.74l.6-.45-.23-.7.6.45.6-.45-.24.7.6.45h-.74l-.22.7zM.76 2.24l-.23-.7h-.73l.6-.45-.23-.7.59.45.6-.45-.23.7.6.45h-.73l-.24.7zM2.02 1.02l-.23-.7H1.05l.6-.45-.23-.7.6.45.59-.45-.23.7.6.45h-.74l-.22.7zM3.28 2.24l-.23-.7h-.74l.6-.45-.23-.7.6.45.59-.45-.23.7.6.45h-.74l-.22.7zM4.54 1.02l-.23-.7h-.74l.6-.45-.23-.7.6.45.6-.45-.24.7.6.45h-.74l-.22.7zM5.8 2.24l-.23-.7h-.74l.6-.45-.23-.7.6.45.6-.45-.24.7.6.45h-.74l-.22.7z" fill="#fff"></path></g>
+            </svg>
+            <span>An official website of the United States government</span>
+            <a href="#">Here's how you know <span style="font-size: 10px;">▼</span></a>
+        </div>
+    </div>
+
+    <!-- Header & Official Logo -->
+    <header>
+        <div class="header-container">
+            <!-- Mock Government Seal -->
+            <div class="seal-placeholder">
+                <div class="seal-inner"></div>
+            </div>
+            <!-- Official Typography -->
+            <div class="logo-text">
+                <h1>United States Government</h1>
+                <span>Department of Public Records & Data Verification</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Search Section -->
+        <div class="search-section">
+            <h2>Search Public Records</h2>
+            <p>Enter a valid registration or case number to verify individual status and details.</p>
+            <div class="search-box">
+                <input type="text" id="searchInput" class="search-input" placeholder="Enter ID (e.g., CA8200720269200)">
+                <button onclick="performSearch()" class="search-btn">Search</button>
+            </div>
+        </div>
+
+        <!-- Error Message -->
+        <div id="errorMessage" class="error-message">
+            <strong>No Results Found.</strong> The number entered does not match any records in our current database.
+        </div>
+
+        <!-- System Results Panel -->
+        <div id="resultsSection" class="results-section">
+            <div class="results-header">
+                <h3>Verification Report</h3>
+                <span class="status-badge">✔ Verified Record</span>
+            </div>
+            <div class="results-body">
+                <div class="info-grid">
+                    <div class="info-group">
+                        <div class="label">Full Legal Name</div>
+                        <div class="value">Gursharan Singh</div>
+                    </div>
+                    <div class="info-group">
+                        <div class="label">Age</div>
+                        <div class="value">20 Years Old</div>
+                    </div>
+                    <div class="info-group">
+                        <div class="label">Place of Origin</div>
+                        <div class="value">Punjab, India</div>
+                    </div>
+                    <div class="info-group">
+                        <div class="label">Status</div>
+                        <div class="value">Active Resident</div>
+                    </div>
+                    <div class="info-group full-width">
+                        <div class="label">United States Registered Address</div>
+                        <div class="value" style="line-height: 1.6;">
+                            115 N Loop Dr<br>
+                            Camarillo, CA 93010<br>
+                            United States
+                        </div>
+                    </div>
+                    <div class="info-group">
+                        <div class="label">Filing Identifier</div>
+                        <div class="value">CA8200720269200</div>
+                    </div>
+                    <div class="info-group">
+                        <div class="label">Last Updated</div>
+                        <div class="value">July 17, 2026</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Official Footer -->
+    <footer>
+        <div class="footer-content">
+            <p><strong>Department of Public Records & Data Verification</strong></p>
+            <p style="margin-top: 10px;">This portal is maintained by the United States Government. Unauthorized access or misuse of this system is strictly prohibited and subject to legal action under federal law.</p>
+        </div>
+    </footer>
+
+    <script>
+        function performSearch() {
+            const query = document.getElementById('searchInput').value.trim();
+            const resultsSection = document.getElementById('resultsSection');
+            const errorMessage = document.getElementById('errorMessage');
+
+            // Reset views
+            resultsSection.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            // Check exact number match
+            if (query === 'CA8200720269200') {
+                resultsSection.style.display = 'block';
+            } else if (query !== '') {
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        // Allow 'Enter' key to trigger search
+        document.getElementById('searchInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                performSearch();
+            }
+        });
+    </script>
+</body>
+</html>
