@@ -59,7 +59,7 @@
             font-size: 14px;
         }
 
-        /* DS-160 Confirmation Document Styles (Matching image.png) */
+        /* DS-160 Confirmation Document Styles */
         #documentView {
             display: none; /* Hidden until searched */
             max-width: 850px;
@@ -67,31 +67,25 @@
             padding: 20px;
         }
 
+        /* Updated Official Header */
         .dos-banner {
-            background: linear-gradient(to right, #002244, #002244 30%, #5a0000 60%, #8b0000);
+            background: linear-gradient(to right, #001f3f, #001f3f 25%, #4a0404 55%, #8b0000);
             color: white;
-            padding: 15px 20px;
+            padding: 12px 20px;
             display: flex;
             align-items: center;
-            border-bottom: 4px solid #cc0000;
+            border-bottom: 4px solid #b30000;
             margin-bottom: 20px;
-            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
         }
 
-        .dos-seal {
-            width: 60px;
-            height: 60px;
-            background-color: #fff;
+        /* Real Official Seal Image Styling */
+        .dos-seal-img {
+            width: 65px;
+            height: 65px;
+            margin-right: 20px;
             border-radius: 50%;
-            margin-right: 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 10px;
-            color: #002244;
-            font-weight: bold;
-            text-align: center;
-            border: 2px solid #eebb00;
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.5));
         }
 
         .dos-title-container {
@@ -101,16 +95,25 @@
 
         .dos-title {
             font-family: 'Times New Roman', Times, serif;
-            font-size: 24px;
+            font-size: 26px;
             font-variant: small-caps;
             letter-spacing: 1px;
             margin-bottom: 2px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+        }
+
+        .dos-title i {
+            font-size: 22px;
+            text-transform: lowercase;
+            font-style: italic;
         }
 
         .dos-subtitle {
             font-size: 11px;
             font-family: Arial, sans-serif;
             letter-spacing: 0.5px;
+            font-weight: bold;
+            color: #e0e0e0;
         }
 
         .doc-type {
@@ -130,7 +133,7 @@
         .confirmation-title {
             color: #000066;
             font-family: 'Times New Roman', Times, serif;
-            font-size: 26px;
+            font-size: 28px;
         }
 
         /* Fake Barcode CSS */
@@ -199,7 +202,7 @@
         }
 
         .info-table td {
-            padding: 4px 5px;
+            padding: 6px 5px;
             vertical-align: top;
         }
 
@@ -213,7 +216,6 @@
             color: #000;
         }
 
-        /* Specific row styling from image */
         .info-table tr.dark-row {
             background-color: #c8c8c8;
         }
@@ -222,16 +224,6 @@
             color: #cc0000;
             font-size: 16px;
             font-weight: bold;
-        }
-
-        .red-bar {
-            background-color: #a30000;
-            color: white;
-            text-align: center;
-            font-weight: bold;
-            padding: 6px;
-            font-size: 13px;
-            letter-spacing: 1px;
         }
 
         .right-panel {
@@ -302,12 +294,14 @@
         <div id="errorMsg" class="error-msg">Record not found. Please check your Confirmation Number.</div>
     </div>
 
-    <!-- DS-160 Document View (Hidden by default) -->
+    <!-- DS-160 Document View -->
     <div id="documentView">
         
-        <!-- Official Banner -->
+        <!-- Official Banner with Real Seal -->
         <div class="dos-banner">
-            <div class="dos-seal">SEAL</div>
+            <!-- Authentic U.S. Department of State Seal via Wikimedia -->
+            <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/81/U.S._Department_of_State_official_seal.svg/240px-U.S._Department_of_State_official_seal.svg.png" alt="Official U.S. Department of State Seal" class="dos-seal-img">
+            
             <div class="dos-title-container">
                 <div class="dos-title">U.S. DEPARTMENT <i>of</i> STATE</div>
                 <div class="dos-subtitle">CONSULAR ELECTRONIC APPLICATION CENTER</div>
@@ -375,7 +369,6 @@
                         </tr>
                     </table>
                 </div>
-                <div class="red-bar">THIS IS NOT A VISA</div>
             </div>
 
             <!-- Right Location Panel -->
@@ -422,7 +415,6 @@
             }
         }
 
-        // Allow pressing Enter key to search
         document.getElementById('searchInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 performSearch();
