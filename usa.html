@@ -3,399 +3,426 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Public Records & Verification - U.S. Government</title>
-    
-    <!-- US Government Official Style Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Merriweather:wght@700&family=Public+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-
+    <title>U.S. Department of State - Consular Electronic Application Center</title>
     <style>
-        :root {
-            --primary-blue: #005ea2;
-            --dark-blue: #112e51;
-            --bg-gray: #f0f0f0;
-            --text-dark: #1b1b1b;
-            --success-green: #00a91c;
-            --error-red: #d83933;
-        }
-
+        /* Base Reset & Search Screen Styles */
         * {
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            font-family: 'Public Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            font-family: Arial, Helvetica, sans-serif;
         }
 
         body {
             background-color: #ffffff;
-            color: var(--text-dark);
-            line-height: 1.5;
+            color: #000000;
         }
 
-        /* Official Government Banner */
-        .usa-banner {
-            background-color: var(--bg-gray);
-            padding: 8px 20px;
-            font-size: 13px;
-            border-bottom: 1px solid #dfe1e2;
-        }
-
-        .usa-banner-inner {
-            max-width: 1040px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .usa-banner-inner img {
-            width: 16px;
-            height: 11px;
-        }
-
-        .usa-banner a {
-            color: #005ea2;
-            margin-left: auto;
-            text-decoration: none;
-        }
-
-        .usa-banner a:hover {
-            text-decoration: underline;
-        }
-
-        /* Official Header & Logo */
-        header {
-            background-color: #ffffff;
-            border-bottom: 4px solid var(--dark-blue);
-            padding: 25px 20px;
-        }
-
-        .header-container {
-            max-width: 1040px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .seal-placeholder {
-            width: 65px;
-            height: 65px;
-            background-color: var(--dark-blue);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border: 2px dashed #d1d1d1;
-            outline: 3px solid var(--dark-blue);
-            outline-offset: -5px;
-        }
-
-        .seal-inner {
-            width: 40px;
-            height: 40px;
-            border: 1px solid #ffffff;
-            border-radius: 50%;
-        }
-
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-        }
-
-        .logo-text h1 {
-            font-family: 'Merriweather', serif;
-            font-size: 26px;
-            color: var(--dark-blue);
-            font-weight: 700;
-            letter-spacing: -0.5px;
-            margin-bottom: 2px;
-        }
-
-        .logo-text span {
-            font-size: 14px;
-            color: #5b616b;
-            font-weight: 400;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        /* Main Content Layout */
-        main {
-            max-width: 1040px;
-            margin: 40px auto;
-            padding: 0 20px;
-            min-height: 60vh;
-        }
-
-        .search-section {
-            background: #f4f6f9;
-            padding: 40px;
-            border-radius: 2px;
-            border-left: 5px solid var(--primary-blue);
-            margin-bottom: 40px;
-        }
-
-        .search-section h2 {
-            font-family: 'Merriweather', serif;
-            color: var(--dark-blue);
-            margin-bottom: 10px;
-            font-size: 24px;
-        }
-
-        .search-section p {
-            margin-bottom: 20px;
-            color: #5b616b;
-            font-size: 16px;
-        }
-
-        .search-box {
-            display: flex;
-            gap: 15px;
+        .search-container {
             max-width: 600px;
+            margin: 100px auto;
+            padding: 30px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .search-container h2 {
+            margin-bottom: 20px;
+            color: #003366;
+            font-family: 'Times New Roman', Times, serif;
         }
 
         .search-input {
-            flex: 1;
-            padding: 12px 16px;
-            border: 1px solid #5b616b;
-            border-radius: 4px;
+            width: 100%;
+            padding: 12px;
             font-size: 16px;
-            color: var(--text-dark);
-            box-shadow: inset 0 0 0 1px transparent;
-            transition: border-color 0.1s;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--primary-blue);
-            box-shadow: inset 0 0 0 2px var(--primary-blue);
+            border: 1px solid #999;
+            margin-bottom: 15px;
         }
 
         .search-btn {
-            background-color: var(--primary-blue);
+            background-color: #003366;
             color: white;
             border: none;
-            padding: 0 30px;
-            border-radius: 4px;
+            padding: 12px 25px;
             font-size: 16px;
-            font-weight: 600;
             cursor: pointer;
+            font-weight: bold;
         }
 
-        .search-btn:hover {
-            background-color: var(--dark-blue);
-        }
-
-        /* Results Panel */
-        .results-section {
+        .error-msg {
+            color: red;
             display: none;
-            border: 1px solid #dfe1e2;
-            border-radius: 4px;
+            margin-top: 10px;
+            font-size: 14px;
         }
 
-        .results-header {
-            background-color: #f0f0f0;
-            padding: 15px 25px;
-            border-bottom: 1px solid #dfe1e2;
+        /* DS-160 Confirmation Document Styles (Matching image.png) */
+        #documentView {
+            display: none; /* Hidden until searched */
+            max-width: 850px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .dos-banner {
+            background: linear-gradient(to right, #002244, #002244 30%, #5a0000 60%, #8b0000);
+            color: white;
+            padding: 15px 20px;
             display: flex;
-            justify-content: space-between;
             align-items: center;
+            border-bottom: 4px solid #cc0000;
+            margin-bottom: 20px;
+            position: relative;
         }
 
-        .results-header h3 {
-            font-family: 'Merriweather', serif;
-            color: var(--dark-blue);
-            font-size: 18px;
+        .dos-seal {
+            width: 60px;
+            height: 60px;
+            background-color: #fff;
+            border-radius: 50%;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: #002244;
+            font-weight: bold;
+            text-align: center;
+            border: 2px solid #eebb00;
         }
 
-        .status-badge {
-            background: #e6f6eb;
-            color: var(--success-green);
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 13px;
-            font-weight: 700;
-            border: 1px solid var(--success-green);
-        }
-
-        .results-body {
-            padding: 30px;
-            background-color: #ffffff;
-        }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-        }
-
-        .info-group {
+        .dos-title-container {
             display: flex;
             flex-direction: column;
-            gap: 4px;
         }
 
-        .info-group.full-width {
-            grid-column: span 2;
+        .dos-title {
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 24px;
+            font-variant: small-caps;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
         }
 
-        .label {
+        .dos-subtitle {
+            font-size: 11px;
+            font-family: Arial, sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .doc-type {
+            color: #8b0000;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 18px;
+            margin-bottom: 25px;
+        }
+
+        .confirmation-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 25px;
+        }
+
+        .confirmation-title {
+            color: #000066;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 26px;
+        }
+
+        /* Fake Barcode CSS */
+        .barcode-box {
+            width: 250px;
+            height: 45px;
+            background: repeating-linear-gradient(
+                to right,
+                #000 0, #000 2px,
+                transparent 2px, transparent 4px,
+                #000 4px, #000 7px,
+                transparent 7px, transparent 9px,
+                #000 9px, #000 10px,
+                transparent 10px, transparent 13px
+            );
+        }
+
+        .intro-text {
             font-size: 13px;
-            color: #5b616b;
-            font-weight: 600;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-family: Arial, sans-serif;
         }
 
-        .value {
-            font-size: 17px;
-            color: var(--text-dark);
-            font-weight: 400;
+        /* Grey Data Box Layout */
+        .grey-box {
+            background-color: #d8d8d8;
+            border: 2px solid #b0b0b0;
+            display: flex;
+            margin-bottom: 20px;
         }
 
-        .error-message {
-            display: none;
-            background-color: #fbf3f2;
-            color: var(--text-dark);
-            padding: 20px;
-            border-left: 5px solid var(--error-red);
-            font-weight: 500;
-            margin-bottom: 30px;
+        .left-panel {
+            flex: 2.2;
+            border-right: 2px solid #b0b0b0;
+            display: flex;
+            flex-direction: column;
         }
 
-        /* Footer */
-        footer {
-            background-color: var(--bg-gray);
-            padding: 40px 20px;
-            margin-top: 50px;
-            border-top: 1px solid #dfe1e2;
+        .data-row-container {
+            display: flex;
+            flex: 1;
+            padding: 10px;
+            background-color: #e4e4e4;
         }
-        .footer-content {
-            max-width: 1040px;
-            margin: 0 auto;
-            font-size: 14px;
-            color: #5b616b;
+
+        .photo-placeholder {
+            width: 130px;
+            height: 130px;
+            background-color: #cccccc;
+            border: 1px solid #999;
+            margin-right: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #666;
+            font-size: 12px;
+            flex-shrink: 0;
+        }
+
+        .info-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+            font-family: Arial, sans-serif;
+        }
+
+        .info-table td {
+            padding: 4px 5px;
+            vertical-align: top;
+        }
+
+        .info-table .label {
+            color: #333;
+            width: 40%;
+        }
+
+        .info-table .value {
+            font-weight: normal;
+            color: #000;
+        }
+
+        /* Specific row styling from image */
+        .info-table tr.dark-row {
+            background-color: #c8c8c8;
+        }
+        
+        .red-conf {
+            color: #cc0000;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .red-bar {
+            background-color: #a30000;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            padding: 6px;
+            font-size: 13px;
+            letter-spacing: 1px;
+        }
+
+        .right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            background-color: #e4e4e4;
+        }
+
+        .location-info {
+            padding: 15px;
+            font-size: 12px;
+            line-height: 1.5;
+            color: #333;
+        }
+
+        .version-info {
+            text-align: center;
+            padding: 6px;
+            font-size: 11px;
+            color: #555;
+            background-color: #d8d8d8;
+            border-top: 1px solid #b0b0b0;
+        }
+
+        /* Footer Instructions */
+        .footer-instructions {
+            font-size: 12px;
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+
+        .footer-instructions .red-bold {
+            color: #a30000;
+            font-weight: bold;
+        }
+
+        .footer-instructions .blue-bold {
+            color: #0000cc;
+            font-weight: bold;
+        }
+
+        .bottom-barcode {
+            margin-top: 30px;
+            width: 200px;
+            height: 35px;
+            background: repeating-linear-gradient(
+                to right,
+                #000 0, #000 3px,
+                transparent 3px, transparent 5px,
+                #000 5px, #000 6px,
+                transparent 6px, transparent 9px,
+                #000 9px, #000 12px,
+                transparent 12px, transparent 14px
+            );
         }
     </style>
 </head>
 <body>
 
-    <!-- Top Official Gov Banner -->
-    <div class="usa-banner">
-        <div class="usa-banner-inner">
-            <!-- Inline SVG for US Flag -->
-            <svg class="usa-banner__header-flag" aria-hidden="true" alt="U.S. flag" height="11" width="16" xmlns="http://www.w3.org/2000/svg">
-                <g fill="none" fill-rule="evenodd"><path d="M0 0h16v11H0z" fill="#fff"></path><path d="M0 0h16v1.22H0zM0 2.44h16v1.23H0zM0 4.89h16v1.22H0zM0 7.33h16v1.23H0zM0 9.78h16v1.22H0z" fill="#db1c35"></path><path d="M0 0h6.3v5.5H0z" fill="#1f2c5d"></path><path d="M.76 4.7l-.23-.7h-.73l.6-.45-.23-.7.59.45.6-.45-.23.7.6.45h-.73l-.24.7zM2.02 3.48l-.23-.7h-.74l.6-.45-.23-.7.6.45.59-.45-.23.7.6.45h-.74l-.22.7zM3.28 4.7l-.23-.7h-.74l.6-.45-.23-.7.6.45.59-.45-.23.7.6.45h-.74l-.22.7zM4.54 3.48l-.23-.7h-.74l.6-.45-.23-.7.6.45.6-.45-.24.7.6.45h-.74l-.22.7zM5.8 4.7l-.23-.7h-.74l.6-.45-.23-.7.6.45.6-.45-.24.7.6.45h-.74l-.22.7zM.76 2.24l-.23-.7h-.73l.6-.45-.23-.7.59.45.6-.45-.23.7.6.45h-.73l-.24.7zM2.02 1.02l-.23-.7H1.05l.6-.45-.23-.7.6.45.59-.45-.23.7.6.45h-.74l-.22.7zM3.28 2.24l-.23-.7h-.74l.6-.45-.23-.7.6.45.59-.45-.23.7.6.45h-.74l-.22.7zM4.54 1.02l-.23-.7h-.74l.6-.45-.23-.7.6.45.6-.45-.24.7.6.45h-.74l-.22.7zM5.8 2.24l-.23-.7h-.74l.6-.45-.23-.7.6.45.6-.45-.24.7.6.45h-.74l-.22.7z" fill="#fff"></path></g>
-            </svg>
-            <span>An official website of the United States government</span>
-            <a href="#">Here's how you know <span style="font-size: 10px;">▼</span></a>
-        </div>
+    <!-- Search Screen -->
+    <div id="searchView" class="search-container">
+        <h2>U.S. Visa Document Search</h2>
+        <p style="margin-bottom: 15px; font-size: 14px;">Please enter your Confirmation Number to retrieve your document.</p>
+        <input type="text" id="searchInput" class="search-input" placeholder="Enter Confirmation Number (e.g., CA8200720269200)">
+        <button onclick="performSearch()" class="search-btn">Retrieve Application</button>
+        <div id="errorMsg" class="error-msg">Record not found. Please check your Confirmation Number.</div>
     </div>
 
-    <!-- Header & Official Logo -->
-    <header>
-        <div class="header-container">
-            <!-- Mock Government Seal -->
-            <div class="seal-placeholder">
-                <div class="seal-inner"></div>
-            </div>
-            <!-- Official Typography -->
-            <div class="logo-text">
-                <h1>United States Government</h1>
-                <span>Department of Public Records & Data Verification</span>
-            </div>
-        </div>
-    </header>
-
-    <!-- Main Content -->
-    <main>
-        <!-- Search Section -->
-        <div class="search-section">
-            <h2>Search Public Records</h2>
-            <p>Enter a valid registration or case number to verify individual status and details.</p>
-            <div class="search-box">
-                <input type="text" id="searchInput" class="search-input" placeholder="Enter ID (e.g., CA8200720269200)">
-                <button onclick="performSearch()" class="search-btn">Search</button>
+    <!-- DS-160 Document View (Hidden by default) -->
+    <div id="documentView">
+        
+        <!-- Official Banner -->
+        <div class="dos-banner">
+            <div class="dos-seal">SEAL</div>
+            <div class="dos-title-container">
+                <div class="dos-title">U.S. DEPARTMENT <i>of</i> STATE</div>
+                <div class="dos-subtitle">CONSULAR ELECTRONIC APPLICATION CENTER</div>
             </div>
         </div>
 
-        <!-- Error Message -->
-        <div id="errorMessage" class="error-message">
-            <strong>No Results Found.</strong> The number entered does not match any records in our current database.
+        <!-- Document Subheading -->
+        <div class="doc-type">Online Nonimmigrant Visa Application (DS-160)</div>
+
+        <!-- Confirmation Heading & Barcode -->
+        <div class="confirmation-header">
+            <div class="confirmation-title">Confirmation</div>
+            <div class="barcode-box"></div>
         </div>
 
-        <!-- System Results Panel -->
-        <div id="resultsSection" class="results-section">
-            <div class="results-header">
-                <h3>Verification Report</h3>
-                <span class="status-badge">✔ Verified Record</span>
+        <div class="intro-text">
+            This confirms the submission of the Nonimmigrant visa<br>application for:
+        </div>
+
+        <!-- Grey Data Box -->
+        <div class="grey-box">
+            
+            <!-- Left Data Panel -->
+            <div class="left-panel">
+                <div class="data-row-container">
+                    <div class="photo-placeholder">
+                        [ Photo Area ]
+                    </div>
+                    <table class="info-table">
+                        <tr>
+                            <td class="label">Name<br>Provided:</td>
+                            <td class="value">Gursharan Singh</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Age / DOB:</td>
+                            <td class="value">20 Years Old</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Place of<br>Birth:</td>
+                            <td class="value">Punjab, India</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Gender:</td>
+                            <td class="value">Male</td>
+                        </tr>
+                        <tr class="dark-row">
+                            <td class="label">Nationality:</td>
+                            <td class="value">INDIA</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Passport<br>Number:</td>
+                            <td class="value">J8791774</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Purpose of<br>Travel:</td>
+                            <td class="value">SPECIALTY OCCUPATION<br>(H1B)</td>
+                        </tr>
+                        <tr>
+                            <td class="label">Completed<br>On:</td>
+                            <td class="value">17 JUL 2026</td>
+                        </tr>
+                        <tr class="dark-row">
+                            <td class="label">Confirmation<br>No:</td>
+                            <td class="value red-conf">CA8200720269200</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="red-bar">THIS IS NOT A VISA</div>
             </div>
-            <div class="results-body">
-                <div class="info-grid">
-                    <div class="info-group">
-                        <div class="label">Full Legal Name</div>
-                        <div class="value">Gursharan Singh</div>
-                    </div>
-                    <div class="info-group">
-                        <div class="label">Age</div>
-                        <div class="value">20 Years Old</div>
-                    </div>
-                    <div class="info-group">
-                        <div class="label">Place of Origin</div>
-                        <div class="value">Punjab, India</div>
-                    </div>
-                    <div class="info-group">
-                        <div class="label">Status</div>
-                        <div class="value">Active Resident</div>
-                    </div>
-                    <div class="info-group full-width">
-                        <div class="label">United States Registered Address</div>
-                        <div class="value" style="line-height: 1.6;">
-                            115 N Loop Dr<br>
-                            Camarillo, CA 93010<br>
-                            United States
-                        </div>
-                    </div>
-                    <div class="info-group">
-                        <div class="label">Filing Identifier</div>
-                        <div class="value">CA8200720269200</div>
-                    </div>
-                    <div class="info-group">
-                        <div class="label">Last Updated</div>
-                        <div class="value">July 17, 2026</div>
-                    </div>
+
+            <!-- Right Location Panel -->
+            <div class="right-panel">
+                <div class="location-info">
+                    Location Selected:<br><br>
+                    <strong>United States Address Details</strong><br>
+                    <br>
+                    115 N Loop Dr<br>
+                    Camarillo, CA 93010<br>
+                    United States
+                </div>
+                <div class="version-info">
+                    Version 01.02.00
                 </div>
             </div>
-        </div>
-    </main>
 
-    <!-- Official Footer -->
-    <footer>
-        <div class="footer-content">
-            <p><strong>Department of Public Records & Data Verification</strong></p>
-            <p style="margin-top: 10px;">This portal is maintained by the United States Government. Unauthorized access or misuse of this system is strictly prohibited and subject to legal action under federal law.</p>
         </div>
-    </footer>
+
+        <!-- Footer Instructions -->
+        <div class="footer-instructions">
+            <span class="red-bold">YOU MUST BRING</span> the confirmation page and the following document(s) with you at all steps during the application process:<br>
+            <span class="blue-bold">Passport; Evidence of approved I-129</span><br><br>
+            You may also provide any additional documents you feel will support your case.
+        </div>
+
+        <!-- Bottom Barcode -->
+        <div class="bottom-barcode"></div>
+
+    </div>
 
     <script>
         function performSearch() {
             const query = document.getElementById('searchInput').value.trim();
-            const resultsSection = document.getElementById('resultsSection');
-            const errorMessage = document.getElementById('errorMessage');
+            const searchView = document.getElementById('searchView');
+            const documentView = document.getElementById('documentView');
+            const errorMsg = document.getElementById('errorMsg');
 
-            // Reset views
-            resultsSection.style.display = 'none';
-            errorMessage.style.display = 'none';
-
-            // Check exact number match
             if (query === 'CA8200720269200') {
-                resultsSection.style.display = 'block';
-            } else if (query !== '') {
-                errorMessage.style.display = 'block';
+                searchView.style.display = 'none';
+                documentView.style.display = 'block';
+            } else {
+                errorMsg.style.display = 'block';
             }
         }
 
-        // Allow 'Enter' key to trigger search
+        // Allow pressing Enter key to search
         document.getElementById('searchInput').addEventListener('keypress', function(e) {
             if (e.key === 'Enter') {
                 performSearch();
