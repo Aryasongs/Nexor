@@ -298,6 +298,48 @@ canvas{max-width:100%;}
 .waveform-canvas{width:100%;height:70px;margin-top:10px;background:var(--surface2);border-radius:10px;}
 .center-col{display:flex;flex-direction:column;align-items:center;text-align:center;}
 
+/* heart rate detail — Apple Health style */
+.range-tabs{
+  display:flex;background:var(--surface2);border-radius:20px;padding:3px;
+  margin-bottom:16px;overflow-x:auto;
+}
+.range-tab{
+  flex:1;text-align:center;padding:7px 10px;border-radius:16px;
+  font-size:13px;font-weight:600;color:var(--muted);white-space:nowrap;
+}
+.range-tab.active{background:#333a47;color:#fff;}
+.avg-label{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;}
+.avg-row{display:flex;align-items:baseline;gap:8px;margin-bottom:2px;}
+.avg-big{font-family:'Space Grotesk',sans-serif;font-size:40px;font-weight:700;}
+.avg-unit{font-size:15px;color:var(--muted);font-weight:500;}
+.avg-daterange{font-size:12.5px;color:var(--muted2);margin-bottom:14px;}
+.about-card{
+  background:var(--surface2);border-radius:14px;padding:16px;margin-top:16px;
+  font-size:13px;line-height:1.65;color:#c7cbd3;
+}
+.about-card h4{font-size:15px;margin-bottom:10px;color:var(--text);font-weight:600;}
+.about-card p+p{margin-top:10px;}
+.hr-log-btn{
+  font-size:12px;color:var(--cyan);border:1px solid var(--border);
+  padding:5px 12px;border-radius:20px;margin-left:auto;
+}
+.section-heading-row{display:flex;align-items:center;margin-bottom:14px;}
+.section-heading-row h3{font-size:16px;font-weight:600;}
+.ecg-card{
+  background:var(--surface2);border-radius:14px;padding:15px 16px;margin-bottom:12px;
+}
+.ecg-card:last-child{margin-bottom:0;}
+.ecg-card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:2px;}
+.ecg-title{font-size:14.5px;font-weight:600;}
+.ecg-title.poor{color:var(--coral);}
+.ecg-title.ok{color:#e5e8ec;}
+.ecg-datetime{font-size:12px;color:var(--muted2);}
+.ecg-bpm-row{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);margin:6px 0 10px;}
+.ecg-canvas{width:100%;height:90px;display:block;border-radius:8px;}
+.no-data-box{
+  padding:40px 10px;text-align:center;color:var(--muted2);font-size:13.5px;
+}
+
 /* mobile topbar */
 .mobile-topbar{display:none;}
 @media(max-width:760px){
@@ -649,52 +691,221 @@ function renderSummary() {
   `;
 }
 
+let hrRange = 'Y';
+
+function mulberry32(a) {
+  return function() {
+    a |= 0; a = a + 0x6D2B79F5 | 0;
+    let t = Math.imul(a ^ a >>> 15, 1 | a);
+    t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+    return ((t ^ t >>> 14) >>> 0) / 4294967296;
+  };
+}
+
+function buildHRSeries(range) {
+  const historyObj = d('heart.hrHistory', {}) || {};
+  const history = Object.values(historyObj).filter(h => h && typeof h.bpm === 'number' && h.ts);
+  const nowMs = Date.now();
+  let bucketCount, bucketMs;
+  if (range === 'D') { bucketCount = 8; bucketMs = 3 * 3600 * 1000; }
+  else if (range === 'W') { bucketCount = 7; bucketMs = 24 * 3600 * 1000; }
+  else if (range === 'M') { bucketCount = 30; bucketMs = 24 * 3600 * 1000; }
+  else if (range === '6M') { bucketCount = 6; bucketMs = 30 * 24 * 3600 * 1000; }
+  else { bucketCount = 12; bucketMs = 30 * 24 * 3600 * 1000; }
+
+  const buckets = new Array(bucketCount).fill(null).map(() => ({ sum: 0, n: 0 }));
+  history.forEach(h => {
+    const age = nowMs - h.ts;
+    const idx = bucketCount - 1 - Math.floor(age / bucketMs);
+    if (idx >= 0 && idx < bucketCount) { buckets[idx].sum += h.bpm; buckets[idx].n++; }
+  });
+
+  const labels = [], values = [];
+  const monthLetters = ['J','F','M','A','M','J','J','A','S','O','N','D'];
+  const dayLetters = ['S','M','T','W','T','F','S'];
+  for (let i = 0; i < bucketCount; i++) {
+    const bucketDt = new Date(nowMs - (bucketCount - 1 - i) * bucketMs);
+    let label;
+    if (range === 'D') { const h12 = bucketDt.getHours() % 12 || 12; label = h12 + (bucketDt.getHours() < 12 ? 'AM' : 'PM'); }
+    else if (range === 'W') label = dayLetters[bucketDt.getDay()];
+    else if (range === 'M') label = bucketDt.getDate();
+    else label = monthLetters[bucketDt.getMonth()];
+    labels.push(label);
+    values.push(buckets[i].n > 0 ? Math.round(buckets[i].sum / buckets[i].n) : null);
+  }
+  const realVals = values.filter(v => v != null);
+  const avg = realVals.length ? Math.round(realVals.reduce((a,b)=>a+b,0) / realVals.length) : null;
+  const firstIdx = values.findIndex(v => v != null);
+  const lastIdx = values.length - 1 - [...values].reverse().findIndex(v => v != null);
+  let dateRangeStr = '';
+  if (firstIdx >= 0) {
+    const firstDt = new Date(nowMs - (bucketCount - 1 - firstIdx) * bucketMs);
+    const lastDt = new Date(nowMs - (bucketCount - 1 - lastIdx) * bucketMs);
+    const opts = { month: 'short', year: 'numeric' };
+    dateRangeStr = firstIdx === lastIdx ? firstDt.toLocaleDateString('en-US', opts)
+      : firstDt.toLocaleDateString('en-US', opts) + ' – ' + lastDt.toLocaleDateString('en-US', opts);
+  }
+  return { labels, values, avg, dateRangeStr };
+}
+
+function drawEcgWave(canvas, seedNum, poor) {
+  const dpr = window.devicePixelRatio || 1;
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  canvas.width = w * dpr; canvas.height = h * dpr;
+  const ctx = canvas.getContext('2d');
+  ctx.scale(dpr, dpr);
+  ctx.clearRect(0, 0, w, h);
+  ctx.strokeStyle = 'rgba(255,255,255,0.10)';
+  ctx.lineWidth = 1;
+  for (let i = 1; i < 4; i++) {
+    const x = w * i / 4;
+    ctx.beginPath(); ctx.moveTo(x, 4); ctx.lineTo(x, h - 4); ctx.stroke();
+  }
+  const rand = mulberry32(seedNum);
+  ctx.strokeStyle = poor ? '#ff6b5d' : '#ff5a6e';
+  ctx.lineWidth = 1.6;
+  ctx.beginPath();
+  const midY = h * 0.55, scaleY = h * 0.42;
+  if (poor) {
+    let y = midY;
+    for (let x = 0; x <= w; x += 2) {
+      y += (rand() - 0.5) * h * 0.32;
+      y = Math.max(h * 0.06, Math.min(h * 0.94, y));
+      x === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+  } else {
+    const beats = 4.3, period = w / beats;
+    for (let x = 0; x <= w; x += 1.5) {
+      const phase = (x % period) / period;
+      let y = 0;
+      y += 0.12 * Math.exp(-Math.pow((phase - 0.15) / 0.045, 2));
+      y -= 0.15 * Math.exp(-Math.pow((phase - 0.30) / 0.012, 2));
+      y += 1.0 * Math.exp(-Math.pow((phase - 0.335) / 0.010, 2));
+      y -= 0.35 * Math.exp(-Math.pow((phase - 0.365) / 0.014, 2));
+      y += 0.22 * Math.exp(-Math.pow((phase - 0.62) / 0.06, 2));
+      y += (rand() - 0.5) * 0.02;
+      const py = midY - y * scaleY;
+      x === 0 ? ctx.moveTo(x, py) : ctx.lineTo(x, py);
+    }
+  }
+  ctx.stroke();
+}
+
+function setHRRange(r) { hrRange = r; renderHeart(); }
+
 function renderHeart() {
-  const whr = d('heart.walkingHR', 0);
+  const series = buildHRSeries(hrRange);
   const resting = d('heart.restingHR', 0);
   const ecgs = d('ecg', {});
   const ecgArr = Object.entries(ecgs).sort((a,b)=>(b[1].ts||0)-(a[1].ts||0));
   const sys = d('bloodPressure.systolic', 0);
   const dia = d('bloodPressure.diastolic', 0);
   const bpDate = d('bloodPressure.date', '');
+  const ranges = ['D','W','M','6M','Y'];
 
   mainContent.innerHTML = `
     <div class="page-header"><h1>Heart</h1><p>Walking heart rate, ECG readings and blood pressure.</p></div>
     ${pulseDividerSVG()}
-    <div class="grid">
-      <div class="card">
-        <div class="card-head"><div class="card-title"><span class="dot" style="background:var(--coral)"></span>Walking Heart Rate Average</div>
-          <button class="card-edit" onclick="editHeart()">Edit</button></div>
-        <div class="metric-big">${whr}<span class="metric-unit">BPM</span></div>
-        <div class="metric-sub">Resting: ${resting} BPM</div>
-      </div>
 
+    <div class="card wide" style="margin-bottom:16px;">
+      <div class="card-head">
+        <div class="card-title"><span class="dot" style="background:var(--coral)"></span>Walking Heart Rate Average</div>
+        <button class="card-edit" onclick="addHRReading()">+ Log Reading</button>
+      </div>
+      <div class="range-tabs">
+        ${ranges.map(r => `<button class="range-tab ${r===hrRange?'active':''}" onclick="setHRRange('${r}')">${r}</button>`).join('')}
+      </div>
+      ${series.avg != null ? `
+        <div class="avg-label">Average</div>
+        <div class="avg-row"><div class="avg-big">${series.avg}</div><div class="avg-unit">BPM</div></div>
+        <div class="avg-daterange">${series.dateRangeStr}</div>
+        <canvas id="whrCanvas" height="180"></canvas>
+      ` : `<div class="no-data-box">No walking heart rate data for this range yet.<br>Log a reading or measure with the camera scanner in Live Tracking.</div>`}
+      <div class="metric-sub" style="margin-top:10px;">Resting Heart Rate: ${resting || '—'} BPM</div>
+      <div class="about-card">
+        <h4>About Walking Heart Rate Average</h4>
+        <p>This reflects the average beats per minute recorded while you're walking at a steady pace throughout the day.</p>
+        <p>A lower walking heart rate is generally linked to better cardiovascular fitness, while temporary increases can happen with illness, stress, or pregnancy. Regular walking tends to improve this number over time.</p>
+      </div>
+    </div>
+
+    <div class="grid">
       <div class="card">
         <div class="card-head"><div class="card-title"><span class="dot" style="background:var(--cyan)"></span>Blood Pressure</div>
           <button class="card-edit" onclick="editBP()">Edit</button></div>
         <div style="display:flex;gap:22px;">
-          <div><div class="metric-sub">Systolic</div><div class="metric-big" style="font-size:28px;">${sys}</div></div>
-          <div><div class="metric-sub">Diastolic</div><div class="metric-big" style="font-size:28px;">${dia}</div></div>
+          <div><div class="metric-sub">Systolic</div><div class="metric-big" style="font-size:28px;">${sys||'—'}</div></div>
+          <div><div class="metric-sub">Diastolic</div><div class="metric-big" style="font-size:28px;">${dia||'—'}</div></div>
         </div>
         <div class="metric-sub" style="margin-top:8px;">${bpDate ? 'Last logged '+bpDate : 'No readings yet'}</div>
       </div>
+    </div>
 
-      <div class="card wide">
-        <div class="card-head"><div class="card-title"><span class="dot" style="background:var(--violet)"></span>Electrocardiograms (ECG)</div>
-          <button class="card-edit" onclick="addEcg()">+ Add</button></div>
-        ${ecgArr.length ? ecgArr.map(([key,e])=>`
-          <div class="ecg-row">
-            <div class="ecg-top">
-              <span class="ecg-badge ${e.result==='Poor Recording'?'bad':'ok'}">${e.result}</span>
-              <span class="ecg-date">${e.date}</span>
-            </div>
-            <div class="ecg-bpm">${e.bpm ? e.bpm+' BPM Average' : '-- BPM Average'}
-              <button class="wo-del" style="float:right;" onclick="deleteEcg('${key}')">✕</button>
-            </div>
-          </div>`).join('') : '<div class="empty-hint">No ECG recordings yet.</div>'}
+    <div class="card wide" style="margin-top:16px;">
+      <div class="section-heading-row">
+        <h3>Electrocardiograms (ECG)</h3>
+        <button class="card-edit hr-log-btn" onclick="addEcg()">+ Add</button>
       </div>
+      ${ecgArr.length ? ecgArr.map(([key,e]) => {
+        const isPoor = e.result === 'Poor Recording';
+        const seed = Math.abs(hashStr(key));
+        return `
+        <div class="ecg-card">
+          <div class="ecg-card-top">
+            <div class="ecg-title ${isPoor?'poor':'ok'}">${e.result}</div>
+            <div class="ecg-datetime">${e.date}</div>
+          </div>
+          <div class="ecg-bpm-row">❤️ ${e.bpm ? e.bpm + ' BPM Average' : '-- BPM Average'}
+            <button class="wo-del" style="margin-left:auto;" onclick="deleteEcg('${key}')">✕</button>
+          </div>
+          <canvas class="ecg-canvas" id="ecgcv_${key}"></canvas>
+        </div>`;
+      }).join('') : '<div class="no-data-box">No ECG recordings yet.</div>'}
     </div>
   `;
+
+  if (series.avg != null) {
+    const ctx = document.getElementById('whrCanvas');
+    const vals = series.values;
+    const real = vals.filter(v=>v!=null);
+    const minV = Math.max(0, Math.floor((Math.min(...real) - 8)/10)*10);
+    const maxV = Math.ceil((Math.max(...real) + 8)/10)*10;
+    if (whrChart) whrChart.destroy();
+    whrChart = new Chart(ctx, {
+      type: 'line',
+      data: { labels: series.labels, datasets: [{
+        data: vals, borderColor: '#ff5a6e', borderWidth: 2.5, spanGaps: true, tension: 0.15,
+        pointRadius: vals.map(v => v!=null ? 4 : 0), pointBackgroundColor: '#ff5a6e', pointBorderColor:'#ff5a6e'
+      }]},
+      options: { plugins:{legend:{display:false}}, scales:{
+        x:{ grid:{display:false}, ticks:{ color:'#8b93a1', font:{size:11}, maxTicksLimit:8 } },
+        y:{ min:minV, max:maxV, position:'right', grid:{ color:'#1a1f28' }, ticks:{ color:'#8b93a1', font:{size:11} } }
+      }}
+    });
+  }
+
+  ecgArr.forEach(([key,e]) => {
+    const cv = document.getElementById('ecgcv_' + key);
+    if (cv) drawEcgWave(cv, hashStr(key), e.result === 'Poor Recording');
+  });
+}
+
+function hashStr(s) {
+  let h = 0;
+  for (let i = 0; i < s.length; i++) { h = Math.imul(31, h) + s.charCodeAt(i) | 0; }
+  return h;
+}
+
+function addHRReading() {
+  const today = new Date().toISOString().slice(0,10);
+  openModal('Log Heart Rate Reading', [
+    {key:'bpm', label:'BPM', type:'number', value:''},
+    {key:'date', label:'Date (YYYY-MM-DD)', value: today},
+  ], (r) => {
+    const ts = r.date ? new Date(r.date + 'T12:00:00').getTime() : Date.now();
+    uref('heart/hrHistory').push({ bpm: Math.round(r.bpm), ts });
+    uref('heart/walkingHR').set(Math.round(r.bpm));
+  });
 }
 
 function renderTrends() {
@@ -1053,7 +1264,7 @@ function stopHRCamera() {
 
 function saveHRReading(bpm) {
   uref('heart/walkingHR').set(bpm);
-  uref('heartLog').push({ bpm, ts: Date.now(), date: new Date().toLocaleString() });
+  uref('heart/hrHistory').push({ bpm, ts: Date.now() });
   alert('Saved ' + bpm + ' BPM to your Heart page.');
 }
 
