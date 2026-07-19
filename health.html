@@ -273,6 +273,31 @@ canvas{max-width:100%;}
 /* pulse divider */
 .pulse-divider{width:100%;height:26px;opacity:0.5;margin:6px 0 22px;}
 
+/* live tracking */
+.live-stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:18px 0;}
+.live-stat{background:var(--surface2);border-radius:12px;padding:14px;text-align:center;}
+.live-stat .lv{font-family:'IBM Plex Mono',monospace;font-size:22px;font-weight:600;}
+.live-stat .ll{font-size:11px;color:var(--muted);margin-top:4px;text-transform:uppercase;letter-spacing:.04em;}
+.btn-track{
+  padding:13px 22px;border-radius:12px;font-weight:600;font-size:14.5px;
+  background:linear-gradient(135deg,var(--coral),#e0483a);color:#fff;
+}
+.btn-track.stop{background:var(--surface2);border:1px solid var(--coral);color:var(--coral);}
+.btn-track:disabled{opacity:0.5;cursor:not-allowed;}
+.perm-note{font-size:12px;color:var(--muted2);margin-top:10px;line-height:1.5;}
+.hr-video-wrap{
+  width:100%;max-width:220px;aspect-ratio:1;border-radius:16px;overflow:hidden;
+  background:#000;position:relative;margin:0 auto 14px;border:2px solid var(--border);
+}
+.hr-video-wrap video{width:100%;height:100%;object-fit:cover;}
+.hr-video-wrap.active{border-color:var(--coral);}
+.hr-finger-hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.55);color:#fff;font-size:12px;text-align:center;padding:14px;}
+.hr-result{text-align:center;margin-top:14px;}
+.hr-result .bpm-big{font-family:'Space Grotesk',sans-serif;font-size:46px;font-weight:700;color:var(--coral);}
+.waveform-canvas{width:100%;height:70px;margin-top:10px;background:var(--surface2);border-radius:10px;}
+.center-col{display:flex;flex-direction:column;align-items:center;text-align:center;}
+
 /* mobile topbar */
 .mobile-topbar{display:none;}
 @media(max-width:760px){
@@ -351,6 +376,7 @@ canvas{max-width:100%;}
       </div>
       <div class="nav">
         <button class="nav-item active" data-page="summary">📋 &nbsp;Summary</button>
+        <button class="nav-item" data-page="live">📡 &nbsp;Live Tracking</button>
         <button class="nav-item" data-page="heart">❤️ &nbsp;Heart</button>
         <button class="nav-item" data-page="trends">📈 &nbsp;Trends</button>
         <button class="nav-item" data-page="highlights">✨ &nbsp;Highlights</button>
@@ -488,6 +514,11 @@ document.querySelectorAll('.nav-item').forEach(btn => {
   btn.addEventListener('click', () => {
     document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
     btn.classList.add('active');
+    if (currentPage === 'live' && btn.dataset.page !== 'live' && typeof stopHRCamera === 'function') {
+      hrRunning = false;
+      if (hrRafId) cancelAnimationFrame(hrRafId);
+      stopHRCamera();
+    }
     currentPage = btn.dataset.page;
     renderPage(currentPage);
     document.getElementById('sidebar').classList.remove('open');
@@ -568,6 +599,7 @@ let stepsChart, distChart, whrChart;
 
 function renderPage(page) {
   if (page === 'summary') renderSummary();
+  else if (page === 'live') renderLive();
   else if (page === 'heart') renderHeart();
   else if (page === 'trends') renderTrends();
   else if (page === 'highlights') renderHighlights();
@@ -798,6 +830,269 @@ function editHighlights() {
     {key:'headphoneAudio', label:'Headphone Audio (%)', type:'number', value:d('highlights.headphoneAudio',0)},
     {key:'headphoneLimit', label:'Headphone 7-day Limit (%)', type:'number', value:d('highlights.headphoneLimit',100)},
   ], (r) => uref('highlights').update(r));
+}
+
+/* =========================================================
+   LIVE TRACKING — REAL SENSORS
+   1) Workout: GPS (Geolocation) + accelerometer (DeviceMotion) step counter
+   2) Heart Rate: rear camera PPG (color-intensity of fingertip over lens)
+   ========================================================= */
+
+// ---- Workout tracking state ----
+let wkActive = false, wkWatchId = null, wkStartTs = 0, wkTimerId = null;
+let wkLastPos = null, wkDistanceM = 0, wkSteps = 0;
+let wkLastStepTs = 0, wkAccelBuffer = [];
+
+function haversineMeters(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const toRad = x => x * Math.PI / 180;
+  const dLat = toRad(lat2 - lat1), dLon = toRad(lon2 - lon1);
+  const a = Math.sin(dLat/2)**2 + Math.cos(toRad(lat1))*Math.cos(toRad(lat2))*Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+function handleMotionStep(ev) {
+  const g = ev.accelerationIncludingGravity || ev.acceleration;
+  if (!g) return;
+  const mag = Math.sqrt((g.x||0)**2 + (g.y||0)**2 + (g.z||0)**2);
+  wkAccelBuffer.push(mag);
+  if (wkAccelBuffer.length > 6) wkAccelBuffer.shift();
+  const avg = wkAccelBuffer.reduce((a,b)=>a+b,0) / wkAccelBuffer.length;
+  const now = Date.now();
+  // peak-detection pedometer: crossing above ~12.5 m/s^2 with min 300ms gap between steps
+  if (mag - avg > 2.2 && mag > 11.5 && (now - wkLastStepTs) > 300) {
+    wkLastStepTs = now;
+    wkSteps++;
+    updateWkStatsUI();
+  }
+}
+
+function updateWkStatsUI() {
+  const durEl = document.getElementById('wkDuration');
+  const distEl = document.getElementById('wkDistance');
+  const stepEl = document.getElementById('wkSteps');
+  const paceEl = document.getElementById('wkPace');
+  if (!durEl) return;
+  const elapsedSec = Math.floor((Date.now() - wkStartTs)/1000);
+  const mm = String(Math.floor(elapsedSec/60)).padStart(2,'0');
+  const ss = String(elapsedSec%60).padStart(2,'0');
+  durEl.textContent = `${mm}:${ss}`;
+  const miles = wkDistanceM / 1609.34;
+  distEl.textContent = miles.toFixed(2);
+  stepEl.textContent = wkSteps;
+  const pace = miles > 0.02 ? (elapsedSec/60) / miles : 0;
+  paceEl.textContent = pace > 0 ? pace.toFixed(1) + ' min/mi' : '—';
+}
+
+async function startWorkout() {
+  if (!navigator.geolocation) { alert('Geolocation not supported on this device/browser.'); return; }
+  // iOS 13+ requires explicit motion permission from a user gesture
+  if (typeof DeviceMotionEvent !== 'undefined' && typeof DeviceMotionEvent.requestPermission === 'function') {
+    try {
+      const perm = await DeviceMotionEvent.requestPermission();
+      if (perm !== 'granted') { alert('Motion permission denied — step counting will be unavailable, distance will still track via GPS.'); }
+    } catch(e) {}
+  }
+  wkActive = true; wkStartTs = Date.now(); wkDistanceM = 0; wkSteps = 0; wkLastPos = null; wkAccelBuffer = [];
+  window.addEventListener('devicemotion', handleMotionStep);
+  wkWatchId = navigator.geolocation.watchPosition((pos) => {
+    const { latitude, longitude, accuracy } = pos.coords;
+    if (accuracy && accuracy > 40) return; // ignore very noisy fixes
+    if (wkLastPos) {
+      const dist = haversineMeters(wkLastPos.lat, wkLastPos.lon, latitude, longitude);
+      if (dist > 0.5 && dist < 60) wkDistanceM += dist; // filter GPS jitter/jumps
+    }
+    wkLastPos = { lat: latitude, lon: longitude };
+  }, (err) => {
+    console.warn('GPS error', err.message);
+  }, { enableHighAccuracy: true, maximumAge: 1000, timeout: 15000 });
+  wkTimerId = setInterval(updateWkStatsUI, 1000);
+  renderLive();
+}
+
+function stopWorkout() {
+  wkActive = false;
+  if (wkWatchId != null) navigator.geolocation.clearWatch(wkWatchId);
+  window.removeEventListener('devicemotion', handleMotionStep);
+  if (wkTimerId) clearInterval(wkTimerId);
+  const elapsedSec = Math.floor((Date.now() - wkStartTs)/1000);
+  const miles = wkDistanceM / 1609.34;
+  const mm = Math.floor(elapsedSec/60), ss = elapsedSec%60;
+  const durStr = `${mm}:${String(ss).padStart(2,'0')}`;
+  // Save as a real workout entry + roll into today's activity totals
+  uref('workouts').push({
+    name: 'Outdoor Walk', duration: durStr, date: 'Today', icon: '🚶', ts: Date.now()
+  });
+  uref('activity/steps').transaction(v => (v||0) + wkSteps);
+  uref('activity/distance').transaction(v => Math.round(((v||0) + miles) * 100) / 100);
+  uref('activity/exercise').transaction(v => (v||0) + Math.round(elapsedSec/60));
+  alert(`Workout saved — ${durStr}, ${miles.toFixed(2)} mi, ${wkSteps} steps.`);
+  renderLive();
+}
+
+// ---- Camera PPG heart rate ----
+let hrStream = null, hrRafId = null, hrSamples = [], hrStartTs = 0, hrRunning = false;
+const HR_DURATION_MS = 15000;
+
+async function startHRMeasurement() {
+  const video = document.getElementById('hrVideo');
+  const hint = document.getElementById('hrHint');
+  try {
+    hrStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: { ideal: 'environment' } }, audio: false });
+  } catch (e) {
+    alert('Camera access denied or unavailable: ' + e.message);
+    return;
+  }
+  video.srcObject = hrStream;
+  await video.play();
+  const track = hrStream.getVideoTracks()[0];
+  try {
+    const caps = track.getCapabilities ? track.getCapabilities() : {};
+    if (caps.torch) await track.applyConstraints({ advanced: [{ torch: true }] });
+  } catch(e) { /* torch not supported, still works without it */ }
+
+  hint.style.display = 'flex';
+  hrSamples = []; hrStartTs = Date.now(); hrRunning = true;
+  document.getElementById('hrStartBtn').disabled = true;
+  document.getElementById('hrStatus').textContent = 'Measuring… hold still, cover the rear camera + flash with your fingertip.';
+
+  const canvas = document.createElement('canvas');
+  canvas.width = 40; canvas.height = 40;
+  const ctx = canvas.getContext('2d');
+  const waveCanvas = document.getElementById('hrWave');
+  const waveCtx = waveCanvas.getContext('2d');
+
+  function sampleFrame() {
+    if (!hrRunning) return;
+    const elapsed = Date.now() - hrStartTs;
+    try {
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+      const frame = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+      let rSum = 0, n = 0;
+      for (let i = 0; i < frame.length; i += 4) { rSum += frame[i]; n++; }
+      const rAvg = rSum / n;
+      hrSamples.push({ t: elapsed, v: rAvg });
+    } catch(e) {}
+
+    // draw waveform
+    if (hrSamples.length > 2) {
+      waveCtx.clearRect(0,0,waveCanvas.width, waveCanvas.height);
+      const recent = hrSamples.slice(-120);
+      const vals = recent.map(s=>s.v);
+      const min = Math.min(...vals), max = Math.max(...vals) || min+1;
+      waveCtx.strokeStyle = '#ff6b5d';
+      waveCtx.lineWidth = 2;
+      waveCtx.beginPath();
+      recent.forEach((s, i) => {
+        const x = (i/(recent.length-1)) * waveCanvas.width;
+        const y = waveCanvas.height - ((s.v - min)/(max-min+0.0001)) * waveCanvas.height;
+        i === 0 ? waveCtx.moveTo(x,y) : waveCtx.lineTo(x,y);
+      });
+      waveCtx.stroke();
+    }
+
+    if (elapsed < HR_DURATION_MS) {
+      hrRafId = requestAnimationFrame(sampleFrame);
+    } else {
+      finishHRMeasurement();
+    }
+  }
+  hrRafId = requestAnimationFrame(sampleFrame);
+}
+
+function finishHRMeasurement() {
+  hrRunning = false;
+  if (hrRafId) cancelAnimationFrame(hrRafId);
+  stopHRCamera();
+  const bpm = estimateBPM(hrSamples);
+  document.getElementById('hrStatus').textContent = bpm ? 'Measurement complete.' : 'Could not get a clear signal — try again with steadier finger placement.';
+  document.getElementById('hrStartBtn').disabled = false;
+  document.getElementById('hrStartBtn').textContent = 'Measure Again';
+  const resultBox = document.getElementById('hrResultBox');
+  if (bpm) {
+    resultBox.innerHTML = `<div class="bpm-big">${bpm}</div><div class="metric-sub">BPM (camera PPG estimate)</div>
+      <button class="btn-primary" style="margin-top:12px;" onclick="saveHRReading(${bpm})">Save Reading</button>`;
+  } else {
+    resultBox.innerHTML = '';
+  }
+}
+
+function estimateBPM(samples) {
+  if (samples.length < 30) return null;
+  // detrend with a moving average window
+  const win = 8;
+  const smoothed = samples.map((s,i) => {
+    const lo = Math.max(0, i-win), hi = Math.min(samples.length, i+win);
+    const seg = samples.slice(lo,hi).map(x=>x.v);
+    const mean = seg.reduce((a,b)=>a+b,0)/seg.length;
+    return { t: s.t, v: s.v - mean };
+  });
+  // peak detection with refractory period (min 320ms between beats -> max ~187bpm)
+  const peaks = [];
+  for (let i = 2; i < smoothed.length - 2; i++) {
+    const p = smoothed[i];
+    if (p.v > smoothed[i-1].v && p.v > smoothed[i+1].v && p.v > smoothed[i-2].v && p.v > smoothed[i+2].v && p.v > 1.2) {
+      if (!peaks.length || (p.t - peaks[peaks.length-1]) > 320) peaks.push(p.t);
+    }
+  }
+  if (peaks.length < 4) return null;
+  const intervals = [];
+  for (let i = 1; i < peaks.length; i++) intervals.push(peaks[i] - peaks[i-1]);
+  intervals.sort((a,b)=>a-b);
+  const mid = intervals[Math.floor(intervals.length/2)]; // median interval, robust to outliers
+  const bpm = Math.round(60000 / mid);
+  if (bpm < 40 || bpm > 200) return null;
+  return bpm;
+}
+
+function stopHRCamera() {
+  if (hrStream) { hrStream.getTracks().forEach(t => t.stop()); hrStream = null; }
+  const hint = document.getElementById('hrHint');
+  if (hint) hint.style.display = 'none';
+}
+
+function saveHRReading(bpm) {
+  uref('heart/walkingHR').set(bpm);
+  uref('heartLog').push({ bpm, ts: Date.now(), date: new Date().toLocaleString() });
+  alert('Saved ' + bpm + ' BPM to your Heart page.');
+}
+
+function renderLive() {
+  mainContent.innerHTML = `
+    <div class="page-header"><h1>Live Tracking</h1><p>Real sensor data — GPS + motion for workouts, camera for heart rate.</p></div>
+    ${pulseDividerSVG()}
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><div class="card-title"><span class="dot" style="background:var(--cyan)"></span>Workout — GPS &amp; Steps</div></div>
+        <div class="live-stat-grid">
+          <div class="live-stat"><div class="lv mono" id="wkDuration">00:00</div><div class="ll">Duration</div></div>
+          <div class="live-stat"><div class="lv mono" id="wkDistance">0.00</div><div class="ll">Distance (mi)</div></div>
+          <div class="live-stat"><div class="lv mono" id="wkSteps">0</div><div class="ll">Steps</div></div>
+        </div>
+        <div style="text-align:center;font-size:12.5px;color:var(--muted);margin-bottom:14px;">Pace: <span id="wkPace">—</span></div>
+        <div style="text-align:center;">
+          ${!wkActive
+            ? `<button class="btn-track" onclick="startWorkout()">▶ Start Workout</button>`
+            : `<button class="btn-track stop" onclick="stopWorkout()">■ Stop &amp; Save</button>`}
+        </div>
+        <div class="perm-note">Uses your device's GPS (Geolocation) and accelerometer (DeviceMotion). Browser will ask for location + motion permission — needs HTTPS and works best outdoors with steady phone in hand/pocket.</div>
+      </div>
+
+      <div class="card center-col">
+        <div class="card-head" style="width:100%;"><div class="card-title"><span class="dot" style="background:var(--coral)"></span>Heart Rate — Camera Scan</div></div>
+        <div class="hr-video-wrap" id="hrVideoWrap">
+          <video id="hrVideo" muted playsinline></video>
+          <div class="hr-finger-hint" id="hrHint" style="display:none;">Cover the rear camera lens gently with your fingertip</div>
+        </div>
+        <canvas class="waveform-canvas" id="hrWave" width="280" height="70"></canvas>
+        <div id="hrStatus" class="metric-sub" style="margin-top:10px;">Tap start, then cover your phone's rear camera + flash fully with a fingertip.</div>
+        <button class="btn-track" id="hrStartBtn" style="margin-top:14px;" onclick="startHRMeasurement()">▶ Start 15s Measurement</button>
+        <div id="hrResultBox"></div>
+        <div class="perm-note">Uses the rear camera to detect blood-flow color changes in your fingertip (photoplethysmography) — the same principle Apple Watch/Fitbit optical sensors use. This is an estimate, not a medical device.</div>
+      </div>
+    </div>
+  `;
+  if (wkActive) updateWkStatsUI();
 }
 </script>
 </body>
