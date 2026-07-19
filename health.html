@@ -1,0 +1,804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Nexor Health</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-database-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+:root{
+  --bg:#090b0f;
+  --surface:#12151b;
+  --surface2:#1a1f28;
+  --border:#232936;
+  --violet:#7c6cf0;
+  --cyan:#2ad9c2;
+  --coral:#ff6b5d;
+  --amber:#f5b942;
+  --text:#eef1f5;
+  --muted:#8b93a1;
+  --muted2:#5c6472;
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Inter',sans-serif;
+  -webkit-font-smoothing:antialiased;
+  overflow-x:hidden;
+}
+h1,h2,h3,.display{font-family:'Space Grotesk',sans-serif;}
+.mono{font-family:'IBM Plex Mono',monospace;}
+a{color:inherit;text-decoration:none;}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+::-webkit-scrollbar{width:8px;}
+::-webkit-scrollbar-thumb{background:#232936;border-radius:4px;}
+
+/* ---------- AUTH SCREEN ---------- */
+#authScreen{
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  position:relative;
+  overflow:hidden;
+  padding:24px;
+}
+#authScreen::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:
+    radial-gradient(600px 400px at 15% 20%, rgba(124,108,240,0.16), transparent 60%),
+    radial-gradient(600px 400px at 85% 80%, rgba(42,217,194,0.12), transparent 60%);
+  pointer-events:none;
+}
+.auth-card{
+  position:relative;
+  width:100%;
+  max-width:400px;
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:20px;
+  padding:40px 32px;
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  margin-bottom:28px;
+}
+.pulse-mark{width:34px;height:34px;flex-shrink:0;}
+.brand-name{font-size:22px;font-weight:700;letter-spacing:-0.02em;}
+.auth-card h2{font-size:20px;margin-bottom:6px;font-weight:600;}
+.auth-sub{color:var(--muted);font-size:13.5px;margin-bottom:24px;}
+.field{margin-bottom:14px;}
+.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.04em;}
+.field input{
+  width:100%;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:10px;
+  padding:11px 13px;
+  color:var(--text);
+  font-size:14.5px;
+  outline:none;
+  transition:border-color .15s;
+}
+.field input:focus{border-color:var(--violet);}
+.btn-primary{
+  width:100%;
+  background:linear-gradient(135deg,var(--violet),#5a4bd6);
+  color:#fff;
+  padding:12px;
+  border-radius:10px;
+  font-weight:600;
+  font-size:14.5px;
+  margin-top:6px;
+  transition:opacity .15s, transform .1s;
+}
+.btn-primary:hover{opacity:0.92;}
+.btn-primary:active{transform:scale(0.98);}
+.auth-toggle{
+  text-align:center;
+  margin-top:18px;
+  font-size:13.5px;
+  color:var(--muted);
+}
+.auth-toggle span{color:var(--cyan);font-weight:600;cursor:pointer;}
+.auth-error{
+  color:var(--coral);
+  font-size:13px;
+  margin-top:10px;
+  min-height:16px;
+}
+
+/* ---------- APP SHELL ---------- */
+#app{display:none;min-height:100vh;}
+.shell{display:flex;min-height:100vh;}
+.sidebar{
+  width:248px;
+  flex-shrink:0;
+  background:var(--surface);
+  border-right:1px solid var(--border);
+  padding:24px 18px;
+  display:flex;
+  flex-direction:column;
+  position:sticky;
+  top:0;
+  height:100vh;
+}
+.sidebar .brand{margin-bottom:30px;padding-left:4px;}
+.sidebar .brand-name{font-size:18px;}
+.user-chip{
+  display:flex;
+  align-items:center;
+  gap:11px;
+  background:var(--surface2);
+  border:1px solid var(--border);
+  border-radius:12px;
+  padding:11px 12px;
+  margin-bottom:22px;
+}
+.avatar{
+  width:36px;height:36px;border-radius:50%;
+  background:linear-gradient(135deg,var(--violet),var(--cyan));
+  display:flex;align-items:center;justify-content:center;
+  font-weight:700;font-size:15px;color:#0a0a0a;flex-shrink:0;
+}
+.user-chip .uname{font-size:13.5px;font-weight:600;line-height:1.2;}
+.user-chip .uemail{font-size:11px;color:var(--muted);line-height:1.3;}
+.nav{display:flex;flex-direction:column;gap:2px;flex:1;}
+.nav button{
+  display:flex;align-items:center;gap:11px;
+  padding:10px 12px;border-radius:10px;
+  font-size:14px;color:var(--muted);font-weight:500;
+  transition:background .12s, color .12s;
+  text-align:left;width:100%;
+}
+.nav button:hover{background:var(--surface2);color:var(--text);}
+.nav button.active{background:rgba(124,108,240,0.14);color:var(--violet);}
+.nav-icon{width:18px;height:18px;flex-shrink:0;}
+.signout{
+  font-size:12.5px;color:var(--muted2);padding:10px 12px;
+  border-top:1px solid var(--border);margin-top:10px;padding-top:16px;
+}
+.signout:hover{color:var(--coral);}
+
+.main{flex:1;min-width:0;padding:28px 34px 80px;max-width:1180px;}
+.page-header{margin-bottom:26px;}
+.page-header h1{font-size:26px;font-weight:700;letter-spacing:-0.01em;}
+.page-header p{color:var(--muted);font-size:13.5px;margin-top:4px;}
+
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px;}
+@media(max-width:860px){.grid{grid-template-columns:1fr;}}
+
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:20px;
+  position:relative;
+}
+.card.wide{grid-column:1/-1;}
+.card-head{
+  display:flex;align-items:center;justify-content:between;gap:8px;
+  margin-bottom:14px;
+}
+.card-title{
+  display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;
+}
+.card-title .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.card-edit{
+  margin-left:auto;font-size:11.5px;color:var(--muted2);
+  border:1px solid var(--border);padding:4px 10px;border-radius:20px;
+  transition:all .12s;
+}
+.card-edit:hover{color:var(--text);border-color:var(--violet);}
+.card-note{font-size:12.5px;color:var(--muted);margin-bottom:14px;line-height:1.5;}
+
+/* activity rings */
+.rings-row{display:flex;align-items:center;gap:26px;}
+.rings-stats{flex:1;display:flex;flex-direction:column;gap:10px;}
+.ring-stat{display:flex;align-items:center;gap:9px;font-size:13px;}
+.ring-stat .sw{width:9px;height:9px;border-radius:50%;flex-shrink:0;}
+.ring-stat b{font-family:'IBM Plex Mono',monospace;font-weight:500;}
+.ring-stat .lbl{color:var(--muted);}
+
+.metric-big{font-family:'Space Grotesk',sans-serif;font-size:34px;font-weight:700;letter-spacing:-0.01em;}
+.metric-unit{font-size:14px;color:var(--muted);font-weight:500;margin-left:4px;}
+.metric-sub{font-size:12px;color:var(--muted2);margin-top:2px;}
+
+.workout-row{
+  display:flex;align-items:center;gap:12px;padding:10px 0;
+  border-bottom:1px solid var(--border);
+}
+.workout-row:last-child{border-bottom:none;}
+.wo-icon{
+  width:34px;height:34px;border-radius:10px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  background:var(--surface2);font-size:15px;
+}
+.wo-name{font-size:13.5px;font-weight:600;}
+.wo-date{font-size:11.5px;color:var(--muted2);}
+.wo-dur{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:13.5px;color:var(--cyan);}
+.wo-del{color:var(--muted2);font-size:16px;padding:2px 6px;}
+.wo-del:hover{color:var(--coral);}
+
+.ecg-row{background:var(--surface2);border-radius:12px;padding:13px 14px;margin-bottom:10px;}
+.ecg-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.ecg-badge{font-size:13px;font-weight:600;}
+.ecg-badge.ok{color:var(--cyan);}
+.ecg-badge.bad{color:var(--coral);}
+.ecg-date{font-size:11.5px;color:var(--muted2);}
+.ecg-bpm{font-size:12px;color:var(--muted);}
+.ecg-row:last-child{margin-bottom:0;}
+
+.hl-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.hl-row:last-child{border-bottom:none;}
+.hl-label{color:var(--muted);display:flex;align-items:center;gap:8px;}
+.hl-val{font-family:'IBM Plex Mono',monospace;font-weight:500;}
+
+canvas{max-width:100%;}
+
+.empty-hint{color:var(--muted2);font-size:12.5px;font-style:italic;}
+
+/* modal */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(6,7,10,0.72);
+  align-items:center;justify-content:center;z-index:100;padding:20px;
+  backdrop-filter:blur(3px);
+}
+.modal-overlay.show{display:flex;}
+.modal{
+  background:var(--surface);border:1px solid var(--border);border-radius:16px;
+  padding:26px;width:100%;max-width:380px;max-height:86vh;overflow-y:auto;
+}
+.modal h3{font-size:17px;margin-bottom:16px;font-weight:600;}
+.modal .field label{font-size:11px;}
+.modal-actions{display:flex;gap:10px;margin-top:18px;}
+.btn-ghost{
+  flex:1;padding:10px;border-radius:10px;border:1px solid var(--border);
+  color:var(--muted);font-size:13.5px;font-weight:500;
+}
+.btn-ghost:hover{color:var(--text);}
+.modal .btn-primary{flex:1;margin-top:0;}
+
+/* pulse divider */
+.pulse-divider{width:100%;height:26px;opacity:0.5;margin:6px 0 22px;}
+
+/* mobile topbar */
+.mobile-topbar{display:none;}
+@media(max-width:760px){
+  .shell{flex-direction:column;}
+  .sidebar{
+    position:fixed;top:0;left:0;height:100vh;z-index:60;
+    transform:translateX(-100%);transition:transform .2s;
+  }
+  .sidebar.open{transform:translateX(0);}
+  .mobile-topbar{
+    display:flex;align-items:center;gap:12px;padding:16px 18px;
+    border-bottom:1px solid var(--border);position:sticky;top:0;
+    background:var(--bg);z-index:50;
+  }
+  .main{padding:20px 16px 70px;}
+  .overlay-dim{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:55;}
+  .overlay-dim.show{display:block;}
+}
+</style>
+</head>
+<body>
+
+<!-- ============ AUTH SCREEN ============ -->
+<div id="authScreen">
+  <div class="auth-card">
+    <div class="brand">
+      <svg class="pulse-mark" viewBox="0 0 40 40" fill="none">
+        <circle cx="20" cy="20" r="19" stroke="url(#g1)" stroke-width="1.5" opacity="0.5"/>
+        <path d="M4 20H12L15 10L20 30L24 16L27 20H36" stroke="url(#g1)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+        <defs><linearGradient id="g1" x1="0" y1="0" x2="40" y2="40"><stop stop-color="#7c6cf0"/><stop offset="1" stop-color="#2ad9c2"/></linearGradient></defs>
+      </svg>
+      <div class="brand-name">Nexor Health</div>
+    </div>
+    <h2 id="authTitle">Welcome back</h2>
+    <p class="auth-sub" id="authSub">Sign in to view your health summary.</p>
+
+    <div class="field" id="nameField" style="display:none;">
+      <label>Name</label>
+      <input type="text" id="nameInput" placeholder="Your name">
+    </div>
+    <div class="field">
+      <label>Email</label>
+      <input type="email" id="emailInput" placeholder="you@example.com">
+    </div>
+    <div class="field">
+      <label>Password</label>
+      <input type="password" id="passInput" placeholder="••••••••">
+    </div>
+    <button class="btn-primary" id="authSubmit">Sign In</button>
+    <div class="auth-error" id="authError"></div>
+    <div class="auth-toggle" id="authToggle">
+      Don't have an account? <span id="toggleLink">Create one</span>
+    </div>
+  </div>
+</div>
+
+<!-- ============ APP ============ -->
+<div id="app">
+  <div class="overlay-dim" id="overlayDim"></div>
+  <div class="shell">
+    <div class="sidebar" id="sidebar">
+      <div class="brand">
+        <svg class="pulse-mark" viewBox="0 0 40 40" fill="none">
+          <circle cx="20" cy="20" r="19" stroke="url(#g2)" stroke-width="1.5" opacity="0.5"/>
+          <path d="M4 20H12L15 10L20 30L24 16L27 20H36" stroke="url(#g2)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          <defs><linearGradient id="g2" x1="0" y1="0" x2="40" y2="40"><stop stop-color="#7c6cf0"/><stop offset="1" stop-color="#2ad9c2"/></linearGradient></defs>
+        </svg>
+        <div class="brand-name">Nexor Health</div>
+      </div>
+      <div class="user-chip">
+        <div class="avatar" id="avatarInitial">S</div>
+        <div>
+          <div class="uname" id="sideUserName">—</div>
+          <div class="uemail" id="sideUserEmail">—</div>
+        </div>
+      </div>
+      <div class="nav">
+        <button class="nav-item active" data-page="summary">📋 &nbsp;Summary</button>
+        <button class="nav-item" data-page="heart">❤️ &nbsp;Heart</button>
+        <button class="nav-item" data-page="trends">📈 &nbsp;Trends</button>
+        <button class="nav-item" data-page="highlights">✨ &nbsp;Highlights</button>
+      </div>
+      <button class="signout" id="signOutBtn">Sign out</button>
+    </div>
+
+    <div style="flex:1;min-width:0;">
+      <div class="mobile-topbar">
+        <button id="menuBtn" style="font-size:20px;">☰</button>
+        <div class="brand-name" style="font-size:16px;">Nexor Health</div>
+      </div>
+      <div class="main" id="mainContent"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ MODAL ============ -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal" id="modalBody"></div>
+</div>
+
+<script>
+/* ---------------- FIREBASE ---------------- */
+const firebaseConfig = {
+  apiKey: "AIzaSyC30TcmMVhP_8HdFYS1WufRiZwSDYNMTF0",
+  authDomain: "pulse2-92372.firebaseapp.com",
+  databaseURL: "https://pulse2-92372-default-rtdb.firebaseio.com",
+  projectId: "pulse2-92372",
+  storageBucket: "pulse2-92372.firebasestorage.app",
+  messagingSenderId: "276235725177",
+  appId: "1:276235725177:web:0f4e0789fae80a435927a8"
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+let currentUser = null;
+let userData = null; // cached snapshot of users/{uid}
+let isSignUpMode = false;
+
+/* ---------------- AUTH UI ---------------- */
+const authTitle = document.getElementById('authTitle');
+const authSub = document.getElementById('authSub');
+const nameField = document.getElementById('nameField');
+const authSubmit = document.getElementById('authSubmit');
+const authToggle = document.getElementById('authToggle');
+const toggleLink = document.getElementById('toggleLink');
+const authError = document.getElementById('authError');
+
+function handleToggleClick() {
+  isSignUpMode = !isSignUpMode;
+  authError.textContent = '';
+  if (isSignUpMode) {
+    authTitle.textContent = 'Create your account';
+    authSub.textContent = 'Start tracking your health with Nexor.';
+    nameField.style.display = 'block';
+    authSubmit.textContent = 'Create Account';
+    authToggle.innerHTML = 'Already have an account? <span id="toggleLink">Sign in</span>';
+  } else {
+    authTitle.textContent = 'Welcome back';
+    authSub.textContent = 'Sign in to view your health summary.';
+    nameField.style.display = 'none';
+    authSubmit.textContent = 'Sign In';
+    authToggle.innerHTML = "Don't have an account? <span id=\"toggleLink\">Create one</span>";
+  }
+  document.getElementById('toggleLink').addEventListener('click', handleToggleClick, { once:true });
+}
+toggleLink.addEventListener('click', handleToggleClick, { once:true });
+
+authSubmit.addEventListener('click', async () => {
+  const email = document.getElementById('emailInput').value.trim();
+  const pass = document.getElementById('passInput').value;
+  const name = document.getElementById('nameInput').value.trim();
+  authError.textContent = '';
+  if (!email || !pass) { authError.textContent = 'Please enter email and password.'; return; }
+  authSubmit.textContent = 'Please wait...';
+  try {
+    if (isSignUpMode) {
+      if (!name) { authError.textContent = 'Please enter your name.'; authSubmit.textContent='Create Account'; return; }
+      const cred = await auth.createUserWithEmailAndPassword(email, pass);
+      await cred.user.updateProfile({ displayName: name });
+      await db.ref('users/' + cred.user.uid + '/profile').set({ name, email });
+    } else {
+      await auth.signInWithEmailAndPassword(email, pass);
+    }
+  } catch (e) {
+    authError.textContent = e.message.replace('Firebase: ', '');
+    authSubmit.textContent = isSignUpMode ? 'Create Account' : 'Sign In';
+  }
+});
+
+document.getElementById('signOutBtn').addEventListener('click', () => auth.signOut());
+
+/* ---------------- AUTH STATE ---------------- */
+auth.onAuthStateChanged(async (user) => {
+  if (user) {
+    currentUser = user;
+    document.getElementById('authScreen').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    let profileSnap = await db.ref('users/' + user.uid + '/profile').get();
+    let name = user.displayName || (profileSnap.exists() ? profileSnap.val().name : null) || user.email.split('@')[0];
+    document.getElementById('sideUserName').textContent = name;
+    document.getElementById('sideUserEmail').textContent = user.email;
+    document.getElementById('avatarInitial').textContent = name.charAt(0).toUpperCase();
+    listenToData(user.uid);
+  } else {
+    currentUser = null;
+    document.getElementById('authScreen').style.display = 'flex';
+    document.getElementById('app').style.display = 'none';
+  }
+});
+
+/* ---------------- DATA LISTENER ---------------- */
+function listenToData(uid) {
+  db.ref('users/' + uid).on('value', (snap) => {
+    userData = snap.val() || {};
+    renderPage(currentPage);
+  });
+}
+
+function d(path, fallback) {
+  const parts = path.split('.');
+  let v = userData;
+  for (const p of parts) {
+    if (v == null) return fallback;
+    v = v[p];
+  }
+  return v == null ? fallback : v;
+}
+
+/* ---------------- NAV ---------------- */
+let currentPage = 'summary';
+document.querySelectorAll('.nav-item').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.nav-item').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    currentPage = btn.dataset.page;
+    renderPage(currentPage);
+    document.getElementById('sidebar').classList.remove('open');
+    document.getElementById('overlayDim').classList.remove('show');
+  });
+});
+document.getElementById('menuBtn').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('overlayDim').classList.add('show');
+});
+document.getElementById('overlayDim').addEventListener('click', () => {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlayDim').classList.remove('show');
+});
+
+/* ---------------- MODAL HELPERS ---------------- */
+const modalOverlay = document.getElementById('modalOverlay');
+const modalBody = document.getElementById('modalBody');
+function openModal(title, fields, onSave) {
+  let html = `<h3>${title}</h3>`;
+  fields.forEach(f => {
+    html += `<div class="field"><label>${f.label}</label>
+      <input type="${f.type||'text'}" id="mf_${f.key}" value="${f.value!=null?f.value:''}" placeholder="${f.placeholder||''}"></div>`;
+  });
+  html += `<div class="modal-actions">
+    <button class="btn-ghost" id="modalCancel">Cancel</button>
+    <button class="btn-primary" id="modalSave">Save</button>
+  </div>`;
+  modalBody.innerHTML = html;
+  modalOverlay.classList.add('show');
+  document.getElementById('modalCancel').onclick = closeModal;
+  document.getElementById('modalSave').onclick = () => {
+    const result = {};
+    fields.forEach(f => {
+      const el = document.getElementById('mf_' + f.key);
+      result[f.key] = f.type === 'number' ? parseFloat(el.value || 0) : el.value;
+    });
+    onSave(result);
+    closeModal();
+  };
+}
+function closeModal() { modalOverlay.classList.remove('show'); modalBody.innerHTML=''; }
+modalOverlay.addEventListener('click', (e) => { if (e.target === modalOverlay) closeModal(); });
+
+function uref(path) { return db.ref('users/' + currentUser.uid + '/' + path); }
+
+/* ---------------- PULSE DIVIDER SVG ---------------- */
+function pulseDividerSVG() {
+  return `<svg class="pulse-divider" viewBox="0 0 600 26" preserveAspectRatio="none">
+    <polyline points="0,13 180,13 200,3 215,23 232,13 600,13" fill="none" stroke="url(#pdg)" stroke-width="1.5"/>
+    <defs><linearGradient id="pdg" x1="0" y1="0" x2="600" y2="0">
+      <stop offset="0" stop-color="#232936"/><stop offset="0.35" stop-color="#7c6cf0"/>
+      <stop offset="0.6" stop-color="#2ad9c2"/><stop offset="1" stop-color="#232936"/>
+    </linearGradient></defs></svg>`;
+}
+
+/* ---------------- ACTIVITY RING RENDER ---------------- */
+function ringSVG(move, moveGoal, ex, exGoal, stand, standGoal) {
+  const r1=42,r2=34,r3=26;
+  const c1=2*Math.PI*r1, c2=2*Math.PI*r2, c3=2*Math.PI*r3;
+  const p1=Math.min(move/Math.max(moveGoal,1),1), p2=Math.min(ex/Math.max(exGoal,1),1), p3=Math.min(stand/Math.max(standGoal,1),1);
+  return `<svg width="118" height="118" viewBox="0 0 100 100">
+    <circle cx="50" cy="50" r="${r1}" fill="none" stroke="#2a1418" stroke-width="8"/>
+    <circle cx="50" cy="50" r="${r1}" fill="none" stroke="#ff6b5d" stroke-width="8" stroke-linecap="round"
+      stroke-dasharray="${c1}" stroke-dashoffset="${c1*(1-p1)}" transform="rotate(-90 50 50)"/>
+    <circle cx="50" cy="50" r="${r2}" fill="none" stroke="#16281a" stroke-width="8"/>
+    <circle cx="50" cy="50" r="${r2}" fill="none" stroke="#8ee04a" stroke-width="8" stroke-linecap="round"
+      stroke-dasharray="${c2}" stroke-dashoffset="${c2*(1-p2)}" transform="rotate(-90 50 50)"/>
+    <circle cx="50" cy="50" r="${r3}" fill="none" stroke="#0d2a30" stroke-width="8"/>
+    <circle cx="50" cy="50" r="${r3}" fill="none" stroke="#2ad9c2" stroke-width="8" stroke-linecap="round"
+      stroke-dasharray="${c3}" stroke-dashoffset="${c3*(1-p3)}" transform="rotate(-90 50 50)"/>
+  </svg>`;
+}
+
+/* ---------------- RENDER PAGES ---------------- */
+const mainContent = document.getElementById('mainContent');
+let stepsChart, distChart, whrChart;
+
+function renderPage(page) {
+  if (page === 'summary') renderSummary();
+  else if (page === 'heart') renderHeart();
+  else if (page === 'trends') renderTrends();
+  else if (page === 'highlights') renderHighlights();
+}
+
+function renderSummary() {
+  const move = d('activity.move',0), moveGoal = d('activity.moveGoal',500);
+  const ex = d('activity.exercise',0), exGoal = d('activity.exerciseGoal',30);
+  const stand = d('activity.stand',0), standGoal = d('activity.standGoal',12);
+  const steps = d('activity.steps',0), dist = d('activity.distance',0);
+  const workouts = d('workouts', {});
+  const woArr = Object.entries(workouts).sort((a,b)=> (b[1].ts||0)-(a[1].ts||0)).slice(0,4);
+
+  mainContent.innerHTML = `
+    <div class="page-header"><h1>Summary</h1><p>Your activity, workouts and today's snapshot.</p></div>
+    ${pulseDividerSVG()}
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><div class="card-title"><span class="dot" style="background:var(--coral)"></span>Activity</div>
+          <button class="card-edit" onclick="editActivity()">Edit</button></div>
+        <div class="rings-row">
+          ${ringSVG(move,moveGoal,ex,exGoal,stand,standGoal)}
+          <div class="rings-stats">
+            <div class="ring-stat"><span class="sw" style="background:#ff6b5d"></span><span class="lbl">Move</span>&nbsp;<b>${move}/${moveGoal} cal</b></div>
+            <div class="ring-stat"><span class="sw" style="background:#8ee04a"></span><span class="lbl">Exercise</span>&nbsp;<b>${ex}/${exGoal} min</b></div>
+            <div class="ring-stat"><span class="sw" style="background:#2ad9c2"></span><span class="lbl">Stand</span>&nbsp;<b>${stand}/${standGoal} hrs</b></div>
+          </div>
+        </div>
+        <div style="display:flex;gap:24px;margin-top:16px;">
+          <div><div class="metric-sub">Steps</div><div style="font-size:18px;font-weight:600;" class="mono">${steps}</div></div>
+          <div><div class="metric-sub">Distance</div><div style="font-size:18px;font-weight:600;" class="mono">${dist} mi</div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title"><span class="dot" style="background:var(--violet)"></span>Workouts</div>
+          <button class="card-edit" onclick="addWorkout()">+ Add</button></div>
+        ${woArr.length ? woArr.map(([key,w])=>`
+          <div class="workout-row">
+            <div class="wo-icon">${w.icon||'🏃'}</div>
+            <div><div class="wo-name">${w.name}</div><div class="wo-date">${w.date||''}</div></div>
+            <div class="wo-dur mono">${w.duration}</div>
+            <button class="wo-del" onclick="deleteWorkout('${key}')">✕</button>
+          </div>`).join('') : '<div class="empty-hint">No workouts logged yet.</div>'}
+      </div>
+    </div>
+  `;
+}
+
+function renderHeart() {
+  const whr = d('heart.walkingHR', 0);
+  const resting = d('heart.restingHR', 0);
+  const ecgs = d('ecg', {});
+  const ecgArr = Object.entries(ecgs).sort((a,b)=>(b[1].ts||0)-(a[1].ts||0));
+  const sys = d('bloodPressure.systolic', 0);
+  const dia = d('bloodPressure.diastolic', 0);
+  const bpDate = d('bloodPressure.date', '');
+
+  mainContent.innerHTML = `
+    <div class="page-header"><h1>Heart</h1><p>Walking heart rate, ECG readings and blood pressure.</p></div>
+    ${pulseDividerSVG()}
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><div class="card-title"><span class="dot" style="background:var(--coral)"></span>Walking Heart Rate Average</div>
+          <button class="card-edit" onclick="editHeart()">Edit</button></div>
+        <div class="metric-big">${whr}<span class="metric-unit">BPM</span></div>
+        <div class="metric-sub">Resting: ${resting} BPM</div>
+      </div>
+
+      <div class="card">
+        <div class="card-head"><div class="card-title"><span class="dot" style="background:var(--cyan)"></span>Blood Pressure</div>
+          <button class="card-edit" onclick="editBP()">Edit</button></div>
+        <div style="display:flex;gap:22px;">
+          <div><div class="metric-sub">Systolic</div><div class="metric-big" style="font-size:28px;">${sys}</div></div>
+          <div><div class="metric-sub">Diastolic</div><div class="metric-big" style="font-size:28px;">${dia}</div></div>
+        </div>
+        <div class="metric-sub" style="margin-top:8px;">${bpDate ? 'Last logged '+bpDate : 'No readings yet'}</div>
+      </div>
+
+      <div class="card wide">
+        <div class="card-head"><div class="card-title"><span class="dot" style="background:var(--violet)"></span>Electrocardiograms (ECG)</div>
+          <button class="card-edit" onclick="addEcg()">+ Add</button></div>
+        ${ecgArr.length ? ecgArr.map(([key,e])=>`
+          <div class="ecg-row">
+            <div class="ecg-top">
+              <span class="ecg-badge ${e.result==='Poor Recording'?'bad':'ok'}">${e.result}</span>
+              <span class="ecg-date">${e.date}</span>
+            </div>
+            <div class="ecg-bpm">${e.bpm ? e.bpm+' BPM Average' : '-- BPM Average'}
+              <button class="wo-del" style="float:right;" onclick="deleteEcg('${key}')">✕</button>
+            </div>
+          </div>`).join('') : '<div class="empty-hint">No ECG recordings yet.</div>'}
+      </div>
+    </div>
+  `;
+}
+
+function renderTrends() {
+  const stepsWeekly = d('trends.weeklySteps', [0,0,0,0,0,0,0]);
+  const distWeekly = d('trends.weeklyDistance', [0,0,0,0,0,0,0]);
+  const days = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+
+  mainContent.innerHTML = `
+    <div class="page-header"><h1>Trends</h1><p>How your steps and distance moved over the past week.</p></div>
+    ${pulseDividerSVG()}
+    <div class="grid">
+      <div class="card">
+        <div class="card-head"><div class="card-title"><span class="dot" style="background:var(--coral)"></span>Steps</div>
+          <button class="card-edit" onclick="editTrends('steps')">Edit</button></div>
+        <canvas id="stepsCanvas" height="180"></canvas>
+      </div>
+      <div class="card">
+        <div class="card-head"><div class="card-title"><span class="dot" style="background:var(--cyan)"></span>Walking + Running Distance</div>
+          <button class="card-edit" onclick="editTrends('distance')">Edit</button></div>
+        <canvas id="distCanvas" height="180"></canvas>
+      </div>
+    </div>
+  `;
+
+  const ctx1 = document.getElementById('stepsCanvas');
+  if (stepsChart) stepsChart.destroy();
+  stepsChart = new Chart(ctx1, {
+    type:'bar',
+    data:{ labels:days, datasets:[{ data:stepsWeekly, backgroundColor:'#ff6b5d', borderRadius:5, maxBarThickness:26 }]},
+    options:{ plugins:{legend:{display:false}}, scales:{
+      x:{grid:{display:false}, ticks:{color:'#8b93a1', font:{size:11}}},
+      y:{grid:{color:'#1a1f28'}, ticks:{color:'#8b93a1', font:{size:11}}}
+    }}
+  });
+  const ctx2 = document.getElementById('distCanvas');
+  if (distChart) distChart.destroy();
+  distChart = new Chart(ctx2, {
+    type:'line',
+    data:{ labels:days, datasets:[{ data:distWeekly, borderColor:'#2ad9c2', backgroundColor:'rgba(42,217,194,0.12)', fill:true, tension:0.35, pointRadius:3, pointBackgroundColor:'#2ad9c2' }]},
+    options:{ plugins:{legend:{display:false}}, scales:{
+      x:{grid:{display:false}, ticks:{color:'#8b93a1', font:{size:11}}},
+      y:{grid:{color:'#1a1f28'}, ticks:{color:'#8b93a1', font:{size:11}}}
+    }}
+  });
+}
+
+function renderHighlights() {
+  const som = d('highlights.stateOfMind', '—');
+  const sleep = d('highlights.sleepScore', null);
+  const audio = d('highlights.headphoneAudio', null);
+  const audioLimit = d('highlights.headphoneLimit', 100);
+
+  mainContent.innerHTML = `
+    <div class="page-header"><h1>Highlights</h1><p>State of mind, sleep score and headphone exposure.</p></div>
+    ${pulseDividerSVG()}
+    <div class="grid">
+      <div class="card wide">
+        <div class="card-head"><div class="card-title"><span class="dot" style="background:var(--amber)"></span>Wellbeing</div>
+          <button class="card-edit" onclick="editHighlights()">Edit</button></div>
+        <div class="hl-row"><div class="hl-label">🧠 State of Mind</div><div class="hl-val">${som}</div></div>
+        <div class="hl-row"><div class="hl-label">🛏️ Sleep Score</div><div class="hl-val">${sleep!=null ? sleep : 'No Data'}</div></div>
+        <div class="hl-row"><div class="hl-label">🎧 Headphone Audio (7-day)</div>
+          <div class="hl-val" style="color:${audio>audioLimit?'var(--coral)':'var(--cyan)'}">${audio!=null ? audio+'%' : 'No Data'} <span style="color:var(--muted2);">/ ${audioLimit}%</span></div></div>
+      </div>
+    </div>
+  `;
+}
+
+/* ---------------- EDIT ACTIONS ---------------- */
+function editActivity() {
+  openModal('Edit Activity', [
+    {key:'move', label:'Move (cal)', type:'number', value:d('activity.move',0)},
+    {key:'moveGoal', label:'Move Goal (cal)', type:'number', value:d('activity.moveGoal',500)},
+    {key:'exercise', label:'Exercise (min)', type:'number', value:d('activity.exercise',0)},
+    {key:'exerciseGoal', label:'Exercise Goal (min)', type:'number', value:d('activity.exerciseGoal',30)},
+    {key:'stand', label:'Stand (hrs)', type:'number', value:d('activity.stand',0)},
+    {key:'standGoal', label:'Stand Goal (hrs)', type:'number', value:d('activity.standGoal',12)},
+    {key:'steps', label:'Steps', type:'number', value:d('activity.steps',0)},
+    {key:'distance', label:'Distance (mi)', type:'number', value:d('activity.distance',0)},
+  ], (r) => uref('activity').update(r));
+}
+
+function addWorkout() {
+  openModal('Add Workout', [
+    {key:'name', label:'Workout Name', value:'Outdoor Walk'},
+    {key:'duration', label:'Duration', value:'0:30'},
+    {key:'date', label:'Date', value:'Today'},
+    {key:'icon', label:'Icon (emoji)', value:'🚶'},
+  ], (r) => uref('workouts').push({...r, ts: Date.now()}));
+}
+function deleteWorkout(key){ uref('workouts/'+key).remove(); }
+
+function editHeart() {
+  openModal('Edit Heart Rate', [
+    {key:'walkingHR', label:'Walking Heart Rate Avg (BPM)', type:'number', value:d('heart.walkingHR',0)},
+    {key:'restingHR', label:'Resting Heart Rate (BPM)', type:'number', value:d('heart.restingHR',0)},
+  ], (r) => uref('heart').update(r));
+}
+
+function editBP() {
+  openModal('Edit Blood Pressure', [
+    {key:'systolic', label:'Systolic', type:'number', value:d('bloodPressure.systolic',0)},
+    {key:'diastolic', label:'Diastolic', type:'number', value:d('bloodPressure.diastolic',0)},
+    {key:'date', label:'Date', value:d('bloodPressure.date','')},
+  ], (r) => uref('bloodPressure').set(r));
+}
+
+function addEcg() {
+  openModal('Add ECG Reading', [
+    {key:'result', label:'Result (e.g. Sinus Rhythm)', value:'Sinus Rhythm'},
+    {key:'bpm', label:'BPM Average', type:'number', value:0},
+    {key:'date', label:'Date/Time', value:''},
+  ], (r) => uref('ecg').push({...r, ts: Date.now()}));
+}
+function deleteEcg(key){ uref('ecg/'+key).remove(); }
+
+function editTrends(which) {
+  if (which === 'steps') {
+    const cur = d('trends.weeklySteps',[0,0,0,0,0,0,0]);
+    openModal('Edit Weekly Steps', cur.map((v,i)=>({key:'d'+i,label:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i],type:'number',value:v})),
+      (r)=> uref('trends/weeklySteps').set(Object.values(r).map(Number)));
+  } else {
+    const cur = d('trends.weeklyDistance',[0,0,0,0,0,0,0]);
+    openModal('Edit Weekly Distance (mi)', cur.map((v,i)=>({key:'d'+i,label:['Mon','Tue','Wed','Thu','Fri','Sat','Sun'][i],type:'number',value:v})),
+      (r)=> uref('trends/weeklyDistance').set(Object.values(r).map(Number)));
+  }
+}
+
+function editHighlights() {
+  openModal('Edit Highlights', [
+    {key:'stateOfMind', label:'State of Mind', value:d('highlights.stateOfMind','')},
+    {key:'sleepScore', label:'Sleep Score', type:'number', value:d('highlights.sleepScore',0)},
+    {key:'headphoneAudio', label:'Headphone Audio (%)', type:'number', value:d('highlights.headphoneAudio',0)},
+    {key:'headphoneLimit', label:'Headphone 7-day Limit (%)', type:'number', value:d('highlights.headphoneLimit',100)},
+  ], (r) => uref('highlights').update(r));
+}
+</script>
+</body>
+</html>
