@@ -1,0 +1,965 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Pulse — Live Video Chat</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --bg: #0B2C2C;
+    --bg-deep: #071D1D;
+    --surface: #123B3B;
+    --surface-hi: #17494A;
+    --line: rgba(242,239,233,0.10);
+    --text: #F2EFE9;
+    --muted: #9FBAB7;
+    --coral: #FF6B4A;
+    --coral-dim: rgba(255,107,74,0.14);
+    --live: #4ADE80;
+    --danger: #FF5C5C;
+    --font-display: 'Space Grotesk', sans-serif;
+    --font-body: 'Inter', sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    font-family: var(--font-body);
+    background: var(--bg-deep);
+    background-image:
+      radial-gradient(circle at 12% 0%, rgba(255,107,74,0.06), transparent 45%),
+      radial-gradient(circle at 90% 100%, rgba(74,222,128,0.05), transparent 40%);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  header {
+    padding: 18px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: var(--font-display);
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 0.2px;
+  }
+
+  .brand .dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--coral);
+    box-shadow: 0 0 0 0 rgba(255,107,74,0.6);
+    animation: ping 2.2s ease-out infinite;
+  }
+
+  @keyframes ping {
+    0%   { box-shadow: 0 0 0 0 rgba(255,107,74,0.55); }
+    70%  { box-shadow: 0 0 0 9px rgba(255,107,74,0); }
+    100% { box-shadow: 0 0 0 0 rgba(255,107,74,0); }
+  }
+
+  .brand small {
+    font-family: var(--font-mono);
+    font-weight: 400;
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.5px;
+  }
+
+  .app {
+    max-width: 1100px;
+    margin: auto;
+    padding: 18px 16px 40px;
+  }
+
+  .safety-strip {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: rgba(255,92,92,0.08);
+    border: 1px solid rgba(255,92,92,0.25);
+    padding: 11px 14px;
+    border-radius: 10px;
+    margin-bottom: 16px;
+    font-size: 13px;
+    color: #FFB4A8;
+  }
+
+  .safety-strip svg { flex-shrink: 0; }
+
+  /* Gender pill selectors */
+  .prefs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 14px 16px;
+    margin-bottom: 16px;
+  }
+
+  .prefs .group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .prefs .group-label {
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+
+  .pill-row {
+    display: flex;
+    gap: 6px;
+  }
+
+  .pill {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 14px;
+    border-radius: 20px;
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .pill:hover { border-color: rgba(255,107,74,0.4); color: var(--text); }
+
+  .pill.active {
+    background: var(--coral);
+    border-color: var(--coral);
+    color: #1A0A05;
+    font-weight: 600;
+  }
+
+  /* Video stage */
+  .stage {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+
+  .video-card {
+    position: relative;
+    border-radius: 18px;
+    overflow: hidden;
+    background: var(--bg-deep);
+    border: 1px solid var(--line);
+    aspect-ratio: 4/3.2;
+  }
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    background: var(--bg-deep);
+  }
+
+  .tag {
+    position: absolute;
+    left: 10px;
+    bottom: 10px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    background: rgba(7,29,29,0.72);
+    backdrop-filter: blur(6px);
+    padding: 5px 10px;
+    border-radius: 20px;
+    border: 1px solid var(--line);
+  }
+
+  .tag.you::before {
+    content: "";
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--live);
+    margin-right: 6px;
+  }
+
+  .banned { filter: blur(70px); }
+
+  /* Status readout */
+  #status {
+    margin-top: 12px;
+    padding: 12px 14px;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    font-family: var(--font-mono);
+    font-size: 12.5px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 9px;
+  }
+
+  #status .beacon {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--live);
+    flex-shrink: 0;
+  }
+
+  /* Controls */
+  .controls {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  button.action {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    padding: 11px 15px;
+    border-radius: 11px;
+    font-family: var(--font-body);
+    font-weight: 500;
+    font-size: 13.5px;
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  button.action:hover { background: var(--surface-hi); }
+  button.action:active { transform: scale(0.97); }
+
+  .start   { background: var(--coral); border-color: var(--coral); color: #1A0A05; font-weight: 600; }
+  .start:hover { background: #FF7D5F; }
+  .stop    { color: var(--danger); border-color: rgba(255,92,92,0.3); }
+  .stop:hover { background: rgba(255,92,92,0.1); }
+  .report  { color: #FFC078; border-color: rgba(255,192,120,0.3); }
+  .report:hover { background: rgba(255,192,120,0.08); }
+
+  /* Chat */
+  #messages {
+    margin-top: 14px;
+    height: 220px;
+    overflow-y: auto;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .msg {
+    max-width: 78%;
+    padding: 9px 12px;
+    border-radius: 12px;
+    font-size: 13.5px;
+    line-height: 1.4;
+    background: var(--surface-hi);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+
+  .msg.mine {
+    align-self: flex-end;
+    background: var(--coral-dim);
+    border: 1px solid rgba(255,107,74,0.25);
+    border-bottom-right-radius: 4px;
+    border-bottom-left-radius: 12px;
+  }
+
+  .msg .who {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 2px;
+    letter-spacing: 0.4px;
+  }
+
+  .chatBox {
+    margin-top: 10px;
+    display: flex;
+    gap: 8px;
+  }
+
+  input {
+    flex: 1;
+    min-width: 160px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    outline: none;
+    padding: 13px 14px;
+    border-radius: 11px;
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+  }
+
+  input::placeholder { color: var(--muted); }
+  input:focus { border-color: rgba(255,107,74,0.5); }
+
+  @media(max-width: 768px) {
+    .stage { grid-template-columns: 1fr; }
+    .video-card { aspect-ratio: 4/3; }
+  }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.20.0"></script>
+<script src="https://cdn.jsdelivr.net/npm/nsfwjs@4.2.1"></script>
+</head>
+
+<body>
+
+<header>
+  <div class="brand">
+    <span class="dot"></span>
+    Pulse <small>LIVE VIDEO CHAT</small>
+  </div>
+</header>
+
+<div class="app">
+
+  <div class="safety-strip">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#FFB4A8" stroke-width="2"><path d="M12 2 3 6v6c0 5 3.8 9 9 10 5.2-1 9-5 9-10V6l-9-4Z"/><path d="M12 8v5"/><path d="M12 16h.01"/></svg>
+    Explicit or inappropriate content is prohibited. AI moderation is active — violations result in an automatic 7-day ban.
+  </div>
+
+  <div class="prefs">
+    <div class="group">
+      <span class="group-label">I am</span>
+      <div class="pill-row" id="myGenderRow">
+        <button type="button" class="pill" data-value="male">Male</button>
+        <button type="button" class="pill" data-value="female">Female</button>
+        <button type="button" class="pill" data-value="other">Other</button>
+      </div>
+    </div>
+    <div class="group">
+      <span class="group-label">Looking for</span>
+      <div class="pill-row" id="lookingForRow">
+        <button type="button" class="pill" data-value="female">Female</button>
+        <button type="button" class="pill" data-value="male">Male</button>
+        <button type="button" class="pill" data-value="any">Anyone</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="video-card">
+      <video id="localVideo" autoplay muted playsinline></video>
+      <span class="tag you">YOU</span>
+    </div>
+    <div class="video-card">
+      <video id="remoteVideo" autoplay playsinline></video>
+      <span class="tag">STRANGER</span>
+    </div>
+  </div>
+
+  <div id="status"><span class="beacon"></span>Ready</div>
+
+  <div class="controls">
+    <button class="action start" onclick="startChat()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+      Start Chat
+    </button>
+    <button class="action" onclick="nextChat()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 4v16l12-8-12-8Z"/><path d="M19 5v14"/></svg>
+      Next Stranger
+    </button>
+    <button class="action stop" onclick="stopChat()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="2"/></svg>
+      Stop
+    </button>
+    <button class="action" onclick="toggleMic()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2"/><line x1="12" y1="19" x2="12" y2="23"/></svg>
+      Mute Mic
+    </button>
+    <button class="action" onclick="toggleCamera()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 7l-7 5 7 5V7Z"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+      Camera Off
+    </button>
+    <button class="action" onclick="switchCamera()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 3v6h-6"/></svg>
+      Switch Camera
+    </button>
+    <button class="action report" onclick="reportUser()">
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
+      Report
+    </button>
+  </div>
+
+  <div id="messages"></div>
+
+  <div class="chatBox">
+    <input id="chatInput" placeholder="Type a message..." />
+    <button class="action start" onclick="sendMessage()">Send</button>
+  </div>
+
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+  import {
+    getDatabase,
+    ref,
+    set,
+    get,
+    push,
+    remove,
+    onValue,
+    onChildAdded,
+    serverTimestamp,
+    onDisconnect
+  } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+  // ===================== CONFIG =====================
+  const firebaseConfig = {
+    apiKey: "AIzaSyC30TcmMVhP_8HdFYS1WufRiZwSDYNMTF0",
+    authDomain: "pulse2-92372.firebaseapp.com",
+    databaseURL: "https://pulse2-92372-default-rtdb.firebaseio.com",
+    projectId: "pulse2-92372",
+    storageBucket: "pulse2-92372.firebasestorage.app",
+    messagingSenderId: "276235725177",
+    appId: "1:276235725177:web:0f4e0789fae80a435927a8"
+  };
+
+  // Cloudflare Worker that bans by real IP (server-verified, spoof-proof)
+  const BAN_WORKER_URL = "https://ban.sgursharn076.workers.dev";
+  // ⚠️ Must match the BAN_SECRET you set with `wrangler secret put BAN_SECRET`
+  // (or via Dashboard → Settings → Variables and Secrets)
+  const BAN_SECRET = "REPLACE_WITH_YOUR_BAN_SECRET";
+  // ====================================================
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  const localVideo = document.getElementById("localVideo");
+  const remoteVideo = document.getElementById("remoteVideo");
+  const statusBox = document.getElementById("status");
+  const messagesBox = document.getElementById("messages");
+  const chatInput = document.getElementById("chatInput");
+
+  const BAN_DURATION_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
+
+  let localStream = null;
+  let remoteStream = null;
+  let pc = null;
+  let roomId = null;
+  let isCreator = false;
+  let micOn = true;
+  let cameraOn = true;
+  let usingBackCamera = false;
+  let nsfwModel = null;
+  let banned = false;
+  let nsfwInterval = null;
+  let myIP = null;
+
+  // ---- gender pill selectors ----
+  let myGender = "male";
+  let lookingFor = "female";
+
+  function wirePillRow(rowId, onSelect, defaultValue) {
+    const row = document.getElementById(rowId);
+    const pills = [...row.querySelectorAll(".pill")];
+    pills.forEach(p => {
+      if (p.dataset.value === defaultValue) p.classList.add("active");
+      p.addEventListener("click", () => {
+        pills.forEach(x => x.classList.remove("active"));
+        p.classList.add("active");
+        onSelect(p.dataset.value);
+      });
+    });
+  }
+
+  wirePillRow("myGenderRow", v => myGender = v, "male");
+  wirePillRow("lookingForRow", v => lookingFor = v, "female");
+
+  let userId = localStorage.getItem("safeChatUserId");
+  if (!userId) {
+    userId = "user_" + Math.random().toString(36).substring(2, 14);
+    localStorage.setItem("safeChatUserId", userId);
+  }
+
+  const servers = {
+    iceServers: [
+      { urls: "stun:stun.l.google.com:19302" },
+      { urls: "stun:stun1.l.google.com:19302" },
+      { urls: "stun:stun2.l.google.com:19302" }
+    ]
+  };
+
+  function status(text, dotColor) {
+    statusBox.innerHTML = `<span class="beacon" style="background:${dotColor || 'var(--live)'}"></span>${text}`;
+  }
+
+  function ipKeyOf(ip) {
+    return ip ? ip.replace(/\./g, "_").replace(/:/g, "-") : null;
+  }
+
+  async function fetchIP() {
+    try {
+      const res = await fetch("https://api.ipify.org?format=json");
+      const data = await res.json();
+      myIP = data.ip;
+    } catch (err) {
+      console.error("IP lookup failed:", err);
+      myIP = null;
+    }
+  }
+
+  async function loadNSFW() {
+    try {
+      status("Loading AI moderation...", "#FFC078");
+      nsfwModel = await nsfwjs.load();
+      status("AI moderation active. Ready.");
+    } catch (err) {
+      console.error(err);
+      status("AI moderation failed to load.", "#FF5C5C");
+    }
+  }
+
+  loadNSFW();
+  fetchIP();
+
+  async function checkBan() {
+    const now = Date.now();
+
+    const userSnap = await get(ref(db, "bannedUsers/" + userId));
+    if (userSnap.exists()) {
+      const data = userSnap.val();
+      if (data.expiresAt && data.expiresAt > now) {
+        banned = true;
+        const daysLeft = Math.ceil((data.expiresAt - now) / (24 * 60 * 60 * 1000));
+        alert("You are banned from using this chat for " + daysLeft + " more day(s). Reason: " + data.reason);
+        status("Banned", "#FF5C5C");
+        return true;
+      } else {
+        await remove(ref(db, "bannedUsers/" + userId));
+      }
+    }
+
+    if (myIP) {
+      const key = ipKeyOf(myIP);
+      const ipSnap = await get(ref(db, "bannedIPs/" + key));
+      if (ipSnap.exists()) {
+        const data = ipSnap.val();
+        if (data.expiresAt && data.expiresAt > now) {
+          banned = true;
+          const daysLeft = Math.ceil((data.expiresAt - now) / (24 * 60 * 60 * 1000));
+          alert("This network/IP is banned for " + daysLeft + " more day(s). Reason: " + data.reason);
+          status("Banned", "#FF5C5C");
+          return true;
+        } else {
+          await remove(ref(db, "bannedIPs/" + key));
+        }
+      }
+    }
+
+    banned = false;
+    return false;
+  }
+
+  async function banUser(reason) {
+    if (banned) return;
+    banned = true;
+
+    localVideo.classList.add("banned");
+    status("Explicit content detected. You are banned for 7 days.", "#FF5C5C");
+
+    const now = Date.now();
+    const expiresAt = now + BAN_DURATION_MS;
+
+    // Local record (userId-based, always works)
+    await set(ref(db, "bannedUsers/" + userId), {
+      userId,
+      reason,
+      time: serverTimestamp(),
+      bannedAt: now,
+      expiresAt
+    });
+
+    // Server-verified IP ban via Cloudflare Worker (spoof-proof real IP)
+    try {
+      const res = await fetch(BAN_WORKER_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "X-Ban-Secret": BAN_SECRET
+        },
+        body: JSON.stringify({ userId, reason })
+      });
+      const data = await res.json();
+      console.log("IP banned via Worker:", data);
+    } catch (err) {
+      console.error("Ban worker call failed, falling back to client IP:", err);
+      if (myIP) {
+        await set(ref(db, "bannedIPs/" + ipKeyOf(myIP)), {
+          ip: myIP, userId, reason, time: serverTimestamp(), bannedAt: now, expiresAt
+        });
+      }
+    }
+
+    await push(ref(db, "moderationLogs"), {
+      userId,
+      ip: myIP || "unknown",
+      roomId: roomId || "none",
+      reason,
+      time: serverTimestamp()
+    });
+
+    setTimeout(async () => {
+      await stopChat();
+      alert("You were banned for 7 days for inappropriate content.");
+    }, 1200);
+  }
+
+  async function initMedia() {
+    const constraints = {
+      video: {
+        facingMode: usingBackCamera ? "environment" : "user",
+        width: { ideal: 1280 },
+        height: { ideal: 720 }
+      },
+      audio: true
+    };
+
+    localStream = await navigator.mediaDevices.getUserMedia(constraints).catch(async () => {
+      return await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+    });
+
+    localVideo.srcObject = localStream;
+    startNSFWDetection();
+  }
+
+  function createPeerConnection() {
+    pc = new RTCPeerConnection(servers);
+    remoteStream = new MediaStream();
+    remoteVideo.srcObject = remoteStream;
+
+    localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+
+    pc.ontrack = event => {
+      event.streams[0].getTracks().forEach(track => remoteStream.addTrack(track));
+    };
+
+    pc.onicecandidate = event => {
+      if (!event.candidate || !roomId) return;
+      const path = isCreator ? `rooms/${roomId}/callerCandidates` : `rooms/${roomId}/calleeCandidates`;
+      push(ref(db, path), event.candidate.toJSON());
+    };
+
+    pc.onconnectionstatechange = () => {
+      status("Connection: " + pc.connectionState);
+      if (pc.connectionState === "disconnected" || pc.connectionState === "failed") {
+        status("Stranger disconnected", "#FFC078");
+      }
+    };
+  }
+
+  function isCompatible(myG, myP, otherG, otherP) {
+    const iAccept = myP === "any" || myP === otherG;
+    const theyAccept = otherP === "any" || otherP === myG;
+    return iAccept && theyAccept;
+  }
+
+  async function startChat() {
+    try {
+      await fetchIP();
+      if (await checkBan()) return;
+
+      status("Opening camera...", "#FFC078");
+      if (!localStream) await initMedia();
+
+      status("Searching for a matching stranger...", "#FFC078");
+
+      const waitingSnap = await get(ref(db, "waitingUsers"));
+      let matchedUser = null;
+
+      if (waitingSnap.exists()) {
+        const users = waitingSnap.val();
+        for (let id in users) {
+          if (id === userId) continue;
+          const candidate = users[id];
+          const candidateGender = candidate.gender || "other";
+          const candidatePref = candidate.lookingFor || "any";
+          if (isCompatible(myGender, lookingFor, candidateGender, candidatePref)) {
+            matchedUser = id;
+            break;
+          }
+        }
+      }
+
+      if (matchedUser) {
+        isCreator = false;
+        roomId = "room_" + Math.random().toString(36).substring(2, 14);
+
+        await remove(ref(db, "waitingUsers/" + matchedUser));
+
+        await set(ref(db, "rooms/" + roomId), {
+          users: { [matchedUser]: true, [userId]: true },
+          createdAt: serverTimestamp()
+        });
+
+        await set(ref(db, "matchedRooms/" + matchedUser), roomId);
+        await set(ref(db, "matchedRooms/" + userId), roomId);
+
+        createPeerConnection();
+        await createAnswerFlow();
+
+      } else {
+        isCreator = true;
+
+        await set(ref(db, "waitingUsers/" + userId), {
+          gender: myGender,
+          lookingFor: lookingFor,
+          createdAt: serverTimestamp()
+        });
+
+        onDisconnect(ref(db, "waitingUsers/" + userId)).remove();
+
+        onValue(ref(db, "matchedRooms/" + userId), async snap => {
+          if (snap.exists() && !roomId) {
+            roomId = snap.val();
+            await remove(ref(db, "waitingUsers/" + userId));
+            createPeerConnection();
+            await createOfferFlow();
+          }
+        });
+
+        status("Waiting for a matching stranger...", "#FFC078");
+      }
+
+    } catch (err) {
+      console.error(err);
+      status("Error: " + err.message, "#FF5C5C");
+    }
+  }
+
+  async function createOfferFlow() {
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+
+    await set(ref(db, `rooms/${roomId}/offer`), { type: offer.type, sdp: offer.sdp });
+
+    onValue(ref(db, `rooms/${roomId}/answer`), async snap => {
+      if (snap.exists() && !pc.currentRemoteDescription) {
+        await pc.setRemoteDescription(new RTCSessionDescription(snap.val()));
+      }
+    });
+
+    listenCandidates("calleeCandidates");
+    listenMessages();
+    status("Connected. Waiting for stranger video...");
+  }
+
+  async function createAnswerFlow() {
+    onValue(ref(db, `rooms/${roomId}/offer`), async snap => {
+      if (snap.exists() && !pc.currentRemoteDescription) {
+        await pc.setRemoteDescription(new RTCSessionDescription(snap.val()));
+        const answer = await pc.createAnswer();
+        await pc.setLocalDescription(answer);
+        await set(ref(db, `rooms/${roomId}/answer`), { type: answer.type, sdp: answer.sdp });
+      }
+    });
+
+    listenCandidates("callerCandidates");
+    listenMessages();
+    status("Connecting...", "#FFC078");
+  }
+
+  function listenCandidates(path) {
+    onChildAdded(ref(db, `rooms/${roomId}/${path}`), async snap => {
+      try {
+        await pc.addIceCandidate(new RTCIceCandidate(snap.val()));
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  }
+
+  function listenMessages() {
+    messagesBox.innerHTML = "";
+    onChildAdded(ref(db, `rooms/${roomId}/messages`), snap => {
+      const data = snap.val();
+      const mine = data.from === userId;
+
+      const div = document.createElement("div");
+      div.className = "msg" + (mine ? " mine" : "");
+      div.innerHTML = `<span class="who">${mine ? "You" : "Stranger"}</span>${escapeHtml(data.text)}`;
+
+      messagesBox.appendChild(div);
+      messagesBox.scrollTop = messagesBox.scrollHeight;
+    });
+  }
+
+  function escapeHtml(str) {
+    const d = document.createElement("div");
+    d.innerText = str;
+    return d.innerHTML;
+  }
+
+  async function sendMessage() {
+    const text = chatInput.value.trim();
+    if (!text || !roomId || banned) return;
+
+    await push(ref(db, `rooms/${roomId}/messages`), { from: userId, text, time: serverTimestamp() });
+    chatInput.value = "";
+  }
+
+  chatInput.addEventListener("keydown", e => { if (e.key === "Enter") sendMessage(); });
+
+  async function stopChat() {
+    try {
+      if (pc) { pc.close(); pc = null; }
+
+      if (roomId) {
+        await remove(ref(db, "rooms/" + roomId));
+        await remove(ref(db, "matchedRooms/" + userId));
+      }
+
+      await remove(ref(db, "waitingUsers/" + userId));
+
+      roomId = null;
+      remoteVideo.srcObject = null;
+      messagesBox.innerHTML = "";
+
+      status(banned ? "Banned" : "Stopped", banned ? "#FF5C5C" : "#9FBAB7");
+    } catch (err) {
+      console.error(err);
+    }
+  }
+
+  async function nextChat() {
+    if (banned) return;
+    await stopChat();
+    setTimeout(startChat, 700);
+  }
+
+  function toggleMic() {
+    if (!localStream) return;
+    micOn = !micOn;
+    localStream.getAudioTracks().forEach(track => track.enabled = micOn);
+    status(micOn ? "Mic on" : "Mic muted");
+  }
+
+  function toggleCamera() {
+    if (!localStream) return;
+    cameraOn = !cameraOn;
+    localStream.getVideoTracks().forEach(track => track.enabled = cameraOn);
+    status(cameraOn ? "Camera on" : "Camera off");
+  }
+
+  async function switchCamera() {
+    try {
+      if (!localStream) {
+        usingBackCamera = !usingBackCamera;
+        await initMedia();
+        return;
+      }
+
+      usingBackCamera = !usingBackCamera;
+
+      const newStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: usingBackCamera ? "environment" : "user", width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: true
+      });
+
+      const newVideoTrack = newStream.getVideoTracks()[0];
+      const newAudioTrack = newStream.getAudioTracks()[0];
+
+      if (pc) {
+        const videoSender = pc.getSenders().find(s => s.track && s.track.kind === "video");
+        if (videoSender) await videoSender.replaceTrack(newVideoTrack);
+        const audioSender = pc.getSenders().find(s => s.track && s.track.kind === "audio");
+        if (audioSender && newAudioTrack) await audioSender.replaceTrack(newAudioTrack);
+      }
+
+      localStream.getTracks().forEach(track => track.stop());
+      localStream = newStream;
+      localVideo.srcObject = newStream;
+
+      status(usingBackCamera ? "Back camera enabled" : "Front camera enabled");
+    } catch (err) {
+      console.error(err);
+      status("Camera switch failed", "#FF5C5C");
+    }
+  }
+
+  async function reportUser() {
+    if (!roomId) { alert("No active stranger to report."); return; }
+
+    await push(ref(db, "reports"), {
+      roomId, reporter: userId, reporterIP: myIP || "unknown",
+      reason: "Manual user report", time: serverTimestamp()
+    });
+
+    alert("Report submitted. Our team will review it.");
+  }
+
+  function startNSFWDetection() {
+    if (nsfwInterval) clearInterval(nsfwInterval);
+
+    nsfwInterval = setInterval(async () => {
+      if (!nsfwModel || !localVideo || banned) return;
+      if (localVideo.readyState < 2) return;
+
+      try {
+        const predictions = await nsfwModel.classify(localVideo);
+        const porn = predictions.find(p => p.className === "Porn")?.probability || 0;
+        const hentai = predictions.find(p => p.className === "Hentai")?.probability || 0;
+        const sexy = predictions.find(p => p.className === "Sexy")?.probability || 0;
+
+        if (porn > 0.72 || hentai > 0.72 || sexy > 0.92) {
+          await banUser("Adult/nude content detected by AI");
+        }
+      } catch (err) {
+        console.error("NSFW detection error:", err);
+      }
+    }, 2000);
+  }
+
+  window.startChat = startChat;
+  window.nextChat = nextChat;
+  window.stopChat = stopChat;
+  window.sendMessage = sendMessage;
+  window.toggleMic = toggleMic;
+  window.toggleCamera = toggleCamera;
+  window.switchCamera = switchCamera;
+  window.reportUser = reportUser;
+
+  window.addEventListener("beforeunload", () => {
+    remove(ref(db, "waitingUsers/" + userId));
+    remove(ref(db, "matchedRooms/" + userId));
+    if (roomId) remove(ref(db, "rooms/" + roomId));
+  });
+</script>
+
+</body>
+</html>
