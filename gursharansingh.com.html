@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gursharn Arya — Profile</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,450;9..144,600;9..144,700&family=Inter:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#0a0a0a;
+    --paper:#ffffff;
+    --line:#e3e3e0;
+    --line-strong:#c9c9c5;
+    --gray:#6b6b68;
+    --gray-soft:#9a9a96;
+    --wash:#f7f7f5;
+    --signal:#b3391f;
+    --signal-soft:#f4e6e2;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'IBM Plex Mono',monospace;}
+
+  /* ===== Top bar ===== */
+  .topbar{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:20px 48px;border-bottom:1px solid var(--line);
+    position:sticky;top:0;background:rgba(255,255,255,.92);backdrop-filter:blur(6px);z-index:50;
+  }
+  .brand{font-family:'Fraunces',serif;font-weight:600;font-size:19px;letter-spacing:-0.01em;}
+  .brand span{color:var(--gray-soft);font-weight:450;}
+  .topnav{display:flex;gap:32px;}
+  .topnav a{color:var(--gray);text-decoration:none;font-size:13px;letter-spacing:.02em;text-transform:uppercase;}
+  .topnav a:hover{color:var(--ink);}
+
+  /* ===== Hero ===== */
+  .hero{
+    display:grid;grid-template-columns:340px 1fr;gap:64px;
+    padding:64px 48px 56px;border-bottom:1px solid var(--line);
+    max-width:1280px;margin:0 auto;
+  }
+  .photo-wrap{
+    width:100%;aspect-ratio:1/1;overflow:hidden;
+    border:1px solid var(--line-strong);
+    background:var(--wash);
+  }
+  .photo-wrap img{width:100%;height:100%;object-fit:cover;display:block;filter:grayscale(15%);}
+  .stat-row{display:flex;border-top:1px solid var(--line);margin-top:24px;}
+  .stat{flex:1;padding:16px 0 0;border-right:1px solid var(--line);}
+  .stat:last-child{border-right:none;}
+  .stat-num{font-family:'Fraunces',serif;font-size:28px;font-weight:600;}
+  .stat-label{font-size:11px;color:var(--gray);text-transform:uppercase;letter-spacing:.05em;margin-top:4px;}
+
+  .eyebrow{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--signal);font-weight:500;margin-bottom:14px;}
+  h1{font-family:'Fraunces',serif;font-weight:700;font-size:56px;line-height:1.02;letter-spacing:-0.02em;}
+  .aka{color:var(--gray);font-size:14px;margin-top:10px;}
+  .role-line{font-size:19px;color:#333;margin-top:22px;line-height:1.5;max-width:640px;}
+  .role-line strong{font-weight:600;color:var(--ink);}
+  .tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:24px;}
+  .tag{border:1px solid var(--line-strong);padding:6px 12px;font-size:12px;color:var(--gray);font-family:'IBM Plex Mono',monospace;}
+  .meta-grid{display:grid;grid-template-columns:repeat(3,auto);gap:36px;margin-top:32px;}
+  .meta-item .k{font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-soft);margin-bottom:4px;}
+  .meta-item .v{font-size:14px;font-weight:500;}
+  .links{display:flex;gap:16px;margin-top:28px;}
+  .links a{
+    font-size:12px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink);
+    border:1px solid var(--ink);padding:9px 16px;text-decoration:none;
+  }
+  .links a:hover{background:var(--ink);color:var(--paper);}
+
+  /* ===== Layout ===== */
+  .layout{display:grid;grid-template-columns:1fr 300px;gap:64px;max-width:1280px;margin:0 auto;padding:0 48px 100px;}
+  section{padding-top:56px;border-top:1px solid var(--line);}
+  section:first-of-type{border-top:none;}
+  .sec-head{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:24px;}
+  .sec-title{font-family:'Fraunces',serif;font-size:24px;font-weight:600;}
+  .sec-count{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--gray-soft);}
+  p.body-text{font-size:15px;line-height:1.75;color:#2a2a28;max-width:680px;}
+
+  /* Role cards */
+  .role-card{
+    display:flex;gap:16px;align-items:center;padding:18px 0;border-bottom:1px solid var(--line);
+  }
+  .role-card:last-child{border-bottom:none;}
+  .role-mark{
+    width:44px;height:44px;flex-shrink:0;border:1px solid var(--line-strong);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;font-weight:600;font-size:16px;background:var(--wash);
+  }
+  .role-name{font-size:15px;font-weight:600;}
+  .role-sub{font-size:13px;color:var(--gray);margin-top:2px;}
+  .role-date{margin-left:auto;font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--gray-soft);white-space:nowrap;}
+
+  /* Education */
+  .edu-row{display:grid;grid-template-columns:180px 1fr 140px;gap:16px;padding:16px 0;border-bottom:1px solid var(--line);align-items:baseline;}
+  .edu-row:last-child{border-bottom:none;}
+  .edu-school{font-weight:600;font-size:14px;}
+  .edu-degree{font-size:13px;color:var(--gray);}
+  .edu-date{font-family:'IBM Plex Mono',monospace;font-size:12px;color:var(--gray-soft);text-align:right;}
+
+  /* News */
+  .news-row{padding:16px 0;border-bottom:1px solid var(--line);}
+  .news-row:last-child{border-bottom:none;}
+  .news-kicker{font-family:'IBM Plex Mono',monospace;font-size:11px;color:var(--signal);text-transform:uppercase;}
+  .news-title{font-size:14.5px;margin-top:4px;font-weight:500;}
+  .news-date{font-size:12px;color:var(--gray-soft);margin-top:3px;}
+
+  /* Sidebar */
+  .side-block{border-top:1px solid var(--line);padding-top:24px;margin-bottom:40px;}
+  .side-title{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-soft);margin-bottom:14px;}
+  .side-item{font-size:13px;padding:9px 0;border-bottom:1px dashed var(--line);color:#333;}
+  .side-item b{display:block;font-size:13.5px;color:var(--ink);}
+
+  /* ===== Knowledge Graph ===== */
+  .graph-section{border-top:1px solid var(--line);padding:64px 48px 80px;background:var(--wash);}
+  .graph-inner{max-width:1280px;margin:0 auto;}
+  .graph-head{margin-bottom:8px;}
+  .graph-sub{color:var(--gray);font-size:14px;max-width:520px;margin-bottom:32px;}
+  .graph-canvas{width:100%;height:560px;border:1px solid var(--line-strong);background:var(--paper);position:relative;overflow:hidden;}
+  .node{
+    position:absolute;transform:translate(-50%,-50%);
+    display:flex;flex-direction:column;align-items:center;gap:6px;
+    cursor:pointer;transition:transform .25s ease;
+  }
+  .node:hover{transform:translate(-50%,-50%) scale(1.07);}
+  .node-dot{
+    border-radius:50%;background:var(--paper);border:1.5px solid var(--ink);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Fraunces',serif;font-weight:600;text-align:center;line-height:1.1;
+  }
+  .node.center .node-dot{width:120px;height:120px;font-size:14px;background:var(--ink);color:var(--paper);border-color:var(--ink);padding:8px;}
+  .node.primary .node-dot{width:88px;height:88px;font-size:12px;padding:6px;border-color:var(--signal);}
+  .node.sub .node-dot{width:64px;height:64px;font-size:10.5px;padding:4px;color:var(--gray);}
+  .node-label{font-family:'IBM Plex Mono',monospace;font-size:10px;color:var(--gray-soft);text-transform:uppercase;letter-spacing:.03em;}
+  svg.edges{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;}
+  svg.edges line{stroke:var(--line-strong);stroke-width:1.2;}
+  svg.edges line.strong{stroke:var(--signal);stroke-width:1.4;opacity:.55;}
+
+  footer{padding:32px 48px;border-top:1px solid var(--line);display:flex;justify-content:space-between;color:var(--gray-soft);font-size:12px;}
+
+  @media (max-width:900px){
+    .hero{grid-template-columns:1fr;padding:40px 24px;}
+    .layout{grid-template-columns:1fr;padding:0 24px 60px;gap:40px;}
+    h1{font-size:38px;}
+    .topbar{padding:16px 24px;}
+    .topnav{display:none;}
+    .graph-section{padding:48px 24px;}
+    .graph-canvas{height:640px;}
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand">Gursharn Arya <span>/ profile</span></div>
+  <div class="topnav">
+    <a href="#overview">Overview</a>
+    <a href="#roles">Roles</a>
+    <a href="#education">Education</a>
+    <a href="#graph">Graph</a>
+    <a href="#news">News</a>
+  </div>
+</div>
+
+<div class="hero" id="overview">
+  <div>
+    <div class="photo-wrap">
+      <img src="https://nexor-f4d.pages.dev/IMG_9632.jpeg" alt="Gursharn Arya">
+    </div>
+    <div class="stat-row">
+      <div class="stat">
+        <div class="stat-num">2</div>
+        <div class="stat-label">Current Roles</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">7</div>
+        <div class="stat-label">Group Subsidiaries</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">2</div>
+        <div class="stat-label">Degrees</div>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="eyebrow">Founder · Chairman · CEO</div>
+    <h1>Gursharn Arya</h1>
+    <div class="aka">Also known as G. Arya, Gursharn Singh Arya</div>
+    <p class="role-line">
+      <strong>Chairman of Dozera Group</strong>, a diversified holding company spanning technology, media,
+      AI, and e-commerce, and <strong>CEO of Nexor</strong>, a social media platform built and operated under
+      the Dozera umbrella. Based in the United States.
+    </p>
+    <div class="tags">
+      <div class="tag">Entrepreneur</div>
+      <div class="tag">Technology</div>
+      <div class="tag">Media</div>
+      <div class="tag">AI</div>
+      <div class="tag">E-commerce</div>
+    </div>
+    <div class="meta-grid">
+      <div class="meta-item">
+        <div class="k">Location</div>
+        <div class="v">United States, North America</div>
+      </div>
+      <div class="meta-item">
+        <div class="k">Gender</div>
+        <div class="v">Male</div>
+      </div>
+      <div class="meta-item">
+        <div class="k">Type</div>
+        <div class="v">Founder / Operator</div>
+      </div>
+    </div>
+    <div class="links">
+      <a href="https://www.facebook.com/Gursharnarya/" target="_blank" rel="noopener">Facebook ↗</a>
+      <a href="#" target="_blank" rel="noopener">LinkedIn ↗</a>
+      <a href="https://nexor-f4d.pages.dev" target="_blank" rel="noopener">Nexor ↗</a>
+    </div>
+  </div>
+</div>
+
+<div class="layout">
+  <div>
+    <section id="about">
+      <div class="sec-head"><div class="sec-title">About</div></div>
+      <p class="body-text">
+        Gursharn Arya is an entrepreneur and founder based in the United States, best known for
+        establishing Dozera Group, a holding company with a portfolio spanning technology, media, AI,
+        and e-commerce. As chairman, Arya oversees a group of subsidiaries that operate independently
+        while aligning to a shared long-term vision. Alongside the group, Arya serves as CEO of Nexor,
+        a social platform built within the Dozera ecosystem, and has previously been described as a
+        senior advisor within Dozera's own affiliated ventures.
+      </p>
+    </section>
+
+    <section id="roles">
+      <div class="sec-head">
+        <div class="sec-title">Current Roles</div>
+        <div class="sec-count mono">002</div>
+      </div>
+      <div class="role-card">
+        <div class="role-mark">DZ</div>
+        <div>
+          <div class="role-name">Chairman &amp; Founder — Dozera Group</div>
+          <div class="role-sub">Holding company · Technology, Media, AI, E-commerce</div>
+        </div>
+        <div class="role-date mono">Present</div>
+      </div>
+      <div class="role-card">
+        <div class="role-mark">NX</div>
+        <div>
+          <div class="role-name">Chief Executive Officer — Nexor</div>
+          <div class="role-sub">Social media platform, operated under Dozera Group</div>
+        </div>
+        <div class="role-date mono">Present</div>
+      </div>
+    </section>
+
+    <section id="portfolio">
+      <div class="sec-head">
+        <div class="sec-title">Group Subsidiaries</div>
+        <div class="sec-count mono">007</div>
+      </div>
+      <div class="role-card"><div class="role-mark">AI</div><div><div class="role-name">Dozera AI</div><div class="role-sub">Artificial intelligence division</div></div></div>
+      <div class="role-card"><div class="role-mark">DN</div><div><div class="role-name">Dozera News</div><div class="role-sub">Media &amp; publishing</div></div></div>
+      <div class="role-card"><div class="role-mark">DX</div><div><div class="role-name">Dozera X</div><div class="role-sub">Ventures division</div></div></div>
+      <div class="role-card"><div class="role-mark">SC</div><div><div class="role-name">Scorpionit</div><div class="role-sub">Technology &amp; cybersecurity</div></div></div>
+      <div class="role-card"><div class="role-mark">SW</div><div><div class="role-name">Sows</div><div class="role-sub">Affiliated venture</div></div></div>
+      <div class="role-card"><div class="role-mark">AC</div><div><div class="role-name">AIRCOSTA</div><div class="role-sub">Affiliated venture</div></div></div>
+      <div class="role-card"><div class="role-mark">DS</div><div><div class="role-name">Dozera Shop</div><div class="role-sub">E-commerce</div></div></div>
+    </section>
+
+    <section id="education">
+      <div class="sec-head">
+        <div class="sec-title">Education</div>
+        <div class="sec-count mono">002</div>
+      </div>
+      <div class="edu-row">
+        <div class="edu-school">Dias University</div>
+        <div class="edu-degree">B.Tech, Computer Science</div>
+        <div class="edu-date mono">2018 – 2021</div>
+      </div>
+      <div class="edu-row">
+        <div class="edu-school">GNA University</div>
+        <div class="edu-degree">BCA, Computer Science</div>
+        <div class="edu-date mono">2021 – 2024</div>
+      </div>
+    </section>
+
+    <section id="news">
+      <div class="sec-head">
+        <div class="sec-title">Recent News &amp; Activity</div>
+        <div class="sec-count mono">002</div>
+      </div>
+      <div class="news-row">
+        <div class="news-kicker">Interview</div>
+        <div class="news-title">Gursharn Arya: A Visionary Punjabi Businessman and Cultural Advocate in the USA</div>
+        <div class="news-date mono">Oct 17, 2024</div>
+      </div>
+      <div class="news-row">
+        <div class="news-kicker">News</div>
+        <div class="news-title">Dozera Group coverage — equityzen.com</div>
+        <div class="news-date mono">Jul 17, 2025</div>
+      </div>
+    </section>
+  </div>
+
+  <div>
+    <div class="side-block">
+      <div class="side-title">Quick Facts</div>
+      <div class="side-item"><b>Full name</b>Gursharn Singh Arya</div>
+      <div class="side-item"><b>Primary venture</b>Dozera Group</div>
+      <div class="side-item"><b>Operating role</b>CEO, Nexor</div>
+      <div class="side-item"><b>Base</b>United States</div>
+    </div>
+    <div class="side-block">
+      <div class="side-title">Related Entities</div>
+      <div class="side-item"><b>Nexor</b>Social platform · CEO</div>
+      <div class="side-item"><b>Dozera AI</b>Group subsidiary</div>
+      <div class="side-item"><b>Dozera News</b>Group subsidiary</div>
+      <div class="side-item"><b>Scorpionit</b>Group subsidiary</div>
+    </div>
+  </div>
+</div>
+
+<div class="graph-section" id="graph">
+  <div class="graph-inner">
+    <div class="eyebrow">Knowledge Graph</div>
+    <div class="graph-head">
+      <span class="sec-title" style="font-family:'Fraunces',serif;font-size:24px;font-weight:600;">Entity relationships</span>
+    </div>
+    <p class="graph-sub">How Gursharn Arya connects to the ventures and roles that make up the Dozera ecosystem.</p>
+
+    <div class="graph-canvas" id="canvas">
+      <svg class="edges" id="edges"></svg>
+      <!-- nodes positioned by JS -->
+    </div>
+  </div>
+</div>
+
+<footer>
+  <div>Gursharn Arya — Profile</div>
+  <div>Compiled from public sources · Not affiliated with Crunchbase</div>
+</footer>
+
+<script>
+  const canvas = document.getElementById('canvas');
+  const svg = document.getElementById('edges');
+
+  const nodes = [
+    {id:'center', label:'Gursharn Arya', type:'center', x:0.5, y:0.5},
+    {id:'dozera', label:'Dozera Group', sub:'Chairman', type:'primary', x:0.24, y:0.28},
+    {id:'nexor', label:'Nexor', sub:'CEO', type:'primary', x:0.76, y:0.28},
+    {id:'ai', label:'Dozera AI', type:'sub', x:0.10, y:0.62},
+    {id:'news', label:'Dozera News', type:'sub', x:0.24, y:0.82},
+    {id:'x', label:'Dozera X', type:'sub', x:0.42, y:0.88},
+    {id:'scorp', label:'Scorpionit', type:'sub', x:0.58, y:0.88},
+    {id:'sows', label:'Sows', type:'sub', x:0.76, y:0.82},
+    {id:'aircosta', label:'AIRCOSTA', type:'sub', x:0.90, y:0.62},
+    {id:'shop', label:'Dozera Shop', type:'sub', x:0.68, y:0.14},
+  ];
+
+  const edges = [
+    {a:'center', b:'dozera', strong:true},
+    {a:'center', b:'nexor', strong:true},
+    {a:'dozera', b:'ai'},
+    {a:'dozera', b:'news'},
+    {a:'dozera', b:'x'},
+    {a:'dozera', b:'scorp'},
+    {a:'dozera', b:'sows'},
+    {a:'dozera', b:'aircosta'},
+    {a:'dozera', b:'shop'},
+  ];
+
+  function render(){
+    const w = canvas.clientWidth, h = canvas.clientHeight;
+    canvas.querySelectorAll('.node').forEach(n=>n.remove());
+    const pos = {};
+    nodes.forEach(n=>{
+      pos[n.id] = {x:n.x*w, y:n.y*h};
+      const el = document.createElement('div');
+      el.className = 'node ' + n.type;
+      el.style.left = (n.x*100)+'%';
+      el.style.top = (n.y*100)+'%';
+      el.innerHTML = `<div class="node-dot">${n.label}</div>` + (n.sub? `<div class="node-label">${n.sub}</div>` : '');
+      canvas.appendChild(el);
+    });
+    svg.setAttribute('width', w);
+    svg.setAttribute('height', h);
+    svg.innerHTML = edges.map(e=>{
+      const a = pos[e.a], b = pos[e.b];
+      return `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" class="${e.strong?'strong':''}"/>`;
+    }).join('');
+  }
+
+  render();
+  window.addEventListener('resize', render);
+</script>
+
+</body>
+</html>
