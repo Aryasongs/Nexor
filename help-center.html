@@ -197,7 +197,7 @@ footer{border-top:1px solid var(--border2);padding:34px 24px 50px;margin-top:20p
 .footer-col a:hover{color:var(--cyan);}
 .footer-bottom{max-width:1040px;margin:26px auto 0;padding-top:20px;border-top:1px solid var(--border2);font-size:12px;color:var(--text3);display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px;}
 
-/* ===== AI ASSISTANT WIDGET ===== */
+/* ===== AI ASSISTANT WIDGET (full-page, Gemini-style) ===== */
 #ai-fab{
   position:fixed;bottom:22px;right:22px;z-index:400;
   width:58px;height:58px;border-radius:50%;
@@ -209,47 +209,85 @@ footer{border-top:1px solid var(--border2);padding:34px 24px 50px;margin-top:20p
 #ai-fab i{font-size:26px;color:#000;}
 @keyframes aiPulse{0%,100%{box-shadow:0 8px 26px rgba(0,0,0,0.5);}50%{box-shadow:0 8px 34px rgba(0,0,0,0.7);}}
 #ai-panel{
-  position:fixed;bottom:22px;right:22px;z-index:401;
-  width:360px;max-width:calc(100vw - 32px);height:520px;max-height:calc(100vh - 100px);
-  background:linear-gradient(180deg,rgba(20,34,54,0.98),rgba(10,20,34,0.98));
-  border:1px solid var(--border2);border-radius:20px;
-  box-shadow:0 30px 80px rgba(0,0,0,0.55);
+  position:fixed;inset:0;z-index:401;
+  width:100vw;height:100vh;height:100dvh;
+  background:linear-gradient(180deg,#000 0%,#000 52%,#060a1e 74%,#12143f 100%);
   display:flex;flex-direction:column;overflow:hidden;
 }
 .ai-head{
-  display:flex;align-items:center;gap:10px;padding:16px;border-bottom:1px solid var(--border2);
-  background:var(--surface2);
+  display:flex;align-items:center;gap:12px;flex-shrink:0;
+  padding:14px 16px;padding-top:calc(14px + env(safe-area-inset-top));
 }
-.ai-head-icon{
-  width:36px;height:36px;border-radius:10px;flex-shrink:0;
-  background:#fff;
-  display:flex;align-items:center;justify-content:center;color:#000;font-size:18px;
+.ai-head-btn{
+  width:40px;height:40px;border-radius:50%;flex-shrink:0;
+  background:rgba(255,255,255,0.08);color:var(--text);
+  display:flex;align-items:center;justify-content:center;font-size:19px;
 }
-.ai-head b{font-size:13.5px;font-weight:800;display:block;}
-.ai-head span{font-size:11px;color:var(--green);font-weight:600;display:flex;align-items:center;gap:4px;}
-.ai-head span::before{content:'';width:6px;height:6px;border-radius:50%;background:var(--green);}
-.ai-close{margin-left:auto;color:var(--text3);font-size:20px;}
-.ai-body{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;}
-.msg{max-width:85%;font-size:13px;line-height:1.6;padding:10px 13px;border-radius:14px;}
+.ai-head-btn:hover{background:rgba(255,255,255,0.14);}
+.ai-head-title{font-size:16.5px;font-weight:700;color:var(--text);display:flex;align-items:baseline;gap:6px;}
+.ai-head-title span{font-size:13px;font-weight:500;color:var(--text3);}
+.ai-idle{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;padding:24px;gap:20px;overflow-y:auto;
+}
+.ai-idle-icon{
+  font-size:54px;line-height:1;
+  background:linear-gradient(135deg,#00c8ff,#7c5cff 45%,#ff4d94 75%,#ffd400);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+}
+.ai-idle h2{font-size:25px;font-weight:600;color:var(--text2);line-height:1.3;max-width:320px;}
+.ai-idle-substatus{font-size:12.5px;color:var(--text3);}
+.ai-idle-substatus strong{color:var(--cyan);}
+.ai-idle-chips{display:flex;flex-wrap:wrap;gap:9px;justify-content:center;max-width:400px;}
+.ai-idle-chips button{
+  background:rgba(255,255,255,0.06);border:1px solid var(--border2);color:var(--text);
+  font-size:12.5px;font-weight:600;padding:10px 16px;border-radius:999px;
+}
+.ai-idle-chips button:hover{border-color:rgba(255,255,255,0.32);background:rgba(255,255,255,0.1);}
+.ai-body{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:12px;}
+.msg{max-width:85%;font-size:13.5px;line-height:1.6;padding:10px 13px;border-radius:16px;white-space:pre-wrap;}
 .msg.bot{background:var(--surface2);border:1px solid var(--border2);align-self:flex-start;border-bottom-left-radius:4px;}
 .msg.user{background:#fff;color:#000;font-weight:600;align-self:flex-end;border-bottom-right-radius:4px;}
+.msg.user img{border-radius:10px;margin-bottom:6px;max-height:220px;object-fit:cover;}
 .msg-suggestions{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-self:flex-start;max-width:100%;}
 .msg-suggestions button{
   background:var(--surface3);border:1px solid var(--border2);color:var(--text);
   font-size:11.5px;font-weight:700;padding:7px 12px;border-radius:999px;
 }
 .msg-suggestions button:hover{border-color:rgba(0,200,255,0.35);}
-.ai-input-row{display:flex;align-items:center;gap:8px;padding:12px;border-top:1px solid var(--border2);}
+.ai-input-wrap{flex-shrink:0;padding:8px 14px calc(14px + env(safe-area-inset-bottom));}
+.ai-attach-preview{
+  display:flex;align-items:center;gap:10px;margin:0 4px 8px;
+  background:var(--surface2);border:1px solid var(--border2);border-radius:14px;padding:8px 10px;
+}
+.ai-attach-preview img{width:44px;height:44px;object-fit:cover;border-radius:9px;flex-shrink:0;}
+.ai-attach-preview .ai-attach-label{flex:1;font-size:12px;color:var(--text2);}
+.ai-attach-preview .ai-attach-remove{color:var(--text3);font-size:18px;flex-shrink:0;}
+.ai-attach-preview .ai-attach-remove:hover{color:var(--text);}
+.ai-input-row{
+  display:flex;align-items:center;gap:4px;
+  background:var(--surface2);border:1px solid var(--border2);
+  border-radius:28px;padding:6px 6px 6px 8px;
+}
+.ai-icon-btn{
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;
+  background:none;color:var(--text2);font-size:19px;
+  display:flex;align-items:center;justify-content:center;
+}
+.ai-icon-btn:hover{background:rgba(255,255,255,0.08);color:var(--text);}
 .ai-input-row input{
-  flex:1;background:var(--surface2);border:1px solid var(--border2);color:var(--text);
-  font-size:13px;padding:11px 14px;border-radius:999px;
+  flex:1;background:none;border:none;color:var(--text);
+  font-size:14px;padding:9px 4px;min-width:0;
 }
+.ai-input-row input::placeholder{color:var(--text3);}
 .ai-send{
-  width:40px;height:40px;border-radius:50%;flex-shrink:0;
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;
   background:#fff;color:#000;
-  display:flex;align-items:center;justify-content:center;font-size:17px;
+  display:flex;align-items:center;justify-content:center;font-size:16px;
+  transition:opacity .15s;
 }
-@media(max-width:480px){ #ai-panel{right:16px;bottom:16px;width:calc(100vw - 32px);} }
+.ai-send.ai-send-idle{background:rgba(255,255,255,0.12);color:var(--text2);}
+
 </style>
 </head>
 <body>
@@ -387,16 +425,31 @@ footer{border-top:1px solid var(--border2);padding:34px 24px 50px;margin-top:20p
 <div id="ai-fab" onclick="toggleAI(true)"><i class="ph-fill ph-sparkle"></i></div>
 <div id="ai-panel" class="hidden">
   <div class="ai-head">
-    <div class="ai-head-icon"><i class="ph-fill ph-sparkle"></i></div>
-    <div><b>Sparky — AI Help Assistant</b><span>Online</span></div>
-    <i class="ph ph-x ai-close" onclick="toggleAI(false)"></i>
+    <button class="ai-head-btn" onclick="toggleAI(false)" title="Close"><i class="ph ph-arrow-left"></i></button>
+    <div class="ai-head-title">Sparky <span>AI Assistant</span></div>
+    <button class="ai-head-btn" style="margin-left:auto;" onclick="newAIChat()" title="New chat"><i class="ph ph-note-pencil"></i></button>
   </div>
-  <div class="ai-body" id="ai-body"></div>
-  <div class="ai-input-row">
-    <input id="ai-input" type="text" placeholder="Type your question..." onkeydown="if(event.key==='Enter')sendAI()">
-    <button class="ai-send" onclick="sendAI()"><i class="ph-fill ph-paper-plane-right"></i></button>
+
+  <div id="ai-idle" class="ai-idle">
+    <i class="ph-fill ph-sparkle ai-idle-icon"></i>
+    <h2 id="ai-idle-heading">What can I help with?</h2>
+    <div class="ai-idle-substatus" id="ai-idle-substatus"></div>
+    <div class="ai-idle-chips" id="ai-idle-chips"></div>
+  </div>
+
+  <div class="ai-body hidden" id="ai-body"></div>
+
+  <div class="ai-input-wrap">
+    <div class="ai-attach-preview hidden" id="ai-attach-preview"></div>
+    <div class="ai-input-row">
+      <input type="file" id="ai-image-input" accept="image/*" class="hidden" onchange="onAIImagePicked(event)">
+      <button class="ai-icon-btn" onclick="document.getElementById('ai-image-input').click()" title="Attach a screenshot"><i class="ph ph-plus"></i></button>
+      <input id="ai-input" type="text" placeholder="Ask Sparky, or attach a screenshot..." onkeydown="if(event.key==='Enter')sendAI()" oninput="updateAISendBtn()">
+      <button class="ai-send ai-send-idle" id="ai-send-btn" onclick="sendAI()"><i class="ph-fill ph-paper-plane-right"></i></button>
+    </div>
   </div>
 </div>
+
 
 <script>
 // ============================================================
@@ -1598,54 +1651,90 @@ function personalizeReply(text){
 let aiHistory = [];
 let currentTopicId = null;
 
-function renderAccountBanner(){
-  if(!userCtx || !userCtx.handle) return;
+// Fills the idle (pre-conversation) screen — greeting heading, logged-in
+// status, and quick-topic chips — shown full-page before the user's
+// first message, Gemini-style. Chips just fill the input and send.
+function renderAIView(){
+  const idle=document.getElementById('ai-idle');
   const body=document.getElementById('ai-body');
-  const bar=document.createElement('div');
-  bar.className='msg-suggestions';
-  bar.style.cssText='background:var(--surface3);border:1px solid var(--border2);border-radius:10px;padding:8px 10px;font-size:11.5px;color:var(--text3);display:block;';
-  const stats=`${fmtCount(userCtx.pulsesCount)} Pulses · ${fmtCount(userCtx.followersCount)} followers · ${fmtCount(userCtx.followingCount)} following`;
-  bar.innerHTML = `<i class="ph ph-check-circle" style="color:var(--cyan);"></i> Logged in as <strong style="color:var(--text);">${userCtx.name||userCtx.handle}</strong> (@${userCtx.handle})${userCtx.verified?' ✓':''} · ${stats}`;
-  body.appendChild(bar);
+  if(aiHistory.length===0){
+    const n=greetName();
+    document.getElementById('ai-idle-heading').textContent = n ? `What can I help with, ${n}?` : 'What can I help with?';
+    const sub=document.getElementById('ai-idle-substatus');
+    sub.innerHTML = (userCtx && userCtx.handle) ? `Logged in as <strong>@${userCtx.handle}</strong>` : '';
+    const chipsWrap=document.getElementById('ai-idle-chips');
+    chipsWrap.innerHTML='';
+    [['password-forgot','Forgot password'],['hacked-account','Account hacked'],['community-guidelines','Community guidelines'],['report-content','Report a problem']].forEach(([id,label])=>{
+      const b=document.createElement('button');
+      b.textContent=label;
+      b.onclick=()=>{ document.getElementById('ai-input').value=label; sendAI(); };
+      chipsWrap.appendChild(b);
+    });
+    idle.classList.remove('hidden');
+    body.classList.add('hidden');
+  } else {
+    idle.classList.add('hidden');
+    body.classList.remove('hidden');
+  }
 }
-
 function toggleAI(open){
   document.getElementById('ai-panel').classList.toggle('hidden', !open);
   document.getElementById('ai-fab').classList.toggle('hidden', open);
-  if(open && !window._aiInit){
-    window._aiInit = true;
-    renderAccountBanner();
-    const n=greetName();
-    const handleLine = userCtx && userCtx.handle ? ` I can see you're logged in as @${userCtx.handle}, so I can tailor answers to your account.` : '';
-    const greeting=(n?`Hi ${n}! `:'Hi! ')+'I\'m Sparky 👋'+handleLine+' What can I help you with?';
-    addBotMsg(greeting, ['password-forgot','hacked-account','community-guidelines','report-content']);
-    aiHistory.push({role:'model', text:greeting});
-  }
+  if(open) renderAIView();
 }
-function addBotMsg(text, suggestLinks){
+// Resets the conversation back to the idle screen — the pencil icon in
+// the header, same idea as starting a new chat in Gemini.
+function newAIChat(){
+  aiHistory=[];
+  currentTopicId=null;
+  document.getElementById('ai-body').innerHTML='';
+  clearAIAttachment();
+  document.getElementById('ai-input').value='';
+  updateAISendBtn();
+  renderAIView();
+}
+function addBotMsg(text, sourceIds){
   const body=document.getElementById('ai-body');
   const div=document.createElement('div');
   div.className='msg bot';
   div.textContent=text;
   body.appendChild(div);
-  if(suggestLinks && suggestLinks.length){
-    const sg=document.createElement('div');
-    sg.className='msg-suggestions';
-    suggestLinks.forEach(id=>{
-      const b=document.createElement('button');
-      b.textContent=ARTICLES[id].title;
-      b.onclick=()=>{ toggleAI(false); go(id); };
-      sg.appendChild(b);
-    });
-    body.appendChild(sg);
+  if(sourceIds && sourceIds.length){
+    const validIds = sourceIds.filter(id=>ARTICLES[id]);
+    if(validIds.length){
+      const sg=document.createElement('div');
+      sg.className='msg-suggestions';
+      const label=document.createElement('span');
+      label.textContent='Sources';
+      label.style.cssText='display:block;width:100%;font-size:10.5px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:var(--text3);margin-bottom:5px;';
+      sg.appendChild(label);
+      validIds.forEach(id=>{
+        const b=document.createElement('button');
+        b.textContent=ARTICLES[id].title;
+        b.onclick=()=>{ toggleAI(false); go(id); };
+        sg.appendChild(b);
+      });
+      body.appendChild(sg);
+    }
   }
   body.scrollTop=body.scrollHeight;
 }
-function addUserMsg(text){
+function addUserMsg(text, img){
   const body=document.getElementById('ai-body');
   const div=document.createElement('div');
   div.className='msg user';
-  div.textContent=text;
+  if(img && img.dataUrl){
+    const im=document.createElement('img');
+    im.src=img.dataUrl;
+    im.style.display='block';
+    im.style.maxWidth='100%';
+    div.appendChild(im);
+  }
+  if(text){
+    const span=document.createElement('div');
+    span.textContent=text;
+    div.appendChild(span);
+  }
   body.appendChild(div);
   body.scrollTop=body.scrollHeight;
 }
@@ -1663,42 +1752,224 @@ function removeTypingIndicator(){
   const el=document.getElementById('typing-indicator');
   if(el) el.remove();
 }
-// Builds Sparky's persona + grounding context for the Groq call. The
-// article catalog is what lets Sparky suggest real, existing article
-// buttons instead of hallucinating links, and the userCtx line is what
-// lets it "know" who it's talking to without ever being handed anything
-// sensitive (only the same public display info the rest of this page
-// already has access to).
-function buildSparkySystemPrompt(){
+// ------------------------------------------------------------------
+// ARTICLE RETRIEVAL — Sparky no longer just hands the user an article
+// link. For every message we score every article's title/keywords/
+// description/full body against the user's words, pull the full text of
+// the best-matching ones, and feed *that* to the model as grounding so it
+// can write an actual synthesized answer in its own words. The ids it
+// says it actually drew on come back as "sourceArticleIds" and are shown
+// as a small "Sources" footer in the chat (see addBotMsg) instead of a
+// "here's an article, go read it" hand-off.
+// ------------------------------------------------------------------
+function stripHtml(html){
+  return String(html||'').replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
+}
+const ARTICLE_PLAINTEXT = {}; // cache so we don't re-strip HTML on every keystroke
+function getArticlePlainBody(id){
+  if(!ARTICLE_PLAINTEXT[id]) ARTICLE_PLAINTEXT[id] = stripHtml(ARTICLES[id].body);
+  return ARTICLE_PLAINTEXT[id];
+}
+function getRelevantArticles(text, topN){
+  topN = topN || 4;
+  const words = String(text||'').toLowerCase().replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(w=>w.length>2);
+  let scored = [];
+  if(words.length){
+    scored = Object.entries(ARTICLES).map(([id,a])=>{
+      const title=a.title.toLowerCase(), kw=(a.keywords||[]).join(' ').toLowerCase();
+      const desc=a.desc.toLowerCase(), plain=getArticlePlainBody(id).toLowerCase();
+      let score=0;
+      for(const w of words){
+        if(title.includes(w)) score+=3;
+        if(kw.includes(w)) score+=2;
+        if(desc.includes(w)) score+=1;
+        if(plain.includes(w)) score+=1;
+      }
+      return {id,score};
+    }).filter(s=>s.score>0).sort((a,b)=>b.score-a.score);
+  }
+  const top = scored.slice(0,topN).map(s=>s.id);
+  // Keep the ongoing topic grounded too, so a short follow-up ("what
+  // about after that?") doesn't lose its context just because those
+  // words alone don't score well against anything.
+  if(currentTopicId && !top.includes(currentTopicId) && ARTICLES[currentTopicId]){
+    top.push(currentTopicId);
+  }
+  return top.slice(0,topN);
+}
+
+// ------------------------------------------------------------------
+// TICKET / COPYRIGHT-REPORT FILING — there's no live backend wired into
+// this static page, so "filing" something here means Sparky creates a
+// durable local record (same pattern as nexorUserContext) with a
+// reference ID it can hand back in chat, instead of sending the user off
+// to a separate form. Swap the bodies of these two functions for real
+// API calls once a backend endpoint exists.
+// ------------------------------------------------------------------
+function genRefId(prefix){
+  return prefix+'-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,6).toUpperCase();
+}
+function createSupportTicket(data){
+  const ticket = {
+    id: genRefId('TCK'),
+    createdAt: new Date().toISOString(),
+    status: 'open',
+    reporter: (userCtx && userCtx.handle) ? {handle:userCtx.handle, name:userCtx.name||null} : null,
+    category: (data && data.category) || 'other',
+    description: (data && data.description) || '',
+    contactEmail: (data && data.contactEmail) || null,
+    screenshotDataUrl: (data && data.screenshotDataUrl) || null,
+    screenshotName: (data && data.screenshotName) || null
+  };
+  try{
+    const list = JSON.parse(localStorage.getItem('nexorSupportTickets')||'[]');
+    list.push(ticket);
+    localStorage.setItem('nexorSupportTickets', JSON.stringify(list));
+  }catch(e){ console.error('[Sparky] could not persist support ticket', e); }
+  return ticket;
+}
+function fileCopyrightReport(data){
+  const report = {
+    id: genRefId('CPR'),
+    createdAt: new Date().toISOString(),
+    status: 'pending_review', // a strike is only ever added by Trust & Safety after manual review — Sparky only files the report
+    reporter: (userCtx && userCtx.handle) ? {handle:userCtx.handle, name:userCtx.name||null} : null,
+    reporterName: (data && data.reporterName) || null,
+    reporterEmail: (data && data.reporterEmail) || null,
+    infringingHandle: (data && data.infringingHandle) || null,
+    originalWorkDescription: (data && data.originalWorkDescription) || null,
+    ownershipStatement: (data && data.ownershipStatement) || null,
+    goodFaithStatement: (data && data.goodFaithStatement) || null,
+    screenshotDataUrl: (data && data.screenshotDataUrl) || null,
+    screenshotName: (data && data.screenshotName) || null
+  };
+  try{
+    const list = JSON.parse(localStorage.getItem('nexorCopyrightReports')||'[]');
+    list.push(report);
+    localStorage.setItem('nexorCopyrightReports', JSON.stringify(list));
+  }catch(e){ console.error('[Sparky] could not persist copyright report', e); }
+  return report;
+}
+
+// ------------------------------------------------------------------
+// SCREENSHOT ATTACHMENT — lets the user attach an image (an error
+// screen, a piece of content, etc.) from the "+" button. The Groq model
+// behind Sparky is text-only, so the image itself is never sent to it —
+// instead a short bracketed note is added to the message text so Sparky
+// knows one was attached and can react naturally, while the actual image
+// travels with the message bubble and, if a ticket/report gets filed
+// this turn, gets attached to that record as evidence. Images are
+// downscaled client-side before being kept, so a big screenshot doesn't
+// blow up localStorage.
+// ------------------------------------------------------------------
+let pendingImage = null;
+function clearAIAttachment(){
+  pendingImage = null;
+  const prev=document.getElementById('ai-attach-preview');
+  prev.classList.add('hidden');
+  prev.innerHTML='';
+  document.getElementById('ai-image-input').value='';
+}
+function onAIImagePicked(evt){
+  const file = evt.target.files && evt.target.files[0];
+  if(!file || !file.type.startsWith('image/')){ evt.target.value=''; return; }
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    const img = new Image();
+    img.onload = ()=>{
+      const maxDim = 1280;
+      let {width,height} = img;
+      if(width>maxDim || height>maxDim){
+        const scale = maxDim/Math.max(width,height);
+        width = Math.round(width*scale); height = Math.round(height*scale);
+      }
+      const canvas=document.createElement('canvas');
+      canvas.width=width; canvas.height=height;
+      canvas.getContext('2d').drawImage(img,0,0,width,height);
+      pendingImage = { dataUrl: canvas.toDataURL('image/jpeg',0.82), name: file.name||'screenshot.jpg' };
+      showAIAttachmentPreview();
+      updateAISendBtn();
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+function showAIAttachmentPreview(){
+  const prev=document.getElementById('ai-attach-preview');
+  prev.innerHTML='';
+  prev.classList.remove('hidden');
+  const im=document.createElement('img');
+  im.src=pendingImage.dataUrl;
+  prev.appendChild(im);
+  const label=document.createElement('span');
+  label.className='ai-attach-label';
+  label.textContent='Screenshot attached — will be sent with your next message';
+  prev.appendChild(label);
+  const rm=document.createElement('button');
+  rm.className='ai-attach-remove';
+  rm.innerHTML='<i class="ph ph-x"></i>';
+  rm.title='Remove screenshot';
+  rm.onclick=()=>{ clearAIAttachment(); updateAISendBtn(); };
+  prev.appendChild(rm);
+}
+// Toggles the send button's filled/idle look based on whether there's
+// anything to send (text or an attached screenshot).
+function updateAISendBtn(){
+  const hasText = document.getElementById('ai-input').value.trim().length>0;
+  document.getElementById('ai-send-btn').classList.toggle('ai-send-idle', !hasText && !pendingImage);
+}
+
+
+// retrievedIds are the top articles matched against the user's latest
+// message (see getRelevantArticles) — their full text is included so
+// Sparky writes a real synthesized answer instead of pasting a
+// description, and reports back which ones it actually used.
+function buildSparkySystemPrompt(retrievedIds){
   const catalog = Object.entries(ARTICLES).map(([id,a])=>`${id}: ${a.title} — ${a.desc}`).join('\n');
+  const excerpts = (retrievedIds||[]).map(id=>`--- ${id}: ${ARTICLES[id].title} ---\n${getArticlePlainBody(id).slice(0,900)}`).join('\n\n');
   const who = (userCtx && userCtx.handle)
     ? `The person you're talking to is logged in as @${userCtx.handle}${userCtx.name?` (${userCtx.name})`:''}${userCtx.verified?', a verified account':''}. You may reference this naturally (e.g. greeting them by name), but never invent account details, activity, or history you don't actually have.`
     : `This person opened the Help Center directly, so you have no account details for them — keep things friendly and general.`;
   return `You are Sparky, the friendly AI help assistant built into the Nexor Sparks Help Center (Nexor Sparks is a social media app made by Nexor Technologies).
 Personality: warm, upbeat, a little playful, never robotic or overly formal — like a helpful friend who happens to know the app inside out. Match the user's language: if they write in Hinglish (Hindi+English mixed) or Hindi, reply that way too; otherwise reply in English. Keep most replies short (1-4 sentences) unless a longer explanation is genuinely needed.
 You are NOT limited to only help topics — you're also happy to chat casually, answer general questions, or talk about whatever the user brings up, the way a friendly assistant would, while staying tasteful and steering back toward being useful when it makes sense.
-Ground yourself ONLY in the article catalog below for anything about Nexor Sparks' specific features, policies, rules, or numbers — never invent a feature, rule, price, or statistic that isn't in it or general common sense. If you're not sure, say so honestly and point to the closest matching article or suggest "Report a Problem" for anything account-specific you can't resolve yourself.
+
+Ground yourself ONLY in the article catalog and excerpts below for anything about Nexor Sparks' specific features, policies, rules, or numbers — never invent a feature, rule, price, or statistic that isn't in them or general common sense. If you're not sure, say so honestly and point to the closest matching article, or offer to file a support ticket for anything account-specific you can't resolve yourself.
 ${who}
 
-ARTICLE CATALOG (id: title — description):
+HOW TO ANSWER: don't just paste an article's description and hand over a link. Read the "RELEVANT ARTICLE EXCERPTS" below (when any are provided) and write the actual answer yourself, in your own words, pulling together whatever's useful from one or more of them. Only list an excerpt's id in "sourceArticleIds" if you genuinely used it to answer this specific message — never cite one you didn't use, and never invent an id that isn't in the excerpts list. Leave "sourceArticleIds" empty for greetings/small talk/pure action turns.
+
+FULL ARTICLE CATALOG (id: title — description — for your general awareness of what exists):
 ${catalog}
 
+RELEVANT ARTICLE EXCERPTS for this message (full text — use these to write your answer):
+${excerpts || '(nothing matched well this turn — answer from general catalog awareness above, or ask a clarifying question)'}
+
+If a message contains a bracketed note like "[Attached screenshot: name]", the user has attached an image alongside their text. You cannot see its pixels, but it has been saved and shown to them in chat, and — if you file a ticket or copyright report this turn — it travels along as evidence automatically. Acknowledge it naturally (e.g. "Got the screenshot, thanks") instead of pretending you analyzed it, and lean toward offering to file a support ticket when someone attaches a screenshot of an error/bug.
+
+SPECIAL ACTIONS — you can take these yourself, right in chat, instead of sending the user to a separate page:1) "create_ticket" — for a support/report-a-problem case the articles can't resolve (account dispute, bug, billing issue, content issue, etc.) that the user wants filed rather than self-served.
+   Required "data" fields: category (one of "account","billing","bug","content","other"), description (clear summary in the user's own words), contactEmail (only required if there is no logged-in userCtx handle above).
+2) "file_copyright_report" — when the user wants to report that someone else is using THEIR OWN original content without permission, and wants you to file it here instead of the separate copyright report page.
+   Required "data" fields: reporterName, reporterEmail, infringingHandle (the @handle, username, or link of whoever posted it), originalWorkDescription (what the original work is), ownershipStatement (their own first-person statement that they own/represent the rights to it), goodFaithStatement (their own first-person good-faith statement that the use is unauthorized).
+   Never claim you're issuing a strike yourself — always make clear a strike is only added to the other account after Nexor's Trust & Safety team manually reviews and upholds the report; you're only filing it on the user's behalf.
+Rules for actions: ask for missing required fields naturally, one or two at a time, across as many turns as it takes. NEVER fabricate a value the user hasn't actually given you. While fields are still missing, keep "action.type" set to the relevant type with "action.ready":false and whatever's been collected so far in "action.data". Only set "action.ready":true once every required field for that type has been explicitly provided by the user. If no action applies this turn, omit "action" or set its "type" to null.
+
 Respond with ONLY compact JSON, no other text, no markdown fences:
-{"reply":"your natural conversational reply as plain text","suggestedArticleIds":["id1","id2"]}
-"suggestedArticleIds" must be 0-3 ids copied exactly from the catalog above (omit entirely, i.e. empty array, if nothing is clearly relevant) — never invent an id.`;
+{"reply":"your natural conversational reply as plain text","sourceArticleIds":["id1","id2"],"action":{"type":"create_ticket|file_copyright_report|null","ready":false,"data":{}}}`;
 }
 
 // Calls Sparky's real brain (Groq, via the Cloudflare Worker proxy).
 // Throws on any network/parse failure so the caller can fall back to the
 // instant local rule engine instead of leaving the user stuck.
-async function groqSparkyReply(){
-  const sys = buildSparkySystemPrompt();
+async function groqSparkyReply(text){
+  const retrievedIds = getRelevantArticles(text, 4);
+  const sys = buildSparkySystemPrompt(retrievedIds);
   const msgs = [{role:'system', content:sys}];
   aiHistory.slice(-14).forEach(m=>msgs.push({role: m.role==='user' ? 'user' : 'assistant', content:m.text}));
   const res = await fetch(GROQ_PROXY_ENDPOINT, {
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({ model:GROQ_MODEL, messages:msgs, temperature:0.7, max_tokens:350 })
+    body:JSON.stringify({ model:GROQ_MODEL, messages:msgs, temperature:0.6, max_tokens:600 })
   });
   if(!res.ok) throw new Error('Groq proxy HTTP '+res.status);
   const json = await res.json();
@@ -1712,23 +1983,49 @@ async function groqSparkyReply(){
 async function sendAI(){
   const input=document.getElementById('ai-input');
   const text=input.value.trim();
-  if(!text) return;
-  addUserMsg(text);
-  aiHistory.push({role:'user', text});
+  const img=pendingImage;
+  if(!text && !img) return;
+  document.getElementById('ai-idle').classList.add('hidden');
+  document.getElementById('ai-body').classList.remove('hidden');
+  addUserMsg(text, img);
+  const historyText = text + (img ? ` [Attached screenshot: ${img.name}]` : '');
+  aiHistory.push({role:'user', text: historyText});
   input.value='';
+  clearAIAttachment();
+  updateAISendBtn();
   addTypingIndicator();
 
   try{
-    const result = await groqSparkyReply();
+    const result = await groqSparkyReply(historyText);
     removeTypingIndicator();
-    const links = (result.suggestedArticleIds||[]).filter(id=>ARTICLES[id]).slice(0,3);
-    if(links.length) currentTopicId = links[0];
-    const reply = personalizeReply(result.reply);
-    addBotMsg(reply, links.length ? links : null);
+    const sources = (result.sourceArticleIds||[]).filter(id=>ARTICLES[id]).slice(0,3);
+    if(sources.length) currentTopicId = sources[0];
+
+    let actionNote='';
+    const action = result.action;
+    if(action && action.type && action.ready){
+      const dataWithImg = Object.assign({}, action.data||{}, img ? {screenshotDataUrl:img.dataUrl, screenshotName:img.name} : {});
+      try{
+        if(action.type==='create_ticket'){
+          const t = createSupportTicket(dataWithImg);
+          const via = t.contactEmail ? ` at ${t.contactEmail}` : ((userCtx&&userCtx.handle) ? ` via your account @${userCtx.handle}` : '');
+          actionNote = `\n\n✅ Support ticket filed — reference **${t.id}**${t.screenshotDataUrl?' (screenshot attached)':''}. Our team will follow up${via}.`;
+        } else if(action.type==='file_copyright_report'){
+          const r = fileCopyrightReport(dataWithImg);
+          actionNote = `\n\n✅ Copyright report filed — reference **${r.id}**${r.screenshotDataUrl?' (screenshot attached)':''}. Nexor's Trust & Safety team will manually review it, and a strike is only added to the other account if the report is upheld.`;
+        }
+      }catch(e){
+        console.error('[Sparky] action failed', e);
+        actionNote = '\n\n⚠️ I tried to file that just now but hit a snag on my end — mind trying again in a moment?';
+      }
+    }
+
+    const reply = personalizeReply(result.reply) + actionNote;
+    addBotMsg(reply, sources.length ? sources : null);
     aiHistory.push({role:'model', text:reply});
   }catch(e){
     console.error('[Sparky] Groq call failed, falling back to local rule engine:', e);
-    sendAILocal(text);
+    sendAILocal(historyText);
   }
 }
 
