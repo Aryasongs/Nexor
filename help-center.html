@@ -277,7 +277,7 @@ footer{border-top:1px solid var(--border2);padding:34px 24px 50px;margin-top:20p
 .ai-icon-btn:hover{background:rgba(255,255,255,0.08);color:var(--text);}
 .ai-input-row input{
   flex:1;background:none;border:none;color:var(--text);
-  font-size:14px;padding:9px 4px;min-width:0;
+  font-size:16px;padding:9px 4px;min-width:0;
 }
 .ai-input-row input::placeholder{color:var(--text3);}
 .ai-send{
@@ -1788,14 +1788,28 @@ function getRelevantArticles(text, topN){
       return {id,score};
     }).filter(s=>s.score>0).sort((a,b)=>b.score-a.score);
   }
+  const maxScore = scored.length ? scored[0].score : 0;
   const top = scored.slice(0,topN).map(s=>s.id);
   // Keep the ongoing topic grounded too, so a short follow-up ("what
   // about after that?") doesn't lose its context just because those
-  // words alone don't score well against anything.
+  // words alone don't score well against anything — but this doesn't
+  // count toward maxScore, so it can't fake a confident match.
   if(currentTopicId && !top.includes(currentTopicId) && ARTICLES[currentTopicId]){
     top.push(currentTopicId);
   }
-  return top.slice(0,topN);
+  return { ids: top.slice(0,topN), maxScore, wordCount: words.length };
+}
+// Confidence check: how well did the best-matching article actually
+// score against the user's own words? This is what stops Sparky from
+// confidently stitching together a few loosely-related articles and
+// presenting it as a sure answer — weak matches get an honest hedge
+// instead (see the MATCH CONFIDENCE block in the system prompt).
+function classifyConfidence(retrieval){
+  if(!retrieval.wordCount) return 'none';
+  if(retrieval.maxScore >= 5) return 'high';
+  if(retrieval.maxScore >= 2) return 'medium';
+  if(retrieval.maxScore > 0) return 'low';
+  return 'none';
 }
 
 // ------------------------------------------------------------------
@@ -1923,21 +1937,33 @@ function updateAISendBtn(){
 // retrievedIds are the top articles matched against the user's latest
 // message (see getRelevantArticles) — their full text is included so
 // Sparky writes a real synthesized answer instead of pasting a
-// description, and reports back which ones it actually used.
-function buildSparkySystemPrompt(retrievedIds){
+// description, and reports back which ones it actually used. confidence
+// is the honesty check: it tells Sparky how well those articles actually
+// matched, so a weak/loose match gets a hedge instead of a
+// falsely-confident answer stitched together from unrelated excerpts.
+function buildSparkySystemPrompt(retrievedIds, confidence){
   const catalog = Object.entries(ARTICLES).map(([id,a])=>`${id}: ${a.title} — ${a.desc}`).join('\n');
   const excerpts = (retrievedIds||[]).map(id=>`--- ${id}: ${ARTICLES[id].title} ---\n${getArticlePlainBody(id).slice(0,900)}`).join('\n\n');
   const who = (userCtx && userCtx.handle)
     ? `The person you're talking to is logged in as @${userCtx.handle}${userCtx.name?` (${userCtx.name})`:''}${userCtx.verified?', a verified account':''}. You may reference this naturally (e.g. greeting them by name), but never invent account details, activity, or history you don't actually have.`
     : `This person opened the Help Center directly, so you have no account details for them — keep things friendly and general.`;
+  const confidenceLine = {
+    high:   'HIGH — these excerpts are a strong match for what was asked. Answer normally and confidently, synthesizing across them.',
+    medium: 'MEDIUM — these excerpts are a reasonable but partial match. Answer using them, but don\'t overstate certainty on any detail they don\'t clearly cover.',
+    low:    'LOW — these excerpts are only a loose/tangential match, not really about what was asked. Say so honestly (e.g. "I\'m not fully sure, but this might be related...") instead of confidently stitching them into a definite answer. It\'s fine to ask one clarifying question instead of guessing.',
+    none:   'NONE — nothing in the catalog matched this well. Do NOT invent an answer by loosely combining unrelated excerpts. Say plainly that you\'re not sure / don\'t have a confident answer for this in the Help Center content, point to the closest general topic if any, ask a clarifying question, or offer to file a support ticket if it sounds account-specific. Leave "sourceArticleIds" empty.'
+  }[confidence] || 'MEDIUM — these excerpts are a reasonable but partial match. Answer using them, but don\'t overstate certainty on any detail they don\'t clearly cover.';
   return `You are Sparky, the friendly AI help assistant built into the Nexor Sparks Help Center (Nexor Sparks is a social media app made by Nexor Technologies).
-Personality: warm, upbeat, a little playful, never robotic or overly formal — like a helpful friend who happens to know the app inside out. Match the user's language: if they write in Hinglish (Hindi+English mixed) or Hindi, reply that way too; otherwise reply in English. Keep most replies short (1-4 sentences) unless a longer explanation is genuinely needed.
-You are NOT limited to only help topics — you're also happy to chat casually, answer general questions, or talk about whatever the user brings up, the way a friendly assistant would, while staying tasteful and steering back toward being useful when it makes sense.
+Personality: warm, upbeat, genuinely funny, never robotic or overly formal — like a witty friend who happens to know the app inside out and actually enjoys talking to people. Read the user's mood from how they write and match it: if they're joking around, joke back; if they're frustrated or upset, drop the jokes and be calm and genuinely helpful first; if they're just chatting, be relaxed and personable. Match the user's language: if they write in Hinglish (Hindi+English mixed) or Hindi, reply that way too; otherwise reply in English. Keep most replies short (1-4 sentences) unless a longer explanation is genuinely needed.
+You are NOT limited to only help topics — you're also happy to chat casually, answer general questions, banter, or talk about whatever the user brings up, the way a friendly assistant would, while staying tasteful and steering back toward being useful when it makes sense.
+You're genuinely enthusiastic about Nexor Sparks and happy to talk up what's actually good about it (real features, community, whatever's true) if it comes up naturally — but always honestly. Never invent advantages it doesn't have, never bad-mouth or make false claims about other apps, and never pressure or guilt-trip someone about what app they choose to use. If someone mentions they use another app, it's fine to be a friendly, low-key advocate for Nexor ("honestly you might like X here too") — but the choice is always genuinely theirs, and being fun/warm should never tip into manipulation.
 
 Ground yourself ONLY in the article catalog and excerpts below for anything about Nexor Sparks' specific features, policies, rules, or numbers — never invent a feature, rule, price, or statistic that isn't in them or general common sense. If you're not sure, say so honestly and point to the closest matching article, or offer to file a support ticket for anything account-specific you can't resolve yourself.
 ${who}
 
 HOW TO ANSWER: don't just paste an article's description and hand over a link. Read the "RELEVANT ARTICLE EXCERPTS" below (when any are provided) and write the actual answer yourself, in your own words, pulling together whatever's useful from one or more of them. Only list an excerpt's id in "sourceArticleIds" if you genuinely used it to answer this specific message — never cite one you didn't use, and never invent an id that isn't in the excerpts list. Leave "sourceArticleIds" empty for greetings/small talk/pure action turns.
+
+MATCH CONFIDENCE for this message: ${confidenceLine}
 
 FULL ARTICLE CATALOG (id: title — description — for your general awareness of what exists):
 ${catalog}
@@ -1947,7 +1973,8 @@ ${excerpts || '(nothing matched well this turn — answer from general catalog a
 
 If a message contains a bracketed note like "[Attached screenshot: name]", the user has attached an image alongside their text. You cannot see its pixels, but it has been saved and shown to them in chat, and — if you file a ticket or copyright report this turn — it travels along as evidence automatically. Acknowledge it naturally (e.g. "Got the screenshot, thanks") instead of pretending you analyzed it, and lean toward offering to file a support ticket when someone attaches a screenshot of an error/bug.
 
-SPECIAL ACTIONS — you can take these yourself, right in chat, instead of sending the user to a separate page:1) "create_ticket" — for a support/report-a-problem case the articles can't resolve (account dispute, bug, billing issue, content issue, etc.) that the user wants filed rather than self-served.
+SPECIAL ACTIONS — you can take these yourself, right in chat, instead of sending the user to a separate page:
+1) "create_ticket" — for a support/report-a-problem case the articles can't resolve (account dispute, bug, billing issue, content issue, etc.) that the user wants filed rather than self-served.
    Required "data" fields: category (one of "account","billing","bug","content","other"), description (clear summary in the user's own words), contactEmail (only required if there is no logged-in userCtx handle above).
 2) "file_copyright_report" — when the user wants to report that someone else is using THEIR OWN original content without permission, and wants you to file it here instead of the separate copyright report page.
    Required "data" fields: reporterName, reporterEmail, infringingHandle (the @handle, username, or link of whoever posted it), originalWorkDescription (what the original work is), ownershipStatement (their own first-person statement that they own/represent the rights to it), goodFaithStatement (their own first-person good-faith statement that the use is unauthorized).
@@ -1962,8 +1989,9 @@ Respond with ONLY compact JSON, no other text, no markdown fences:
 // Throws on any network/parse failure so the caller can fall back to the
 // instant local rule engine instead of leaving the user stuck.
 async function groqSparkyReply(text){
-  const retrievedIds = getRelevantArticles(text, 4);
-  const sys = buildSparkySystemPrompt(retrievedIds);
+  const retrieval = getRelevantArticles(text, 4);
+  const confidence = classifyConfidence(retrieval);
+  const sys = buildSparkySystemPrompt(retrieval.ids, confidence);
   const msgs = [{role:'system', content:sys}];
   aiHistory.slice(-14).forEach(m=>msgs.push({role: m.role==='user' ? 'user' : 'assistant', content:m.text}));
   const res = await fetch(GROQ_PROXY_ENDPOINT, {
