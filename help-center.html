@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
 <title>Help Center — Nexor Sparks</title>
 <meta id="meta-description" name="description" content="Nexor Sparks Help Center — everything about account, privacy, community guidelines, copyright, Discord community, referrals, and safety.">
 <meta name="robots" content="index, follow">
@@ -256,6 +256,66 @@ footer{border-top:1px solid var(--border2);padding:34px 24px 50px;margin-top:20p
 }
 .msg-suggestions button:hover{border-color:rgba(0,200,255,0.35);}
 .ai-input-wrap{flex-shrink:0;padding:8px 14px calc(14px + env(safe-area-inset-bottom));}
+
+/* ===== VOICE MODE ===== */
+#voice-panel{
+  position:fixed;inset:0;z-index:402;
+  width:100vw;height:100vh;height:100dvh;
+  background:#000;display:flex;flex-direction:column;overflow:hidden;
+}
+.voice-bg{
+  position:absolute;inset:0;z-index:0;opacity:.55;
+  background:radial-gradient(circle at 30% 20%, #00c8ff, transparent 55%),
+             radial-gradient(circle at 75% 30%, #7c5cff, transparent 50%),
+             radial-gradient(circle at 50% 75%, #ff4d94, transparent 55%),
+             radial-gradient(circle at 85% 80%, #ffd400, transparent 45%);
+  filter:blur(40px) saturate(140%);
+  background-size:200% 200%;
+  animation:voiceBgShift 6s ease-in-out infinite;
+}
+@keyframes voiceBgShift{
+  0%{background-position:0% 0%;}
+  50%{background-position:100% 100%;}
+  100%{background-position:0% 0%;}
+}
+.voice-head{position:relative;z-index:1;display:flex;align-items:center;gap:12px;flex-shrink:0;padding:14px 16px;padding-top:calc(14px + env(safe-area-inset-top));}
+.voice-stage{position:relative;z-index:1;flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px;padding:24px;}
+.voice-sparkle{
+  font-size:56px;line-height:1;
+  background:linear-gradient(135deg,#00c8ff,#7c5cff 45%,#ff4d94 75%,#ffd400);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;color:transparent;
+  animation:voiceSparklePulse 1.8s ease-in-out infinite;
+}
+@keyframes voiceSparklePulse{0%,100%{transform:scale(1);}50%{transform:scale(1.14);}}
+.voice-status{font-size:22px;font-weight:600;color:var(--text);text-align:center;}
+.voice-dots{display:flex;gap:6px;}
+.voice-dots span{width:7px;height:7px;border-radius:50%;background:var(--text2);animation:voiceDotBounce 1.2s ease-in-out infinite;}
+.voice-dots span:nth-child(2){animation-delay:.15s;}
+.voice-dots span:nth-child(3){animation-delay:.3s;}
+@keyframes voiceDotBounce{0%,60%,100%{opacity:.3;transform:translateY(0);}30%{opacity:1;transform:translateY(-4px);}}
+.voice-transcript{font-size:15px;color:var(--text2);text-align:center;max-width:320px;line-height:1.5;min-height:1.5em;}
+.voice-controls{position:relative;z-index:1;flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:22px;padding:18px 24px calc(28px + env(safe-area-inset-bottom));}
+.voice-ctrl-btn{
+  width:52px;height:52px;border-radius:50%;flex-shrink:0;
+  background:rgba(255,255,255,0.08);color:var(--text);font-size:21px;
+  display:flex;align-items:center;justify-content:center;
+}
+.voice-ctrl-btn:hover{background:rgba(255,255,255,0.14);}
+.voice-close-btn{background:rgba(255,255,255,0.14);}
+.voice-mic-big{
+  width:76px;height:76px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,#00c8ff,#7c5cff 45%,#ff4d94 85%);
+  color:#000;font-size:28px;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 0 0 0 rgba(124,92,255,0.5);
+  animation:voiceMicPulse 1.6s ease-in-out infinite;
+}
+@keyframes voiceMicPulse{
+  0%{box-shadow:0 0 0 0 rgba(124,92,255,0.45);}
+  70%{box-shadow:0 0 0 18px rgba(124,92,255,0);}
+  100%{box-shadow:0 0 0 0 rgba(124,92,255,0);}
+}
+.voice-mic-big.voice-muted{animation:none;box-shadow:none;background:rgba(255,255,255,0.14);color:var(--text);}
 .ai-attach-preview{
   display:flex;align-items:center;gap:10px;margin:0 4px 8px;
   background:var(--surface2);border:1px solid var(--border2);border-radius:14px;padding:8px 10px;
@@ -445,8 +505,33 @@ footer{border-top:1px solid var(--border2);padding:34px 24px 50px;margin-top:20p
       <input type="file" id="ai-image-input" accept="image/*" class="hidden" onchange="onAIImagePicked(event)">
       <button class="ai-icon-btn" onclick="document.getElementById('ai-image-input').click()" title="Attach a screenshot"><i class="ph ph-plus"></i></button>
       <input id="ai-input" type="text" placeholder="Ask Sparky, or attach a screenshot..." onkeydown="if(event.key==='Enter')sendAI()" oninput="updateAISendBtn()">
+      <button class="ai-icon-btn" id="ai-mic-btn" onclick="openVoicePanel()" title="Voice input"><i class="ph ph-microphone"></i></button>
       <button class="ai-send ai-send-idle" id="ai-send-btn" onclick="sendAI()"><i class="ph-fill ph-paper-plane-right"></i></button>
     </div>
+  </div>
+</div>
+
+<!-- ====== VOICE MODE — full-screen listening UI, entered from the mic
+     button in Sparky's input row. Own visual identity (Sparky's existing
+     cyan/purple/pink/amber gradient + sparkle mark), not a copy of any
+     other assistant's branding. ====== -->
+<div id="voice-panel" class="hidden">
+  <div class="voice-bg" id="voice-bg"></div>
+  <div class="voice-head">
+    <button class="ai-head-btn" onclick="closeVoicePanel()" title="Back"><i class="ph ph-arrow-left"></i></button>
+    <div class="ai-head-title">Sparky <span>Voice</span></div>
+  </div>
+  <div class="voice-stage">
+    <i class="ph-fill ph-sparkle voice-sparkle" id="voice-sparkle"></i>
+    <div class="voice-status" id="voice-status">Listening…</div>
+    <div class="voice-dots" id="voice-dots"><span></span><span></span><span></span></div>
+    <div class="voice-transcript" id="voice-transcript"></div>
+  </div>
+  <div class="voice-controls">
+    <button class="voice-ctrl-btn" id="voice-attach-btn" onclick="document.getElementById('ai-image-input').click()" title="Attach a screenshot"><i class="ph ph-image"></i></button>
+    <button class="voice-ctrl-btn" id="voice-keyboard-btn" onclick="closeVoicePanel()" title="Switch to keyboard"><i class="ph ph-keyboard"></i></button>
+    <button class="voice-mic-big" id="voice-mic-big" onclick="toggleVoiceListening()" title="Pause/resume"><i class="ph-fill ph-microphone" id="voice-mic-icon"></i></button>
+    <button class="voice-ctrl-btn voice-close-btn" onclick="closeVoicePanel()" title="Close"><i class="ph ph-x"></i></button>
   </div>
 </div>
 
@@ -1946,10 +2031,96 @@ function showAIAttachmentPreview(){
   prev.appendChild(rm);
 }
 // Toggles the send button's filled/idle look based on whether there's
-// anything to send (text or an attached screenshot).
+// anything to send (text or an attached screenshot). Mic button only makes
+// sense to offer when there's nothing typed yet.
 function updateAISendBtn(){
   const hasText = document.getElementById('ai-input').value.trim().length>0;
   document.getElementById('ai-send-btn').classList.toggle('ai-send-idle', !hasText && !pendingImage);
+  const micBtn=document.getElementById('ai-mic-btn');
+  if(micBtn) micBtn.classList.toggle('hidden', hasText || !!pendingImage);
+}
+
+// ------------------------------------------------------------------
+// VOICE MODE — full-screen listening UI + real speech-to-text via the
+// browser's Web Speech API. Not every browser supports it (notably desktop
+// Safari), so we check first and fall back to a toast instead of opening a
+// panel that can never actually listen.
+// ------------------------------------------------------------------
+let voiceRecognition=null;
+let voiceListening=false;
+function getSpeechRecognitionCtor(){
+  return window.SpeechRecognition || window.webkitSpeechRecognition || null;
+}
+function openVoicePanel(){
+  const Ctor=getSpeechRecognitionCtor();
+  if(!Ctor){
+    showToastMsg('Voice input isn\'t supported in this browser — try typing instead');
+    return;
+  }
+  document.getElementById('voice-panel').classList.remove('hidden');
+  document.getElementById('voice-transcript').textContent='';
+  startVoiceListening();
+}
+function closeVoicePanel(){
+  stopVoiceListening();
+  document.getElementById('voice-panel').classList.add('hidden');
+}
+function startVoiceListening(){
+  const Ctor=getSpeechRecognitionCtor();
+  if(!Ctor) return;
+  voiceRecognition = new Ctor();
+  voiceRecognition.lang = (navigator.language||'en-US');
+  voiceRecognition.continuous = true;
+  voiceRecognition.interimResults = true;
+  let finalText='';
+  voiceRecognition.onstart = ()=>{
+    voiceListening=true;
+    document.getElementById('voice-status').textContent='Listening…';
+    document.getElementById('voice-dots').classList.remove('hidden');
+    document.getElementById('voice-mic-big').classList.remove('voice-muted');
+    document.getElementById('voice-mic-icon').className='ph-fill ph-microphone';
+  };
+  voiceRecognition.onresult = (e)=>{
+    let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const t=e.results[i][0].transcript;
+      if(e.results[i].isFinal) finalText+=t+' '; else interim+=t;
+    }
+    document.getElementById('voice-dots').classList.add('hidden');
+    document.getElementById('voice-status').textContent = finalText||interim ? 'I heard:' : 'Listening…';
+    document.getElementById('voice-transcript').textContent = (finalText+interim).trim();
+  };
+  voiceRecognition.onerror = ()=>{
+    document.getElementById('voice-status').textContent='Didn\'t catch that — try again';
+  };
+  voiceRecognition.onend = ()=>{
+    voiceListening=false;
+    if(finalText.trim()){
+      document.getElementById('ai-input').value = finalText.trim();
+      closeVoicePanel();
+      updateAISendBtn();
+      sendAI();
+    }
+  };
+  try{ voiceRecognition.start(); }catch(e){ /* already started, ignore */ }
+}
+function stopVoiceListening(){
+  if(voiceRecognition){ try{ voiceRecognition.onend=null; voiceRecognition.stop(); }catch(e){} }
+  voiceRecognition=null;
+  voiceListening=false;
+}
+// Mic button in the voice panel itself: mute/resume without leaving the screen.
+function toggleVoiceListening(){
+  if(voiceListening){
+    if(voiceRecognition) try{ voiceRecognition.onend=null; voiceRecognition.stop(); }catch(e){}
+    voiceListening=false;
+    document.getElementById('voice-status').textContent='Paused — tap mic to resume';
+    document.getElementById('voice-dots').classList.add('hidden');
+    document.getElementById('voice-mic-big').classList.add('voice-muted');
+    document.getElementById('voice-mic-icon').className='ph ph-microphone-slash';
+  } else {
+    startVoiceListening();
+  }
 }
 
 
