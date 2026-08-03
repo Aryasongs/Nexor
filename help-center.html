@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Help Center — Nexor Sparks</title>
-<meta name="description" content="Nexor Sparks Help Center — everything about account, privacy, community guidelines, copyright, and safety.">
+<meta id="meta-description" name="description" content="Nexor Sparks Help Center — everything about account, privacy, community guidelines, copyright, Discord community, referrals, and safety.">
+<meta name="robots" content="index, follow">
+<link id="canonical-link" rel="canonical" href="https://nexor-f4d.pages.dev/help-center">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%23050A14'/%3E%3Cpath d='M7 2v11h3v9l7-12h-4l4-8z' fill='%2300C8FF'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -252,6 +254,45 @@ footer{border-top:1px solid var(--border2);padding:34px 24px 50px;margin-top:20p
 </head>
 <body>
 
+<!-- SEO/no-JS fallback: a real, plain-HTML index of every Help Center
+     article with its own real link, visible in the raw page source even
+     to tools that don't execute JavaScript. The interactive app below
+     hides this via CSS (not JS) once it loads, and re-renders the same
+     articles as the full single-page experience. Keep titles/links here
+     in sync with the ARTICLES object in the script at the bottom. -->
+<noscript>
+  <main style="max-width:720px;margin:0 auto;padding:24px;font-family:sans-serif;line-height:1.6;">
+    <h1>Nexor Sparks Help Center</h1>
+    <p>This help center works best with JavaScript enabled. Below are direct links to every article.</p>
+    <h2>Account &amp; Login</h2>
+    <ul>
+      <li><a href="/help-center/getting-started">Getting started on Nexor Sparks</a></li>
+      <li><a href="/help-center/password-forgot">Forgot your password? How to reset it</a></li>
+      <li><a href="/help-center/hacked-account">Your account has been hacked or compromised</a></li>
+      <li><a href="/help-center/delete-account">Deactivating or deleting your account</a></li>
+    </ul>
+    <h2>Community &amp; Rewards</h2>
+    <ul>
+      <li><a href="/help-center/discord-community">Nexor Discord — community server &amp; connecting your account</a></li>
+      <li><a href="/help-center/invite-refer-program">Invite &amp; Refer — how referral rewards work</a></li>
+    </ul>
+    <h2>Safety &amp; Reporting</h2>
+    <ul>
+      <li><a href="/help-center/account-suspension">Account restrictions, warnings, and suspensions</a></li>
+      <li><a href="/help-center/report-content">Reporting content, an account, or a problem</a></li>
+      <li><a href="/help-center/blocking-safety">Blocking, muting, and privacy settings</a></li>
+    </ul>
+    <h2>Rules &amp; Policies</h2>
+    <ul>
+      <li><a href="/help-center/privacy-policy">Privacy Policy</a></li>
+      <li><a href="/help-center/terms-of-service">Terms of Service</a></li>
+      <li><a href="/help-center/community-guidelines">Community Guidelines</a></li>
+      <li><a href="/help-center/copyright-policy">Copyright &amp; Intellectual Property Policy</a></li>
+      <li><a href="/help-center/country-legal-restrictions">Country-specific legal restrictions &amp; content laws</a></li>
+    </ul>
+  </main>
+</noscript>
+
 <header>
   <div class="brand" onclick="goHome()">
     <div class="brand-mark"><svg viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z" fill="#E7E9EA"/></svg></div>
@@ -321,8 +362,14 @@ footer{border-top:1px solid var(--border2);padding:34px 24px 50px;margin-top:20p
       <b>Safety</b>
       <a onclick="go('report-content')">Report a Problem</a>
       <a onclick="go('blocking-safety')">Blocking &amp; Safety Tools</a>
-      <a onclick="go('ai-content-label')">AI-Generated Content</a>
-      <a onclick="go('verification')">Verified &amp; Org Badges</a>
+      <a onclick="go('account-suspension')">Account Restrictions &amp; Suspensions</a>
+      <a onclick="go('country-legal-restrictions')">Country &amp; Legal Restrictions</a>
+    </div>
+    <div class="footer-col">
+      <b>Community</b>
+      <a href="https://discord.gg/nexorsparks" target="_blank" rel="noopener">Join our Discord</a>
+      <a onclick="go('invite-refer-program')">Invite &amp; Refer</a>
+      <a onclick="go('discord-community')">Connect Discord Account</a>
     </div>
     <div class="footer-col">
       <b>Nexor Sparks</b>
@@ -358,9 +405,18 @@ footer{border-top:1px solid var(--border2);padding:34px 24px 50px;margin-top:20p
 const CATS = [
   {id:'account', label:'Account & Login'},
   {id:'content', label:'Pulses, Articles & AI Content'},
+  {id:'community', label:'Community & Rewards'},
   {id:'policies', label:'Rules & Policies'},
   {id:'safety', label:'Safety & Reporting'},
 ];
+
+// Sparky's real AI brain — same Cloudflare Worker proxy already used by
+// the main app's misinformation fact-checker (nexor-f4d index.html), so
+// the Groq API key never ships to the browser here either. This is a
+// generic OpenAI-style chat proxy: {model, messages} in, Groq's
+// completion out — nothing fact-check-specific about the endpoint itself.
+const GROQ_PROXY_ENDPOINT = 'https://facrcheck.sgursharn076.workers.dev';
+const GROQ_MODEL = 'llama-3.3-70b-versatile';
 
 const ARTICLES = {
   'getting-started':{
@@ -449,6 +505,7 @@ const ARTICLES = {
         <li><strong>Turn on extra protection.</strong> Enable Two-Factor Login and Login Alerts from Settings so future attempts are blocked or immediately flagged to you.</li>
       </ol>
       <div class="callout warn"><i class="ph ph-warning"></i>If you can't reset your password because the attacker has also changed your recovery email/phone, don't worry — submit an account recovery request via the AI Assistant (bottom right corner) or the "Report a Problem" page, and our team will help you regain access.</div>
+      <div class="callout"><i class="ph ph-shield-check"></i>To confirm you're really the original owner before restoring a compromised account, we may ask you to complete a quick government ID verification through our partner Didit — this protects you by making sure an attacker can't claim your account back instead of you. See the Identity Verification guide for what to expect.</div>
       <h2>Keeping your account safe going forward</h2>
       <ul>
         <li>Use a unique password for Nexor Sparks — never reuse a password from another website.</li>
@@ -457,7 +514,7 @@ const ARTICLES = {
         <li>Be cautious about which third-party apps or sites you ever give your login details to — Nexor Sparks will never ask for your password outside the official app.</li>
       </ul>
     `,
-    related:['change-password','two-factor-login','report-content']
+    related:['change-password','two-factor-login','identity-verification-check']
   },
   'delete-account':{
     cat:'account', icon:'ph-trash', title:'Deactivating or deleting your account',
@@ -595,6 +652,134 @@ const ARTICLES = {
     `,
     related:['pulses-articles','community-guidelines']
   },
+  'identity-verification-check':{
+    urgent:true, cat:'safety', icon:'ph-shield-warning', title:'Why you\'re being asked to verify your identity',
+    desc:'A full-screen government ID check that can appear if your account was flagged for suspicious activity.',
+    keywords:['verify your identity','identity verification required','why do i need to verify','account locked verify','confirm government id','suspicious activity verification','govt id check','cant log in verify identity','impersonation verification'],
+    body:`
+      <p>If you're seeing a full-screen <strong>"Verify your identity"</strong> page that blocks you from using the app, this is a security check — separate from the blue tick / Get Verified badge (see the Verified Badge guide for that).</p>
+
+      <h2>Why this happens</h2>
+      <p>Nexor Sparks runs automated checks that compare accounts against reports and known signals of impersonation — for example, a very similar username, display name, profile photo, or bio to an existing account, combined with duplicated content. When our systems find strong evidence that an account may be impersonating someone else, or that its access looks compromised, we require the account holder to confirm their real identity before continuing.</p>
+
+      <h2>What you need to do</h2>
+      <ol>
+        <li>Tap <strong>"Verify my identity"</strong> on the screen.</li>
+        <li>You'll be taken to our verification partner, <strong>Didit</strong>, to scan a government-issued ID (passport, national ID card, or driver's license) and take a quick selfie.</li>
+        <li>Didit checks that the document is genuine, that you're a real live person (not a photo or video), and that your selfie matches the ID photo — this usually takes about 2 minutes.</li>
+        <li>If your profile has a display name set, we also ask Didit to check it against the legal name printed on your ID.</li>
+      </ol>
+
+      <h2>What happens next</h2>
+      <ul>
+        <li><strong>Approved</strong> — the screen clears automatically (usually within a few minutes) and you're back in the app.</li>
+        <li><strong>In review</strong> — occasionally a case needs manual review; you'll stay on the screen a bit longer, no action needed from you.</li>
+        <li><strong>Declined</strong> — you can try again from the same screen. If it keeps failing and you believe this is a mistake, contact us via the AI Assistant or the "Report a Problem" page.</li>
+      </ul>
+
+      <div class="callout"><i class="ph ph-lock-key"></i>Your ID photo and selfie are processed by Didit strictly to confirm your identity. They are never shown to other Nexor Sparks users and are handled under Didit's own <a href="https://didit.me/legal/verification-privacy-notice" target="_blank">Verification Privacy Notice</a> as well as our own Privacy Policy.</div>
+
+      <h2>Not the same as the blue tick</h2>
+      <p>This check doesn't give you a verified badge and isn't something you can trigger yourself from Settings — it only appears when an account has been automatically or manually flagged. If you want the blue tick / business badge instead, see the How to get verified guide.</p>
+    `,
+    related:['community-guidelines','get-verified','hacked-account']
+  },
+  'nexor-premium':{
+    cat:'account', icon:'ph-crown-simple', title:'Nexor Premium — features, pricing & how to subscribe',
+    desc:'Everything Nexor Premium includes, current pricing, and how to subscribe or cancel.',
+    keywords:['premium','subscription','subscribe','nexor premium','paid plan','upgrade','verified badge premium','content boost','super like'],
+    body:`
+      <p>Nexor Premium is Nexor Sparks' optional paid subscription. Here's exactly what it includes and how billing works.</p>
+
+      <h2>What's included</h2>
+      <ul>
+        <li><strong>Verified badge</strong> — the blue tick appears on your profile automatically while Premium is active.</li>
+        <li><strong>24/7 priority support</strong> — a dedicated Priority Support chat (Settings &gt; Priority Support) with faster responses than the standard Help Center flow.</li>
+        <li><strong>Content boost</strong> — your Pulses get a real ranking boost in everyone's feed while your subscription is active.</li>
+        <li><strong>Platform-wide promotion</strong> — your profile is promoted platform-wide for 4 days when you subscribe.</li>
+        <li><strong>Story rewatch & viewer insights</strong> — open any of your active Stories and tap the view count to see who rewatched it.</li>
+        <li><strong>Custom accent color</strong> — personalize the app's accent color, visible only to you.</li>
+        <li><strong>Super Likes</strong> — while Premium is active, your likes show up as a distinct gold "Super Like" to the recipient.</li>
+      </ul>
+
+      <h2>Pricing</h2>
+      <p>New subscribers get an intro price of <strong>₹49 for the first 6 months</strong> (a one-time charge covering the full 6-month intro period), then it renews automatically at <strong>₹119.00/month</strong> until cancelled. Prices shown in other currencies in the app are a live estimate only — the actual charge is processed in Indian Rupees (₹) via Razorpay.</p>
+
+      <h2>How to subscribe</h2>
+      <ol>
+        <li>Go to <strong>Settings &gt; Nexor Premium</strong>.</li>
+        <li>Review the features and pricing, then tick the agreement checkbox.</li>
+        <li>Tap <strong>"Claim your offer"</strong> and complete payment.</li>
+      </ol>
+
+      <h2>How to cancel</h2>
+      <p>Go to <strong>Settings &gt; Nexor Premium</strong> and cancel from there at any time. Cancelling stops the next renewal — you keep every Premium feature until the end of the period you already paid for, but it does not refund that period.</p>
+
+      <div class="callout"><i class="ph ph-info"></i>For full billing details (auto-renewal, price changes, failed payments) see the Subscription & Billing Terms, and for how refunds work see the Refund Policy.</div>
+    `,
+    related:['subscription-billing','refund-policy','verification']
+  },
+  'subscription-billing':{
+    cat:'policies', icon:'ph-receipt', title:'Subscription & Billing Terms',
+    desc:'Auto-renewal, cancellation, pricing, and billing terms for Nexor Premium.',
+    keywords:['billing','auto renewal','cancel subscription','subscription terms','recurring payment','razorpay'],
+    body:`
+      <p>These terms cover how billing works for Nexor Premium.</p>
+
+      <h2>What you're buying</h2>
+      <p>Nexor Premium is a recurring monthly subscription that includes the verified badge, priority support, content boost, a 4-day platform-wide promotion at signup, Story rewatch insights, and a custom accent color.</p>
+
+      <h2>Intro price</h2>
+      <p>New subscribers pay <strong>₹49</strong> for the first 6 months. After that, the subscription automatically renews at the standard price of <strong>₹119.00/month</strong> until cancelled.</p>
+
+      <h2>Auto-renewal</h2>
+      <p>Your card/UPI is not charged again automatically by us mid-cycle beyond what Razorpay processes for each billing date; you keep access as long as payments succeed.</p>
+
+      <h2>Cancelling anytime</h2>
+      <p>You can cancel from <strong>Settings &gt; Nexor Premium</strong> at any time. Cancelling stops the next renewal — it does not end your current paid period early.</p>
+
+      <h2>Price changes</h2>
+      <p>If we ever change the standard renewal price, active subscribers are notified in-app before it takes effect on their next billing date.</p>
+
+      <h2>Pricing currency</h2>
+      <p>All charges are processed in Indian Rupees (₹). Prices shown in any other currency in the app are a live estimate only, calculated from a real daily exchange rate for reference — the actual charge and any currency conversion is handled by your bank/card network, which may apply its own fee or rate.</p>
+
+      <h2>Failed payments</h2>
+      <p>If a renewal payment fails, Premium features (including the verified badge granted through this subscription) may be paused until payment succeeds.</p>
+
+      <div class="callout"><i class="ph ph-info"></i>See also the Refund Policy for how refunds are handled.</div>
+    `,
+    related:['nexor-premium','refund-policy','terms-of-service']
+  },
+  'refund-policy':{
+    cat:'policies', icon:'ph-hand-coins', title:'Refund Policy',
+    desc:'How refunds work for Nexor Premium and other paid features.',
+    keywords:['refund','money back','chargeback','duplicate charge','cancel refund','payment refund'],
+    body:`
+      <p>This policy explains how refunds work for Nexor Premium and other paid features.</p>
+
+      <h2>Intro offer charge</h2>
+      <p>The ₹49 intro price for the first 6 months of Nexor Premium is a one-time charge and is non-refundable once the payment is successfully processed, except where required by law.</p>
+
+      <h2>Monthly renewal charges</h2>
+      <p>After the intro period, Nexor Premium renews automatically at ₹119.00/month. If you're charged after you already cancelled, or charged in error, contact us within <strong>7 days</strong> of the charge and we'll investigate and refund if the charge was incorrect.</p>
+
+      <h2>Cancelling stops future charges only</h2>
+      <p>Cancelling your subscription stops it from renewing again; it does not refund the period you've already paid for. You keep Premium features until the end of the period you already paid for.</p>
+
+      <h2>Accidental or duplicate payments</h2>
+      <p>If Razorpay shows you were charged twice for the same period, or a payment failed but money was still deducted by your bank, reach out to Priority Support with your payment ID and we'll refund the duplicate/failed charge.</p>
+
+      <h2>How refunds are paid</h2>
+      <p>Approved refunds are issued back to your original payment method via Razorpay, and typically take <strong>5–7 business days</strong> to reflect depending on your bank.</p>
+
+      <h2>How to request one</h2>
+      <p>Open <strong>Priority Support</strong> (Settings &gt; Priority Support) or contact us here in the Help Center with your payment ID and the reason for your request.</p>
+
+      <div class="callout warn"><i class="ph ph-warning"></i>Have your payment ID ready when requesting a refund — it significantly speeds up investigation and resolution.</div>
+    `,
+    related:['nexor-premium','subscription-billing','report-content']
+  },
   'verification':{
     cat:'content', icon:'ph-seal-check', title:'Verified badge and Business badge',
     desc:'How the blue tick and business badge work, and what they mean.',
@@ -606,10 +791,11 @@ const ARTICLES = {
       <h2>Business badge</h2>
       <p>Shown instead of the blue tick on verified <strong>Business/Organization</strong> accounts, confirming the account belongs to an official organization or brand.</p>
       <div class="callout"><i class="ph ph-info"></i>Badges only indicate authenticity — they don't imply any kind of endorsement or priority. Switching your Account Type updates the badge shown on all your past content too.</div>
+      <p>There are two ways to get the badge: apply through the free Get Verified form (manually reviewed), or subscribe to <strong>Nexor Premium</strong>, which grants it automatically along with several other perks.</p>
       <h2>Beware of fake verified badges</h2>
       <p>If an account claims to be verified but doesn't have the real badge, report it via the "Report a Problem" page.</p>
     `,
-    related:['get-verified','account-types','report-content']
+    related:['get-verified','nexor-premium','account-types']
   },
   'get-verified':{
     cat:'account', icon:'ph-identification-card', title:'How to get verified — identity verification form',
@@ -687,6 +873,7 @@ const ARTICLES = {
         <li><strong>Account information</strong> — your username/handle, display name, email address and/or phone number, password (always stored encrypted, never in plain text), date of birth, profile photo, banner image, and bio.</li>
         <li><strong>Content you create</strong> — every Pulse, Bolt (video), Story, Article, comment, reply, like, and Direct Message you send, along with any media (photos/videos) attached to them.</li>
         <li><strong>Verification data (only if you apply)</strong> — your legal name, country, ID document type and photo, and the proof links you submit through the "Get Verified" form. This is used strictly for the manual review process and is not shown publicly.</li>
+        <li><strong>Government ID verification (if your account is flagged)</strong> — if our automated systems flag an account for likely impersonation or compromised access, we require a one-time identity check through our verification partner, <strong>Didit</strong>. This includes a photo of a government-issued ID, a live selfie, and the resulting match/liveness decision. Didit processes this data on our behalf under its own Verification Privacy Notice; it is never shown to other users and is used only to unlock the account.</li>
         <li><strong>Usage & device data</strong> — how you interact with the app (what you view, tap, and for how long), your approximate device type, app version, IP address, and general log information, used mainly for security and reliability.</li>
         <li><strong>Social graph</strong> — who you follow, who follows you, who you've blocked or muted.</li>
       </ul>
@@ -706,7 +893,7 @@ const ARTICLES = {
       <p>We do <strong>not</strong> sell your personal data to third parties, and we never share your password with anyone, including our own staff (it's encrypted end to end).</p>
       <ul>
         <li><strong>Public content:</strong> anything you post publicly (Pulses, Bolts, Stories set to public, Articles, public profile info) is visible to anyone who can see your profile, based on your privacy settings.</li>
-        <li><strong>Service providers:</strong> we share the minimum data necessary with providers who help us run the app, such as cloud hosting and storage, purely to operate the service on our behalf — they are not permitted to use your data for their own purposes.</li>
+        <li><strong>Service providers:</strong> we share the minimum data necessary with providers who help us run the app — including cloud hosting/storage and our identity verification partner, <strong>Didit</strong>, for accounts required to complete a government ID check — purely to operate the service on our behalf. They are not permitted to use your data for their own purposes.</li>
         <li><strong>Legal requirements:</strong> we may disclose information if required by law, court order, or a valid governmental request, or where necessary to protect the rights, property, or safety of Nexor Sparks, our users, or the public.</li>
         <li><strong>Business transfers:</strong> if Nexor is ever involved in a merger, acquisition, or sale of assets, user information may be transferred as part of that transaction, subject to this same policy (or an equally protective one).</li>
       </ul>
@@ -779,7 +966,7 @@ const ARTICLES = {
       <h2>7. Changes to these Terms</h2>
       <p>We may update these Terms from time to time as the app evolves or laws change. We'll do our best to communicate major changes through the app before they take effect. Continuing to use Nexor Sparks after changes take effect means you accept the updated Terms.</p>
     `,
-    related:['community-guidelines','copyright-policy','privacy-policy']
+    related:['community-guidelines','subscription-billing','privacy-policy']
   },
   'community-guidelines':{
     cat:'policies', icon:'ph-users-three', title:'Community Guidelines',
@@ -792,6 +979,7 @@ const ARTICLES = {
       <ul>
         <li><strong>Use your real identity.</strong> Impersonating another person, brand, or organization is not allowed, whether as a joke, a "fan account" pretending to be official, or with malicious intent.</li>
         <li><strong>No fake accounts.</strong> Creating multiple accounts to evade a ban, manipulate engagement, or deceive others is prohibited.</li>
+        <li><strong>Automated impersonation checks.</strong> We run automated checks (matching username, display name, photo, bio, and content against existing accounts) to detect likely impersonation. An account with strong evidence against it can be required to complete a government ID verification before it can be used again — see the Identity Verification guide.</li>
         <li><strong>Label AI-generated content.</strong> If a Pulse, Bolt, or Article was fully or significantly created with AI tools, mark it honestly — see the AI Content Label guide.</li>
         <li><strong>No fake engagement.</strong> Buying followers, using bots, or running like/comment exchange schemes to artificially inflate your numbers is not allowed.</li>
       </ul>
@@ -827,6 +1015,7 @@ const ARTICLES = {
       <ol>
         <li><strong>Content removal</strong> — the specific Pulse, Bolt, Story, Article, or comment that broke a rule is taken down.</li>
         <li><strong>A warning</strong> — for a first or minor violation, you may simply receive a warning explaining what happened and why.</li>
+        <li><strong>Identity verification requirement</strong> — if automated checks find strong evidence an account is impersonating someone else, the account is locked behind a full-screen government ID check until the holder confirms their identity — see the Identity Verification guide.</li>
         <li><strong>Temporary suspension</strong> — repeated or more serious violations can lead to a temporary account suspension.</li>
         <li><strong>Permanent ban</strong> — severe violations (e.g. content that endangers someone's safety) or a pattern of repeated violations can result in permanent removal from Nexor Sparks.</li>
       </ol>
@@ -837,7 +1026,7 @@ const ARTICLES = {
 
       <div class="callout warn"><i class="ph ph-warning"></i>If there is an immediate threat to someone's life or physical safety, contact your local emergency services first, before reporting in-app.</div>
     `,
-    related:['report-content','ai-content-label','terms-of-service']
+    related:['report-content','identity-verification-check','ai-content-label','terms-of-service']
   },
   'copyright-policy':{
     cat:'policies', icon:'ph-copyright', title:'Copyright & Intellectual Property Policy',
@@ -1054,12 +1243,120 @@ const ARTICLES = {
     `,
     related:['getting-started','account-center']
   },
+  'discord-community':{
+    cat:'community', icon:'ph-discord-logo', title:'Nexor Discord — community server & connecting your account',
+    desc:'Join the official Nexor Discord, and link your Discord account for community perks.',
+    keywords:['discord','discord server','discord link','discord invite','join discord','connect discord','link discord'],
+    body:`
+      <p>Nexor Sparks has an official <strong>Discord server</strong> where you can chat with the team and other users, get early access to updates, report bugs directly, and hang out outside the app.</p>
+      <h2>Joining the Discord server</h2>
+      <ol>
+        <li>Tap the Discord icon in the app footer, or <strong>Settings &gt; Community &gt; Nexor Discord</strong>.</li>
+        <li>Use the invite link below to join — it works whether or not you connect your account.</li>
+      </ol>
+      <a class="ext-link-btn" href="https://discord.gg/nexorsparks" target="_blank" rel="noopener"><i class="ph-fill ph-discord-logo"></i> Join the Nexor Discord</a>
+      <div class="callout"><i class="ph ph-info"></i>If this link has expired, ask for a fresh one via the AI Assistant or from <strong>Settings &gt; Community</strong> in the app — invite links are occasionally rotated for spam protection.</div>
+      <h2>Connecting your Discord account</h2>
+      <p>From <strong>Settings &gt; Connect Discord</strong>, you can link your Discord account to your Nexor profile. Once connected:</p>
+      <ul>
+        <li>A small Discord badge appears on your Nexor profile and next to your Pulses.</li>
+        <li>You unlock community-only roles and channels inside the Discord server automatically.</li>
+      </ul>
+      <p>You can disconnect at any time from the same settings screen — this only removes the link between the two accounts and doesn't delete or affect either account.</p>
+      <h2>Discord community rules</h2>
+      <p>The Discord server has its own moderation, separate from (but consistent with) the in-app Community Guidelines. Harassment, hate speech, spam, NSFW content, and impersonation are not allowed there either, and server moderators can mute, kick, or ban independently of your Nexor Sparks account status.</p>
+      <div class="callout warn"><i class="ph ph-warning"></i>Nexor Sparks is not officially affiliated with or endorsed by Discord Inc. — "Nexor Discord" refers to our own community server hosted on Discord's platform.</div>
+    `,
+    related:['invite-refer-program','community-guidelines','report-content']
+  },
+  'invite-refer-program':{
+    cat:'community', icon:'ph-gift', title:'Invite & Refer — how referral rewards work',
+    desc:'Invite friends to Nexor Sparks and earn rewards once they become active.',
+    keywords:['invite','refer','referral','refer a friend','referral code','ads credit','invite friends','referral reward'],
+    body:`
+      <p><strong>Settings &gt; Invite &amp; Refer</strong> lets you share your personal invite link or code with friends. When someone signs up using it and becomes an active user, you earn a reward.</p>
+      <h2>How to invite someone</h2>
+      <ol>
+        <li>Go to <strong>Invite &amp; Refer</strong> from Settings or the navigation menu.</li>
+        <li>Share your unique referral link/code however you like — DM, social media, or in person.</li>
+        <li>Track invites sent and rewards earned right on that screen.</li>
+      </ol>
+      <h2>When a referral counts</h2>
+      <p>A referral is only credited once the invited person creates a genuine new account using your link <strong>and</strong> stays active on it for a few days afterward — this prevents throwaway signups from being farmed for rewards.</p>
+      <h2>Reward amounts</h2>
+      <p>Reward value depends on the invited user's own country at signup — users in India earn a rupee-based Ads Credit reward, while a set of other eligible countries (like the US, Canada, UK, Australia, New Zealand, Ireland, and Singapore) earn a comparable dollar-based reward. Countries outside these lists may not currently be reward-eligible.</p>
+      <div class="callout"><i class="ph ph-info"></i>There's a monthly cap on how many referrals can be credited per person, to keep the program fair and sustainable — once you hit it, extra invites that month simply won't earn a reward, but they'll still count starting the following month.</div>
+      <h2>Why an invite might not get credited</h2>
+      <ul>
+        <li>The invited account was created with a disposable/temporary email address.</li>
+        <li>The invited account didn't stay active long enough after signing up.</li>
+        <li>The same device or IP address was used to create multiple "invited" accounts (self-referral farming).</li>
+        <li>You've already hit your monthly referral cap.</li>
+      </ul>
+      <p>If you believe a genuine referral wasn't credited by mistake, reach out via the AI Assistant or the "Report a Problem" page with the details.</p>
+    `,
+    related:['discord-community','account-types']
+  },
+  'account-suspension':{
+    urgent:true, cat:'safety', icon:'ph-prohibit', title:'Account restrictions, warnings, and suspensions',
+    desc:'How our strike system works, what triggers a suspension, and how to appeal.',
+    keywords:['suspend','suspended','suspension','account restricted','account banned','ban','strike','strikes','account status','appeal','why was i suspended'],
+    body:`
+      <p>Nexor Sparks uses a graduated strike system rather than instantly banning accounts for a first mistake — enforcement gets stricter the more an account keeps violating the Community Guidelines.</p>
+      <h2>How strikes work</h2>
+      <p>When one of your Pulses, comments, or Stories is removed for breaking the guidelines, it adds a strike to your account. Not every violation is equal — more severe categories (threats of violence, hate speech, encouraging self-harm) add more weight per strike than milder ones (like general harassment), so a single serious violation can escalate you faster than several minor ones.</p>
+      <h2>What happens as strikes add up</h2>
+      <ul>
+        <li><strong>Early strikes</strong> — content is removed and you're notified, but your account otherwise works normally.</li>
+        <li><strong>4th strike</strong> — you'll see an Account Status warning screen summarizing your violations. Some account features may become limited at this point.</li>
+        <li><strong>6th strike</strong> — your account is automatically suspended for <strong>10 days</strong>.</li>
+        <li><strong>Repeated copyright violations</strong> are tracked separately — 3 upheld copyright strikes will automatically suspend the account (see the Copyright Policy).</li>
+      </ul>
+      <h2>Temporary vs. permanent suspension</h2>
+      <p>Most first-time suspensions are <strong>temporary</strong> — you'll see exactly when you can log back in on the suspension screen. Severe or repeated violations can result in a <strong>permanent</strong> suspension instead.</p>
+      <div class="callout warn"><i class="ph ph-warning"></i>Permanent suspensions can be appealed for up to <strong>180 days</strong> from the suspension date. After that window closes, the decision becomes final and the account may be permanently disabled.</div>
+      <h2>How to appeal</h2>
+      <ol>
+        <li>Open the suspension screen shown when you try to log in.</li>
+        <li>Tap <strong>Appeal</strong> — you only get one active appeal per suspension, so make it count.</li>
+        <li>Our team reviews appeals manually; you'll be notified once a decision is made.</li>
+      </ol>
+      <h2>Content removed vs. account restricted vs. account suspended</h2>
+      <p>These are three different, escalating things: a single piece of content being removed doesn't necessarily restrict your account; enough strikes limits some features (like reach) while you can otherwise keep using Nexor Sparks; only crossing the suspension threshold locks you out of the account entirely.</p>
+      <div class="callout"><i class="ph ph-info"></i>You can check your current strike count and any active restrictions anytime from <strong>Settings &gt; Account Status</strong>.</div>
+    `,
+    related:['community-guidelines','copyright-strikes','report-content']
+  },
+  'country-legal-restrictions':{
+    cat:'policies', icon:'ph-scales', title:'Country-specific legal restrictions & content laws',
+    desc:'Why some accounts or content may be unavailable in certain countries.',
+    keywords:['geo restriction','country restriction','legal request','blocked in my country','not available in country','local law','jurisdiction','country law'],
+    body:`
+      <p>Nexor Sparks operates across many countries, each with its own laws about what content can be shown. In rare cases, we're legally required to restrict specific content or accounts within a specific country, even though it remains visible everywhere else.</p>
+      <h2>What a legal restriction looks like</h2>
+      <p>If you try to open a profile or piece of content that's been legally restricted in your country, you'll see a notice explaining that we complied with a valid legal request to restrict it — this is different from the account being suspended, deleted, or restricted for guideline violations.</p>
+      <h2>Why this happens</h2>
+      <ul>
+        <li>A court order or valid government/regulatory request specific to that country.</li>
+        <li>Local laws that prohibit certain categories of content outright in that jurisdiction.</li>
+        <li>Local age-of-majority or minimum-age requirements that differ from our global minimum age policy.</li>
+      </ul>
+      <div class="callout"><i class="ph ph-info"></i>A country-level legal restriction only affects visibility within that specific country — it doesn't delete the content, doesn't notify your followers elsewhere, and doesn't count as a guideline violation or strike against the account.</div>
+      <h2>Data protection & your rights</h2>
+      <p>Depending on where you live, local privacy law (such as GDPR in the EU/UK, or similar frameworks elsewhere) may give you specific rights over your data — including access, correction, deletion, and data portability. See the Privacy Policy for how to exercise these.</p>
+      <h2>Minimum age</h2>
+      <p>Nexor Sparks enforces a global minimum age for account creation, and some countries set a higher minimum age or require parental consent below a certain age. We ask for your accurate date of birth at signup specifically to apply the correct rule for your country.</p>
+      <h2>If you think a restriction is a mistake</h2>
+      <p>Submit a request via the AI Assistant or the "Report a Problem" page — legal restrictions are reviewed by our team and lifted if they no longer apply or were applied incorrectly.</p>
+    `,
+    related:['privacy-policy','account-suspension','terms-of-service']
+  },
 };
 
 // ============================================================
 // CATEGORY GRID RENDER
 // ============================================================
-const CAT_LABELS = {account:'Account & Login', content:'Pulses, Articles & AI Content', policies:'Rules & Policies', safety:'Safety & Reporting'};
+const CAT_LABELS = {account:'Account & Login', content:'Pulses, Articles & AI Content', community:'Community & Rewards', policies:'Rules & Policies', safety:'Safety & Reporting'};
 function renderHome(){
   const wrap = document.getElementById('category-wrap');
   wrap.innerHTML = '';
@@ -1083,12 +1380,34 @@ function renderHome(){
 
 // ============================================================
 // ROUTER
+// SEO note: each article gets its own real URL — /help-center/<id> — via
+// the History API, instead of a #hash, so search engines and any crawler
+// or fetch-based tool can index/request a specific article directly. Old
+// #hash links (bookmarked/shared before this change) still work and are
+// silently upgraded to the new path on load. This requires the host to
+// serve help-center.html (status 200, not a redirect) for any request
+// under /help-center/* — e.g. a Cloudflare Pages _redirects rule:
+//   /help-center/*  /help-center.html  200
 // ============================================================
-function goHome(){ location.hash=''; }
-function go(id){ location.hash = '#'+id; }
-window.addEventListener('hashchange', render);
+const HC_BASE = '/help-center';
+const SITE_ORIGIN = 'https://nexor-f4d.pages.dev';
+function idFromPath(){
+  let p = location.pathname.replace(/\/+$/,''); // strip trailing slash
+  if(p.startsWith(HC_BASE)) p = p.slice(HC_BASE.length);
+  return p.replace(/^\//,'');
+}
+function goHome(){ history.pushState({}, '', HC_BASE); render(); }
+function go(id){ history.pushState({id}, '', HC_BASE+'/'+id); render(); }
+window.addEventListener('popstate', render);
 function render(){
-  const id = location.hash.replace('#','');
+  // Upgrade a legacy #hash link to the new path once, then continue.
+  if(location.hash){
+    const hid = location.hash.replace('#','');
+    location.hash='';
+    if(hid && ARTICLES[hid]){ history.replaceState({id:hid}, '', HC_BASE+'/'+hid); }
+    else { history.replaceState({}, '', HC_BASE); }
+  }
+  const id = idFromPath();
   const homeEl = document.getElementById('page-home');
   const artEl = document.getElementById('page-article');
   if(id && ARTICLES[id]){
@@ -1102,7 +1421,27 @@ function render(){
     document.getElementById('search-results').classList.add('hidden');
     document.getElementById('search-input').value='';
     document.getElementById('hero-search-input').value='';
+    document.title='Help Center — Nexor Sparks';
+    setMeta('Nexor Sparks Help Center — everything about account, privacy, community guidelines, copyright, Discord community, referrals, and safety.', HC_BASE);
+    setJsonLd(null);
   }
+}
+function setMeta(desc, path){
+  const m=document.getElementById('meta-description'); if(m) m.setAttribute('content', desc);
+  const c=document.getElementById('canonical-link'); if(c) c.setAttribute('href', SITE_ORIGIN+path);
+}
+function setJsonLd(a){
+  let el=document.getElementById('article-jsonld');
+  if(!a){ if(el) el.remove(); return; }
+  if(!el){ el=document.createElement('script'); el.type='application/ld+json'; el.id='article-jsonld'; document.head.appendChild(el); }
+  el.textContent = JSON.stringify({
+    '@context':'https://schema.org',
+    '@type':'TechArticle',
+    headline:a.title,
+    description:a.desc,
+    articleSection:CAT_LABELS[a.cat],
+    publisher:{'@type':'Organization', name:'Nexor Technologies'}
+  });
 }
 function renderArticle(id){
   const a = ARTICLES[id];
@@ -1116,6 +1455,9 @@ function renderArticle(id){
   const relWrap = document.getElementById('art-related');
   relWrap.innerHTML = '<div class="section-label">Related Articles</div>' +
     (a.related||[]).map(rid=>`<a onclick="go('${rid}')">${ARTICLES[rid].title}</a>`).join('');
+  document.title = a.title+' — Nexor Sparks Help Center';
+  setMeta(a.desc, HC_BASE+'/'+id);
+  setJsonLd(a);
 }
 function markHelpful(v){ showToastMsg(v? 'Thanks! Your feedback has been saved.' : 'Thanks for the feedback — we\'ll work on improving this article.'); }
 function showToastMsg(msg){
@@ -1194,12 +1536,16 @@ function fmtCount(n){
 // ============================================================
 const AI_RULES = [
   {kw:['hack','hacked','compromise','compromised','stolen account','suspicious login','someone logged in','account taken over'], reply:'{name}Sounds like your account may be compromised.{handle} Here\'s what to do right now: (1) If you can still log in, change your password immediately using Password Reset. (2) If you can\'t log in, use "Forgot Password" to get back in. (3) Check Settings > Login Activity for any unknown active sessions and log them out. (4) Verify your recovery email/phone is really yours. (5) Review recent activity and undo anything you didn\'t post. If any of these steps doesn\'t work — for example, the attacker has already changed your recovery email or phone — don\'t worry, you can still submit an account recovery request right here with me, or through the "Report a Problem" page, and we\'ll figure it out from there. Full guide linked below.', link:'hacked-account'},
+  {kw:['verify your identity','identity verification required','why do i need to verify','account locked verify','why is my account asking me to verify','forced to verify','locked verify identity','confirm my government id','why cant i log in verify'], reply:'{name}If you\'re seeing a full-screen "Verify your identity" page, our automated systems flagged your account — usually for signals that resemble impersonating someone else, or a compromised login. Tap "Verify my identity" on that screen to complete a quick government ID + selfie check through our partner Didit (about 2 minutes). Once approved, the screen clears automatically. This is different from the blue tick — see the full guide below.', link:'identity-verification-check'},
   {kw:['change password','update password','current password','new password'], reply:'You can update your password anytime from Settings > Change Password — just enter your current password, then your new one.', link:'change-password'},
   {kw:['password','forgot','reset password'], reply:'Resetting your password is easy — tap "Forgot Password?" on the login screen and verify your email/phone to set a new one.', link:'password-forgot'},
   {kw:['two factor','2fa','login alert','login activity','active session','active device'], reply:'You can turn on Two-factor login and Login alerts, and review Login Activity, all from Settings — together they\'re the strongest way to protect your account.', link:'two-factor-login'},
   {kw:['link phone','phone number','otp'], reply:'You can add a phone number for recovery from Settings > Link phone number — you\'ll get an OTP by SMS to confirm it.', link:'link-phone'},
   {kw:['delete account','deactivate','close account','remove account'], reply:'You can either temporarily deactivate or permanently delete your account. Go to Settings > Account to find the option.', link:'delete-account'},
-  {kw:['get verified','apply verification','verify me','id upload','identity verification','verification form'], reply:'{name}To apply for a verified badge, go to Settings > Get Verified. It\'s a full identity form — legal name, country, ID document photo, your reason, and a few links proving your identity — reviewed manually by our team.', link:'get-verified'},
+  {kw:['get verified','apply verification','verify me','id upload','identity verification','verification form'], reply:'{name}To apply for a verified badge, go to Settings > Get Verified. It\'s a full identity form — legal name, country, ID document photo, your reason, and a few links proving your identity — reviewed manually by our team. You can also get the badge instantly by subscribing to Nexor Premium.', link:'get-verified'},
+  {kw:['premium','subscribe','subscription','upgrade','nexor premium','super like'], reply:'{name}Nexor Premium (Settings > Nexor Premium) gets you the verified badge, 24/7 priority support, a content boost, a 4-day platform-wide promotion, Story rewatch insights, and a custom accent color — intro price ₹49 for 6 months, then ₹119.00/month, cancel anytime.', link:'nexor-premium'},
+  {kw:['refund','money back','charged twice','duplicate charge','wrongly charged'], reply:'{name}The ₹49 intro charge is non-refundable once processed. For an incorrect renewal charge or a duplicate/failed payment, contact Priority Support with your payment ID within 7 days and we\'ll investigate — approved refunds take 5–7 business days via Razorpay.', link:'refund-policy'},
+  {kw:['cancel premium','cancel subscription','stop renewal','auto renew','billing terms'], reply:'{name}You can cancel Nexor Premium anytime from Settings > Nexor Premium — it stops the next renewal but doesn\'t refund the period you\'ve already paid for, and you keep your perks until that period ends.', link:'subscription-billing'},
   {kw:['username change','change handle','change username','request username','cant change username'], reply:'{name}Since verified accounts can\'t edit their username directly, use Settings > Request username change to submit it for manual review — you can only have one pending request at a time.', link:'username-change-request'},
   {kw:['verified','blue tick','badge','organization','business badge'], reply:'{name}Verified Personal/Creator accounts show the blue tick, while verified Business/Organization accounts show a separate business badge instead — both just confirm authenticity.', link:'verification'},
   {kw:['account type','business account','creator account','organization account','switch account'], reply:'{name}You can switch between Personal, Creator, and Business/Organization anytime from Settings > Account Type — it updates your badge everywhere automatically.', link:'account-types'},
@@ -1317,6 +1663,52 @@ function removeTypingIndicator(){
   const el=document.getElementById('typing-indicator');
   if(el) el.remove();
 }
+// Builds Sparky's persona + grounding context for the Groq call. The
+// article catalog is what lets Sparky suggest real, existing article
+// buttons instead of hallucinating links, and the userCtx line is what
+// lets it "know" who it's talking to without ever being handed anything
+// sensitive (only the same public display info the rest of this page
+// already has access to).
+function buildSparkySystemPrompt(){
+  const catalog = Object.entries(ARTICLES).map(([id,a])=>`${id}: ${a.title} — ${a.desc}`).join('\n');
+  const who = (userCtx && userCtx.handle)
+    ? `The person you're talking to is logged in as @${userCtx.handle}${userCtx.name?` (${userCtx.name})`:''}${userCtx.verified?', a verified account':''}. You may reference this naturally (e.g. greeting them by name), but never invent account details, activity, or history you don't actually have.`
+    : `This person opened the Help Center directly, so you have no account details for them — keep things friendly and general.`;
+  return `You are Sparky, the friendly AI help assistant built into the Nexor Sparks Help Center (Nexor Sparks is a social media app made by Nexor Technologies).
+Personality: warm, upbeat, a little playful, never robotic or overly formal — like a helpful friend who happens to know the app inside out. Match the user's language: if they write in Hinglish (Hindi+English mixed) or Hindi, reply that way too; otherwise reply in English. Keep most replies short (1-4 sentences) unless a longer explanation is genuinely needed.
+You are NOT limited to only help topics — you're also happy to chat casually, answer general questions, or talk about whatever the user brings up, the way a friendly assistant would, while staying tasteful and steering back toward being useful when it makes sense.
+Ground yourself ONLY in the article catalog below for anything about Nexor Sparks' specific features, policies, rules, or numbers — never invent a feature, rule, price, or statistic that isn't in it or general common sense. If you're not sure, say so honestly and point to the closest matching article or suggest "Report a Problem" for anything account-specific you can't resolve yourself.
+${who}
+
+ARTICLE CATALOG (id: title — description):
+${catalog}
+
+Respond with ONLY compact JSON, no other text, no markdown fences:
+{"reply":"your natural conversational reply as plain text","suggestedArticleIds":["id1","id2"]}
+"suggestedArticleIds" must be 0-3 ids copied exactly from the catalog above (omit entirely, i.e. empty array, if nothing is clearly relevant) — never invent an id.`;
+}
+
+// Calls Sparky's real brain (Groq, via the Cloudflare Worker proxy).
+// Throws on any network/parse failure so the caller can fall back to the
+// instant local rule engine instead of leaving the user stuck.
+async function groqSparkyReply(){
+  const sys = buildSparkySystemPrompt();
+  const msgs = [{role:'system', content:sys}];
+  aiHistory.slice(-14).forEach(m=>msgs.push({role: m.role==='user' ? 'user' : 'assistant', content:m.text}));
+  const res = await fetch(GROQ_PROXY_ENDPOINT, {
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({ model:GROQ_MODEL, messages:msgs, temperature:0.7, max_tokens:350 })
+  });
+  if(!res.ok) throw new Error('Groq proxy HTTP '+res.status);
+  const json = await res.json();
+  const raw = (json.choices && json.choices[0] && json.choices[0].message && json.choices[0].message.content) || '';
+  const cleaned = raw.replace(/```json|```/g,'').trim();
+  const parsed = JSON.parse(cleaned);
+  if(!parsed || typeof parsed.reply !== 'string') throw new Error('unexpected Sparky response shape');
+  return parsed;
+}
+
 async function sendAI(){
   const input=document.getElementById('ai-input');
   const text=input.value.trim();
@@ -1324,14 +1716,28 @@ async function sendAI(){
   addUserMsg(text);
   aiHistory.push({role:'user', text});
   input.value='';
-
-  // Rule-based match, first against the full keyword rule set, and if
-  // nothing hits, against every article's own title/desc/keywords — all
-  // fully local and instant. A match is treated as the user explicitly
-  // changing topic; otherwise we fall through to a "still on topic" or
-  // generic reply so the conversation always keeps moving without ever
-  // leaving this page or calling out to any server.
   addTypingIndicator();
+
+  try{
+    const result = await groqSparkyReply();
+    removeTypingIndicator();
+    const links = (result.suggestedArticleIds||[]).filter(id=>ARTICLES[id]).slice(0,3);
+    if(links.length) currentTopicId = links[0];
+    const reply = personalizeReply(result.reply);
+    addBotMsg(reply, links.length ? links : null);
+    aiHistory.push({role:'model', text:reply});
+  }catch(e){
+    console.error('[Sparky] Groq call failed, falling back to local rule engine:', e);
+    sendAILocal(text);
+  }
+}
+
+// Local, fully offline fallback — used only if the Groq call above fails
+// (no network, proxy down, etc.) so Sparky always replies with *something*
+// useful instead of going silent. Rule-based match first against the full
+// keyword rule set, then fuzzy-matched against every article's own
+// title/desc/keywords.
+function sendAILocal(text){
   setTimeout(()=>{
     removeTypingIndicator();
 
@@ -1344,9 +1750,6 @@ async function sendAI(){
       return;
     }
 
-    // Fallback 1: fuzzy-match the free-typed question against every
-    // article's own keywords/title/desc, so topics not covered by a
-    // hand-written AI_RULES entry can still surface the right article.
     const found = fuzzyFindArticle(text);
     if(found){
       currentTopicId = found;
@@ -1356,8 +1759,6 @@ async function sendAI(){
       return;
     }
 
-    // Fallback 2: if we were already mid-topic, assume this is a
-    // follow-up about that same article rather than a brand-new question.
     if(currentTopicId && ARTICLES[currentTopicId]){
       const reply = personalizeReply(`I'm not 100% sure I've got a specific answer for that, but it sounds related to "${ARTICLES[currentTopicId].title}" — take a look at the full article below, or try rephrasing your question.`);
       addBotMsg(reply, [currentTopicId]);
@@ -1365,7 +1766,6 @@ async function sendAI(){
       return;
     }
 
-    // Fallback 3: nothing matched at all.
     const reply = 'I couldn\'t quite match that to a topic I know. Try rephrasing, browse the categories above, or pick one of these common topics below.';
     addBotMsg(reply, ['password-forgot','hacked-account','community-guidelines','report-content']);
     aiHistory.push({role:'model', text:reply});
