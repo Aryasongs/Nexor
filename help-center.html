@@ -470,6 +470,11 @@ const CATS = [
 // completion out — nothing fact-check-specific about the endpoint itself.
 const GROQ_PROXY_ENDPOINT = 'https://facrcheck.sgursharn076.workers.dev';
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
+// Deep link back into the main app that auto-opens the Premium subscription
+// sheet on load (see checkDeepLinkActions() in index.html). Help Center is a
+// separate tab with no shared session/JS state with the app, so a URL is the
+// only way to hand off an intent like "open the subscribe screen" to it.
+const SUBSCRIBE_URL = 'https://nexor-f4d.pages.dev/#subscribe';
 
 const ARTICLES = {
   'getting-started':{
@@ -1738,6 +1743,20 @@ function addUserMsg(text, img){
   body.appendChild(div);
   body.scrollTop=body.scrollHeight;
 }
+// Renders a real tappable CTA button under the last bot message — used for
+// actions like "open_subscription" that just need to hand the user a link
+// into the main app, rather than a text confirmation like the ticket flows.
+function addBotCta(label, url, iconClass){
+  const body=document.getElementById('ai-body');
+  const wrap=document.createElement('div');
+  wrap.className='msg-suggestions';
+  const b=document.createElement('button');
+  b.innerHTML = (iconClass?`<i class="${iconClass}"></i> `:'') + label;
+  b.onclick=()=>{ window.open(url, '_blank'); };
+  wrap.appendChild(b);
+  body.appendChild(wrap);
+  body.scrollTop=body.scrollHeight;
+}
 function addTypingIndicator(){
   const body=document.getElementById('ai-body');
   const div=document.createElement('div');
@@ -1979,10 +1998,11 @@ SPECIAL ACTIONS — you can take these yourself, right in chat, instead of sendi
 2) "file_copyright_report" — when the user wants to report that someone else is using THEIR OWN original content without permission, and wants you to file it here instead of the separate copyright report page.
    Required "data" fields: reporterName, reporterEmail, infringingHandle (the @handle, username, or link of whoever posted it), originalWorkDescription (what the original work is), ownershipStatement (their own first-person statement that they own/represent the rights to it), goodFaithStatement (their own first-person good-faith statement that the use is unauthorized).
    Never claim you're issuing a strike yourself — always make clear a strike is only added to the other account after Nexor's Trust & Safety team manually reviews and upholds the report; you're only filing it on the user's behalf.
+3) "open_subscription" — when the user asks about Nexor Premium, subscribing, pricing, the verified badge via Premium, or otherwise sounds interested in upgrading. No "data" fields needed — this just surfaces a real "View Premium" button under your reply that takes them straight to the subscription screen in the app. Set "action.ready":true immediately (there's nothing to collect). Only offer this when it's genuinely relevant to what they asked — don't push it into unrelated conversations, and never claim you can charge them or activate anything yourself from chat; the button just opens the real subscription screen where they see the actual price and confirm it themselves.
 Rules for actions: ask for missing required fields naturally, one or two at a time, across as many turns as it takes. NEVER fabricate a value the user hasn't actually given you. While fields are still missing, keep "action.type" set to the relevant type with "action.ready":false and whatever's been collected so far in "action.data". Only set "action.ready":true once every required field for that type has been explicitly provided by the user. If no action applies this turn, omit "action" or set its "type" to null.
 
 Respond with ONLY compact JSON, no other text, no markdown fences:
-{"reply":"your natural conversational reply as plain text","sourceArticleIds":["id1","id2"],"action":{"type":"create_ticket|file_copyright_report|null","ready":false,"data":{}}}`;
+{"reply":"your natural conversational reply as plain text","sourceArticleIds":["id1","id2"],"action":{"type":"create_ticket|file_copyright_report|open_subscription|null","ready":false,"data":{}}}`;
 }
 
 // Calls Sparky's real brain (Groq, via the Cloudflare Worker proxy).
@@ -2030,6 +2050,7 @@ async function sendAI(){
     if(sources.length) currentTopicId = sources[0];
 
     let actionNote='';
+    let showSubscribeCta=false;
     const action = result.action;
     if(action && action.type && action.ready){
       const dataWithImg = Object.assign({}, action.data||{}, img ? {screenshotDataUrl:img.dataUrl, screenshotName:img.name} : {});
@@ -2041,6 +2062,8 @@ async function sendAI(){
         } else if(action.type==='file_copyright_report'){
           const r = fileCopyrightReport(dataWithImg);
           actionNote = `\n\n✅ Copyright report filed — reference **${r.id}**${r.screenshotDataUrl?' (screenshot attached)':''}. Nexor's Trust & Safety team will manually review it, and a strike is only added to the other account if the report is upheld.`;
+        } else if(action.type==='open_subscription'){
+          showSubscribeCta=true; // rendered as a real button below, not text
         }
       }catch(e){
         console.error('[Sparky] action failed', e);
@@ -2050,6 +2073,7 @@ async function sendAI(){
 
     const reply = personalizeReply(result.reply) + actionNote;
     addBotMsg(reply, sources.length ? sources : null);
+    if(showSubscribeCta) addBotCta('View Premium', SUBSCRIBE_URL, 'ph ph-crown-simple');
     aiHistory.push({role:'model', text:reply});
   }catch(e){
     console.error('[Sparky] Groq call failed, falling back to local rule engine:', e);
@@ -2062,6 +2086,13 @@ async function sendAI(){
 // useful instead of going silent. Rule-based match first against the full
 // keyword rule set, then fuzzy-matched against every article's own
 // title/desc/keywords.
+// Offline fallback has no LLM to decide "should I offer the subscribe
+// button", so it's a plain keyword check instead — deliberately narrow
+// (whole-word-ish) so it doesn't fire on unrelated messages.
+const SUBSCRIBE_INTENT_RE = /\b(premium|subscri(be|ption)|upgrade|paid plan|verified badge)\b/i;
+function maybeShowSubscribeCta(text){
+  if(SUBSCRIBE_INTENT_RE.test(text)) addBotCta('View Premium', SUBSCRIBE_URL, 'ph ph-crown-simple');
+}
 function sendAILocal(text){
   setTimeout(()=>{
     removeTypingIndicator();
@@ -2071,6 +2102,7 @@ function sendAILocal(text){
       if(match.link) currentTopicId = match.link;
       const reply = personalizeReply(match.reply);
       addBotMsg(reply, match.link ? [match.link] : null);
+      maybeShowSubscribeCta(text);
       aiHistory.push({role:'model', text:reply});
       return;
     }
@@ -2080,6 +2112,7 @@ function sendAILocal(text){
       currentTopicId = found;
       const reply = personalizeReply(`Here's what I found on that — "${ARTICLES[found].title}." ${ARTICLES[found].desc}`);
       addBotMsg(reply, [found]);
+      maybeShowSubscribeCta(text);
       aiHistory.push({role:'model', text:reply});
       return;
     }
