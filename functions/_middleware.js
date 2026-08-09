@@ -101,7 +101,16 @@ export const onRequest = async ({ request, next }) => {
     const bio = (u.bio || "").trim();
     const followers = fmtCount(u.followersCount || 0);
     const following = fmtCount(u.followingCount || 0);
-    const image = u.photoURL || u.avatar || DEFAULT_IMAGE;
+    // Real profile photos live in `photoURL` (a hosted https link) OR
+    // `photoBase64` (an inline data:image/... URI, used when the user never
+    // uploaded to real storage). Crawlers/social scrapers (and og:image in
+    // general) cannot fetch a base64 data URI as an image — it must be a real
+    // https URL — so we only use photoURL, and only if it actually looks like
+    // one. Otherwise we fall back to the Nexor logo rather than something
+    // that will render broken everywhere this meta tag is read.
+    const image = (typeof u.photoURL === "string" && /^https?:\/\//i.test(u.photoURL))
+      ? u.photoURL
+      : DEFAULT_IMAGE;
     const pageUrl = `${SITE_ORIGIN}/@${realHandle}`;
 
     const title = `${name} (@${realHandle}) • Nexor Sparks`;
