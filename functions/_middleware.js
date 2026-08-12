@@ -103,6 +103,50 @@ function applyMeta(response, values) {
     .transform(response);
 }
 
+// Injects server-rendered post cards into the initial empty #feed-list div,
+// so a crawler that doesn't run JS sees real recent posts instead of
+// nothing. For a real visitor, this is purely cosmetic/instant — the app's
+// own JS replaces #feed-list's content with the live, personalized,
+// interactive feed within moments of Firebase loading, exactly like it
+// already did before this existed. Nothing about the real app's behavior
+// changes; this only affects what's present in the very first HTML byte.
+class FeedListInjector {
+  constructor(html) { this.html = html; }
+  element(el) { el.setInnerContent(this.html, { html: true }); }
+}
+async function handleHomepage(response) {
+  const pulsesRes = await fetch(`${DB_BASE}/pulses.json?orderBy="createdAt"&limitToLast=20`);
+  if (!pulsesRes.ok) return response;
+  const pulsesObj = await pulsesRes.json();
+  if (!pulsesObj) return response;
+
+  const posts = Object.entries(pulsesObj)
+    .filter(([, p]) => p && !p.deleted && !p.private)
+    .sort((a, b) => (b[1].createdAt || 0) - (a[1].createdAt || 0));
+
+  if (!posts.length) return response;
+
+  const cardsHtml = posts.map(([id, p]) => {
+    const author = esc(p.creatorName || "User");
+    const handle = esc(p.creatorHandle || "user");
+    const text = esc((p.text || "").slice(0, 280));
+    const img = p.images && p.images[0];
+    const imgHtml = realImageOrDefault(img) !== DEFAULT_IMAGE
+      ? `<img src="${esc(img)}" alt="" style="max-width:100%;border-radius:12px;margin-top:8px;">`
+      : "";
+    return `<article style="padding:14px 16px;border-bottom:1px solid rgba(255,255,255,0.08);">
+      <a href="/@${handle}" style="font-weight:700;color:inherit;text-decoration:none;">${author}</a>
+      <span style="color:#9CA3AF;"> @${handle}</span>
+      <p style="margin:6px 0 0;"><a href="/p/${esc(id)}" style="color:inherit;text-decoration:none;">${text}</a></p>
+      ${imgHtml}
+    </article>`;
+  }).join("\n");
+
+  return new HTMLRewriter()
+    .on("#feed-list", new FeedListInjector(cardsHtml))
+    .transform(response);
+}
+
 async function handleProfile(handle, response) {
   const idxRes = await fetch(`${DB_BASE}/handleIndex/${encodeURIComponent(handle)}.json`);
   if (!idxRes.ok) return response;
@@ -158,10 +202,11 @@ async function handlePost(postId, response) {
 
 export const onRequest = async ({ request, next }) => {
   const url = new URL(request.url);
+  const isHomepage = url.pathname === "/" || url.pathname === "/index.html";
   const profileMatch = url.pathname.match(/^\/@([a-zA-Z0-9_]{1,30})\/?$/);
   const postMatch = url.pathname.match(/^\/p\/([^\/?#]+)\/?$/);
 
-  if (!profileMatch && !postMatch) return next(); // any other route — untouched
+  if (!isHomepage && !profileMatch && !postMatch) return next(); // any other route — untouched
 
   const response = await next(); // the normal static index.html response
   const contentType = response.headers.get("content-type") || "";
@@ -170,6 +215,7 @@ export const onRequest = async ({ request, next }) => {
   try {
     if (profileMatch) return await handleProfile(profileMatch[1].toLowerCase(), response);
     if (postMatch) return await handlePost(postMatch[1], response);
+    if (isHomepage) return await handleHomepage(response);
     return response;
   } catch (err) {
     // Any failure (network, permission-denied, bad data) -> just serve the
