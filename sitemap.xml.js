@@ -16,6 +16,17 @@
 // reliable, fresh starting set of your most relevant/recent URLs. Google
 // discovers further pages by following links between them from there.
 //
+// IMAGE INDEXING: each <url> entry for a Pulse that has a real (https, not
+// base64) image now also carries an <image:image> tag, using Google's image
+// sitemap extension (xmlns:image). This is what actually gets a post's
+// photo into Google Images search — the og:image meta tag on the post page
+// (from _middleware.js) helps link previews/rich results, but Google's
+// separate Image Search index specifically looks for sitemap <image:image>
+// entries (or discovers images by crawling <img> tags on an indexed page).
+// A base64 data-URI image can't be listed here — Google's image crawler
+// needs a real fetchable https URL, so those posts just get the normal
+// <url> entry without an <image:image> child.
+//
 // REQUIREMENT: same as _middleware.js — `pulses` (ordered by createdAt) and
 // the public fields under `users/{uid}` need to be readable without auth.
 
@@ -28,6 +39,9 @@ function xmlEscape(str) {
 }
 function isoDate(ms) {
   try { return new Date(ms || Date.now()).toISOString(); } catch { return new Date().toISOString(); }
+}
+function isRealImageUrl(u) {
+  return typeof u === "string" && /^https?:\/\//i.test(u);
 }
 
 export const onRequest = async () => {
@@ -44,10 +58,13 @@ export const onRequest = async () => {
       if (pulsesObj) {
         for (const [id, p] of Object.entries(pulsesObj)) {
           if (!p || p.deleted || p.private) continue; // skip removed/private posts if those flags exist
+          const postImage = p.images && p.images[0];
           urls.push({
             loc: `${SITE_ORIGIN}/p/${id}`,
             lastmod: isoDate(p.editedAt || p.createdAt),
             priority: "0.7",
+            image: isRealImageUrl(postImage) ? postImage : null,
+            imageCaption: p.text || null,
           });
           if (p.creatorHandle && !seenHandles.has(p.creatorHandle)) {
             seenHandles.add(p.creatorHandle);
@@ -67,10 +84,17 @@ export const onRequest = async () => {
 
   const body =
     `<?xml version="1.0" encoding="UTF-8"?>\n` +
-    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n` +
-    urls.map(u =>
-      `  <url>\n    <loc>${xmlEscape(u.loc)}</loc>\n    <lastmod>${u.lastmod}</lastmod>\n    <priority>${u.priority}</priority>\n  </url>`
-    ).join("\n") +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">\n` +
+    urls.map(u => {
+      let entry = `  <url>\n    <loc>${xmlEscape(u.loc)}</loc>\n    <lastmod>${u.lastmod}</lastmod>\n    <priority>${u.priority}</priority>\n`;
+      if (u.image) {
+        entry += `    <image:image>\n      <image:loc>${xmlEscape(u.image)}</image:loc>\n`;
+        if (u.imageCaption) entry += `      <image:caption>${xmlEscape(u.imageCaption.slice(0, 200))}</image:caption>\n`;
+        entry += `    </image:image>\n`;
+      }
+      entry += `  </url>`;
+      return entry;
+    }).join("\n") +
     `\n</urlset>\n`;
 
   return new Response(body, {
