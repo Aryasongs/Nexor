@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /settings
+Disallow: /messages
+Disallow: /chat
+
+Sitemap: https://nexor-f4d.pages.dev/sitemap.xml
