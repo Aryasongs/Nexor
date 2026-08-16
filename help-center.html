@@ -585,6 +585,9 @@ const GEMINI_MODEL = 'gemini-2.5-flash';
 // Used only when both Groq AND Gemini fail.
 const CFAI_PROXY_ENDPOINT = 'https://sparky-cfai.sgursharn076.workers.dev';
 const CFAI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+// Vision-capable Workers AI model, used only when a screenshot is attached
+// and both Groq (text-only) can't help and Gemini's vision call has failed.
+const CFAI_VISION_MODEL = '@cf/meta/llama-3.2-11b-vision-instruct';
 // Deep link back into the main app that auto-opens the Premium subscription
 // sheet on load (see checkDeepLinkActions() in index.html). Help Center is a
 // separate tab with no shared session/JS state with the app, so a URL is the
@@ -2162,7 +2165,7 @@ function toggleVoiceListening(){
 // is the honesty check: it tells Sparky how well those articles actually
 // matched, so a weak/loose match gets a hedge instead of a
 // falsely-confident answer stitched together from unrelated excerpts.
-function buildSparkySystemPrompt(retrievedIds, confidence){
+function buildSparkySystemPrompt(retrievedIds, confidence, hasImage){
   const catalog = Object.entries(ARTICLES).map(([id,a])=>`${id}: ${a.title} — ${a.desc}`).join('\n');
   const excerpts = (retrievedIds||[]).map(id=>`--- ${id}: ${ARTICLES[id].title} ---\n${getArticlePlainBody(id).slice(0,900)}`).join('\n\n');
   const who = (userCtx && userCtx.handle)
@@ -2192,7 +2195,9 @@ ${catalog}
 RELEVANT ARTICLE EXCERPTS for this message (full text — use these to write your answer):
 ${excerpts || '(nothing matched well this turn — answer from general catalog awareness above, or ask a clarifying question)'}
 
-If a message contains a bracketed note like "[Attached screenshot: name]", the user has attached an image alongside their text. You cannot see its pixels, but it has been saved and shown to them in chat, and — if you file a ticket or copyright report this turn — it travels along as evidence automatically. Acknowledge it naturally (e.g. "Got the screenshot, thanks") instead of pretending you analyzed it, and lean toward offering to file a support ticket when someone attaches a screenshot of an error/bug.
+${hasImage
+  ? `The user has attached a screenshot THIS turn, and its actual image data has been included alongside their message — you can genuinely see it. Look at it and reference specific, real details (visible error text, which screen/button, what looks wrong, etc.) to help diagnose the issue, instead of just acknowledging that a screenshot exists. If you file a ticket or copyright report this turn, it travels along as evidence automatically.`
+  : `If a message contains a bracketed note like "[Attached screenshot: name]" from an EARLIER turn, that image was only visible to you in that turn and isn't included again now — don't pretend you can still see it. Refer back to what was discussed about it in words, and acknowledge naturally (e.g. "like in that screenshot you sent...") instead of re-describing pixels you no longer have.`}
 
 SPECIAL ACTIONS — you can take these yourself, right in chat, instead of sending the user to a separate page:
 1) "create_ticket" — for a support/report-a-problem case the articles can't resolve (account dispute, bug, billing issue, content issue, etc.) that the user wants filed rather than self-served.
@@ -2232,10 +2237,30 @@ async function callSparkyProvider(endpoint, model, msgs, providerLabel){
   if(!res.ok) throw new Error(providerLabel+' proxy HTTP '+res.status);
   const json = await res.json();
   const raw = (json.choices && json.choices[0] && json.choices[0].message && json.choices[0].message.content) || '';
-  const cleaned = raw.replace(/```json|```/g,'').trim();
-  const parsed = JSON.parse(cleaned);
-  if(!parsed || typeof parsed.reply !== 'string') throw new Error('unexpected Sparky response shape from '+providerLabel);
+  const parsed = extractSparkyJson(raw);
+  if(!parsed || typeof parsed.reply !== 'string') throw new Error('unexpected Sparky response shape from '+providerLabel+' — raw: '+raw.slice(0,200));
   return parsed;
+}
+
+// Some models don't perfectly follow "respond with ONLY compact JSON" —
+// they occasionally wrap it in ```json fences or add a stray sentence
+// before/after. Strip fences first, then if a straight parse fails, fall
+// back to grabbing the first {...} block in the text (matches the
+// outermost braces) before giving up.
+function extractSparkyJson(raw){
+  const cleaned = raw.replace(/```json|```/g,'').trim();
+  try{
+    return JSON.parse(cleaned);
+  }catch(e){
+    const start = cleaned.indexOf('{');
+    const end = cleaned.lastIndexOf('}');
+    if(start !== -1 && end > start){
+      try{
+        return JSON.parse(cleaned.slice(start, end+1));
+      }catch(e2){ /* fall through */ }
+    }
+    return null;
+  }
 }
 
 // Sparky's real brain, with a 3-step fallback chain:
