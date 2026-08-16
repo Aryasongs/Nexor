@@ -579,7 +579,7 @@ const GROQ_MODEL = 'llama-3.3-70b-versatile';
 // which provider actually answered). Used only when the Groq call fails
 // (rate limit, outage, etc.) — see worker-gemini.js.
 const GEMINI_PROXY_ENDPOINT = 'https://gemininexor.sgursharn076.workers.dev';
-const GEMINI_MODEL = 'gemini-2.5-flash';
+const GEMINI_MODEL = 'gemini-3.5-flash';
 // Fallback #2: Cloudflare Workers AI, via its own tiny proxy worker (no
 // external API key needed — the model runs on Cloudflare's own AI binding).
 // Used only when both Groq AND Gemini fail.
