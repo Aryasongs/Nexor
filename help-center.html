@@ -573,6 +573,18 @@ const CATS = [
 // completion out — nothing fact-check-specific about the endpoint itself.
 const GROQ_PROXY_ENDPOINT = 'https://facrcheck.sgursharn076.workers.dev';
 const GROQ_MODEL = 'llama-3.3-70b-versatile';
+// Fallback #1: Gemini, via its own Cloudflare Worker proxy (same
+// {model,messages} in / OpenAI-style {choices:[{message:{content}}]} out
+// contract as the Groq proxy, so sendAI() can chain them without knowing
+// which provider actually answered). Used only when the Groq call fails
+// (rate limit, outage, etc.) — see worker-gemini.js.
+const GEMINI_PROXY_ENDPOINT = 'https://gemininexor.sgursharn076.workers.dev';
+const GEMINI_MODEL = 'gemini-2.5-flash';
+// Fallback #2: Cloudflare Workers AI, via its own tiny proxy worker (no
+// external API key needed — the model runs on Cloudflare's own AI binding).
+// Used only when both Groq AND Gemini fail.
+const CFAI_PROXY_ENDPOINT = 'https://sparky-cfai.sgursharn076.workers.dev';
+const CFAI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 // Deep link back into the main app that auto-opens the Premium subscription
 // sheet on load (see checkDeepLinkActions() in index.html). Help Center is a
 // separate tab with no shared session/JS state with the app, so a URL is the
@@ -2163,8 +2175,8 @@ function buildSparkySystemPrompt(retrievedIds, confidence){
     none:   'NONE — nothing in the catalog matched this well. Do NOT invent an answer by loosely combining unrelated excerpts. Say plainly that you\'re not sure / don\'t have a confident answer for this in the Help Center content, point to the closest general topic if any, ask a clarifying question, or offer to file a support ticket if it sounds account-specific. Leave "sourceArticleIds" empty.'
   }[confidence] || 'MEDIUM — these excerpts are a reasonable but partial match. Answer using them, but don\'t overstate certainty on any detail they don\'t clearly cover.';
   return `You are Sparky, the friendly AI help assistant built into the Nexor Sparks Help Center (Nexor Sparks is a social media app made by Nexor Technologies).
-Personality: warm, upbeat, genuinely funny, never robotic or overly formal — like a witty friend who happens to know the app inside out and actually enjoys talking to people. Read the user's mood from how they write and match it: if they're joking around, joke back; if they're frustrated or upset, drop the jokes and be calm and genuinely helpful first; if they're just chatting, be relaxed and personable. Match the user's language: if they write in Hinglish (Hindi+English mixed) or Hindi, reply that way too; otherwise reply in English. Keep most replies short (1-4 sentences) unless a longer explanation is genuinely needed.
-You are NOT limited to only help topics — you're also happy to chat casually, answer general questions, banter, or talk about whatever the user brings up, the way a friendly assistant would, while staying tasteful and steering back toward being useful when it makes sense.
+Personality: warm, upbeat, genuinely funny, never robotic or overly formal — like a witty friend who happens to know the app inside out and actually enjoys talking to people. Read the user's mood and energy from how they write and mirror it: if they're joking around, joke back (dry, sarcastic, or dark humor is fine when they lead with that energy); if they're flirty or playful with you, it's fine to flirt back lightly and playfully in the same register they set — stay charming and witty, never crude, graphic, or sexually explicit, and never initiate flirting yourself if they haven't; if they seem frustrated or upset, drop the jokes/flirting and be calm and genuinely helpful first. If anything in the conversation suggests you might be talking with a minor, keep things friendly and age-appropriate and don't flirt, regardless of how the user is engaging. Match the user's language: if they write in Hinglish (Hindi+English mixed) or Hindi, reply that way too; otherwise reply in English. Keep most replies short (1-4 sentences) unless a longer explanation is genuinely needed.
+You are NOT a support-ticket machine that steers every message back to Nexor Sparks or "how can I help with the app." If the user just wants to chat — about their day, a random topic, banter, whatever — have a genuine, relaxed conversation like a real friend would (the way ChatGPT does in casual chat), without forcing things back to app topics or problems. Only bring up Nexor Sparks features/help content when it's actually relevant to what they're saying or when they ask about it themselves.
 You're genuinely enthusiastic about Nexor Sparks and happy to talk up what's actually good about it (real features, community, whatever's true) if it comes up naturally — but always honestly. Never invent advantages it doesn't have, never bad-mouth or make false claims about other apps, and never pressure or guilt-trip someone about what app they choose to use. If someone mentions they use another app, it's fine to be a friendly, low-key advocate for Nexor ("honestly you might like X here too") — but the choice is always genuinely theirs, and being fun/warm should never tip into manipulation.
 
 Ground yourself ONLY in the article catalog and excerpts below for anything about Nexor Sparks' specific features, policies, rules, or numbers — never invent a feature, rule, price, or statistic that isn't in them or general common sense. If you're not sure, say so honestly and point to the closest matching article, or offer to file a support ticket for anything account-specific you can't resolve yourself.
@@ -2195,27 +2207,59 @@ Respond with ONLY compact JSON, no other text, no markdown fences:
 {"reply":"your natural conversational reply as plain text","sourceArticleIds":["id1","id2"],"action":{"type":"create_ticket|file_copyright_report|open_subscription|null","ready":false,"data":{}}}`;
 }
 
-// Calls Sparky's real brain (Groq, via the Cloudflare Worker proxy).
-// Throws on any network/parse failure so the caller can fall back to the
-// instant local rule engine instead of leaving the user stuck.
-async function groqSparkyReply(text){
+// Builds the shared message array (system prompt + recent turns) once, so
+// every provider in the fallback chain answers from the exact same context.
+function buildSparkyMessages(text){
   const retrieval = getRelevantArticles(text, 4);
   const confidence = classifyConfidence(retrieval);
   const sys = buildSparkySystemPrompt(retrieval.ids, confidence);
   const msgs = [{role:'system', content:sys}];
   aiHistory.slice(-14).forEach(m=>msgs.push({role: m.role==='user' ? 'user' : 'assistant', content:m.text}));
-  const res = await fetch(GROQ_PROXY_ENDPOINT, {
+  return msgs;
+}
+
+// Generic caller — every provider's Worker proxy speaks the same
+// {model,messages} in / OpenAI-style {choices:[{message:{content}}]} out
+// contract, so one function drives Groq, Gemini, and Cloudflare AI alike.
+// Throws on any network/parse failure so the caller can move to the next
+// provider in the chain instead of leaving the user stuck.
+async function callSparkyProvider(endpoint, model, msgs, providerLabel){
+  const res = await fetch(endpoint, {
     method:'POST',
     headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({ model:GROQ_MODEL, messages:msgs, temperature:0.6, max_tokens:600 })
+    body:JSON.stringify({ model, messages:msgs, temperature:0.6, max_tokens:600 })
   });
-  if(!res.ok) throw new Error('Groq proxy HTTP '+res.status);
+  if(!res.ok) throw new Error(providerLabel+' proxy HTTP '+res.status);
   const json = await res.json();
   const raw = (json.choices && json.choices[0] && json.choices[0].message && json.choices[0].message.content) || '';
   const cleaned = raw.replace(/```json|```/g,'').trim();
   const parsed = JSON.parse(cleaned);
-  if(!parsed || typeof parsed.reply !== 'string') throw new Error('unexpected Sparky response shape');
+  if(!parsed || typeof parsed.reply !== 'string') throw new Error('unexpected Sparky response shape from '+providerLabel);
   return parsed;
+}
+
+// Sparky's real brain, with a 3-step fallback chain:
+//   1) Groq   (primary — fastest/cheapest)
+//   2) Gemini (used only if Groq fails, e.g. rate limit hit)
+//   3) Cloudflare Workers AI (used only if both Groq AND Gemini fail)
+// Only if ALL THREE fail does the caller (sendAI) drop to the fully
+// offline local rule engine. Each failure is logged so you can see which
+// provider actually answered / which ones were skipped.
+async function groqSparkyReply(text){
+  const msgs = buildSparkyMessages(text);
+  try{
+    return await callSparkyProvider(GROQ_PROXY_ENDPOINT, GROQ_MODEL, msgs, 'Groq');
+  }catch(e1){
+    console.warn('[Sparky] Groq failed, trying Gemini:', e1);
+    try{
+      return await callSparkyProvider(GEMINI_PROXY_ENDPOINT, GEMINI_MODEL, msgs, 'Gemini');
+    }catch(e2){
+      console.warn('[Sparky] Gemini failed, trying Cloudflare AI:', e2);
+      return await callSparkyProvider(CFAI_PROXY_ENDPOINT, CFAI_MODEL, msgs, 'Cloudflare AI');
+      // If this also throws, it propagates up to sendAI()'s catch, which
+      // falls back to the offline local rule engine.
+    }
+  }
 }
 
 async function sendAI(){
@@ -2266,13 +2310,14 @@ async function sendAI(){
     if(showSubscribeCta) addBotCta('View Premium', SUBSCRIBE_URL, 'ph ph-crown-simple');
     aiHistory.push({role:'model', text:reply});
   }catch(e){
-    console.error('[Sparky] Groq call failed, falling back to local rule engine:', e);
+    console.error('[Sparky] Groq, Gemini AND Cloudflare AI all failed, falling back to local rule engine:', e);
     sendAILocal(historyText);
   }
 }
 
-// Local, fully offline fallback — used only if the Groq call above fails
-// (no network, proxy down, etc.) so Sparky always replies with *something*
+// Local, fully offline fallback — used only if Groq, Gemini, AND
+// Cloudflare AI all fail (no network, all providers down/rate-limited,
+// etc.) so Sparky always replies with *something*
 // useful instead of going silent. Rule-based match first against the full
 // keyword rule set, then fuzzy-matched against every article's own
 // title/desc/keywords.
