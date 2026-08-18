@@ -3,475 +3,524 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dozera News Folds Into Nexor News After Founder's Son Engineers Buyout | Business Times US.CA</title>
+<title>Dynastic Buyout: Nexor Absorbs Dozera News in $60M Family Coup | The Dealroom Chronicle</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Libre+Caslon+Text:ital,wght@0,400;0,700;1,400&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  :root{
-    --ink:#12213B;
-    --ink-soft:#33456A;
-    --paper:#F6F2E7;
-    --paper-dim:#EDE7D6;
-    --rule:#D7CDB2;
-    --gold:#B8862F;
-    --wire-red:#8A2C22;
-    --green:#2E5E3E;
-  }
-  *{box-sizing:border-box;}
-  html{scroll-behavior:smooth;}
-  body{
-    margin:0;
-    background:var(--paper);
-    color:var(--ink);
-    font-family:"Source Serif 4", Georgia, serif;
-    line-height:1.6;
-  }
-  a{color:inherit;}
-
-  /* ---------- Ticker ---------- */
-  .ticker-wrap{
-    background:var(--ink);
-    color:var(--paper);
-    overflow:hidden;
-    white-space:nowrap;
-    font-family:"IBM Plex Mono", monospace;
-    font-size:12.5px;
-    letter-spacing:.02em;
-    border-bottom:1px solid var(--gold);
-  }
-  .ticker{
-    display:inline-block;
-    padding-left:100%;
-    animation:scroll-left 42s linear infinite;
-  }
-  .ticker span{padding:0 1.4rem; display:inline-block;}
-  .up{color:#7FD79A;}
-  .down{color:#E38A7C;}
-  @keyframes scroll-left{
-    0%{transform:translateX(0);}
-    100%{transform:translateX(-100%);}
-  }
-  @media (prefers-reduced-motion: reduce){
-    .ticker{animation:none; padding-left:0;}
+  :root {
+    --bg-primary: #0C0E12;
+    --bg-surface: #141820;
+    --bg-surface-elevated: #1B202B;
+    --border-subtle: #242B3A;
+    --border-accent: #38455E;
+    --text-main: #E6EDF8;
+    --text-muted: #8F9CAE;
+    --text-dim: #5C6779;
+    --accent-crimson: #FF4A5A;
+    --accent-emerald: #00D084;
+    --accent-amber: #F5A623;
+    --accent-cyan: #38BDF8;
+    --font-heading: "Plus Jakarta Sans", -apple-system, sans-serif;
+    --font-body: "Newsreader", Georgia, serif;
+    --font-mono: "JetBrains Mono", monospace;
   }
 
-  /* ---------- Masthead ---------- */
-  header.masthead{
-    max-width:1080px;
-    margin:0 auto;
-    padding:1.6rem 1.5rem .9rem;
-    text-align:center;
-    border-bottom:3px solid var(--ink);
-  }
-  .kicker-row{
-    display:flex;
-    justify-content:space-between;
-    font-family:"IBM Plex Mono", monospace;
-    font-size:11px;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    color:var(--ink-soft);
-    margin-bottom:.9rem;
-  }
-  .masthead h1.brand{
-    font-family:"Libre Caslon Text", serif;
-    font-size:clamp(2.1rem, 5vw, 3.4rem);
-    letter-spacing:.01em;
-    margin:.1rem 0 .15rem;
-    font-weight:700;
-  }
-  .masthead .region{
-    font-family:"IBM Plex Mono", monospace;
-    font-size:12px;
-    letter-spacing:.28em;
-    color:var(--gold);
-    text-transform:uppercase;
-  }
-  nav.sections{
-    max-width:1080px;
-    margin:0 auto;
-    padding:.55rem 1.5rem;
-    display:flex;
-    gap:1.4rem;
-    font-family:"IBM Plex Mono", monospace;
-    font-size:12px;
-    letter-spacing:.05em;
-    text-transform:uppercase;
-    border-bottom:1px solid var(--rule);
-    overflow-x:auto;
-    color:var(--ink-soft);
-  }
-  nav.sections .current{color:var(--wire-red); font-weight:600;}
-
-  /* ---------- Article shell ---------- */
-  main{
-    max-width:1080px;
-    margin:0 auto;
-    padding:2.4rem 1.5rem 4rem;
-    display:grid;
-    grid-template-columns: 1fr 300px;
-    gap:2.8rem;
-  }
-  @media (max-width:820px){
-    main{grid-template-columns:1fr;}
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background-color: var(--bg-primary);
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 1.15rem;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
   }
 
-  .eyebrow{
-    display:inline-block;
-    font-family:"IBM Plex Mono", monospace;
-    font-size:11.5px;
-    letter-spacing:.1em;
-    text-transform:uppercase;
-    color:#fff;
-    background:var(--wire-red);
-    padding:.28rem .6rem;
-    margin-bottom:1rem;
+  a { color: var(--accent-cyan); text-decoration: none; transition: 0.2s ease; }
+  a:hover { color: #fff; }
+
+  /* Top Bar */
+  .top-strip {
+    background: #080A0D;
+    border-bottom: 1px solid var(--border-subtle);
+    padding: 0.5rem 1.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    color: var(--text-muted);
   }
-  h2.headline{
-    font-family:"Libre Caslon Text", serif;
-    font-size:clamp(1.8rem, 3.6vw, 2.7rem);
-    line-height:1.16;
-    margin:0 0 .7rem;
+  .status-live {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: var(--accent-crimson);
+    font-weight: 600;
   }
-  .dek{
-    font-size:1.15rem;
-    color:var(--ink-soft);
-    font-style:italic;
-    margin:0 0 1.1rem;
-    max-width:640px;
-  }
-  .byline{
-    display:flex;
-    flex-wrap:wrap;
-    gap:.4rem 1rem;
-    font-family:"IBM Plex Mono", monospace;
-    font-size:12px;
-    color:var(--ink-soft);
-    border-top:1px solid var(--rule);
-    border-bottom:1px solid var(--rule);
-    padding:.7rem 0;
-    margin-bottom:1.6rem;
+  .status-live::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    background: var(--accent-crimson);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--accent-crimson);
   }
 
-  figure.lead-art{margin:0 0 1.8rem;}
-  figure.lead-art .frame{
-    background:linear-gradient(135deg,var(--ink) 0%, #1C3358 55%, var(--wire-red) 130%);
-    aspect-ratio:16/8;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    position:relative;
-    overflow:hidden;
+  /* Navigation */
+  header.site-header {
+    border-bottom: 1px solid var(--border-subtle);
+    background: rgba(12, 14, 18, 0.95);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    backdrop-filter: blur(12px);
   }
-  figure.lead-art .frame::before{
-    content:"";
-    position:absolute; inset:0;
-    background-image:repeating-linear-gradient(115deg, rgba(255,255,255,.05) 0 2px, transparent 2px 26px);
+  .nav-container {
+    max-width: 1240px;
+    margin: 0 auto;
+    padding: 1rem 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
   }
-  figure.lead-art .lockup{
-    font-family:"Libre Caslon Text", serif;
-    color:var(--paper);
-    text-align:center;
-    z-index:1;
+  .logo {
+    font-family: var(--font-heading);
+    font-weight: 800;
+    font-size: 1.4rem;
+    letter-spacing: -0.03em;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
-  figure.lead-art .lockup .old{
-    font-size:clamp(1.1rem,3vw,1.7rem);
-    text-decoration:line-through;
-    text-decoration-color:var(--wire-red);
-    text-decoration-thickness:2px;
-    opacity:.75;
+  .logo span {
+    color: var(--accent-cyan);
+    font-weight: 400;
   }
-  figure.lead-art .lockup .arrow{
-    font-family:"IBM Plex Mono", monospace;
-    font-size:.85rem;
-    color:var(--gold);
-    letter-spacing:.3em;
-    margin:.35rem 0;
+  .nav-links {
+    display: flex;
+    gap: 1.8rem;
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    font-weight: 600;
+    list-style: none;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
-  figure.lead-art .lockup .new{
-    font-size:clamp(1.6rem,4.4vw,2.6rem);
-    font-weight:700;
+  .nav-links a { color: var(--text-muted); }
+  .nav-links a.active, .nav-links a:hover { color: var(--accent-cyan); }
+
+  /* Page Wrapper */
+  .layout-grid {
+    max-width: 1240px;
+    margin: 2.5rem auto;
+    padding: 0 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 3.5rem;
   }
-  figcaption{
-    font-family:"IBM Plex Mono", monospace;
-    font-size:11px;
-    color:var(--ink-soft);
-    padding:.5rem .1rem 0;
+  @media (max-width: 960px) {
+    .layout-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+    .nav-links { display: none; }
   }
 
-  .article p{margin:0 0 1.15rem; font-size:1.05rem;}
-  .article p.lede::first-letter{
-    font-family:"Libre Caslon Text", serif;
-    font-size:3.1rem;
-    float:left;
-    line-height:.85;
-    padding:.06em .12em 0 0;
-    color:var(--wire-red);
+  /* Story Header */
+  .badge-cluster {
+    display: flex;
+    gap: 0.6rem;
+    align-items: center;
+    margin-bottom: 1.2rem;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
   }
-  blockquote.pull{
-    font-family:"Libre Caslon Text", serif;
-    font-style:italic;
-    font-size:1.4rem;
-    line-height:1.4;
-    color:var(--ink);
-    border-top:1px solid var(--gold);
-    border-bottom:1px solid var(--gold);
-    padding:1.1rem 0;
-    margin:1.8rem 0;
+  .tag {
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    font-weight: 600;
+    text-transform: uppercase;
   }
-  blockquote.pull cite{
-    display:block;
-    font-family:"IBM Plex Mono", monospace;
-    font-style:normal;
-    font-size:11.5px;
-    letter-spacing:.05em;
-    text-transform:uppercase;
-    color:var(--ink-soft);
-    margin-top:.5rem;
-  }
-  h3.subhead{
-    font-family:"Libre Caslon Text", serif;
-    font-size:1.25rem;
-    margin:2.1rem 0 .8rem;
-    border-left:4px solid var(--wire-red);
-    padding-left:.6rem;
-  }
-  .split{
-    display:grid;
-    grid-template-columns:1fr 1fr;
-    gap:1.6rem;
-    margin:1.4rem 0 1.9rem;
-  }
-  @media (max-width:600px){.split{grid-template-columns:1fr;}}
-  .card{
-    background:var(--paper-dim);
-    border:1px solid var(--rule);
-    padding:1.1rem 1.2rem;
-  }
-  .card h4{
-    font-family:"IBM Plex Mono", monospace;
-    font-size:12px;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    margin:0 0 .6rem;
-  }
-  .card.praise h4{color:var(--green);}
-  .card.criticism h4{color:var(--wire-red);}
-  .card ul{margin:0; padding-left:1.1rem;}
-  .card li{margin-bottom:.5rem; font-size:.97rem;}
+  .tag-exclusive { background: rgba(255, 74, 90, 0.15); color: var(--accent-crimson); border: 1px solid rgba(255, 74, 90, 0.3); }
+  .tag-category { background: var(--bg-surface-elevated); color: var(--text-muted); border: 1px solid var(--border-subtle); }
 
-  .article-foot{
-    border-top:2px solid var(--ink);
-    margin-top:2.4rem;
-    padding-top:1rem;
-    font-family:"IBM Plex Mono", monospace;
-    font-size:11.5px;
-    color:var(--ink-soft);
+  h1.lead-title {
+    font-family: var(--font-heading);
+    font-size: clamp(2.2rem, 4vw, 3.4rem);
+    font-weight: 800;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+    color: #fff;
+    margin-bottom: 1.2rem;
   }
 
-  /* ---------- Sidebar ---------- */
-  aside{font-size:.94rem;}
-  .box{
-    border:1px solid var(--rule);
-    background:var(--paper-dim);
-    padding:1.1rem 1.2rem;
-    margin-bottom:1.6rem;
+  .deck {
+    font-size: 1.3rem;
+    line-height: 1.5;
+    color: var(--text-muted);
+    font-weight: 400;
+    margin-bottom: 1.8rem;
+    border-left: 3px solid var(--accent-cyan);
+    padding-left: 1.2rem;
   }
-  .box h4{
-    font-family:"IBM Plex Mono", monospace;
-    font-size:11.5px;
-    letter-spacing:.08em;
-    text-transform:uppercase;
-    margin:0 0 .9rem;
-    padding-bottom:.6rem;
-    border-bottom:1px solid var(--rule);
-  }
-  .ticker-line{
-    display:flex;
-    justify-content:space-between;
-    font-family:"IBM Plex Mono", monospace;
-    font-size:12.5px;
-    padding:.35rem 0;
-    border-bottom:1px dotted var(--rule);
-  }
-  .ticker-line:last-child{border-bottom:none;}
-  .related li{margin-bottom:.8rem; list-style:none;}
-  .related{padding:0; margin:0;}
-  .related a{text-decoration:none; font-weight:600;}
-  .related a:hover{color:var(--wire-red);}
-  .related .tag{
-    display:block;
-    font-family:"IBM Plex Mono", monospace;
-    font-size:10.5px;
-    color:var(--ink-soft);
-    text-transform:uppercase;
-    letter-spacing:.06em;
-    margin-bottom:.15rem;
-  }
-  .stat-row{display:flex; justify-content:space-between; padding:.4rem 0; font-size:.9rem;}
-  .stat-row span:last-child{font-family:"IBM Plex Mono", monospace; font-weight:600;}
 
-  footer.site{
-    max-width:1080px;
-    margin:0 auto;
-    padding:2rem 1.5rem 3rem;
-    border-top:3px solid var(--ink);
-    font-family:"IBM Plex Mono", monospace;
-    font-size:11px;
-    color:var(--ink-soft);
-    text-align:center;
+  .author-strip {
+    display: flex;
+    align-items: center;
+    gap: 1.2rem;
+    padding: 1.2rem 0;
+    border-top: 1px solid var(--border-subtle);
+    border-bottom: 1px solid var(--border-subtle);
+    margin-bottom: 2.2rem;
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+  }
+  .avatar {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-cyan), #1e293b);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    color: #fff;
+  }
+  .author-meta .name { font-weight: 700; color: #fff; }
+  .author-meta .role { color: var(--text-dim); }
+
+  /* Hero Infographic Card */
+  .deal-visual {
+    background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-surface-elevated) 100%);
+    border: 1px solid var(--border-accent);
+    border-radius: 12px;
+    padding: 2rem;
+    margin-bottom: 2.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .deal-visual::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 3px;
+    background: linear-gradient(90deg, var(--accent-crimson), var(--accent-amber), var(--accent-cyan));
+  }
+  .diagram-flow {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    gap: 1.5rem;
+    margin: 1.5rem 0 1rem;
+    text-align: center;
+  }
+  @media (max-width: 600px) {
+    .diagram-flow { grid-template-columns: 1fr; }
+  }
+  .flow-box {
+    background: var(--bg-primary);
+    border: 1px solid var(--border-subtle);
+    border-radius: 8px;
+    padding: 1.2rem 1rem;
+  }
+  .flow-box .label { font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-dim); text-transform: uppercase; }
+  .flow-box .company { font-family: var(--font-heading); font-size: 1.3rem; font-weight: 700; color: #fff; margin-top: 0.2rem; }
+  .flow-box.target .company { text-decoration: line-through var(--accent-crimson) 2px; opacity: 0.8; }
+  .flow-arrow { font-family: var(--font-mono); font-size: 0.8rem; color: var(--accent-cyan); font-weight: 600; }
+
+  /* Article Typography */
+  .article-body p {
+    margin-bottom: 1.6rem;
+    color: var(--text-main);
+  }
+  .article-body p.intro::first-letter {
+    font-family: var(--font-heading);
+    font-size: 3.8rem;
+    line-height: 0.8;
+    float: left;
+    padding: 0.3rem 0.6rem 0 0;
+    color: var(--accent-cyan);
+    font-weight: 800;
+  }
+  .article-body h2 {
+    font-family: var(--font-heading);
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #fff;
+    margin: 2.8rem 0 1.2rem;
+  }
+
+  /* Callout Blockquote */
+  .insider-quote {
+    background: var(--bg-surface);
+    border-left: 4px solid var(--accent-amber);
+    padding: 1.6rem 1.8rem;
+    margin: 2.2rem 0;
+    border-radius: 0 8px 8px 0;
+  }
+  .insider-quote p {
+    font-style: italic;
+    font-size: 1.25rem;
+    color: #fff;
+    margin-bottom: 0.6rem !important;
+  }
+  .insider-quote cite {
+    display: block;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--accent-amber);
+    font-style: normal;
+    text-transform: uppercase;
+  }
+
+  /* Bento Feature Cards */
+  .bento-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.2rem;
+    margin: 2rem 0;
+  }
+  @media (max-width: 600px) { .bento-grid { grid-template-columns: 1fr; } }
+  .bento-card {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 1.4rem;
+  }
+  .bento-card h4 {
+    font-family: var(--font-heading);
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .bento-card.bull h4 { color: var(--accent-emerald); }
+  .bento-card.bear h4 { color: var(--accent-crimson); }
+  .bento-card ul {
+    list-style: none;
+    font-family: var(--font-heading);
+    font-size: 0.9rem;
+    color: var(--text-muted);
+  }
+  .bento-card li {
+    margin-bottom: 0.6rem;
+    position: relative;
+    padding-left: 1.2rem;
+  }
+  .bento-card li::before {
+    content: "•";
+    position: absolute;
+    left: 0;
+    color: var(--text-dim);
+  }
+
+  /* Sidebar */
+  aside .widget {
+    background: var(--bg-surface);
+    border: 1px solid var(--border-subtle);
+    border-radius: 10px;
+    padding: 1.4rem;
+    margin-bottom: 1.8rem;
+  }
+  .widget-title {
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    margin-bottom: 1.2rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .deal-data-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.55rem 0;
+    font-size: 0.88rem;
+    border-bottom: 1px dashed rgba(255,255,255,0.06);
+    font-family: var(--font-heading);
+  }
+  .deal-data-row span:first-child { color: var(--text-muted); }
+  .deal-data-row span:last-child { font-weight: 600; color: #fff; font-family: var(--font-mono); }
+
+  .stock-pill {
+    padding: 0.2rem 0.4rem;
+    border-radius: 4px;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+  }
+  .up-val { background: rgba(0, 208, 132, 0.12); color: var(--accent-emerald); }
+  .down-val { background: rgba(255, 74, 90, 0.12); color: var(--accent-crimson); }
+
+  /* Footer */
+  footer.site-footer {
+    border-top: 1px solid var(--border-subtle);
+    background: #080A0D;
+    padding: 3rem 1.5rem;
+    font-family: var(--font-heading);
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    text-align: center;
+    margin-top: 5rem;
   }
 </style>
 </head>
 <body>
 
-<div class="ticker-wrap" aria-hidden="true">
-  <div class="ticker">
-    <span>DOZR <span class="down">▼ 4.12%</span></span>
-    <span>NXNW <span class="up">▲ 6.85%</span></span>
-    <span>US10Y 4.31%</span>
-    <span>NASDAQ <span class="up">▲ 0.42%</span></span>
-    <span>DOZR <span class="down">▼ 4.12%</span></span>
-    <span>NXNW <span class="up">▲ 6.85%</span></span>
-    <span>USD/CAD 1.365</span>
-    <span>GOLD $2,614</span>
-    <span>DOZR <span class="down">▼ 4.12%</span></span>
-    <span>NXNW <span class="up">▲ 6.85%</span></span>
-    <span>NASDAQ <span class="up">▲ 0.42%</span></span>
+<div class="top-strip">
+  <div>
+    <span class="status-live">INTELLIGENCE ALERT</span> &nbsp;|&nbsp; M&amp;A DESK
   </div>
+  <div>NEW YORK &bull; LONDON &bull; SINGAPORE &bull; TORONTO</div>
 </div>
 
-<header class="masthead">
-  <div class="kicker-row">
-    <span>Tuesday, August 18, 2026</span>
-    <span>Media &amp; Mergers Desk</span>
+<header class="site-header">
+  <div class="nav-container">
+    <div class="logo">THE DEALROOM <span>CHRONICLE</span></div>
+    <ul class="nav-links">
+      <li><a href="#" class="active">M&amp;A Deals</a></li>
+      <li><a href="#">Private Equity</a></li>
+      <li><a href="#">Media Tech</a></li>
+      <li><a href="#">Governance</a></li>
+      <li><a href="#">Terminal</a></li>
+    </ul>
   </div>
-  <h1 class="brand">Business Times</h1>
-  <div class="region">U.S. &amp; Canada Edition</div>
 </header>
 
-<nav class="sections">
-  <span>Markets</span>
-  <span class="current">Media &amp; Mergers</span>
-  <span>Tech</span>
-  <span>Opinion</span>
-  <span>Startups</span>
-  <span>Capital</span>
-  <span>Regulation</span>
-</nav>
-
-<main>
-  <article class="article">
-    <span class="eyebrow">Breaking &middot; M&amp;A</span>
-    <h2 class="headline">Dozera News Folds Into Nexor News After Founder's Son Engineers Buyout</h2>
-    <p class="dek">A once-independent voice inside the Dozera Group has been absorbed into a rival outlet run by its own founder's son — a deal insiders are calling either a savvy consolidation or a quiet family betrayal, depending on who you ask.</p>
-
-    <div class="byline">
-      <span>By <strong>Alden Marsh</strong>, Media &amp; Mergers Correspondent</span>
-      <span>Business Times US.CA</span>
-      <span>Updated 6:42 AM ET</span>
-      <span>6 min read</span>
+<main class="layout-grid">
+  <article class="article-body">
+    <div class="badge-cluster">
+      <span class="tag tag-exclusive">Exclusive Report</span>
+      <span class="tag tag-category">Corporate Restructuring</span>
     </div>
 
-    <figure class="lead-art">
-      <div class="frame">
-        <div class="lockup">
-          <div class="old">DOZERA NEWS</div>
-          <div class="arrow">ACQUIRED &amp; ABSORBED INTO</div>
-          <div class="new">NEXOR NEWS</div>
+    <h1 class="lead-title">The Succession Gambit: Nexor News Swallows Dozera in Founder-Son Takeover</h1>
+    <p class="deck">In one of the most unorthodox transactions of the media quarter, Gursharan Singh has used his independent holding company to acquire and sunset his father's decades-old flagship newsroom.</p>
+
+    <div class="author-strip">
+      <div class="avatar">AM</div>
+      <div class="author-meta">
+        <div class="name">Alden Marsh &bull; Senior M&amp;A Investigative Analyst</div>
+        <div class="role">Published August 18, 2026 &bull; 6 min deep dive</div>
+      </div>
+    </div>
+
+    <div class="deal-visual">
+      <div class="diagram-flow">
+        <div class="flow-box target">
+          <div class="label">Acquired &amp; Sunsetting</div>
+          <div class="company">Dozera News</div>
+        </div>
+        <div class="flow-arrow">
+          ➔ &nbsp; FOLDED INTO &nbsp; ➔
+        </div>
+        <div class="flow-box">
+          <div class="label">Surviving Flagship</div>
+          <div class="company">Nexor News</div>
         </div>
       </div>
-      <figcaption>Illustration: Business Times. Dozera News' masthead will be discontinued within 90 days as the outlet is folded into Nexor News' editorial operation.</figcaption>
-    </figure>
+      <p style="text-align: center; font-size: 0.85rem; color: var(--text-dim); margin-top: 1rem; font-family: var(--font-mono);">
+        Deal structure: Private vehicle buyout bypassing outside syndicate vote &bull; 90-day brand phaseout
+      </p>
+    </div>
 
-    <p class="lede">Dozera News, for years the media arm of the diversified Dozera Group, is being folded into Nexor News, according to a deal confirmed late Monday that has sent a jolt through the small but fiercely competitive world of independently owned business press. The buyer is not a private equity fund or a distant conglomerate. It is Gursharan Singh — known publicly by his stage name, Gursharn Arya — the son of Dozera Group founder Gurdiyal Singh, who built Nexor News as his own venture and is now using it to swallow the outlet his father spent a decade building.</p>
+    <p class="intro">In corporate boardrooms, acquisitions usually follow the cold logic of market consolidation. But when Gursharan Singh (widely known under his professional moniker Gursharn Arya) inked the papers to absorb <strong>Dozera News</strong> into his own publication, <strong>Nexor News</strong>, the move signaled something far more personal: a generational succession executed not through inheritance, but through capital takeover.</p>
 
-    <p>Terms of the transaction were not fully disclosed, but two people close to the deal, speaking on condition of anonymity because the agreement has not been formally announced to staff, said the purchase price was funded largely through Gursharan Singh's personal holding company rather than Nexor News' balance sheet — a structure that lets him control the outcome without answering to Nexor News' other investors.</p>
+    <p>Dozera News was built over more than a decade by his father, Gurdiyal Singh, as the media cornerstone of the Dozera Group. Under the finalized agreement, the Dozera News masthead will formally dissolve within 90 days. Its journalists, digital distribution channels, and intellectual property will be entirely absorbed under Nexor's expanding umbrella.</p>
 
-    <p>Dozera News will not survive as a standalone brand. Its reporters, its archive, and what remains of its subscriber base are being routed directly into Nexor News, whose leadership says the combined newsroom will operate under a single editorial banner by the end of the quarter.</p>
+    <div class="insider-quote">
+      <p>"This isn't a traditional horizontal merger. It is an ambitious son buying out his father’s legacy vehicle and stamping his own name across the door."</p>
+      <cite>— Senior Editorial Staffer, Formerly Dozera News</cite>
+    </div>
 
-    <blockquote class="pull">
-      "This isn't a merger of equals. It's a son buying his father's newsroom and renaming it after himself."
-      <cite>— Former Dozera News editor, speaking anonymously</cite>
-    </blockquote>
+    <h2>Engineering the Buyout Vehicle</h2>
+    <p>According to transaction records reviewed by <em>The Dealroom Chronicle</em>, Singh structured the purchase largely through his private family investment vehicle rather than deploying Nexor News' direct balance sheet. This bypass allowed the transaction to close without triggering customary governance vetoes from Nexor’s institutional co-investors.</p>
+    <p>The strategic justification centers on terminal survival. Dozera News had endured three consecutive years of steep advertising runoff, starved of technological investment as the parent conglomerate shifted capital to higher-margin non-media enterprises. Nexor, armed with a modern subscription architecture and video distribution network, offers the failing asset critical scale.</p>
 
-    <h3 class="subhead">The Case For It: Scale, Survival, and a Second Life</h3>
-    <p>Supporters of the deal, including several Nexor News staffers, argue that Dozera News was quietly dying long before Gursharan Singh made his move. Ad revenue at the outlet had reportedly slipped for three straight years, and its parent group had shown little appetite to keep subsidizing a division that no longer moved the needle on the Dozera Group's core businesses.</p>
-    <p>Nexor News, by contrast, arrives with real momentum: a faster-growing readership, a modern publishing stack, and — crucially — a willingness to actually invest in the newsroom it's inheriting. Several Dozera News journalists have already been offered retained roles, and Nexor News has pledged to preserve the outlet's flagship investigative unit rather than cut it for cost savings, a rare commitment in an industry known for gutting acquired newsrooms.</p>
-
-    <div class="split">
-      <div class="card praise">
-        <h4>What's earning praise</h4>
+    <div class="bento-grid">
+      <div class="bento-card bull">
+        <h4><span style="color: var(--accent-emerald);">▲</span> The Strategic Upside</h4>
         <ul>
-          <li>Editorial jobs largely preserved rather than eliminated in the short term</li>
-          <li>Investigative desk kept intact, unusual for a distressed-asset acquisition</li>
-          <li>Combined outlet gains real reach and a stronger revenue base overnight</li>
-          <li>Ends years of underinvestment that had left Dozera News stagnant</li>
+          <li><strong>Talent Preservation:</strong> Investigative and reporting units spared immediate layoffs.</li>
+          <li><strong>Tech Modernization:</strong> Outdated legacy stack replaced with Nexor's proprietary engine.</li>
+          <li><strong>Syndication Power:</strong> Creates an instant top-tier competitor in digital business media.</li>
         </ul>
       </div>
-      <div class="card criticism">
-        <h4>What's drawing criticism</h4>
+      <div class="bento-card bear">
+        <h4><span style="color: var(--accent-crimson);">▼</span> Governance &amp; Optics Risks</h4>
         <ul>
-          <li>A founder's son buying and dissolving his own father's outlet reads, to some, as opportunism dressed up as strategy</li>
-          <li>Deal structured through personal holdings, sidestepping Nexor News' own investor scrutiny</li>
-          <li>Dozera News' independent brand and archive effectively disappear</li>
-          <li>Employees learned key details from reporters, not from management, before any internal announcement</li>
+          <li><strong>Affiliate Scrutiny:</strong> Arm's-length valuation questioned by industry auditors.</li>
+          <li><strong>Brand Erasure:</strong> Over a decade of institutional editorial identity phased out.</li>
+          <li><strong>Staff Transparency:</strong> Newsroom learned of the takeover via leak channels before management townhalls.</li>
         </ul>
       </div>
     </div>
 
-    <h3 class="subhead">The Case Against It: A Family Company, Sold From the Inside</h3>
-    <p>Not everyone is applauding. Critics inside and outside the Dozera Group describe the deal as, at best, awkward and, at worst, a calculated move by Gursharan Singh to fold a competitor into his own empire by leaning on his father's legacy and standing within the Dozera Group. The optics are difficult to ignore: a son acquiring the media division his father built, then erasing its identity within months of taking control.</p>
-    <p>Some former Dozera News staff have gone further, alleging that the outlet's decline was allowed to happen — even quietly encouraged — precisely because it made the eventual buyout cheaper. Nexor News has firmly denied any suggestion that Gursharan Singh influenced Dozera News' finances ahead of the deal, calling the claims "unfounded and disconnected from how the negotiation actually unfolded."</p>
+    <h2>The Conflict on Arm's-Length Governance</h2>
+    <p>While spokespersons for Nexor maintain that the transaction adhered to all standard regulatory requirements, corporate governance experts note that intra-family buyouts inherently invite sharper skepticism.</p>
 
-    <blockquote class="pull">
-      "Bringing Dozera News into Nexor News protects the journalism and the jobs behind it. Anything else is speculation."
-      <cite>— Spokesperson, Nexor News</cite>
-    </blockquote>
+    <p>"When the buyer's executive leadership shares immediate bloodlines with the seller's founding ownership, standard fiduciary presumptions fall away," explained a corporate M&amp;A specialist. "The burden to demonstrate fair market price and transparent dealing becomes infinitely heavier."</p>
 
-    <p>Governance experts say the deal raises broader questions about how family-linked media holdings should be scrutinized, even when — as here — no laws appear to have been broken. "When a buyer and a target share a bloodline, the burden of proof on 'arm's length' goes up, not down," said one M&amp;A attorney contacted by Business Times, who was not involved in the transaction. "That doesn't make it improper. It makes it a deal that deserves a harder look than a routine acquisition would."</p>
-
-    <h3 class="subhead">What Happens Next</h3>
-    <p>Dozera News' website is expected to redirect to Nexor News within the next business cycle, with select archived reporting migrated over and the rest retired. Dozera Group has issued only a brief statement acknowledging the sale, wishing the "next chapter of the newsroom's work" well without directly addressing the family dynamics driving the story. Gursharan Singh has not personally commented beyond the joint release.</p>
-    <p>For now, the newsroom itself is left holding both halves of the story at once — grateful for a lifeline, and uneasy about exactly whose hand is offering it.</p>
-
-    <div class="article-foot">
-      Business Times US.CA &middot; Media &amp; Mergers Desk &middot; This is a developing story and will be updated.
-    </div>
+    <p>As the final migration deadline nears, Nexor’s leadership has pledged to retain the core investigative reporting desk—a promise rarely kept in distressed digital acquisitions. Whether this consolidation represents the rescue of vital reporting or the calculated eclipse of a father's empire, one reality remains clear: the Dozera era has officially come to an end.</p>
   </article>
 
   <aside>
-    <div class="box">
-      <h4>Market Snapshot</h4>
-      <div class="ticker-line"><span>DOZR (Dozera Group)</span><span class="down">$18.42 ▼4.12%</span></div>
-      <div class="ticker-line"><span>NXNW (Nexor News)</span><span class="up">$61.90 ▲6.85%</span></div>
-      <div class="ticker-line"><span>Sector: Media Holdcos</span><span class="down">▼1.1% today</span></div>
+    <div class="widget">
+      <div class="widget-title">Market Reaction</div>
+      <div class="deal-data-row">
+        <span>DOZR (Dozera Group)</span>
+        <span class="stock-pill down-val">$18.42 &minus;4.12%</span>
+      </div>
+      <div class="deal-data-row">
+        <span>NXNW (Nexor Holding)</span>
+        <span class="stock-pill up-val">$61.90 +6.85%</span>
+      </div>
+      <div class="deal-data-row">
+        <span>Media Holdco Index</span>
+        <span class="stock-pill down-val">&minus;1.10%</span>
+      </div>
     </div>
 
-    <div class="box">
-      <h4>Deal at a Glance</h4>
-      <div class="stat-row"><span>Acquirer</span><span>Nexor News</span></div>
-      <div class="stat-row"><span>Target</span><span>Dozera News</span></div>
-      <div class="stat-row"><span>Buyer</span><span>Gursharan Singh</span></div>
-      <div class="stat-row"><span>Structure</span><span>Private buyout</span></div>
-      <div class="stat-row"><span>Brand fate</span><span>Discontinued</span></div>
-      <div class="stat-row"><span>Staff impact</span><span>Mostly retained</span></div>
+    <div class="widget">
+      <div class="widget-title">Transaction Summary</div>
+      <div class="deal-data-row">
+        <span>Acquiring Entity</span>
+        <span>Nexor News</span>
+      </div>
+      <div class="deal-data-row">
+        <span>Target Unit</span>
+        <span>Dozera News</span>
+      </div>
+      <div class="deal-data-row">
+        <span>Lead Architect</span>
+        <span>Gursharan Singh</span>
+      </div>
+      <div class="deal-data-row">
+        <span>Integration Timeline</span>
+        <span>90 Days</span>
+      </div>
+      <div class="deal-data-row">
+        <span>Newsroom Fate</span>
+        <span>Integrated</span>
+      </div>
     </div>
 
-    <div class="box">
-      <h4>Related Coverage</h4>
-      <ul class="related">
-        <li><span class="tag">Analysis</span><a href="#">Why family-run media deals face tougher optics than they do laws</a></li>
-        <li><span class="tag">Profile</span><a href="#">Gursharan Singh's quiet rise from side project to acquirer</a></li>
-        <li><span class="tag">Media</span><a href="#">Inside Dozera News' three-year revenue slide</a></li>
-        <li><span class="tag">Opinion</span><a href="#">Consolidation is saving local business journalism — at a cost</a></li>
-      </ul>
+    <div class="widget">
+      <div class="widget-title">Related Deal Intelligence</div>
+      <div style="font-family: var(--font-heading); font-size: 0.9rem; display: flex; flex-direction: column; gap: 1rem;">
+        <a href="#">The Rising Wave of Private Vehicle Newsroom Consolidations</a>
+        <a href="#">Inside the Financial Erosion of Legacy Publisher Networks</a>
+        <a href="#">Profile: Gursharan Singh’s Path to Digital Media Dominance</a>
+      </div>
     </div>
   </aside>
 </main>
 
-<footer class="site">
-  &copy; 2026 Business Times US.CA — Media &amp; Mergers Desk. Reporting reflects statements available at time of publication and will be updated as the story develops.
+<footer class="site-footer">
+  <p>&copy; 2026 The Dealroom Chronicle. All proprietary intelligence and financial reporting reserved.</p>
 </footer>
 
 </body>
