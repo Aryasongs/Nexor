@@ -49,6 +49,19 @@ export async function renderPulseSSR({ id, assetResponse, context }) {
   const cached = await cache.match(cacheKey);
   if (cached) return cached;
 
+  // Safety net: if ANYTHING below throws (a bad selector, a bug in a
+  // future edit, an unexpected pulse shape, etc.) we fall back to serving
+  // the normal, untouched app instead of ever showing a broken/white page
+  // to a real visitor. SSR is a bonus for crawlers — it must never be able
+  // to break the app itself.
+  try {
+    return await buildRewrittenResponse({ id, assetResponse, context, cache, cacheKey });
+  } catch (e) {
+    return assetResponse;
+  }
+}
+
+async function buildRewrittenResponse({ id, assetResponse, context, cache, cacheKey }) {
   const pulse = await fetchJson(`/pulses/${encodeURIComponent(id)}`);
   if (!pulse || !pulse.uid) {
     return assetResponse;
@@ -83,7 +96,7 @@ export async function renderPulseSSR({ id, assetResponse, context }) {
   }
   class TitleRewriter {
     constructor(value) { this.value = value; }
-    element(element) { element.setText(this.value); }
+    element(element) { element.setInnerContent(this.value); } // NOTE: Element has no setText() — this was the crash
   }
 
   const ssrBlock = gated
@@ -99,20 +112,27 @@ export async function renderPulseSSR({ id, assetResponse, context }) {
   </article>
 </noscript>
 <script type="application/ld+json">
-${JSON.stringify({
-  "@context": "https://schema.org",
-  "@type": "SocialMediaPosting",
-  "headline": title,
-  "articleBody": postText,
-  "datePublished": postedAt,
-  "url": canonicalUrl,
-  "image": postImage || undefined,
-  "author": { "@type": "Person", "name": authorName, "url": `${SITE_ORIGIN}/@${authorHandle}` },
-  "interactionStatistic": [
-    { "@type": "InteractionCounter", "interactionType": "https://schema.org/LikeAction", "userInteractionCount": Number(pulse.likes || 0) },
-    { "@type": "InteractionCounter", "interactionType": "https://schema.org/ReplyAction", "userInteractionCount": Number(pulse.replies || 0) },
-  ],
-})}
+${
+  // Guard against a post's text containing "</script" and prematurely
+  // closing this tag (which would corrupt the rest of the document and
+  // is exactly the kind of bug that causes a blank/white page) — the
+  // standard fix is escaping "/" in "</" sequences inside JSON embedded
+  // in a <script> tag.
+  JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "SocialMediaPosting",
+    "headline": title,
+    "articleBody": postText,
+    "datePublished": postedAt,
+    "url": canonicalUrl,
+    "image": postImage || undefined,
+    "author": { "@type": "Person", "name": authorName, "url": `${SITE_ORIGIN}/@${authorHandle}` },
+    "interactionStatistic": [
+      { "@type": "InteractionCounter", "interactionType": "https://schema.org/LikeAction", "userInteractionCount": Number(pulse.likes || 0) },
+      { "@type": "InteractionCounter", "interactionType": "https://schema.org/ReplyAction", "userInteractionCount": Number(pulse.replies || 0) },
+    ],
+  }).replace(/<\//g, "<\\/")
+}
 </script>`;
 
   class BodyPrepender {
