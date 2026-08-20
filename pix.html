@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Pix</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='6' fill='%230F1115'/%3E%3Cpath d='M7 2v11h3v9l7-12h-4l4-8z' fill='%233B82F6'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<!-- Same Firebase project as Nexor Sparks — Pix will eventually authenticate
+     into this SAME project via a custom token minted by a Nexor Cloudflare
+     Worker (see notes at bottom of file). Kept here now only so the profile
+     screen can read the "Fetch from Nexor" fields once that worker exists. -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+:root{
+  --bg:#0F1115;
+  --surface:#181C22;
+  --surface2:#1E232B;
+  --surface3:#262C36;
+  --border:rgba(59,130,246,0.08);
+  --border2:rgba(255,255,255,0.06);
+  --text:#FFFFFF;
+  --text2:#9CA3AF;
+  --text3:rgba(156,163,175,0.6);
+  --cyan:#3B82F6;
+  --cyan-dim:rgba(59,130,246,0.12);
+  --radius:16px;
+  --radius-sm:10px;
+}
+html,body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;height:100%;overflow-x:hidden;}
+img{-webkit-user-drag:none;}
+button{font-family:inherit;cursor:pointer;}
+.screen{display:none;min-height:100vh;flex-direction:column;}
+.screen.active{display:flex;}
+
+/* ---------- LOGIN SCREEN ---------- */
+#login-screen{align-items:center;justify-content:center;padding:32px;text-align:center;position:relative;}
+.pix-wordmark{display:flex;align-items:center;gap:10px;margin-bottom:14px;}
+.pix-wordmark svg{width:34px;height:34px;flex-shrink:0;}
+.pix-wordmark span{font-size:30px;font-weight:800;letter-spacing:-0.03em;}
+.pix-tagline{color:var(--text2);font-size:14.5px;margin-bottom:52px;max-width:280px;line-height:1.5;}
+.login-nexor-btn{width:100%;max-width:340px;background:var(--text);color:var(--bg);border:none;border-radius:99px;padding:15px 20px;font-size:15.5px;font-weight:700;display:flex;align-items:center;justify-content:center;gap:10px;transition:opacity .15s;}
+.login-nexor-btn:active{opacity:.8;}
+.login-nexor-btn svg{width:20px;height:20px;flex-shrink:0;}
+.login-fineprint{margin-top:20px;color:var(--text3);font-size:12px;max-width:300px;line-height:1.5;}
+
+/* Account picker sheet (mock — real version is served by Nexor Sparks) */
+.sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:flex-end;z-index:50;}
+.sheet-overlay.active{display:flex;}
+.sheet{background:var(--surface);width:100%;border-radius:20px 20px 0 0;padding:22px 20px 28px;animation:sheetUp .22s ease;}
+@keyframes sheetUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+.sheet-handle{width:36px;height:4px;background:var(--surface3);border-radius:99px;margin:0 auto 18px;}
+.sheet-title{font-size:16px;font-weight:700;margin-bottom:4px;}
+.sheet-sub{font-size:13px;color:var(--text2);margin-bottom:18px;}
+.account-row{display:flex;align-items:center;gap:12px;padding:12px;border-radius:var(--radius-sm);background:var(--surface2);border:1px solid var(--border2);margin-bottom:10px;}
+.account-row img{width:42px;height:42px;border-radius:50%;object-fit:cover;flex-shrink:0;}
+.account-row .info{flex:1;min-width:0;}
+.account-row .name{font-size:14.5px;font-weight:700;}
+.account-row .handle{font-size:12.5px;color:var(--text2);}
+.sheet-cancel{width:100%;background:none;border:none;color:var(--text2);font-size:14.5px;font-weight:600;padding:14px 0 0;}
+
+/* ---------- PROFILE SCREEN ---------- */
+#profile-screen{padding-bottom:90px;}
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px 8px;}
+.topbar-icon{width:34px;height:34px;display:flex;align-items:center;justify-content:center;color:var(--text);font-size:20px;border-radius:50%;}
+.topbar-right{display:flex;align-items:center;gap:6px;}
+.topbar-nexor-icon{width:34px;height:34px;display:flex;align-items:center;justify-content:center;}
+.topbar-nexor-icon svg{width:19px;height:19px;}
+
+.profile-head{padding:6px 18px 0;}
+.profile-name-row{display:flex;align-items:center;gap:4px;}
+.profile-name-row h1{font-size:23px;font-weight:800;}
+.profile-name-row i{color:var(--text2);font-size:16px;margin-top:2px;}
+.profile-handle{color:var(--text2);font-size:14.5px;margin-top:2px;}
+
+.profile-avatar-wrap{position:absolute;top:56px;right:18px;}
+.profile-avatar{width:64px;height:64px;border-radius:50%;object-fit:cover;background:var(--surface2);}
+.profile-avatar-add{position:absolute;left:-16px;top:14px;width:30px;height:30px;border-radius:50%;background:var(--surface);border:2px dashed var(--surface3);display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:14px;}
+
+.profile-bio{padding:16px 18px 0;font-size:14.5px;line-height:1.5;color:var(--text);}
+.profile-bio div{margin-bottom:1px;}
+
+.profile-followers{display:flex;align-items:center;gap:10px;padding:16px 18px 0;}
+.follower-stack{display:flex;}
+.follower-stack img{width:24px;height:24px;border-radius:50%;object-fit:cover;border:2px solid var(--bg);margin-left:-8px;background:var(--surface2);}
+.follower-stack img:first-child{margin-left:0;}
+.profile-followers span{font-size:13.5px;color:var(--text2);}
+
+.profile-actions{display:flex;gap:10px;padding:18px;}
+.profile-actions button{flex:1;padding:11px 0;border-radius:var(--radius-sm);font-size:14.5px;font-weight:700;border:1px solid var(--border2);background:transparent;color:var(--text);}
+.profile-actions button:active{background:var(--surface2);}
+
+.profile-tabs{display:flex;border-bottom:1px solid var(--border2);margin-top:4px;}
+.profile-tab{flex:1;text-align:center;padding:13px 0;font-size:14px;font-weight:600;color:var(--text3);position:relative;}
+.profile-tab.active{color:var(--text);}
+.profile-tab.active::after{content:'';position:absolute;bottom:-1px;left:20%;right:20%;height:2px;background:var(--text);border-radius:2px;}
+
+.pix-grid{columns:2;column-gap:8px;padding:10px 12px;}
+.pix-card{break-inside:avoid;margin-bottom:8px;border-radius:14px;overflow:hidden;background:var(--surface2);position:relative;}
+.pix-card img{width:100%;display:block;}
+.pix-empty{text-align:center;color:var(--text3);font-size:14px;padding:60px 20px;}
+
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(15,17,21,0.94);backdrop-filter:blur(14px);border-top:1px solid var(--border2);display:flex;align-items:center;justify-content:space-around;padding:10px 0 calc(10px + env(safe-area-inset-bottom));}
+.bottom-nav i{font-size:24px;color:var(--text2);}
+.bottom-nav .active-nav i{color:var(--text);}
+
+/* ---------- EDIT PROFILE MODAL ---------- */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;align-items:center;justify-content:center;z-index:60;padding:20px;}
+.modal-overlay.active{display:flex;}
+.modal-card{background:var(--surface);border-radius:20px;width:100%;max-width:380px;padding:22px;}
+.modal-card h2{font-size:17px;font-weight:800;margin-bottom:4px;}
+.modal-card p{color:var(--text2);font-size:13px;margin-bottom:18px;line-height:1.5;}
+.fetch-option{display:flex;align-items:center;gap:12px;padding:13px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface2);margin-bottom:10px;}
+.fetch-option i{font-size:20px;color:var(--cyan);flex-shrink:0;}
+.fetch-option .fo-text b{display:block;font-size:14px;}
+.fetch-option .fo-text span{font-size:12px;color:var(--text2);}
+.modal-close{width:100%;margin-top:8px;background:none;border:none;color:var(--text2);font-weight:600;font-size:14px;padding:10px 0;}
+</style>
+</head>
+<body>
+
+<!-- ============= LOGIN SCREEN ============= -->
+<div class="screen active" id="login-screen">
+  <div class="pix-wordmark">
+    <svg viewBox="0 0 24 24"><rect width="24" height="24" rx="7" fill="#3B82F6"/><path d="M12 5c-3.9 0-6 2.6-6 5.4 0 1.7.9 3.3 2.5 4-.2-.8-.4-2 .1-2.9.4-.9 2.4-9.4 2.4-9.4h0" fill="none"/><path d="M12.6 6.2c-3.3 0-5 2.4-5 4.5 0 1.3.7 2.5 1.9 3-.2-.6.3-1.2.4-1.6.1-.4.7-2.9.7-2.9s-.2-.4-.2-1c0-.9.5-1.6 1.2-1.6.6 0 .8.4.8 1 0 .6-.4 1.4-.6 2.2-.2.7.4 1.3 1.1 1.3 1.3 0 2.2-1.7 2.2-3.6 0-1.5-1-2.6-2.8-2.6-2 0-3.3 1.5-3.3 3.2 0 .6.2 1 .4 1.3.1.1.1.2.1.3l-.2.6c0 .1-.1.2-.3.1-.9-.4-1.3-1.4-1.3-2.5 0-1.9 1.6-4.1 4.7-4.1 2.5 0 4.2 1.8 4.2 3.7 0 2.5-1.4 4.4-3.4 4.4-.7 0-1.3-.4-1.5-.8 0 0-.4 1.4-.5 1.7-.2.6-.5 1.1-.8 1.6.7.2 1.4.3 2.2.3 3.9 0 7-3.1 7-7 0-3.7-3.1-6.6-7-6.6z" fill="#fff"/></svg>
+    <span>Pix</span>
+  </div>
+  <p class="pix-tagline">Ideas, boards aur inspiration — sab ek jagah. Save karo, banao, share karo.</p>
+
+  <button class="login-nexor-btn" id="login-btn" onclick="startNexorLogin()">
+    <svg viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#050A14"/><path d="M7 2v11h3v9l7-12h-4l4-8z" fill="#00C8FF"/></svg>
+    Login with Nexor
+  </button>
+  <p class="login-fineprint">Pix par account banane ka sirf ek tareeka hai — apni Nexor ID se login. Alag se signup nahi hota.</p>
+</div>
+
+<!-- ============= PROFILE SCREEN ============= -->
+<div class="screen" id="profile-screen">
+  <div class="topbar">
+    <div class="topbar-icon"><i class="ph ph-chart-bar"></i></div>
+    <div class="topbar-right">
+      <div class="topbar-icon"><i class="ph ph-magnifying-glass"></i></div>
+      <!-- Nexor brand icon in place of a third-party app icon — this is the
+           "linked to Nexor" mark, small icon not a photo, matching the
+           bolt-in-square mark used across Nexor Sparks -->
+      <div class="topbar-nexor-icon">
+        <svg viewBox="0 0 24 24"><rect width="24" height="24" rx="6" fill="#050A14"/><path d="M7 2v11h3v9l7-12h-4l4-8z" fill="#00C8FF"/></svg>
+      </div>
+      <div class="topbar-icon"><i class="ph ph-list"></i></div>
+    </div>
+  </div>
+
+  <div style="position:relative;">
+    <div class="profile-head">
+      <div class="profile-name-row">
+        <h1 id="p-name">Gursharn Arya</h1>
+        <i class="ph ph-caret-down"></i>
+      </div>
+      <div class="profile-handle" id="p-handle">@gursharn</div>
+    </div>
+    <div class="profile-avatar-wrap">
+      <img class="profile-avatar" id="p-avatar" src="https://nexor-f4d.pages.dev/IMG_8305.png" alt="">
+      <div class="profile-avatar-add" onclick="openEditProfile()"><i class="ph-bold ph-plus"></i></div>
+    </div>
+  </div>
+
+  <div class="profile-bio" id="p-bio">
+    <div>Founder, Nexor Technology</div>
+    <div>Building things that people actually use</div>
+  </div>
+
+  <div class="profile-followers">
+    <div class="follower-stack">
+      <img src="https://i.pravatar.cc/40?img=12">
+      <img src="https://i.pravatar.cc/40?img=32">
+      <img src="https://i.pravatar.cc/40?img=48">
+    </div>
+    <span id="p-followers">346 followers</span>
+  </div>
+
+  <div class="profile-actions">
+    <button onclick="openEditProfile()">Edit profile</button>
+    <button>Share profile</button>
+  </div>
+
+  <div class="profile-tabs">
+    <div class="profile-tab active" onclick="switchTab(this,'pins')">Pix</div>
+    <div class="profile-tab" onclick="switchTab(this,'saved')">Saved</div>
+    <div class="profile-tab" onclick="switchTab(this,'boards')">Boards</div>
+  </div>
+
+  <div class="pix-grid" id="pix-grid-pins">
+    <div class="pix-card"><img src="https://picsum.photos/seed/pix1/300/420"></div>
+    <div class="pix-card"><img src="https://picsum.photos/seed/pix2/300/260"></div>
+    <div class="pix-card"><img src="https://picsum.photos/seed/pix3/300/340"></div>
+    <div class="pix-card"><img src="https://picsum.photos/seed/pix4/300/220"></div>
+  </div>
+  <div class="pix-empty" id="pix-empty-saved" style="display:none;">Koi Pix save nahi kiya abhi tak</div>
+  <div class="pix-empty" id="pix-empty-boards" style="display:none;">Koi board nahi bana abhi tak</div>
+
+  <div class="bottom-nav">
+    <div class="active-nav"><i class="ph-fill ph-house"></i></div>
+    <div><i class="ph ph-magnifying-glass"></i></div>
+    <div><i class="ph ph-plus-circle"></i></div>
+    <div><i class="ph ph-bell"></i></div>
+    <div><i class="ph ph-user-circle"></i></div>
+  </div>
+</div>
+
+<!-- Edit profile modal -->
+<div class="modal-overlay" id="edit-modal">
+  <div class="modal-card">
+    <h2>Edit profile</h2>
+    <p>Photo, bio aur cover art khud upload karo, ya seedha Nexor se le lo.</p>
+    <div class="fetch-option" onclick="fetchFromNexor()">
+      <i class="ph-fill ph-download-simple"></i>
+      <div class="fo-text"><b>Fetch from Nexor</b><span>Photo, bio, cover — Nexor profile se copy</span></div>
+    </div>
+    <div class="fetch-option" onclick="alert('Upload flow yahan aayega')">
+      <i class="ph-fill ph-upload-simple"></i>
+      <div class="fo-text"><b>Upload your own</b><span>Alag photo/cover Pix ke liye chuno</span></div>
+    </div>
+    <button class="modal-close" onclick="closeEditProfile()">Cancel</button>
+  </div>
+</div>
+
+<script>
+// Placeholder — swap in the real Nexor project config when this ships.
+const firebaseConfig={apiKey:"AIzaSyC30TcmMVhP_8HdFYS1WufRiZwSDYNMTF0",authDomain:"pulse2-92372.firebaseapp.com",databaseURL:"https://pulse2-92372-default-rtdb.firebaseio.com",projectId:"pulse2-92372",storageBucket:"pulse2-92372.firebasestorage.app"};
+try{ firebase.initializeApp(firebaseConfig); }catch(e){ console.warn('Firebase init skipped in prototype:', e); }
+
+const NEXOR_LOGIN_URL = 'https://nexor-f4d.pages.dev/'; // Nexor Sparks handles the ?pixAuth=1 handoff
+
+function startNexorLogin(){
+  const returnUrl = location.origin + location.pathname;
+  const btn = document.getElementById('login-btn');
+  btn.textContent = 'Redirecting…';
+  btn.disabled = true;
+  location.href = NEXOR_LOGIN_URL + '?pixAuth=1&returnUrl=' + encodeURIComponent(returnUrl);
+}
+
+function checkForPixToken(){
+  const hash = new URLSearchParams(location.hash.replace('#','?'));
+  const token = hash.get('pixToken');
+  if (!token) return;
+
+  history.replaceState(null, '', location.pathname); // clean the URL
+
+  firebase.auth().signInWithCustomToken(token).then(function(){
+    document.getElementById('login-screen').classList.remove('active');
+    document.getElementById('profile-screen').classList.add('active');
+    loadProfileFromNexor();
+  }).catch(function(err){
+    console.error('signInWithCustomToken failed:', err);
+    alert('Login fail ho gaya, dobara try karo');
+  });
+}
+
+function loadProfileFromNexor(){
+  // Same Realtime DB Nexor Sparks writes to — now readable because this
+  // session is authenticated into the same Firebase project.
+  const user = firebase.auth().currentUser;
+  if (!user) return;
+  firebase.database().ref('users/' + user.uid).once('value').then(function(snap){
+    const d = snap.val();
+    if (!d) return;
+    if (d.photoBase64) document.getElementById('p-avatar').src = d.photoBase64;
+    if (d.name) document.getElementById('p-name').textContent = d.name;
+    if (d.username) document.getElementById('p-handle').textContent = '@' + d.username;
+  }).catch(function(e){ console.error('Profile load failed:', e); });
+}
+
+window.addEventListener('load', checkForPixToken);
+
+function switchTab(el,tab){
+  document.querySelectorAll('.profile-tab').forEach(t=>t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('pix-grid-pins').style.display = tab==='pins' ? '' : 'none';
+  document.getElementById('pix-empty-saved').style.display = tab==='saved' ? '' : 'none';
+  document.getElementById('pix-empty-boards').style.display = tab==='boards' ? '' : 'none';
+}
+
+function openEditProfile(){ document.getElementById('edit-modal').classList.add('active'); }
+function closeEditProfile(){ document.getElementById('edit-modal').classList.remove('active'); }
+
+function fetchFromNexor(){
+  loadProfileFromNexor();
+  closeEditProfile();
+}
+</script>
+</body>
+</html>
