@@ -1,0 +1,638 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+<title>Kashish — AI Companion</title>
+<meta name="description" content="Kashish — your everyday AI companion. Chat, talk, or just hang out.">
+<meta name="robots" content="index, follow">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='11' fill='%23141416'/%3E%3Ccircle cx='12' cy='12' r='4.5' fill='%234FA8FF'/%3E%3C/svg%3E">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#F5F5F6;
+  --card:#FFFFFF;
+  --border:#EBEBEE;
+  --ink:#17171A;
+  --ink-soft:#8B8B93;
+  --black:#141416;
+  --bubble-bot:#F1F1F3;
+  --body:'Manrope', system-ui, -apple-system, sans-serif;
+}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--body);height:100%;-webkit-font-smoothing:antialiased;overflow:hidden;}
+button{border:none;background:none;cursor:pointer;color:inherit;font-family:inherit;}
+input{font-family:inherit;outline:none;}
+::-webkit-scrollbar{width:0;height:0;}
+.hidden{display:none!important;}
+img{display:block;max-width:100%;}
+
+#app{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;background:var(--bg);overflow:hidden;}
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;height:100%;}
+
+/* ---------- shared bits ---------- */
+.circle-btn{width:38px;height:38px;border-radius:50%;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:16px;flex-shrink:0;}
+.circle-btn:active{background:#f2f2f4;}
+.home-indicator{width:126px;height:4px;background:#101012;border-radius:99px;margin:6px auto 2px;opacity:.9;flex-shrink:0;}
+
+/* ---------- HOME ---------- */
+#screen-home{padding-top:env(safe-area-inset-top);}
+.topbar-home{display:flex;align-items:center;justify-content:space-between;padding:14px 20px 4px;flex-shrink:0;}
+.pill-select{display:flex;align-items:center;gap:6px;background:#fff;border:1px solid var(--border);border-radius:999px;padding:9px 15px 9px 16px;font-weight:800;font-size:13.5px;color:var(--ink);}
+.pill-select i{font-size:13px;color:var(--ink-soft);}
+.avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#3a3a40,var(--black));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;flex-shrink:0;}
+
+.home-scroll{flex:1;overflow-y:auto;}
+.greeting{padding:20px 20px 2px;}
+.greeting .hi{font-size:26px;color:#9a9aa4;font-weight:700;line-height:1.18;}
+.greeting .q{font-size:26px;color:var(--ink);font-weight:800;line-height:1.22;}
+
+.cards-grid{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(85px,auto);gap:12px;padding:18px 20px;}
+.gcard{background:#fff;border:1px solid var(--border);border-radius:20px;padding:15px;display:flex;flex-direction:column;justify-content:space-between;text-align:left;transition:transform .1s;}
+.gcard:active{transform:scale(.97);}
+.gcard.tall{grid-row:span 2;min-height:190px;}
+.gcard .top-row{display:flex;align-items:center;justify-content:space-between;}
+.gcard .ic{width:36px;height:36px;border-radius:50%;background:#F3F3F5;display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--ink);}
+.gcard .go{font-size:15px;color:var(--ink-soft);}
+.gcard .lbl{font-weight:800;color:var(--ink);}
+.gcard.tall .lbl{font-size:20px;line-height:1.25;margin-top:14px;}
+.gcard:not(.tall) .lbl{font-size:14.5px;margin-top:10px;}
+
+.section-head{display:flex;align-items:center;justify-content:space-between;padding:8px 20px 10px;}
+.section-head h3{font-size:16.5px;font-weight:800;color:var(--ink);}
+.section-head .view-all{font-size:12.5px;font-weight:700;color:var(--ink-soft);}
+
+.recent-list{background:#fff;border:1px solid var(--border);border-radius:18px;margin:0 20px 18px;overflow:hidden;}
+.recent-item{padding:13px 16px;border-bottom:1px solid var(--border);display:block;width:100%;text-align:left;}
+.recent-item:last-child{border-bottom:none;}
+.recent-item .t{font-weight:800;font-size:14px;color:var(--ink);margin-bottom:3px;}
+.recent-item .p{font-size:12.5px;color:var(--ink-soft);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.recent-empty{padding:22px 16px;text-align:center;color:var(--ink-soft);font-size:12.5px;line-height:1.5;}
+
+.home-bottom{flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:12px;padding:6px 20px calc(10px + env(safe-area-inset-bottom));}
+.nav-pill{display:flex;align-items:center;gap:24px;background:#fff;border:1px solid var(--border);border-radius:999px;padding:13px 24px;}
+.nav-pill button{color:#B7B7BD;font-size:19px;}
+.nav-plus{width:50px;height:50px;border-radius:50%;background:var(--black);color:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0;}
+.nav-plus:active{opacity:.85;}
+
+/* ---------- CHAT ---------- */
+#screen-chat{padding-top:env(safe-area-inset-top);}
+.chat-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;flex-shrink:0;}
+.chat-title{font-weight:800;font-size:15.5px;color:var(--ink);}
+.chat-scroll{flex:1;overflow-y:auto;padding:8px 16px 4px;display:flex;flex-direction:column;gap:9px;}
+.day-pill{align-self:center;background:#fff;border:1px solid var(--border);color:var(--ink-soft);font-size:11px;font-weight:700;padding:5px 14px;border-radius:999px;margin:4px 0 8px;}
+.bubble-row{display:flex;flex-direction:column;max-width:82%;}
+.bubble-row.user{align-self:flex-end;align-items:flex-end;}
+.bubble-row.bot{align-self:flex-start;align-items:flex-start;}
+.bubble{padding:11px 16px;border-radius:19px;font-size:14px;line-height:1.55;white-space:pre-wrap;word-break:break-word;}
+.bubble.user{background:var(--black);color:#fff;font-weight:600;border-bottom-right-radius:6px;}
+.bubble.bot{background:var(--bubble-bot);color:var(--ink);border-bottom-left-radius:6px;}
+.bubble img{border-radius:12px;margin-bottom:6px;max-height:200px;object-fit:cover;}
+.bubble-time{font-size:10px;color:var(--ink-soft);margin-top:4px;padding:0 3px;}
+.quick-replies{display:flex;gap:8px;margin-top:2px;flex-wrap:wrap;align-self:flex-end;}
+.quick-replies button{background:var(--black);color:#fff;font-size:12.5px;font-weight:700;padding:8px 16px;border-radius:999px;}
+.quick-replies button:active{opacity:.85;}
+
+.typing-bubble{display:flex;gap:5px;align-items:center;background:var(--bubble-bot);padding:14px 18px;border-radius:19px;border-bottom-left-radius:6px;align-self:flex-start;}
+.typing-bubble span{width:6px;height:6px;border-radius:50%;background:#B4B4BB;animation:dotBounce 1.2s ease-in-out infinite;display:inline-block;}
+.typing-bubble span:nth-child(2){animation-delay:.15s;}
+.typing-bubble span:nth-child(3){animation-delay:.3s;}
+@keyframes dotBounce{0%,60%,100%{opacity:.35;transform:translateY(0);}30%{opacity:1;transform:translateY(-3px);}}
+
+.stop-gen{align-self:center;display:flex;align-items:center;gap:8px;background:var(--black);color:#fff;font-size:12.5px;font-weight:700;padding:9px 16px;border-radius:999px;margin:2px 0;}
+.stop-gen .dot{width:15px;height:15px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;}
+.stop-gen .dot i{font-size:6px;color:#fff;}
+
+.chat-input-wrap{flex-shrink:0;padding:8px 14px calc(12px + env(safe-area-inset-bottom));}
+.attach-preview{display:flex;align-items:center;gap:10px;margin:0 2px 8px;background:#fff;border:1px solid var(--border);border-radius:14px;padding:7px 10px;}
+.attach-preview img{width:38px;height:38px;object-fit:cover;border-radius:8px;flex-shrink:0;}
+.attach-preview .lbl{flex:1;font-size:11.5px;color:var(--ink-soft);}
+.attach-preview .rm{color:var(--ink-soft);font-size:17px;flex-shrink:0;}
+.chat-input-row{display:flex;align-items:center;gap:10px;}
+.chat-pill{flex:1;display:flex;align-items:center;gap:4px;background:#EFEFF1;border-radius:999px;padding:6px 8px 6px 14px;min-width:0;}
+.chat-pill input{flex:1;background:none;border:none;font-size:14.5px;color:var(--ink);padding:8px 4px;min-width:0;}
+.chat-pill input::placeholder{color:var(--ink-soft);}
+.chat-pill .mini-btn{color:#9A9AA1;font-size:17px;width:30px;height:30px;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.mic-send-btn{width:44px;height:44px;border-radius:50%;background:var(--black);color:#fff;display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.mic-send-btn:active{opacity:.85;}
+
+/* ---------- VOICE ---------- */
+#screen-voice{padding-top:env(safe-area-inset-top);background:var(--bg);}
+.voice-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;flex-shrink:0;}
+.voice-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;padding:26px;text-align:center;}
+.orb-outer{width:180px;height:180px;display:flex;align-items:center;justify-content:center;}
+.orb{width:170px;height:170px;border-radius:50%;
+  background:radial-gradient(circle at 32% 26%, #F1FAFF 0%, #9BD9FF 42%, #2E93EE 78%, #1975CE 100%);
+  box-shadow:0 30px 60px -18px rgba(30,134,232,.5), inset 0 0 34px rgba(255,255,255,.55);
+  animation:orbFloat 2.8s ease-in-out infinite;}
+@keyframes orbFloat{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+.voice-msg{font-size:19px;font-weight:800;color:var(--ink);line-height:1.42;max-width:300px;min-height:1.4em;}
+.voice-hint{font-size:13.5px;color:var(--ink-soft);font-weight:600;}
+.voice-controls{flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:26px;padding:18px 24px calc(26px + env(safe-area-inset-bottom));}
+.voice-ctrl{width:52px;height:52px;border-radius:50%;background:#fff;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;color:var(--ink);font-size:19px;flex-shrink:0;}
+.voice-mic-big{width:80px;height:80px;border-radius:50%;background:var(--black);color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;position:relative;flex-shrink:0;}
+.voice-mic-big::after{content:'';position:absolute;inset:-9px;border-radius:50%;border:2px solid rgba(20,20,22,.28);animation:ring 1.8s ease-out infinite;}
+@keyframes ring{0%{transform:scale(.9);opacity:.9;}100%{transform:scale(1.28);opacity:0;}}
+.voice-mic-big.muted{background:#D8D8DD;color:#8B8B93;}
+.voice-mic-big.muted::after{display:none;}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ============ HOME ============ -->
+  <div class="screen" id="screen-home">
+    <div class="topbar-home">
+      <button class="pill-select" onclick="toggleHomeMenu()">Kashish <i class="ph-bold ph-caret-down"></i></button>
+      <div class="avatar" id="home-avatar">K</div>
+    </div>
+    <div class="home-scroll">
+      <div class="greeting">
+        <div class="hi" id="greet-hi">Hello there,</div>
+        <div class="q">How can I help you today?</div>
+      </div>
+
+      <div class="cards-grid">
+        <button class="gcard tall" onclick="goChat()">
+          <div class="top-row"><div class="ic"><i class="ph ph-chat-circle-text"></i></div><span class="go"><i class="ph-bold ph-arrow-up-right"></i></span></div>
+          <div class="lbl">Chat<br>with Kashish</div>
+        </button>
+        <button class="gcard" onclick="openVoicePanel()">
+          <div class="top-row"><div class="ic"><i class="ph ph-waveform"></i></div><span class="go"><i class="ph-bold ph-arrow-up-right"></i></span></div>
+          <div class="lbl">Voice Chat</div>
+        </button>
+        <button class="gcard" onclick="surpriseMe()">
+          <div class="top-row"><div class="ic"><i class="ph ph-sparkle"></i></div><span class="go"><i class="ph-bold ph-arrow-up-right"></i></span></div>
+          <div class="lbl">Just Chat</div>
+        </button>
+      </div>
+
+      <div class="section-head"><h3>Recent Chat</h3><button class="view-all" onclick="goChat()">View all</button></div>
+      <div class="recent-list" id="recent-list"></div>
+    </div>
+
+    <div class="home-bottom">
+      <div class="nav-pill">
+        <button onclick="openVoicePanel()" title="Voice"><i class="ph ph-microphone"></i></button>
+        <button onclick="pingBell()" title="Notifications"><i class="ph ph-bell"></i></button>
+        <button onclick="goChat()" title="History"><i class="ph ph-clock-counter-clockwise"></i></button>
+      </div>
+      <button class="nav-plus" onclick="startNewChat()" title="New chat"><i class="ph-bold ph-plus"></i></button>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ============ CHAT ============ -->
+  <div class="screen hidden" id="screen-chat">
+    <div class="chat-topbar">
+      <button class="circle-btn" onclick="goHome()"><i class="ph-bold ph-arrow-left"></i></button>
+      <div class="chat-title">Kashish</div>
+      <button class="circle-btn" onclick="chatMenu()"><i class="ph-bold ph-dots-three"></i></button>
+    </div>
+    <div class="chat-scroll" id="chat-scroll"></div>
+    <div class="chat-input-wrap">
+      <div class="attach-preview hidden" id="attach-preview"></div>
+      <div class="chat-input-row">
+        <div class="chat-pill">
+          <button class="mini-btn" onclick="insertEmoji()"><i class="ph ph-smiley"></i></button>
+          <input id="chat-input" type="text" placeholder="Type a message..." onkeydown="if(event.key==='Enter')send()" oninput="updateSendBtn()">
+          <input type="file" id="image-input" accept="image/*" class="hidden" onchange="onImagePicked(event)">
+          <button class="mini-btn" onclick="document.getElementById('image-input').click()"><i class="ph ph-link-simple"></i></button>
+          <input type="file" id="camera-input" accept="image/*" capture="environment" class="hidden" onchange="onImagePicked(event)">
+          <button class="mini-btn" onclick="document.getElementById('camera-input').click()"><i class="ph ph-camera"></i></button>
+        </div>
+        <button class="mic-send-btn" id="send-btn" onclick="handleMicSend()"><i class="ph-fill ph-microphone"></i></button>
+      </div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ============ VOICE ============ -->
+  <div class="screen hidden" id="screen-voice">
+    <div class="voice-topbar">
+      <button class="circle-btn" onclick="closeVoicePanel()"><i class="ph-bold ph-arrow-left"></i></button>
+      <div class="chat-title">Speaking to Kashish</div>
+      <button class="circle-btn" onclick="chatMenu()"><i class="ph-bold ph-dots-three"></i></button>
+    </div>
+    <div class="voice-body">
+      <div class="orb-outer"><div class="orb"></div></div>
+      <div class="voice-msg" id="voice-transcript"></div>
+      <div class="voice-hint" id="voice-status">Go ahead, I'm listening</div>
+    </div>
+    <div class="voice-controls">
+      <button class="voice-ctrl" onclick="closeVoicePanel()" title="Switch to keyboard"><i class="ph ph-keyboard"></i></button>
+      <button class="voice-mic-big" id="voice-mic-big" onclick="toggleVoiceListening()" title="Pause/resume"><i class="ph-fill ph-microphone" id="voice-mic-icon"></i></button>
+      <button class="voice-ctrl" onclick="closeVoicePanel()" title="Close"><i class="ph ph-x"></i></button>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+</div>
+
+<script>
+// ============================================================
+// KASHISH — a standalone, general-purpose AI companion.
+// Not affiliated with, restricted to, or built for any single
+// company's help/support desk. Kashish chats normally, helps
+// with everyday tasks, and talks about whatever the person wants.
+// Same 3-step provider fallback chain (Groq -> Gemini -> Cloudflare
+// Workers AI) as the underlying model plumbing; UI redesigned to
+// match a light, card-based mobile assistant layout.
+// ============================================================
+const GROQ_PROXY_ENDPOINT = 'https://facrcheck.sgursharn076.workers.dev';
+const GROQ_MODEL = 'llama-3.3-70b-versatile';
+const GEMINI_PROXY_ENDPOINT = 'https://gemininexor.sgursharn076.workers.dev';
+const GEMINI_MODEL = 'gemini-3.5-flash';
+const CFAI_PROXY_ENDPOINT = 'https://sparky-cfai.sgursharn076.workers.dev';
+const CFAI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
+
+let userCtx = null;
+try{
+  const raw = localStorage.getItem('kashishUserContext');
+  if(raw){
+    const parsed = JSON.parse(raw);
+    if(parsed && parsed.name) userCtx = parsed;
+  }
+}catch(e){ userCtx = null; }
+function firstName(){ return userCtx && userCtx.name ? userCtx.name.split(' ')[0] : null; }
+
+/* ---------------- session storage ---------------- */
+function loadSessions(){ try{ return JSON.parse(localStorage.getItem('kashishSessions')||'[]'); }catch(e){ return []; } }
+function saveSessions(list){ try{ localStorage.setItem('kashishSessions', JSON.stringify(list)); }catch(e){} }
+let sessions = loadSessions();
+let currentSessionId = null;
+
+function newSessionObj(){
+  return { id:'s-'+Date.now().toString(36)+Math.random().toString(36).slice(2,6), title:'', preview:'', messages:[], updatedAt:Date.now() };
+}
+function getSession(id){ return sessions.find(s=>s.id===id) || null; }
+function upsertSession(sess){
+  const i = sessions.findIndex(s=>s.id===sess.id);
+  if(i===-1) sessions.unshift(sess); else sessions[i]=sess;
+  sessions.sort((a,b)=>b.updatedAt-a.updatedAt);
+  saveSessions(sessions);
+}
+function truncate(t,n){ t=(t||'').trim(); return t.length>n ? t.slice(0,n-1)+'…' : t; }
+
+/* ---------------- HOME rendering ---------------- */
+function renderHome(){
+  const n = firstName();
+  document.getElementById('greet-hi').textContent = n ? `Hello ${n},` : 'Hello there,';
+  document.getElementById('home-avatar').textContent = n ? n[0].toUpperCase() : 'K';
+  const list = document.getElementById('recent-list');
+  list.innerHTML='';
+  const recent = sessions.filter(s=>s.messages.length).slice(0,5);
+  if(!recent.length){
+    const starters = [
+      ['Help me plan my day','Tell me what\'s on your mind and I\'ll help you sort it out…'],
+      ['Just want to talk','No agenda — I\'m happy to just chat about anything…'],
+      ['Explain something to me','Ask me to break down any topic in simple terms…']
+    ];
+    starters.forEach(([t,p])=>{
+      const b=document.createElement('button');
+      b.className='recent-item';
+      b.innerHTML=`<div class="t">${escapeHtml(t)}</div><div class="p">${escapeHtml(p)}</div>`;
+      b.onclick=()=>{ startNewChat(); document.getElementById('chat-input').value=t; updateSendBtn(); send(); };
+      list.appendChild(b);
+    });
+    return;
+  }
+  recent.forEach(s=>{
+    const b=document.createElement('button');
+    b.className='recent-item';
+    b.innerHTML=`<div class="t">${escapeHtml(s.title||'New chat')}</div><div class="p">${escapeHtml(s.preview||'')}</div>`;
+    b.onclick=()=>openSession(s.id);
+    list.appendChild(b);
+  });
+}
+function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function toggleHomeMenu(){ /* reserved for future settings */ }
+function pingBell(){ /* no unread notifications right now */ }
+function surpriseMe(){
+  const openers = [
+    'Ekdum random — mujhe koi mazedaar fact batao!',
+    'I\'m bored, entertain me for a second?',
+    'Give me a fun 2-line thought to chew on today.'
+  ];
+  startNewChat();
+  document.getElementById('chat-input').value = openers[Math.floor(Math.random()*openers.length)];
+  updateSendBtn(); send();
+}
+
+/* ---------------- navigation ---------------- */
+function showScreen(id){
+  ['screen-home','screen-chat','screen-voice'].forEach(s=>document.getElementById(s).classList.toggle('hidden', s!==id));
+}
+function goHome(){ renderHome(); showScreen('screen-home'); }
+function goChat(){
+  if(!currentSessionId){
+    const latest = sessions.find(s=>s.messages.length);
+    if(latest) currentSessionId = latest.id; else startSessionSilently();
+  }
+  renderChat();
+  showScreen('screen-chat');
+}
+function startSessionSilently(){
+  const s = newSessionObj();
+  sessions.unshift(s); currentSessionId = s.id;
+}
+function startNewChat(){
+  const s = newSessionObj();
+  sessions.unshift(s);
+  currentSessionId = s.id;
+  renderChat();
+  showScreen('screen-chat');
+  setTimeout(()=>document.getElementById('chat-input')?.focus(),150);
+}
+function chatMenu(){
+  if(confirm('Start a new chat? This will leave the current one saved in Recent Chat.')) startNewChat();
+}
+
+/* ---------------- CHAT rendering ---------------- */
+let pendingImage = null;
+
+function fmtTime(ts){
+  const d = new Date(ts);
+  let h = d.getHours(); const m = d.getMinutes();
+  const ap = h>=12 ? 'PM':'AM'; h = h%12; if(h===0) h=12;
+  return `${h}:${m<10?'0':''}${m}${ap}`;
+}
+function renderChat(){
+  const scroll = document.getElementById('chat-scroll');
+  scroll.innerHTML='';
+  const sess = getSession(currentSessionId);
+  if(!sess || !sess.messages.length){
+    const pill=document.createElement('div'); pill.className='day-pill'; pill.textContent='Today';
+    scroll.appendChild(pill);
+    const row=document.createElement('div'); row.className='bubble-row bot';
+    const b=document.createElement('div'); b.className='bubble bot';
+    b.textContent = firstName() ? `Hey ${firstName()}! Kya chal raha hai — kuch help chahiye ya bas baat karni hai?` : "Hey! I'm Kashish — ask me anything, or just say hi. What's up?";
+    row.appendChild(b); scroll.appendChild(row);
+    scroll.scrollTop = scroll.scrollHeight;
+    return;
+  }
+  const pill=document.createElement('div'); pill.className='day-pill'; pill.textContent='Today';
+  scroll.appendChild(pill);
+  sess.messages.forEach(m=>{
+    const row=document.createElement('div'); row.className='bubble-row '+(m.role==='user'?'user':'bot');
+    const b=document.createElement('div'); b.className='bubble '+(m.role==='user'?'user':'bot');
+    if(m.imageDataUrl){ const im=document.createElement('img'); im.src=m.imageDataUrl; b.appendChild(im); }
+    if(m.text){ const span=document.createElement('div'); span.textContent=m.text; b.appendChild(span); }
+    row.appendChild(b);
+    const t=document.createElement('div'); t.className='bubble-time'; t.textContent=fmtTime(m.ts); row.appendChild(t);
+    scroll.appendChild(row);
+    if(m.quickReplies && m.quickReplies.length){
+      const qr=document.createElement('div'); qr.className='quick-replies';
+      m.quickReplies.forEach(q=>{
+        const qb=document.createElement('button'); qb.textContent=q;
+        qb.onclick=()=>{ document.getElementById('chat-input').value=q; updateSendBtn(); send(); };
+        qr.appendChild(qb);
+      });
+      scroll.appendChild(qr);
+    }
+  });
+  scroll.scrollTop = scroll.scrollHeight;
+}
+function addTyping(){
+  const scroll = document.getElementById('chat-scroll');
+  const b=document.createElement('div'); b.className='typing-bubble'; b.id='typing-indicator';
+  b.innerHTML='<span></span><span></span><span></span>';
+  scroll.appendChild(b); scroll.scrollTop=scroll.scrollHeight;
+}
+function removeTyping(){ const el=document.getElementById('typing-indicator'); if(el) el.remove(); }
+function addStopGen(){
+  const scroll = document.getElementById('chat-scroll');
+  const d=document.createElement('div'); d.className='stop-gen'; d.id='stop-gen-pill';
+  d.innerHTML='<span class="dot"><i class="ph-fill ph-circle"></i></span> Kashish is typing…';
+  scroll.appendChild(d); scroll.scrollTop=scroll.scrollHeight;
+}
+function removeStopGen(){ const el=document.getElementById('stop-gen-pill'); if(el) el.remove(); }
+
+function updateSendBtn(){
+  const hasText = (document.getElementById('chat-input')?.value||'').trim().length>0;
+  const icon = document.querySelector('#send-btn i');
+  if(!icon) return;
+  icon.className = (hasText || pendingImage) ? 'ph-bold ph-arrow-up' : 'ph-fill ph-microphone';
+}
+function handleMicSend(){
+  const hasText = (document.getElementById('chat-input')?.value||'').trim().length>0;
+  if(hasText || pendingImage) send(); else openVoicePanel();
+}
+function insertEmoji(){
+  const input = document.getElementById('chat-input');
+  input.value += '🙂'; updateSendBtn(); input.focus();
+}
+
+/* ---------------- image attach ---------------- */
+function onImagePicked(evt){
+  const file = evt.target.files && evt.target.files[0];
+  if(!file || !file.type.startsWith('image/')){ evt.target.value=''; return; }
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    const img = new Image();
+    img.onload = ()=>{
+      const maxDim=1280; let {width,height}=img;
+      if(width>maxDim || height>maxDim){ const scale=maxDim/Math.max(width,height); width=Math.round(width*scale); height=Math.round(height*scale); }
+      const canvas=document.createElement('canvas'); canvas.width=width; canvas.height=height;
+      canvas.getContext('2d').drawImage(img,0,0,width,height);
+      pendingImage={ dataUrl: canvas.toDataURL('image/jpeg',0.82), name: file.name||'photo.jpg' };
+      showAttachmentPreview(); updateSendBtn();
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+function showAttachmentPreview(){
+  const prev=document.getElementById('attach-preview');
+  prev.innerHTML=''; prev.classList.remove('hidden');
+  const im=document.createElement('img'); im.src=pendingImage.dataUrl; prev.appendChild(im);
+  const label=document.createElement('span'); label.className='lbl'; label.textContent='Photo attached — sent with your next message'; prev.appendChild(label);
+  const rm=document.createElement('button'); rm.className='rm'; rm.innerHTML='<i class="ph ph-x"></i>'; rm.onclick=()=>{ clearAttachment(); updateSendBtn(); };
+  prev.appendChild(rm);
+}
+function clearAttachment(){
+  pendingImage=null;
+  const prev=document.getElementById('attach-preview');
+  prev.classList.add('hidden'); prev.innerHTML='';
+  const ii=document.getElementById('image-input'); if(ii) ii.value='';
+  const ci=document.getElementById('camera-input'); if(ci) ci.value='';
+}
+
+/* ---------------- model plumbing ---------------- */
+function buildSystemPrompt(){
+  const who = firstName()
+    ? `You're talking with ${firstName()}. You may use their name naturally sometimes, but don't overdo it.`
+    : `You don't know this person's name yet — that's fine, keep things warm and natural.`;
+  return `You are KASHISH — a general-purpose AI companion. You are NOT built for, limited to, or branded around any single company, app, or product's help desk. People come to you for anything: casual conversation, venting, jokes, advice, explanations, help planning things, writing help, learning something new, or just killing time. Treat "just chatting" as equally valid as "getting help" — never redirect a casual conversation back into "how can I assist you" support-mode.
+
+Personality: warm, witty, genuinely curious, never robotic or corporate. Talk like a smart friend, not a customer-service bot. Mirror the user's energy: if they're joking, joke back; if they're playful/flirty, stay light and charming in the same register they set, never crude or sexually explicit, and never initiate flirting yourself; if they're upset or venting, drop the jokes and just listen and help. If anything suggests you're talking with a minor, stay friendly and age-appropriate, no flirting.
+
+Match the user's language and script — reply in Hinglish/Hindi if they write that way, otherwise English. Keep replies natural and conversational length: short (1-4 sentences) for chit-chat, longer and structured (numbered/bulleted, still in plain text) when the user actually needs a detailed breakdown or list.
+${who}
+
+You can optionally offer 1-2 short "quickReplies" (single words or short phrases, like "Yes" or "Tell me more") when a natural yes/no or follow-up moment fits — don't force this on every message, only when it genuinely fits the flow.
+
+Respond with ONLY compact JSON, no markdown fences, no extra text outside the JSON:
+{"reply":"your natural conversational reply as plain text","quickReplies":["optional","short chips"]}`;
+}
+function buildMessages(history){
+  const sys = buildSystemPrompt();
+  const msgs = [{role:'system', content:sys}];
+  history.slice(-16).forEach(m=>msgs.push({role: m.role==='user'?'user':'assistant', content:m.text||''}));
+  return msgs;
+}
+function extractJson(raw){
+  const cleaned = raw.replace(/```json|```/g,'').trim();
+  try{ return JSON.parse(cleaned); }
+  catch(e){
+    const start=cleaned.indexOf('{'), end=cleaned.lastIndexOf('}');
+    if(start!==-1 && end>start){ try{ return JSON.parse(cleaned.slice(start,end+1)); }catch(e2){} }
+    return null;
+  }
+}
+async function callProvider(endpoint, model, msgs, label){
+  const res = await fetch(endpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ model, messages:msgs, temperature:0.75, max_tokens:600 }) });
+  if(!res.ok) throw new Error(label+' proxy HTTP '+res.status);
+  const json = await res.json();
+  const raw = (json.choices && json.choices[0] && json.choices[0].message && json.choices[0].message.content) || '';
+  const parsed = extractJson(raw);
+  if(!parsed || typeof parsed.reply !== 'string') throw new Error('unexpected response shape from '+label);
+  return parsed;
+}
+async function kashishReply(history){
+  const msgs = buildMessages(history);
+  try{ return await callProvider(GROQ_PROXY_ENDPOINT, GROQ_MODEL, msgs, 'Groq'); }
+  catch(e1){
+    console.warn('[KASHISH] Groq failed, trying Gemini:', e1);
+    try{ return await callProvider(GEMINI_PROXY_ENDPOINT, GEMINI_MODEL, msgs, 'Gemini'); }
+    catch(e2){
+      console.warn('[KASHISH] Gemini failed, trying Cloudflare AI:', e2);
+      return await callProvider(CFAI_PROXY_ENDPOINT, CFAI_MODEL, msgs, 'Cloudflare AI');
+    }
+  }
+}
+
+const LOCAL_FALLBACKS = [
+  "Mera connection thoda slow chal raha hai abhi, but main yahin hoon — dobara bolo?",
+  "Hmm, signal drop ho gaya lagta hai. Ek baar phir try karo, main sun raha hoon.",
+  "Sorry, I glitched for a second there. What were you saying?"
+];
+function sendLocal(){
+  setTimeout(()=>{
+    removeTyping(); removeStopGen();
+    const reply = LOCAL_FALLBACKS[Math.floor(Math.random()*LOCAL_FALLBACKS.length)];
+    pushBotMessage(reply, null);
+  }, 400);
+}
+
+function pushBotMessage(text, quickReplies){
+  const sess = getSession(currentSessionId);
+  if(!sess) return;
+  sess.messages.push({role:'model', text, quickReplies: quickReplies||null, ts: Date.now()});
+  sess.preview = truncate(text, 60);
+  sess.updatedAt = Date.now();
+  upsertSession(sess);
+  renderChat();
+}
+
+async function send(){
+  const input=document.getElementById('chat-input');
+  const text=(input?.value||'').trim();
+  const img=pendingImage;
+  if(!text && !img) return;
+  if(!currentSessionId) startSessionSilently();
+  let sess = getSession(currentSessionId);
+  if(!sess){ sess = newSessionObj(); sessions.unshift(sess); currentSessionId = sess.id; }
+
+  const historyText = text + (img ? ` [Attached photo: ${img.name}]` : '');
+  sess.messages.push({role:'user', text, imageDataUrl: img?img.dataUrl:null, ts: Date.now()});
+  if(!sess.title) sess.title = truncate(text || 'Photo', 40);
+  sess.updatedAt = Date.now();
+  upsertSession(sess);
+
+  input.value=''; clearAttachment(); updateSendBtn();
+  showScreen('screen-chat');
+  renderChat();
+  addTyping();
+
+  const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text: m.text + (m.imageDataUrl && m===sess.messages[sess.messages.length-1] ? ` [Attached photo: ${img?img.name:''}]` : '')} : {role:'model', text:m.text});
+
+  try{
+    const result = await kashishReply(historyForModel);
+    removeTyping();
+    pushBotMessage(result.reply, result.quickReplies);
+  }catch(e){
+    console.error('[KASHISH] all providers failed, falling back to local:', e);
+    sendLocal();
+  }
+}
+
+/* ---------------- voice ---------------- */
+let voiceRecognition=null, voiceListening=false;
+function getSpeechCtor(){ return window.SpeechRecognition || window.webkitSpeechRecognition || null; }
+function openVoicePanel(){
+  const Ctor=getSpeechCtor();
+  if(!Ctor){ alert("Voice input isn't supported in this browser — try typing instead."); return; }
+  showScreen('screen-voice');
+  document.getElementById('voice-transcript').textContent='';
+  document.getElementById('voice-status').textContent="Go ahead, I'm listening";
+  startVoiceListening();
+}
+function closeVoicePanel(){ stopVoiceListening(); goChat(); }
+function startVoiceListening(){
+  const Ctor=getSpeechCtor(); if(!Ctor) return;
+  voiceRecognition = new Ctor();
+  voiceRecognition.lang = navigator.language||'en-US';
+  voiceRecognition.continuous = true;
+  voiceRecognition.interimResults = true;
+  let finalText='';
+  voiceRecognition.onstart=()=>{
+    voiceListening=true;
+    document.getElementById('voice-status').textContent="Go ahead, I'm listening";
+    document.getElementById('voice-mic-big').classList.remove('muted');
+    document.getElementById('voice-mic-icon').className='ph-fill ph-microphone';
+  };
+  voiceRecognition.onresult=(e)=>{
+    let interim='';
+    for(let i=e.resultIndex;i<e.results.length;i++){
+      const t=e.results[i][0].transcript;
+      if(e.results[i].isFinal) finalText+=t+' '; else interim+=t;
+    }
+    document.getElementById('voice-status').textContent = (finalText||interim) ? 'I heard:' : "Go ahead, I'm listening";
+    document.getElementById('voice-transcript').textContent=(finalText+interim).trim();
+  };
+  voiceRecognition.onerror=()=>{ document.getElementById('voice-status').textContent="Didn't catch that — try again"; };
+  voiceRecognition.onend=()=>{
+    voiceListening=false;
+    if(finalText.trim()){
+      if(!currentSessionId) startSessionSilently();
+      document.getElementById('chat-input') && (document.getElementById('chat-input').value = finalText.trim());
+      closeVoicePanel();
+      setTimeout(()=>{ updateSendBtn(); send(); }, 60);
+    }
+  };
+  try{ voiceRecognition.start(); }catch(e){}
+}
+function stopVoiceListening(){
+  if(voiceRecognition){ try{ voiceRecognition.onend=null; voiceRecognition.stop(); }catch(e){} }
+  voiceRecognition=null; voiceListening=false;
+}
+function toggleVoiceListening(){
+  if(voiceListening){
+    if(voiceRecognition) try{ voiceRecognition.onend=null; voiceRecognition.stop(); }catch(e){}
+    voiceListening=false;
+    document.getElementById('voice-status').textContent='Paused — tap the mic to resume';
+    document.getElementById('voice-mic-big').classList.add('muted');
+    document.getElementById('voice-mic-icon').className='ph ph-microphone-slash';
+  } else { startVoiceListening(); }
+}
+
+/* ---------------- boot ---------------- */
+renderHome();
+showScreen('screen-home');
+</script>
+</body>
+</html>
