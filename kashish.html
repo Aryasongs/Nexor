@@ -95,6 +95,8 @@ img{display:block;max-width:100%;}
 .bubble.bot{background:var(--bubble-bot);color:var(--ink);border-bottom-left-radius:6px;}
 .bubble img{border-radius:12px;margin-bottom:6px;max-height:200px;object-fit:cover;}
 .bubble-time{font-size:10px;color:var(--ink-soft);margin-top:4px;padding:0 3px;}
+.speak-btn{align-self:flex-start;margin-top:2px;color:var(--ink-soft);font-size:14px;padding:3px;opacity:.75;}
+.speak-btn:active{opacity:1;color:var(--ink);}
 .quick-replies{display:flex;gap:8px;margin-top:2px;flex-wrap:wrap;align-self:flex-end;}
 .quick-replies button{background:var(--black);color:#fff;font-size:12.5px;font-weight:700;padding:8px 16px;border-radius:999px;}
 .quick-replies button:active{opacity:.85;}
@@ -189,9 +191,42 @@ img{display:block;max-width:100%;}
 .gen-image-wrap img{width:220px;height:220px;object-fit:cover;border-radius:12px;}
 .gen-loading-box{width:220px;height:220px;border-radius:12px;background:linear-gradient(100deg,#eceef1 30%,#f6f6f8 50%,#eceef1 70%);background-size:200% 100%;animation:genShimmer 1.4s ease-in-out infinite;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:12.5px;font-weight:700;}
 @keyframes genShimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
+
+/* ---------- INTRO / SPLASH ---------- */
+#intro-screen{position:fixed;inset:0;z-index:3000;background:var(--auth-bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:22px;overflow:hidden;transition:opacity .5s ease;}
+#intro-screen.intro-fade-out{opacity:0;pointer-events:none;}
+#intro-screen.hidden{display:none!important;}
+.intro-orb-outer{position:relative;width:120px;height:120px;display:flex;align-items:center;justify-content:center;}
+.intro-orb{width:74px;height:74px;border-radius:50%;
+  background:radial-gradient(circle at 32% 26%, #F1FAFF 0%, #9BD9FF 38%, #4FA8FF 72%, #1975CE 100%);
+  box-shadow:0 0 40px 6px rgba(79,168,255,.45);
+  animation:introPulse 1.8s ease-in-out infinite, introRise .7s cubic-bezier(.2,.8,.2,1) both;}
+@keyframes introPulse{0%,100%{transform:scale(1);}50%{transform:scale(1.14);}}
+@keyframes introRise{from{opacity:0;transform:scale(.4);}to{opacity:1;transform:scale(1);}}
+.intro-orb-ring{position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(79,168,255,.5);animation:introRing 2.2s ease-out infinite;}
+.intro-orb-ring.r2{animation-delay:1.1s;}
+@keyframes introRing{0%{transform:scale(.55);opacity:.9;}100%{transform:scale(1.15);opacity:0;}}
+.intro-wordmark{animation:introTextIn .6s ease .15s both;}
+@keyframes introTextIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+.intro-status{font-size:13px;font-weight:600;color:var(--auth-text3);letter-spacing:.3px;display:flex;align-items:center;gap:2px;animation:introTextIn .6s ease .3s both;}
+.intro-dots span{animation:introDot 1.2s ease-in-out infinite;opacity:.3;}
+.intro-dots span:nth-child(2){animation-delay:.15s;}
+.intro-dots span:nth-child(3){animation-delay:.3s;}
+@keyframes introDot{0%,60%,100%{opacity:.3;}30%{opacity:1;}}
 </style>
 </head>
 <body>
+
+<!-- ============ INTRO / SPLASH ============ -->
+<div id="intro-screen">
+  <div class="intro-orb-outer">
+    <div class="intro-orb"></div>
+    <div class="intro-orb-ring"></div>
+    <div class="intro-orb-ring r2"></div>
+  </div>
+  <div class="kashish-wordmark intro-wordmark">Kashish</div>
+  <div class="intro-status" id="intro-status">Waking up<span class="intro-dots"><span>.</span><span>.</span><span>.</span></span></div>
+</div>
 
 <!-- ============ AUTH (login/signup) ============ -->
 <div id="auth-screen" class="hidden">
@@ -366,7 +401,7 @@ img{display:block;max-width:100%;}
     <div class="voice-topbar">
       <button class="circle-btn" onclick="closeVoicePanel()"><i class="ph-bold ph-arrow-left"></i></button>
       <div class="chat-title">Speaking to Kashish</div>
-      <button class="circle-btn" onclick="chatMenu()"><i class="ph-bold ph-dots-three"></i></button>
+      <button class="circle-btn" id="voice-mute-btn" onclick="toggleVoiceMute()" title="Mute Kashish's voice"><i class="ph ph-speaker-high" id="voice-mute-icon"></i></button>
     </div>
     <div class="voice-body">
       <div class="orb-outer"><div class="orb"></div></div>
@@ -578,6 +613,18 @@ function openAccountMenu(){
 }
 function doLogout(){ auth.signOut(); }
 
+/* ---------------- intro / splash ---------------- */
+let introMinTimeDone=false, introAuthKnown=false;
+function maybeHideIntro(){
+  if(!introMinTimeDone || !introAuthKnown) return;
+  const intro=document.getElementById('intro-screen');
+  if(!intro || intro.classList.contains('hidden')) return;
+  intro.classList.add('intro-fade-out');
+  setTimeout(()=>intro.classList.add('hidden'), 520);
+}
+setTimeout(()=>{ introMinTimeDone=true; maybeHideIntro(); }, 2000);
+setTimeout(()=>{ const s=document.getElementById('intro-status'); if(s && !s.dataset.updated){ s.dataset.updated='1'; s.innerHTML='Almost there<span class="intro-dots"><span>.</span><span>.</span><span>.</span></span>'; } }, 1100);
+
 // Gates the whole app behind sign-in. On sign-in, loads the shared profile
 // (so Kashish greets people by their real name) and reveals the app;
 // on sign-out, locks the app again and shows the auth screen.
@@ -600,6 +647,7 @@ auth.onAuthStateChanged(async (user)=>{
     authScreen.classList.remove('hidden');
     app.classList.add('auth-locked');
   }
+  introAuthKnown=true; maybeHideIntro();
 });
 
 /* ---------------- session storage ---------------- */
@@ -745,6 +793,11 @@ function renderChat(){
     }
     row.appendChild(b);
     const t=document.createElement('div'); t.className='bubble-time'; t.textContent=fmtTime(m.ts); row.appendChild(t);
+    if(m.role!=='user' && m.text && !m.genPending){
+      const speakBtn=document.createElement('button'); speakBtn.className='speak-btn'; speakBtn.innerHTML='<i class="ph ph-speaker-high"></i>';
+      speakBtn.onclick=()=>speak(m.text);
+      row.appendChild(speakBtn);
+    }
     scroll.appendChild(row);
     if(m.quickReplies && m.quickReplies.length){
       const qr=document.createElement('div'); qr.className='quick-replies';
@@ -1031,19 +1084,66 @@ async function send(){
 }
 
 /* ---------------- voice ---------------- */
-let voiceRecognition=null, voiceListening=false;
+let voiceRecognition=null, voiceListening=false, voiceAutoLoop=false;
+
+/* ---- text-to-speech: Kashish speaks her replies back in Voice Chat ---- */
+let ttsVoice=null, ttsVoicesReady=false;
+function pickTtsVoice(){
+  if(!('speechSynthesis' in window)) return null;
+  const voices=speechSynthesis.getVoices();
+  if(!voices.length) return null;
+  const lang=(navigator.language||'en-US');
+  // Prefer a voice matching the browser language (handles Hindi/Hinglish
+  // devices reasonably), else fall back to any English voice, else first available.
+  return voices.find(v=>v.lang===lang)
+      || voices.find(v=>v.lang && v.lang.startsWith(lang.split('-')[0]))
+      || voices.find(v=>v.lang && v.lang.startsWith('en'))
+      || voices[0];
+}
+if('speechSynthesis' in window){
+  speechSynthesis.onvoiceschanged=()=>{ ttsVoice=pickTtsVoice(); ttsVoicesReady=true; };
+  ttsVoice=pickTtsVoice();
+}
+function stripForSpeech(text){
+  // Don't read out emojis/markdown symbols awkwardly — light cleanup only.
+  return (text||'').replace(/[*_`#]/g,'').trim();
+}
+function speak(text){
+  return new Promise(resolve=>{
+    if(!('speechSynthesis' in window) || !text){ resolve(); return; }
+    try{ speechSynthesis.cancel(); }catch(e){}
+    const utter=new SpeechSynthesisUtterance(stripForSpeech(text));
+    if(ttsVoice) utter.voice=ttsVoice;
+    utter.rate=1; utter.pitch=1;
+    utter.onend=()=>resolve();
+    utter.onerror=()=>resolve();
+    speechSynthesis.speak(utter);
+  });
+}
+function stopSpeaking(){ if('speechSynthesis' in window){ try{ speechSynthesis.cancel(); }catch(e){} } }
+let voiceMuted=false;
+function toggleVoiceMute(){
+  voiceMuted=!voiceMuted;
+  if(voiceMuted) stopSpeaking();
+  const icon=document.getElementById('voice-mute-icon');
+  if(icon) icon.className = voiceMuted ? 'ph ph-speaker-slash' : 'ph ph-speaker-high';
+}
+
 function getSpeechCtor(){ return window.SpeechRecognition || window.webkitSpeechRecognition || null; }
 function openVoicePanel(){
   const Ctor=getSpeechCtor();
   if(!Ctor){ alert("Voice input isn't supported in this browser — try typing instead."); return; }
+  if(!currentSessionId) startSessionSilently();
+  voiceAutoLoop=true;
   showScreen('screen-voice');
   document.getElementById('voice-transcript').textContent='';
   document.getElementById('voice-status').textContent="Go ahead, I'm listening";
   startVoiceListening();
 }
-function closeVoicePanel(){ stopVoiceListening(); goChat(); }
+function closeVoicePanel(){ voiceAutoLoop=false; stopVoiceListening(); stopSpeaking(); goChat(); }
 function startVoiceListening(){
   const Ctor=getSpeechCtor(); if(!Ctor) return;
+  stopSpeaking();
   voiceRecognition = new Ctor();
   voiceRecognition.lang = navigator.language||'en-US';
   voiceRecognition.continuous = true;
@@ -1052,6 +1152,7 @@ function startVoiceListening(){
   voiceRecognition.onstart=()=>{
     voiceListening=true;
     document.getElementById('voice-status').textContent="Go ahead, I'm listening";
+    document.getElementById('voice-transcript').textContent='';
     document.getElementById('voice-mic-big').classList.remove('muted');
     document.getElementById('voice-mic-icon').className='ph-fill ph-microphone';
   };
@@ -1067,12 +1168,7 @@ function startVoiceListening(){
   voiceRecognition.onerror=()=>{ document.getElementById('voice-status').textContent="Didn't catch that — try again"; };
   voiceRecognition.onend=()=>{
     voiceListening=false;
-    if(finalText.trim()){
-      if(!currentSessionId) startSessionSilently();
-      document.getElementById('chat-input') && (document.getElementById('chat-input').value = finalText.trim());
-      closeVoicePanel();
-      setTimeout(()=>{ updateSendBtn(); send(); }, 60);
-    }
+    if(finalText.trim()) voiceSend(finalText.trim());
   };
   try{ voiceRecognition.start(); }catch(e){}
 }
@@ -1088,6 +1184,57 @@ function toggleVoiceListening(){
     document.getElementById('voice-mic-big').classList.add('muted');
     document.getElementById('voice-mic-icon').className='ph ph-microphone-slash';
   } else { startVoiceListening(); }
+}
+
+// Full spoken round-trip: user's speech -> text reply -> Kashish speaks it
+// back, all without leaving the Voice Chat screen. Then, if the panel is
+// still open, listening resumes automatically for a natural back-and-forth.
+async function voiceSend(text){
+  let sess = getSession(currentSessionId);
+  if(!sess){ sess = newSessionObj(); sessions.unshift(sess); currentSessionId = sess.id; }
+  sess.messages.push({role:'user', text, ts: Date.now()});
+  if(!sess.title) sess.title = truncate(text, 40);
+  sess.updatedAt = Date.now();
+  upsertSession(sess);
+
+  document.getElementById('voice-status').textContent='Thinking…';
+  document.getElementById('voice-transcript').textContent=text;
+
+  const imagePrompt = detectImageRequest(text);
+  if(imagePrompt !== null){
+    document.getElementById('voice-status').textContent="Image creation needs the chat screen";
+    if(!voiceMuted) await speak("I'll need the chat screen to draw that for you — switching over now.");
+    if(voiceAutoLoop){ voiceAutoLoop=false; stopVoiceListening(); }
+    document.getElementById('chat-input').value = text;
+    goChat(); updateSendBtn(); send();
+    return;
+  }
+
+  const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
+  let replyText;
+  try{
+    const result = await kashishReply(historyForModel);
+    replyText = result.reply;
+    sess.messages.push({role:'model', text: replyText, quickReplies: result.quickReplies||null, ts: Date.now()});
+  }catch(e){
+    console.error('[KASHISH] voice reply failed, using local fallback:', e);
+    replyText = LOCAL_FALLBACKS[Math.floor(Math.random()*LOCAL_FALLBACKS.length)];
+    sess.messages.push({role:'model', text: replyText, ts: Date.now()});
+  }
+  sess.preview = truncate(replyText, 60);
+  sess.updatedAt = Date.now();
+  upsertSession(sess);
+
+  document.getElementById('voice-status').textContent='Kashish is speaking…';
+  document.getElementById('voice-transcript').textContent=replyText;
+  if(!voiceMuted) await speak(replyText);
+
+  // Resume listening automatically for a continuous conversation, unless
+  // the person has since closed the panel or paused it manually.
+  if(voiceAutoLoop){
+    document.getElementById('voice-status').textContent="Go ahead, I'm listening";
+    startVoiceListening();
+  }
 }
 
 /* ---------------- boot ---------------- */
