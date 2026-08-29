@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>CrimenewsU</title>
+<title>CrimenewsU — No statement yet from Nexor founder or family</title>
 <style>
   :root{
     --bg:#101012;
@@ -24,13 +24,6 @@
   }
   .frame{max-width:420px;margin:0 auto;background:var(--bg);min-height:100vh;}
 
-  /* status bar */
-  .statusbar{
-    display:flex;justify-content:space-between;align-items:center;
-    padding:14px 18px 4px;font-size:15px;font-weight:600;color:var(--ink);
-  }
-
-  /* header */
   header{
     display:flex;align-items:center;justify-content:space-between;
     padding:14px 18px 16px;
@@ -51,19 +44,6 @@
     margin-left:2px;
   }
 
-  /* tag bar */
-  .tagbar{
-    display:flex;gap:18px;overflow-x:auto;
-    padding:12px 18px;
-    border-bottom:1px solid var(--line);
-    font-size:13px;
-    font-weight:600;
-    letter-spacing:0.02em;
-  }
-  .tagbar span{white-space:nowrap;color:var(--ink-dim);padding-bottom:6px;}
-  .tagbar span.active{color:var(--accent);border-bottom:2px solid var(--accent);}
-
-  /* breaking strip */
   .breaking{
     display:flex;align-items:center;gap:10px;
     background:var(--accent);
@@ -79,87 +59,99 @@
     flex:0 0 auto;
   }
   @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
-  .breaking .txt{
-    overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
-  }
+  .breaking .txt{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;}
 
-  /* hero */
-  .hero{padding:20px 18px 6px;}
+  .article{padding:20px 18px 6px;}
   .kicker{
     font-size:11px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;
     color:var(--accent);margin-bottom:10px;
   }
   h1.headline{
-    font-size:26px;line-height:1.2;font-weight:800;margin:0 0 12px;letter-spacing:-0.01em;
+    font-size:24px;line-height:1.25;font-weight:800;margin:0 0 12px;letter-spacing:-0.01em;
   }
-  .hero-meta{
+  .dek{font-size:15.5px;line-height:1.55;color:var(--ink-dim);margin:0 0 14px;}
+  .byline-row{
     display:flex;justify-content:space-between;font-size:12px;color:var(--ink-faint);
-    margin-bottom:16px;
+    padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:18px;
   }
 
-  .media{
-    position:relative;width:100%;aspect-ratio:16/10;
-    background:linear-gradient(160deg,#2a2a2e,#111113);
-    border-radius:6px;overflow:hidden;
-    margin-bottom:8px;
+  .advisory{
+    font-size:12px;line-height:1.55;
+    background:var(--bg-raised);
+    border-left:3px solid var(--accent);
+    padding:12px 14px;
+    color:var(--ink-dim);
+    margin-bottom:22px;
+    border-radius:0 4px 4px 0;
   }
-  .media .grain{
-    position:absolute;inset:0;
-    background:repeating-linear-gradient(115deg,rgba(255,255,255,0.03) 0 2px,transparent 2px 6px);
+  .advisory strong{color:var(--ink);}
+
+  .no-response{
+    display:flex;gap:12px;
+    background:var(--bg-raised);
+    border:1px solid var(--line);
+    border-radius:6px;
+    padding:14px 16px;
+    margin-bottom:24px;
   }
-  .media .duration{
-    position:absolute;left:10px;bottom:10px;
-    background:rgba(0,0,0,0.75);color:var(--ink);
-    font-size:11px;font-weight:700;padding:3px 7px;border-radius:3px;
-  }
-  .media .play{
-    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
-    width:56px;height:56px;border-radius:50%;
-    background:rgba(0,0,0,0.55);
-    border:1.5px solid rgba(255,255,255,0.5);
+  .no-response .icon{
+    flex:0 0 34px;height:34px;border-radius:50%;
+    background:rgba(224,38,44,0.14);
     display:flex;align-items:center;justify-content:center;
+    color:var(--accent);
   }
-  .media .play svg{width:20px;height:20px;fill:var(--ink);margin-left:3px;}
-  .caption{font-size:12.5px;color:var(--ink-faint);margin:0 0 22px;line-height:1.4;}
+  .no-response .icon svg{width:18px;height:18px;}
+  .no-response .body h4{font-size:13.5px;margin:0 0 4px;font-weight:800;}
+  .no-response .body p{font-size:12.5px;line-height:1.5;color:var(--ink-dim);margin:0;}
 
-  .lede{font-size:16px;line-height:1.6;color:var(--ink-dim);margin:0 0 26px;}
+  .body-copy{font-size:16px;line-height:1.72;color:var(--ink);}
+  .body-copy p{margin:0 0 18px;}
+  .body-copy p:first-of-type::first-letter{
+    font-size:2.6em;font-weight:800;color:var(--accent);
+    float:left;line-height:0.8;padding-right:7px;padding-top:5px;
+  }
 
-  /* section label */
+  .pull{
+    font-size:19px;line-height:1.45;font-weight:600;color:var(--ink);
+    border-top:1px solid var(--line);border-bottom:1px solid var(--line);
+    padding:18px 0;margin:26px 0;text-align:center;
+  }
+  .pull span{color:var(--accent);}
+
   .section-label{
     display:flex;align-items:center;gap:10px;
-    padding:0 18px;margin-bottom:14px;
+    margin:30px 0 14px;
   }
   .section-label .bar{width:4px;height:16px;background:var(--accent);border-radius:2px;}
-  .section-label h2{font-size:14px;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;margin:0;}
+  .section-label h2{font-size:13px;font-weight:800;letter-spacing:0.05em;text-transform:uppercase;margin:0;}
 
-  /* story list */
-  .story-list{padding:0 18px;margin-bottom:30px;}
-  .story{
-    display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);
+  .status-list{list-style:none;margin:0 0 20px;padding:0;font-size:13px;line-height:1.55;color:var(--ink-dim);}
+  .status-list li{
+    display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);
   }
-  .story:last-child{border-bottom:none;}
-  .story .thumb{
-    flex:0 0 84px;height:64px;border-radius:5px;
-    background:linear-gradient(160deg,#2a2a2e,#111113);
-    position:relative;
+  .status-list li:last-child{border-bottom:none;}
+  .status-list .tag{flex:0 0 118px;font-weight:800;color:var(--ink);}
+
+  .timeline{margin-bottom:10px;}
+  .tl-item{display:flex;gap:12px;padding-bottom:18px;position:relative;}
+  .tl-item::before{
+    content:"";position:absolute;left:5px;top:16px;bottom:-2px;width:1px;background:var(--line);
   }
-  .story .thumb::after{
-    content:"";position:absolute;inset:0;
-    background:repeating-linear-gradient(115deg,rgba(255,255,255,0.04) 0 2px,transparent 2px 6px);
-    border-radius:5px;
+  .tl-item:last-child::before{display:none;}
+  .tl-dot{
+    flex:0 0 11px;height:11px;border-radius:50%;background:var(--accent);
+    margin-top:4px;position:relative;z-index:1;
   }
-  .story .text{flex:1;min-width:0;}
-  .story .cat{font-size:10.5px;font-weight:800;color:var(--accent);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;}
-  .story h3{font-size:14.5px;line-height:1.35;font-weight:700;margin:0 0 6px;}
-  .story .time{font-size:11.5px;color:var(--ink-faint);}
+  .tl-text .time{font-size:11px;color:var(--ink-faint);font-weight:700;margin-bottom:3px;}
+  .tl-text p{font-size:13.5px;line-height:1.5;color:var(--ink-dim);margin:0;}
 
   footer{
-    padding:20px 18px 40px;
+    padding:24px 18px 40px;
     border-top:1px solid var(--line);
     text-align:center;
   }
   footer .logo{justify-content:center;margin-bottom:8px;font-size:18px;}
-  footer p{font-size:11px;color:var(--ink-faint);margin:0;}
+  footer p{font-size:11px;color:var(--ink-faint);margin:0;line-height:1.6;}
 </style>
 </head>
 <body>
@@ -175,71 +167,87 @@
     </span>
   </header>
 
-  <div class="tagbar">
-    <span class="active">Top stories</span>
-    <span>Crime</span>
-    <span>Courts</span>
-    <span>Investigations</span>
-    <span>Cyber</span>
-    <span>World</span>
-  </div>
-
   <div class="breaking">
     <span class="dot"></span>
-    <span class="txt">Breaking — verification pending on latest incident report</span>
+    <span class="txt">Follow-up — Nexor side has not commented as of this report</span>
   </div>
 
-  <div class="hero">
-    <div class="kicker">Security &amp; threats</div>
-    <h1 class="headline">Nexor Technologies founder receives threat allegedly from Pakistan</h1>
-    <div class="hero-meta">
+  <div class="article">
+    <div class="kicker">Security &amp; threats · Follow-up</div>
+    <h1 class="headline">No statement yet from Gursharn Arya, his family, or Nexor on threat report</h1>
+    <p class="dek">Nearly a day after reports of a threatening message allegedly sent from Pakistan, the Nexor Technologies founder, his family, and the company have all remained silent</p>
+
+    <div class="byline-row">
       <span>Staff Report</span>
-      <span>Updated 7 hrs ago</span>
+      <span>Updated 2 hrs ago</span>
     </div>
 
-    <div class="media">
-      <div class="grain"></div>
-      <span class="duration">1:12</span>
-      <div class="play" aria-hidden="true">
-        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-      </div>
+    <div class="advisory">
+      <strong>Editor's note:</strong> The claims below describe an absence of public comment, not confirmation or denial of the underlying threat. Nothing in this report should be read as verifying the origin of the earlier message.
     </div>
-    <p class="caption">Security teams are assessing the origin and authenticity of the message</p>
 
-    <p class="lede">Security concerns have risen after a threatening message reportedly targeted the company founder. Authorities are expected to assess the claim's authenticity as the matter develops.</p>
-  </div>
+    <div class="no-response">
+      <div class="icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/><line x1="9" y1="10" x2="15" y2="10" stroke-dasharray="1 3"/></svg>
+      </div>
+      <div class="body">
+        <h4>No comment received</h4>
+        <p>Repeated attempts to reach Gursharn Arya, his family members, and Nexor Technologies' official channels for comment have gone unanswered as of publication.</p>
+      </div>
+    </div>
 
-  <div class="section-label"><span class="bar"></span><h2>More on this story</h2></div>
-  <div class="story-list">
-    <div class="story">
-      <div class="thumb" aria-hidden="true"></div>
-      <div class="text">
-        <div class="cat">Analysis</div>
-        <h3>What founders can do after a digital threat surfaces online</h3>
-        <div class="time">4 hrs ago</div>
+    <div class="body-copy">
+      <p>More than a day after news first broke of a threatening message allegedly directed at Nexor Technologies founder Gursharn Arya, an unmistakable silence has settled over the story. Neither Arya himself, nor any member of his family, nor a single official representative of Nexor has issued so much as a one-line statement addressing the matter.</p>
+
+      <p>That silence is, in itself, becoming part of the story. In cases involving alleged cross-border threats, a founder's public response, or the calculated decision to withhold one, is often read closely by observers, employees, and users of the affected company's products alike. So far, Nexor's usual communication channels, its website, its social handles, and any founder-linked accounts, show no acknowledgement that the report even exists.</p>
+
+      <div class="pull">"As of this report, <span>not one word</span> has come from Arya, his family, or the company he founded."</div>
+
+      <p>Sources close to the matter have not confirmed whether the silence reflects an ongoing security review, legal caution, a decision to let authorities handle the matter privately, or simply that the family has chosen not to engage with press inquiries during an active safety concern. All of these remain speculation until Nexor or Arya himself addresses it directly.</p>
+
+      <p>For a founder-led company like Nexor, whose products carry the Arya name and reputation closely tied to the brand, the absence of a statement carries its own weight. Employees and product users have reportedly begun asking questions on community channels, though none of these queries have received an official reply either.</p>
+
+      <p>This publication reached out through multiple available channels, email, listed contact numbers, and public social profiles associated with both Arya and Nexor. None of these attempts had produced a response by the time of publication.</p>
+    </div>
+
+    <div class="section-label"><span class="bar"></span><h2>Timeline so far</h2></div>
+    <div class="timeline">
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-text">
+          <div class="time">Day 1</div>
+          <p>Initial report surfaces describing a threatening message allegedly sent from Pakistan and directed at the Nexor founder.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-text">
+          <div class="time">Day 1, later</div>
+          <p>Security teams reportedly begin reviewing the message; no public confirmation of its authenticity issued.</p>
+        </div>
+      </div>
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-text">
+          <div class="time">Day 2</div>
+          <p>Gursharn Arya, his family, and Nexor Technologies remain silent. No statement, denial, or acknowledgement issued through any known channel.</p>
+        </div>
       </div>
     </div>
-    <div class="story">
-      <div class="thumb" aria-hidden="true"></div>
-      <div class="text">
-        <div class="cat">Cyber</div>
-        <h3>Cross-border threat messages are hard to trace — here's why</h3>
-        <div class="time">6 hrs ago</div>
-      </div>
-    </div>
-    <div class="story">
-      <div class="thumb" aria-hidden="true"></div>
-      <div class="text">
-        <div class="cat">Explainer</div>
-        <h3>How investigators verify the origin of an anonymous threat</h3>
-        <div class="time">9 hrs ago</div>
-      </div>
-    </div>
+
+    <div class="section-label"><span class="bar"></span><h2>Story status</h2></div>
+    <ul class="status-list">
+      <li><span class="tag">Verification</span><span>Origin of original message still unconfirmed</span></li>
+      <li><span class="tag">Founder</span><span>No statement issued by Gursharn Arya</span></li>
+      <li><span class="tag">Family</span><span>No comment from family members</span></li>
+      <li><span class="tag">Nexor</span><span>No official company response as of publication</span></li>
+      <li><span class="tag">Next update</span><span>Pending any response or new developments</span></li>
+    </ul>
   </div>
 
   <footer>
     <div class="logo"><span class="crime">Crime</span><span class="news">news</span><span class="u">U</span></div>
-    <p>Developing coverage &middot; details unverified until confirmed</p>
+    <p>This is a developing story. CrimenewsU will update this report if Nexor Technologies, Gursharn Arya, or his family issue a statement.</p>
   </footer>
 
 </div>
