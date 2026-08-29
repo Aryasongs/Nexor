@@ -7,8 +7,13 @@
 <meta name="description" content="Kashish — your everyday AI companion. Chat, talk, or just hang out.">
 <meta name="robots" content="index, follow">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='11' fill='%23141416'/%3E%3Ccircle cx='12' cy='12' r='4.5' fill='%234FA8FF'/%3E%3C/svg%3E">
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Yellowtail&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
+<!-- Firebase (compat SDK) — shared auth/database backend, same project used
+     for account login elsewhere, so Kashish accounts are the same accounts. -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -136,17 +141,160 @@ img{display:block;max-width:100%;}
 @keyframes ring{0%{transform:scale(.9);opacity:.9;}100%{transform:scale(1.28);opacity:0;}}
 .voice-mic-big.muted{background:#D8D8DD;color:#8B8B93;}
 .voice-mic-big.muted::after{display:none;}
+
+/* ---------- AUTH (login/signup — shared account system) ---------- */
+:root{
+  --auth-bg:#0B0C10; --auth-surface:#17181D; --auth-surface2:#1E2027; --auth-border:#2A2C33;
+  --auth-text:#F5F5F7; --auth-text2:#A7A7B0; --auth-text3:#75757F; --auth-accent:#4FA8FF;
+}
+#auth-screen{position:fixed;inset:0;z-index:2000;background:var(--auth-bg);display:flex;flex-direction:column;overflow-y:auto;font-family:var(--body);}
+#auth-screen.hidden{display:none!important;}
+.auth-step{display:none;flex-direction:column;min-height:100%;width:100%;}
+.auth-step.active{display:flex;animation:authFade .3s ease both;}
+@keyframes authFade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+.auth-step-top{display:flex;align-items:center;justify-content:space-between;padding:calc(14px + env(safe-area-inset-top)) 18px 6px;min-height:34px;flex-shrink:0;}
+.auth-back-btn{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;color:var(--auth-text);font-size:18px;background:rgba(255,255,255,.06);flex-shrink:0;}
+.auth-back-btn:active{background:rgba(255,255,255,.12);}
+.auth-top-link{font-size:13px;font-weight:700;color:var(--auth-accent);}
+.auth-step-body{flex:1;padding:14px 26px 24px;display:flex;flex-direction:column;}
+.auth-step-heading{font-size:25px;font-weight:800;color:var(--auth-text);letter-spacing:-.4px;line-height:1.24;margin:8px 0 6px;}
+.auth-step-sub{font-size:13.5px;color:var(--auth-text2);font-weight:500;margin-bottom:22px;}
+.auth-input-wrap{display:flex;align-items:center;gap:6px;background:var(--auth-surface2);border:1px solid var(--auth-border);border-radius:16px;padding:2px 16px;margin-top:4px;}
+.auth-input{flex:1;min-width:0;border:none;outline:none;background:transparent;font-size:17px;color:var(--auth-text);padding:13px 0;font-family:inherit;font-weight:500;}
+.auth-input::placeholder{color:var(--auth-text3);font-weight:400;}
+.auth-pass-eye{font-size:17px;color:var(--auth-text3);padding:6px;flex-shrink:0;}
+.auth-continue-btn{width:100%;background:var(--auth-surface2);color:var(--auth-text3);border:1px solid var(--auth-border);border-radius:999px;padding:14px 0;font-size:15px;font-weight:800;text-align:center;margin-top:26px;transition:all .2s;}
+.auth-continue-btn.enabled{background:var(--auth-text);color:#0B0C10;border-color:transparent;}
+.auth-continue-btn.enabled:active{transform:scale(.98);}
+.auth-continue-btn:disabled{cursor:default;}
+.auth-err{font-size:12.5px;color:#FF6B6B;text-align:center;margin-top:14px;min-height:16px;font-weight:600;}
+.auth-landing-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 28px;gap:6px;}
+.kashish-wordmark{font-family:'Yellowtail',cursive;color:#fff;font-size:56px;line-height:1;letter-spacing:.5px;}
+.auth-landing-sub{font-size:14px;color:var(--auth-text2);font-weight:500;margin-top:10px;text-align:center;}
+.auth-landing-actions{padding:8px 28px calc(28px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;flex-shrink:0;}
+.auth-pill-btn{width:100%;background:#fff;color:#0B0C10;border-radius:999px;padding:15px 0;font-size:15px;font-weight:800;text-align:center;}
+.auth-pill-btn:active{transform:scale(.98);}
+.auth-outline-pill{width:100%;background:transparent;color:var(--auth-text);border:1px solid var(--auth-border);border-radius:999px;padding:15px 0;font-size:15px;font-weight:800;text-align:center;}
+.auth-outline-pill:active{transform:scale(.98);background:rgba(255,255,255,.04);}
+.auth-terms{font-size:11.5px;color:var(--auth-text3);text-align:center;margin-top:6px;line-height:1.5;}
+.auth-gender-opt{display:flex;align-items:center;gap:12px;padding:14px 16px;border-radius:14px;border:1.5px solid var(--auth-border);color:var(--auth-text);font-size:14.5px;font-weight:600;margin-bottom:10px;}
+.auth-gender-opt.on{border-color:var(--auth-accent);background:rgba(79,168,255,.1);}
+
+/* auth-gated app — hidden until signed in */
+#app.auth-locked{display:none!important;}
+
+/* ---------- AI CREATE badge / image message states ---------- */
+.ai-badge{display:inline-flex;align-items:center;gap:4px;font-size:10px;font-weight:800;color:#4FA8FF;background:rgba(79,168,255,.12);border:1px solid rgba(79,168,255,.35);border-radius:7px;padding:2px 7px;margin-bottom:6px;letter-spacing:.4px;}
+.gen-image-wrap{position:relative;}
+.gen-image-wrap img{width:220px;height:220px;object-fit:cover;border-radius:12px;}
+.gen-loading-box{width:220px;height:220px;border-radius:12px;background:linear-gradient(100deg,#eceef1 30%,#f6f6f8 50%,#eceef1 70%);background-size:200% 100%;animation:genShimmer 1.4s ease-in-out infinite;display:flex;align-items:center;justify-content:center;color:var(--ink-soft);font-size:12.5px;font-weight:700;}
+@keyframes genShimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}
 </style>
 </head>
 <body>
 
-<div id="app">
+<!-- ============ AUTH (login/signup) ============ -->
+<div id="auth-screen" class="hidden">
+
+  <!-- STEP: Landing -->
+  <div class="auth-step active" id="auth-step-landing">
+    <div class="auth-landing-body">
+      <div class="kashish-wordmark">Kashish</div>
+      <div class="auth-landing-sub">Your everyday AI companion.<br>Chat, talk, or just hang out.</div>
+    </div>
+    <div class="auth-landing-actions">
+      <button class="auth-pill-btn" onclick="authStartLogin()">Log in</button>
+      <button class="auth-outline-pill" onclick="authStartReg()">Create a new account</button>
+      <div class="auth-terms">By continuing, you agree to our Terms and Privacy Policy.</div>
+    </div>
+  </div>
+
+  <!-- STEP: Login — identifier -->
+  <div class="auth-step" id="auth-step-login-id">
+    <div class="auth-step-top"><button class="auth-back-btn" onclick="authPrevStep()"><i class="ph-bold ph-arrow-left"></i></button><span></span></div>
+    <div class="auth-step-body">
+      <div class="auth-step-heading">Enter your email<br>or username</div>
+      <div class="auth-input-wrap"><input class="auth-input" id="l-email" type="text" placeholder="Email or username" autocomplete="username" oninput="authToggleBtn('btn-login-id', this.value.trim().length>0)" onkeydown="if(event.key==='Enter')authNextStep()"></div>
+      <button class="auth-continue-btn" id="btn-login-id" disabled onclick="authNextStep()">Continue</button>
+    </div>
+  </div>
+
+  <!-- STEP: Login — password -->
+  <div class="auth-step" id="auth-step-login-pass">
+    <div class="auth-step-top"><button class="auth-back-btn" onclick="authPrevStep()"><i class="ph-bold ph-arrow-left"></i></button><span></span></div>
+    <div class="auth-step-body">
+      <div class="auth-step-heading">Enter your password</div>
+      <div class="auth-input-wrap"><input class="auth-input" id="l-pass" type="password" placeholder="Password" autocomplete="current-password" oninput="authToggleBtn('btn-login-pass', this.value.length>0)" onkeydown="if(event.key==='Enter')authNextStep()"><i class="ph ph-eye auth-pass-eye" onclick="toggleAuthPass('l-pass', this)"></i></div>
+      <button class="auth-continue-btn" id="btn-login-pass" disabled onclick="authNextStep()">Sign In</button>
+      <div class="auth-err" id="auth-err-login"></div>
+    </div>
+  </div>
+
+  <!-- STEP: Register — email -->
+  <div class="auth-step" id="auth-step-reg-email">
+    <div class="auth-step-top"><button class="auth-back-btn" onclick="authPrevStep()"><i class="ph-bold ph-arrow-left"></i></button><span></span></div>
+    <div class="auth-step-body">
+      <div class="auth-step-heading">Enter your email address</div>
+      <div class="auth-step-sub">We'll use this to sign in and recover your account</div>
+      <div class="auth-input-wrap"><input class="auth-input" id="r-email" type="email" placeholder="Email address" autocomplete="email" oninput="authToggleBtn('btn-reg-email', this.value.trim().length>3)" onkeydown="if(event.key==='Enter')authNextStep()"></div>
+      <button class="auth-continue-btn" id="btn-reg-email" disabled onclick="authNextStep()">Continue</button>
+    </div>
+  </div>
+
+  <!-- STEP: Register — name -->
+  <div class="auth-step" id="auth-step-reg-name">
+    <div class="auth-step-top"><button class="auth-back-btn" onclick="authPrevStep()"><i class="ph-bold ph-arrow-left"></i></button><span></span></div>
+    <div class="auth-step-body">
+      <div class="auth-step-heading">What's your name?</div>
+      <div class="auth-step-sub">This will appear on your profile</div>
+      <div class="auth-input-wrap"><input class="auth-input" id="r-name" type="text" placeholder="Display name" oninput="authToggleBtn('btn-reg-name', this.value.trim().length>0)" onkeydown="if(event.key==='Enter')authNextStep()"></div>
+      <button class="auth-continue-btn" id="btn-reg-name" disabled onclick="authNextStep()">Continue</button>
+    </div>
+  </div>
+
+  <!-- STEP: Register — username -->
+  <div class="auth-step" id="auth-step-reg-username">
+    <div class="auth-step-top"><button class="auth-back-btn" onclick="authPrevStep()"><i class="ph-bold ph-arrow-left"></i></button><span></span></div>
+    <div class="auth-step-body">
+      <div class="auth-step-heading">Choose your username</div>
+      <div class="auth-step-sub">You can always change this later</div>
+      <div class="auth-input-wrap"><span style="font-size:19px;color:var(--auth-accent);font-weight:600;">@</span><input class="auth-input" id="r-handle" type="text" placeholder="username" oninput="authToggleBtn('btn-reg-username', this.value.trim().length>0)" onkeydown="if(event.key==='Enter')authNextStep()"></div>
+      <button class="auth-continue-btn" id="btn-reg-username" disabled onclick="authNextStep()">Continue</button>
+    </div>
+  </div>
+
+  <!-- STEP: Register — password -->
+  <div class="auth-step" id="auth-step-reg-password">
+    <div class="auth-step-top"><button class="auth-back-btn" onclick="authPrevStep()"><i class="ph-bold ph-arrow-left"></i></button><span></span></div>
+    <div class="auth-step-body">
+      <div class="auth-step-heading">Create a password</div>
+      <div class="auth-step-sub">Use at least 6 characters</div>
+      <div class="auth-input-wrap"><input class="auth-input" id="r-pass" type="password" placeholder="Password" autocomplete="new-password" oninput="authToggleBtn('btn-reg-password', this.value.length>0)" onkeydown="if(event.key==='Enter')authNextStep()"><i class="ph ph-eye auth-pass-eye" onclick="toggleAuthPass('r-pass', this)"></i></div>
+      <button class="auth-continue-btn" id="btn-reg-password" disabled onclick="authNextStep()">Continue</button>
+    </div>
+  </div>
+
+  <!-- STEP: Register — date of birth -->
+  <div class="auth-step" id="auth-step-reg-dob">
+    <div class="auth-step-top"><button class="auth-back-btn" onclick="authPrevStep()"><i class="ph-bold ph-arrow-left"></i></button><span></span></div>
+    <div class="auth-step-body">
+      <div class="auth-step-heading">Date of birth</div>
+      <div class="auth-step-sub">You must be 13 years or older to join</div>
+      <div class="auth-input-wrap"><input class="auth-input" id="r-dob" type="date" autocomplete="bday" oninput="authToggleBtn('btn-reg-dob', this.value.length>0)"></div>
+      <button class="auth-continue-btn" id="btn-reg-dob" disabled onclick="authNextStep()">Create account</button>
+      <div class="auth-err" id="auth-err-reg"></div>
+    </div>
+  </div>
+
+</div>
+
+<div id="app" class="auth-locked">
 
   <!-- ============ HOME ============ -->
   <div class="screen" id="screen-home">
     <div class="topbar-home">
       <button class="pill-select" onclick="toggleHomeMenu()">Kashish <i class="ph-bold ph-caret-down"></i></button>
-      <div class="avatar" id="home-avatar">K</div>
+      <div class="avatar" id="home-avatar" onclick="openAccountMenu()">K</div>
     </div>
     <div class="home-scroll">
       <div class="greeting">
@@ -166,6 +314,10 @@ img{display:block;max-width:100%;}
         <button class="gcard" onclick="surpriseMe()">
           <div class="top-row"><div class="ic"><i class="ph ph-sparkle"></i></div><span class="go"><i class="ph-bold ph-arrow-up-right"></i></span></div>
           <div class="lbl">Just Chat</div>
+        </button>
+        <button class="gcard" onclick="startAiCreate()">
+          <div class="top-row"><div class="ic"><i class="ph ph-magic-wand"></i></div><span class="go"><i class="ph-bold ph-arrow-up-right"></i></span></div>
+          <div class="lbl">AI Create</div>
         </button>
       </div>
 
@@ -248,15 +400,207 @@ const GEMINI_MODEL = 'gemini-3.5-flash';
 const CFAI_PROXY_ENDPOINT = 'https://sparky-cfai.sgursharn076.workers.dev';
 const CFAI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 
-let userCtx = null;
-try{
-  const raw = localStorage.getItem('kashishUserContext');
-  if(raw){
-    const parsed = JSON.parse(raw);
-    if(parsed && parsed.name) userCtx = parsed;
-  }
-}catch(e){ userCtx = null; }
+/* ============================================================
+   AUTH — shared Firebase project. Logging into Kashish signs into
+   the SAME account system used elsewhere, so a user's login here
+   is the same account (and password) as on the other app.
+   ============================================================ */
+const firebaseConfig = {
+  apiKey:"AIzaSyC30TcmMVhP_8HdFYS1WufRiZwSDYNMTF0",
+  authDomain:"pulse2-92372.firebaseapp.com",
+  projectId:"pulse2-92372",
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.database();
+
+let userCtx = null; // {name, uid} of the signed-in account, once known
 function firstName(){ return userCtx && userCtx.name ? userCtx.name.split(' ')[0] : null; }
+
+function toggleAuthPass(inputId, iconEl){
+  const input=document.getElementById(inputId); if(!input) return;
+  const show = input.type==='password';
+  input.type = show?'text':'password';
+  iconEl.className = show?'ph ph-eye-slash auth-pass-eye':'ph ph-eye auth-pass-eye';
+}
+const authLoginSteps=['login-id','login-pass'];
+const authRegSteps=['reg-email','reg-name','reg-username','reg-password','reg-dob'];
+let authFlow=null, authStepIdx=0;
+function authToggleBtn(btnId, enabled){
+  const b=document.getElementById(btnId); if(!b) return;
+  b.disabled=!enabled; b.classList.toggle('enabled', !!enabled);
+}
+function authShowStep(stepId){
+  document.querySelectorAll('#auth-screen > .auth-step').forEach(el=>el.classList.remove('active'));
+  const el=document.getElementById('auth-step-'+stepId);
+  if(el) el.classList.add('active');
+}
+function authGoLanding(){ authFlow=null; authStepIdx=0; authShowStep('landing'); }
+function authStartLogin(){
+  authFlow='login'; authStepIdx=0;
+  document.getElementById('l-email').value=''; document.getElementById('l-pass').value='';
+  document.getElementById('auth-err-login').textContent='';
+  authToggleBtn('btn-login-id', false); authToggleBtn('btn-login-pass', false);
+  authShowStep(authLoginSteps[0]);
+}
+function authStartReg(){
+  authFlow='reg'; authStepIdx=0;
+  ['r-email','r-name','r-handle','r-pass','r-dob'].forEach(id=>{const e=document.getElementById(id); if(e) e.value='';});
+  document.getElementById('auth-err-reg').textContent='';
+  ['btn-reg-email','btn-reg-name','btn-reg-username','btn-reg-password','btn-reg-dob'].forEach(id=>authToggleBtn(id,false));
+  authShowStep(authRegSteps[0]);
+}
+function authPrevStep(){
+  if(authStepIdx<=0){ authGoLanding(); return; }
+  authStepIdx--;
+  const steps = authFlow==='login'?authLoginSteps:authRegSteps;
+  authShowStep(steps[authStepIdx]);
+}
+function authNextStep(){
+  const steps = authFlow==='login'?authLoginSteps:authRegSteps;
+  const currentBtn = document.getElementById('btn-'+steps[authStepIdx]);
+  if(currentBtn && currentBtn.disabled) return;
+  authStepIdx++;
+  if(authStepIdx>=steps.length){
+    if(authFlow==='login') doLogin(); else doRegister();
+    return;
+  }
+  authShowStep(steps[authStepIdx]);
+}
+function setAuthBusy(btnId, busy, label){
+  const b=document.getElementById(btnId); if(!b) return;
+  b.disabled=busy; b.textContent=busy?'Please wait…':label;
+}
+function friendlyAuthErr(err){
+  const m={
+    'auth/invalid-email':'Invalid email address.',
+    'auth/user-not-found':'No account with that email.',
+    'auth/wrong-password':'Incorrect password.',
+    'auth/email-already-in-use':'Email already in use.',
+    'auth/weak-password':'Password too short (min 6 chars).',
+    'auth/invalid-credential':'Wrong email or password.',
+    'auth/network-request-failed':'Network error — check connection.'
+  };
+  return m[err.code]||err.message||'Something went wrong.';
+}
+function calcAge(dobStr){
+  if(!dobStr) return null;
+  const dob=new Date(dobStr+'T00:00:00');
+  if(isNaN(dob.getTime())) return null;
+  const now=new Date();
+  let age=now.getFullYear()-dob.getFullYear();
+  const m=now.getMonth()-dob.getMonth();
+  if(m<0||(m===0&&now.getDate()<dob.getDate())) age--;
+  return age;
+}
+// Resolves a login identifier (email OR @username) to an email address,
+// the same way the shared account system's login does — via handleIndex.
+async function resolveLoginEmail(identifier){
+  const id=(identifier||'').trim();
+  if(!id) return null;
+  if(id.includes('@') && id.indexOf('@')>0 && id.includes('.')) return id; // looks like an email
+  const handle=id.replace(/^@/,'').toLowerCase();
+  const hSnap=await db.ref('handleIndex/'+handle).once('value').catch(()=>null);
+  const hVal=hSnap?hSnap.val():null;
+  let uid = typeof hVal==='string' ? hVal : (hVal && hVal.uid ? hVal.uid : null);
+  if(!uid){
+    const uSnap=await db.ref('users').orderByChild('handle').equalTo(handle).limitToFirst(1).once('value').catch(()=>null);
+    if(uSnap) uSnap.forEach(c=>{uid=c.key;});
+  }
+  if(!uid) return null;
+  const eSnap=await db.ref('users/'+uid+'/email').once('value').catch(()=>null);
+  return eSnap?eSnap.val():null;
+}
+async function doLogin(){
+  const idf=document.getElementById('l-email').value.trim(), p=document.getElementById('l-pass').value;
+  const errEl=document.getElementById('auth-err-login'); errEl.textContent='';
+  if(!idf||!p){ errEl.textContent='Enter email/username and password'; return; }
+  setAuthBusy('btn-login-pass', true);
+  try{
+    const email=await resolveLoginEmail(idf);
+    if(!email){ errEl.textContent='No account found for that email/username.'; setAuthBusy('btn-login-pass', false, 'Sign In'); return; }
+    await auth.signInWithEmailAndPassword(email, p);
+    // onAuthStateChanged takes it from here (loads profile, unlocks the app)
+  }catch(err){
+    errEl.textContent=friendlyAuthErr(err);
+    setAuthBusy('btn-login-pass', false, 'Sign In');
+  }
+}
+async function doRegister(){
+  const email=document.getElementById('r-email').value.trim(),
+        name=document.getElementById('r-name').value.trim(),
+        handle=(document.getElementById('r-handle').value.trim()||'').replace(/^@/,'').replace(/[^a-zA-Z0-9_]/g,'').toLowerCase(),
+        p=document.getElementById('r-pass').value,
+        dob=document.getElementById('r-dob').value;
+  const errEl=document.getElementById('auth-err-reg'); errEl.textContent='';
+  if(!email||!name||!handle||!p||!dob){ errEl.textContent='Fill in all fields'; return; }
+  if(handle.length<3){ errEl.textContent='Username must be at least 3 characters'; return; }
+  if(p.length<6){ errEl.textContent='Password must be at least 6 characters'; return; }
+  const age=calcAge(dob);
+  if(age===null||isNaN(age)){ errEl.textContent='Enter a valid date of birth'; return; }
+  if(age<13){ errEl.textContent='You must be at least 13 years old to create an account'; return; }
+  setAuthBusy('btn-reg-dob', true);
+  const handleRef=db.ref('handleIndex/'+handle);
+  try{
+    let preSnap=null; try{ preSnap=await handleRef.once('value'); }catch(e){ preSnap=null; }
+    if(preSnap && preSnap.exists()){ errEl.textContent='Username @'+handle+' is already taken.'; setAuthBusy('btn-reg-dob', false, 'Create account'); return; }
+    const cred=await auth.createUserWithEmailAndPassword(email,p);
+    const tx=await handleRef.transaction(curr=>curr===null?{uid:cred.user.uid}:curr);
+    if(!tx.committed || !tx.snapshot.val() || tx.snapshot.val().uid!==cred.user.uid){
+      await cred.user.delete().catch(()=>{});
+      errEl.textContent='Username @'+handle+' is already taken.'; setAuthBusy('btn-reg-dob', false, 'Create account'); return;
+    }
+    try{
+      await db.ref('users/'+cred.user.uid).set({
+        name, handle, bio:'', email:cred.user.email,
+        followersCount:0, followingCount:0, pulsesCount:0, totalLikes:0,
+        verified:false, isAI:false, website:'', location:'', pronouns:'', gender:'', languages:'',
+        photoBase64:null, bannerBase64:null, dob, age,
+        legalAgreedAt: firebase.database.ServerValue.TIMESTAMP,
+        createdAt: firebase.database.ServerValue.TIMESTAMP,
+        onboardingComplete:false,
+        referralCode: handle.toUpperCase(),
+        createdVia:'kashish'
+      });
+    }catch(profileErr){
+      await handleRef.remove().catch(()=>{});
+      await cred.user.delete().catch(()=>{});
+      throw profileErr;
+    }
+  }catch(err){
+    errEl.textContent=friendlyAuthErr(err);
+    setAuthBusy('btn-reg-dob', false, 'Create account');
+  }
+}
+function openAccountMenu(){
+  if(!userCtx) return;
+  if(confirm('Log out of Kashish'+(firstName()?(' as '+firstName()):'')+'?')) doLogout();
+}
+function doLogout(){ auth.signOut(); }
+
+// Gates the whole app behind sign-in. On sign-in, loads the shared profile
+// (so Kashish greets people by their real name) and reveals the app;
+// on sign-out, locks the app again and shows the auth screen.
+auth.onAuthStateChanged(async (user)=>{
+  const authScreen=document.getElementById('auth-screen');
+  const app=document.getElementById('app');
+  if(user){
+    let name=user.displayName||null;
+    try{
+      const snap=await db.ref('users/'+user.uid+'/name').once('value');
+      if(snap.exists()) name=snap.val();
+    }catch(e){}
+    userCtx={ uid:user.uid, name: name||user.email||null };
+    authScreen.classList.add('hidden');
+    app.classList.remove('auth-locked');
+    renderHome();
+  }else{
+    userCtx=null;
+    authGoLanding();
+    authScreen.classList.remove('hidden');
+    app.classList.add('auth-locked');
+  }
+});
 
 /* ---------------- session storage ---------------- */
 function loadSessions(){ try{ return JSON.parse(localStorage.getItem('kashishSessions')||'[]'); }catch(e){ return []; } }
@@ -321,6 +665,13 @@ function surpriseMe(){
   document.getElementById('chat-input').value = openers[Math.floor(Math.random()*openers.length)];
   updateSendBtn(); send();
 }
+function startAiCreate(){
+  startNewChat();
+  const input=document.getElementById('chat-input');
+  input.value = '#imagine ';
+  updateSendBtn();
+  input.focus();
+}
 
 /* ---------------- navigation ---------------- */
 function showScreen(id){
@@ -379,8 +730,19 @@ function renderChat(){
   sess.messages.forEach(m=>{
     const row=document.createElement('div'); row.className='bubble-row '+(m.role==='user'?'user':'bot');
     const b=document.createElement('div'); b.className='bubble '+(m.role==='user'?'user':'bot');
-    if(m.imageDataUrl){ const im=document.createElement('img'); im.src=m.imageDataUrl; b.appendChild(im); }
-    if(m.text){ const span=document.createElement('div'); span.textContent=m.text; b.appendChild(span); }
+    if(m.genPending){
+      const badge=document.createElement('div'); badge.className='ai-badge'; badge.innerHTML='<i class="ph-fill ph-sparkle"></i> AI CREATE';
+      b.appendChild(badge);
+      const box=document.createElement('div'); box.className='gen-loading-box'; box.textContent='Creating your image…';
+      b.appendChild(box);
+    } else {
+      if(m.imageDataUrl){
+        if(!m.genFailed){ const badge=document.createElement('div'); badge.className='ai-badge'; badge.innerHTML='<i class="ph-fill ph-sparkle"></i> AI CREATE'; b.appendChild(badge); }
+        const wrap=document.createElement('div'); wrap.className='gen-image-wrap';
+        const im=document.createElement('img'); im.src=m.imageDataUrl; wrap.appendChild(im); b.appendChild(wrap);
+      }
+      if(m.text){ const span=document.createElement('div'); span.textContent=m.text; b.appendChild(span); }
+    }
     row.appendChild(b);
     const t=document.createElement('div'); t.className='bubble-time'; t.textContent=fmtTime(m.ts); row.appendChild(t);
     scroll.appendChild(row);
@@ -538,6 +900,96 @@ function pushBotMessage(text, quickReplies){
   renderChat();
 }
 
+/* ---------------- AI image creation ("AI create") ---------------- */
+// Same free Cloudflare Worker (Workers AI, flux-1-schnell) used elsewhere —
+// no API key needed client-side, the Worker holds the AI binding.
+const KASHISH_IMAGE_WORKER_URL = 'https://nexorai.sgursharn076.workers.dev/';
+const KASHISH_IMAGE_PREFIXES = ['#imagine','imagine ','image ','img ','generate image','make image','create image','draw ','pic ','photo ','picture ','tasveer','tasveer bana','image bana','pic bana','photo bana'];
+function detectImageRequest(text){
+  const t=(text||'').trim().toLowerCase();
+  if(!t) return null;
+  for(const p of KASHISH_IMAGE_PREFIXES){
+    if(t.startsWith(p)) return text.trim().slice(p.length).trim() || text.trim();
+  }
+  return null;
+}
+// Lightweight safety gate — blocks obviously unsafe (sexual/exploitative,
+// especially involving minors) image prompts before they ever reach the
+// generator. Deliberately conservative and non-exhaustive.
+const KASHISH_UNSAFE_IMAGE_TERMS = ['nude','naked','nsfw','porn','sex','undress','topless','explicit','child porn','minor nude','loli'];
+function imagePromptIsUnsafe(prompt){
+  const p=' '+(prompt||'').toLowerCase()+' ';
+  return KASHISH_UNSAFE_IMAGE_TERMS.some(t=>p.includes(' '+t)||p.includes(t+' '));
+}
+function drawKashishWatermark(ctx, w, h){
+  const label='Kashish AI';
+  ctx.save();
+  ctx.font='800 13px Manrope, sans-serif';
+  const textW=ctx.measureText(label).width;
+  const badgeH=26, pad=10, dotR=8;
+  const badgeW=pad*2+dotR*2+6+textW+6;
+  const x=10, y=h-badgeH-10;
+  ctx.fillStyle='rgba(10,10,12,0.68)';
+  const r=badgeH/2;
+  ctx.beginPath();
+  ctx.moveTo(x+r,y); ctx.arcTo(x+badgeW,y,x+badgeW,y+badgeH,r); ctx.arcTo(x+badgeW,y+badgeH,x,y+badgeH,r);
+  ctx.arcTo(x,y+badgeH,x,y,r); ctx.arcTo(x,y,x+badgeW,y,r); ctx.closePath(); ctx.fill();
+  const cx=x+14, cy=y+badgeH/2;
+  ctx.fillStyle='#4FA8FF'; ctx.beginPath(); ctx.arc(cx,cy,dotR,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#fff'; ctx.textAlign='left'; ctx.textBaseline='middle';
+  ctx.fillText(label, cx+dotR+6, cy+0.5);
+  ctx.restore();
+}
+function watermarkDataUrl(dataUrl){
+  return new Promise(resolve=>{
+    const img=new Image();
+    img.onload=()=>{
+      try{
+        const c=document.createElement('canvas'); c.width=img.naturalWidth||600; c.height=img.naturalHeight||600;
+        const ctx=c.getContext('2d'); ctx.drawImage(img,0,0,c.width,c.height);
+        drawKashishWatermark(ctx,c.width,c.height);
+        resolve(c.toDataURL('image/jpeg',0.9));
+      }catch(e){ resolve(dataUrl); }
+    };
+    img.onerror=()=>resolve(dataUrl);
+    img.src=dataUrl;
+  });
+}
+async function generateKashishImage(prompt){
+  const ctrl=new AbortController();
+  const timeoutId=setTimeout(()=>ctrl.abort(), 25000);
+  const res=await fetch(KASHISH_IMAGE_WORKER_URL, {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({ prompt: prompt || 'a simple abstract icon' }), signal:ctrl.signal
+  });
+  clearTimeout(timeoutId);
+  if(!res.ok) throw new Error('Image worker responded '+res.status);
+  const blob=await res.blob();
+  const dataUrl=await new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(reader.result); reader.onerror=reject; reader.readAsDataURL(blob);
+  });
+  return await watermarkDataUrl(dataUrl);
+}
+async function handleImageGenRequest(prompt){
+  const sess=getSession(currentSessionId); if(!sess) return;
+  if(imagePromptIsUnsafe(prompt)){
+    pushBotMessage("I can't generate that — nude, sexual, or exploitative images aren't something I'll create. Describe something else and I'm happy to draw it!", null);
+    return;
+  }
+  const genMsg={role:'model', text:'', ts:Date.now(), genPending:true};
+  sess.messages.push(genMsg);
+  sess.updatedAt=Date.now(); upsertSession(sess); renderChat();
+  try{
+    const dataUrl=await generateKashishImage(prompt);
+    genMsg.genPending=false; genMsg.imageDataUrl=dataUrl; genMsg.text='Here you go ✨';
+  }catch(e){
+    console.error('[KASHISH] image generation failed:', e);
+    genMsg.genPending=false; genMsg.genFailed=true; genMsg.text="Couldn't generate that image right now — try again in a bit?";
+  }
+  sess.updatedAt=Date.now(); upsertSession(sess); renderChat();
+}
+
 async function send(){
   const input=document.getElementById('chat-input');
   const text=(input?.value||'').trim();
@@ -556,6 +1008,14 @@ async function send(){
   input.value=''; clearAttachment(); updateSendBtn();
   showScreen('screen-chat');
   renderChat();
+
+  // "AI create" — image generation, triggered by #imagine / "image ..." / etc.
+  const imagePrompt = !img ? detectImageRequest(text) : null;
+  if(imagePrompt !== null){
+    handleImageGenRequest(imagePrompt);
+    return;
+  }
+
   addTyping();
 
   const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text: m.text + (m.imageDataUrl && m===sess.messages[sess.messages.length-1] ? ` [Attached photo: ${img?img.name:''}]` : '')} : {role:'model', text:m.text});
@@ -631,7 +1091,10 @@ function toggleVoiceListening(){
 }
 
 /* ---------------- boot ---------------- */
-renderHome();
+// Home rendering + screen reveal now happens inside auth.onAuthStateChanged
+// above, once we know whether someone's signed in. showScreen('screen-home')
+// still needs to run once up front so the right screen is active underneath
+// the auth overlay the moment it's dismissed.
 showScreen('screen-home');
 </script>
 </body>
