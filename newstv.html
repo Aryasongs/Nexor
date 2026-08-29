@@ -3,237 +3,244 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Nexor Technologies Founder Receives Threat Allegedly From Pakistan</title>
+<title>CrimenewsU</title>
 <style>
   :root{
-    --paper:#f7f5f0;
-    --ink:#1a1a1a;
-    --ink-soft:#4a4a46;
-    --rule:#1a1a1a;
-    --accent:#8c1c13;
-    --meta:#7a7568;
+    --bg:#101012;
+    --bg-raised:#18181b;
+    --line:#2c2c30;
+    --ink:#f2f1ec;
+    --ink-dim:#a8a7a0;
+    --ink-faint:#6f6e68;
+    --accent:#e0262c;
+    --accent-dim:#8c1418;
   }
   *{box-sizing:border-box;}
   body{
     margin:0;
-    background:#e9e6de;
+    background:var(--bg);
     color:var(--ink);
-    font-family:"Georgia","Times New Roman",serif;
-    -webkit-font-smoothing:antialiased;
-  }
-  .sheet{
-    max-width:760px;
-    margin:0 auto;
-    background:var(--paper);
-    padding:0 32px 64px;
-    min-height:100vh;
-    box-shadow:0 0 40px rgba(0,0,0,0.08);
-  }
-  .masthead{
-    padding:28px 0 14px;
-    text-align:center;
-    border-bottom:3px double var(--rule);
-  }
-  .masthead .brand{
     font-family:"Helvetica Neue",Arial,sans-serif;
-    letter-spacing:0.28em;
-    font-size:11px;
-    text-transform:uppercase;
-    color:var(--meta);
   }
-  .masthead .title{
-    font-family:Georgia, serif;
-    font-weight:700;
-    font-size:38px;
-    letter-spacing:-0.01em;
-    margin:6px 0 8px;
+  .frame{max-width:420px;margin:0 auto;background:var(--bg);min-height:100vh;}
+
+  /* status bar */
+  .statusbar{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:14px 18px 4px;font-size:15px;font-weight:600;color:var(--ink);
   }
-  .masthead .subline{
-    font-family:"Helvetica Neue",Arial,sans-serif;
+
+  /* header */
+  header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:14px 18px 16px;
+    border-bottom:1px solid var(--line);
+  }
+  .icon-btn{width:22px;height:22px;display:flex;align-items:center;justify-content:center;color:var(--ink);}
+  .icon-btn svg{width:20px;height:20px;}
+  .logo{display:flex;align-items:baseline;gap:2px;font-weight:800;font-size:22px;letter-spacing:-0.02em;}
+  .logo .crime{color:var(--ink);}
+  .logo .news{color:var(--accent);}
+  .logo .u{
+    color:var(--bg);
+    background:var(--accent);
+    padding:1px 6px 2px;
+    border-radius:3px;
+    font-size:15px;
+    font-weight:800;
+    margin-left:2px;
+  }
+
+  /* tag bar */
+  .tagbar{
+    display:flex;gap:18px;overflow-x:auto;
+    padding:12px 18px;
+    border-bottom:1px solid var(--line);
+    font-size:13px;
+    font-weight:600;
+    letter-spacing:0.02em;
+  }
+  .tagbar span{white-space:nowrap;color:var(--ink-dim);padding-bottom:6px;}
+  .tagbar span.active{color:var(--accent);border-bottom:2px solid var(--accent);}
+
+  /* breaking strip */
+  .breaking{
+    display:flex;align-items:center;gap:10px;
+    background:var(--accent);
+    padding:8px 18px;
     font-size:12px;
-    letter-spacing:0.14em;
+    font-weight:700;
+    letter-spacing:0.06em;
     text-transform:uppercase;
-    color:var(--meta);
-    display:flex;
-    justify-content:space-between;
-    padding-top:8px;
-    border-top:1px solid #c9c4b6;
   }
+  .breaking .dot{
+    width:7px;height:7px;border-radius:50%;background:var(--ink);
+    animation:pulse 1.4s infinite;
+    flex:0 0 auto;
+  }
+  @keyframes pulse{0%,100%{opacity:1;}50%{opacity:0.3;}}
+  .breaking .txt{
+    overflow:hidden;white-space:nowrap;text-overflow:ellipsis;
+  }
+
+  /* hero */
+  .hero{padding:20px 18px 6px;}
   .kicker{
-    margin-top:34px;
-    font-family:"Helvetica Neue",Arial,sans-serif;
-    font-size:12px;
-    letter-spacing:0.16em;
-    text-transform:uppercase;
-    color:var(--accent);
-    font-weight:700;
+    font-size:11px;font-weight:800;letter-spacing:0.14em;text-transform:uppercase;
+    color:var(--accent);margin-bottom:10px;
   }
   h1.headline{
-    font-size:34px;
-    line-height:1.15;
-    margin:10px 0 12px;
-    font-weight:700;
+    font-size:26px;line-height:1.2;font-weight:800;margin:0 0 12px;letter-spacing:-0.01em;
   }
-  .dek{
-    font-size:19px;
-    line-height:1.4;
-    color:var(--ink-soft);
-    font-style:italic;
-    margin:0 0 18px;
-    padding-bottom:18px;
-    border-bottom:1px solid #c9c4b6;
+  .hero-meta{
+    display:flex;justify-content:space-between;font-size:12px;color:var(--ink-faint);
+    margin-bottom:16px;
   }
-  .byline-row{
-    display:flex;
-    justify-content:space-between;
-    flex-wrap:wrap;
-    gap:8px;
-    font-family:"Helvetica Neue",Arial,sans-serif;
-    font-size:12px;
-    color:var(--meta);
-    margin-bottom:26px;
+
+  .media{
+    position:relative;width:100%;aspect-ratio:16/10;
+    background:linear-gradient(160deg,#2a2a2e,#111113);
+    border-radius:6px;overflow:hidden;
+    margin-bottom:8px;
   }
-  .byline-row strong{color:var(--ink);}
-  .advisory{
-    font-family:"Helvetica Neue",Arial,sans-serif;
-    font-size:12.5px;
-    line-height:1.55;
-    background:#efe9da;
-    border-left:3px solid var(--accent);
-    padding:12px 16px;
-    color:var(--ink-soft);
-    margin-bottom:30px;
+  .media .grain{
+    position:absolute;inset:0;
+    background:repeating-linear-gradient(115deg,rgba(255,255,255,0.03) 0 2px,transparent 2px 6px);
   }
-  .advisory strong{color:var(--ink);}
-  .body-copy{
-    font-size:18px;
-    line-height:1.7;
-    columns:1;
+  .media .duration{
+    position:absolute;left:10px;bottom:10px;
+    background:rgba(0,0,0,0.75);color:var(--ink);
+    font-size:11px;font-weight:700;padding:3px 7px;border-radius:3px;
   }
-  .body-copy p{margin:0 0 20px;}
-  .body-copy p::first-letter{
-    font-size:1em;
+  .media .play{
+    position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+    width:56px;height:56px;border-radius:50%;
+    background:rgba(0,0,0,0.55);
+    border:1.5px solid rgba(255,255,255,0.5);
+    display:flex;align-items:center;justify-content:center;
   }
-  .body-copy .lede::first-letter{
-    font-family:Georgia, serif;
-    font-weight:700;
-    font-size:3.4em;
-    float:left;
-    line-height:0.82;
-    padding-right:8px;
-    padding-top:4px;
-    color:var(--accent);
+  .media .play svg{width:20px;height:20px;fill:var(--ink);margin-left:3px;}
+  .caption{font-size:12.5px;color:var(--ink-faint);margin:0 0 22px;line-height:1.4;}
+
+  .lede{font-size:16px;line-height:1.6;color:var(--ink-dim);margin:0 0 26px;}
+
+  /* section label */
+  .section-label{
+    display:flex;align-items:center;gap:10px;
+    padding:0 18px;margin-bottom:14px;
   }
-  .pull{
-    font-size:22px;
-    line-height:1.4;
-    font-style:italic;
-    color:var(--ink-soft);
-    border-top:1px solid #c9c4b6;
-    border-bottom:1px solid #c9c4b6;
-    padding:18px 0;
-    margin:28px 0;
+  .section-label .bar{width:4px;height:16px;background:var(--accent);border-radius:2px;}
+  .section-label h2{font-size:14px;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;margin:0;}
+
+  /* story list */
+  .story-list{padding:0 18px;margin-bottom:30px;}
+  .story{
+    display:flex;gap:12px;padding:14px 0;border-bottom:1px solid var(--line);
+  }
+  .story:last-child{border-bottom:none;}
+  .story .thumb{
+    flex:0 0 84px;height:64px;border-radius:5px;
+    background:linear-gradient(160deg,#2a2a2e,#111113);
+    position:relative;
+  }
+  .story .thumb::after{
+    content:"";position:absolute;inset:0;
+    background:repeating-linear-gradient(115deg,rgba(255,255,255,0.04) 0 2px,transparent 2px 6px);
+    border-radius:5px;
+  }
+  .story .text{flex:1;min-width:0;}
+  .story .cat{font-size:10.5px;font-weight:800;color:var(--accent);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:4px;}
+  .story h3{font-size:14.5px;line-height:1.35;font-weight:700;margin:0 0 6px;}
+  .story .time{font-size:11.5px;color:var(--ink-faint);}
+
+  footer{
+    padding:20px 18px 40px;
+    border-top:1px solid var(--line);
     text-align:center;
   }
-  .status-block{
-    margin-top:36px;
-    padding-top:22px;
-    border-top:3px double var(--rule);
-  }
-  .status-block h2{
-    font-family:"Helvetica Neue",Arial,sans-serif;
-    font-size:12px;
-    letter-spacing:0.16em;
-    text-transform:uppercase;
-    color:var(--accent);
-    margin:0 0 14px;
-  }
-  .status-list{
-    list-style:none;
-    margin:0;
-    padding:0;
-    font-family:"Helvetica Neue",Arial,sans-serif;
-    font-size:14px;
-    line-height:1.6;
-    color:var(--ink-soft);
-  }
-  .status-list li{
-    padding:10px 0;
-    border-bottom:1px solid #dcd7c8;
-    display:flex;
-    gap:12px;
-  }
-  .status-list li:last-child{border-bottom:none;}
-  .status-list .tag{
-    flex:0 0 120px;
-    font-weight:700;
-    color:var(--ink);
-  }
-  .footer-note{
-    margin-top:40px;
-    font-family:"Helvetica Neue",Arial,sans-serif;
-    font-size:11px;
-    color:var(--meta);
-    text-align:center;
-    letter-spacing:0.04em;
-  }
-  @media (max-width:600px){
-    .sheet{padding:0 18px 48px;}
-    .masthead .title{font-size:28px;}
-    h1.headline{font-size:26px;}
-    .dek{font-size:16px;}
-    .body-copy{font-size:16px;}
-    .byline-row{flex-direction:column;}
-  }
+  footer .logo{justify-content:center;margin-bottom:8px;font-size:18px;}
+  footer p{font-size:11px;color:var(--ink-faint);margin:0;}
 </style>
 </head>
 <body>
-<div class="sheet">
+<div class="frame">
 
-  <div class="masthead">
-    <div class="brand">Independent Security &amp; Technology Desk</div>
-    <div class="title">The Signal Wire</div>
-    <div class="subline">
-      <span>Developing Story</span>
-      <span>Cybersecurity &amp; Corporate Safety</span>
+  <header>
+    <span class="icon-btn" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+    </span>
+    <div class="logo"><span class="crime">Crime</span><span class="news">news</span><span class="u">U</span></div>
+    <span class="icon-btn" aria-hidden="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </span>
+  </header>
+
+  <div class="tagbar">
+    <span class="active">Top stories</span>
+    <span>Crime</span>
+    <span>Courts</span>
+    <span>Investigations</span>
+    <span>Cyber</span>
+    <span>World</span>
+  </div>
+
+  <div class="breaking">
+    <span class="dot"></span>
+    <span class="txt">Breaking — verification pending on latest incident report</span>
+  </div>
+
+  <div class="hero">
+    <div class="kicker">Security &amp; threats</div>
+    <h1 class="headline">Nexor Technologies founder receives threat allegedly from Pakistan</h1>
+    <div class="hero-meta">
+      <span>Staff Report</span>
+      <span>Updated 7 hrs ago</span>
+    </div>
+
+    <div class="media">
+      <div class="grain"></div>
+      <span class="duration">1:12</span>
+      <div class="play" aria-hidden="true">
+        <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+      </div>
+    </div>
+    <p class="caption">Security teams are assessing the origin and authenticity of the message</p>
+
+    <p class="lede">Security concerns have risen after a threatening message reportedly targeted the company founder. Authorities are expected to assess the claim's authenticity as the matter develops.</p>
+  </div>
+
+  <div class="section-label"><span class="bar"></span><h2>More on this story</h2></div>
+  <div class="story-list">
+    <div class="story">
+      <div class="thumb" aria-hidden="true"></div>
+      <div class="text">
+        <div class="cat">Analysis</div>
+        <h3>What founders can do after a digital threat surfaces online</h3>
+        <div class="time">4 hrs ago</div>
+      </div>
+    </div>
+    <div class="story">
+      <div class="thumb" aria-hidden="true"></div>
+      <div class="text">
+        <div class="cat">Cyber</div>
+        <h3>Cross-border threat messages are hard to trace — here's why</h3>
+        <div class="time">6 hrs ago</div>
+      </div>
+    </div>
+    <div class="story">
+      <div class="thumb" aria-hidden="true"></div>
+      <div class="text">
+        <div class="cat">Explainer</div>
+        <h3>How investigators verify the origin of an anonymous threat</h3>
+        <div class="time">9 hrs ago</div>
+      </div>
     </div>
   </div>
 
-  <div class="kicker">Security &amp; Threats</div>
-  <h1 class="headline">Nexor Technologies Founder Receives Threat Allegedly From Pakistan</h1>
-  <p class="dek">Security concerns rise after a threatening message reportedly targeted the company founder</p>
-
-  <div class="byline-row">
-    <span>By <strong>Staff Report</strong></span>
-    <span>Updated Aug 29, 2026</span>
-  </div>
-
-  <div class="advisory">
-    <strong>Editor's note:</strong> This report is based on preliminary, unverified information. Claims regarding the origin of the message are described as "alleged" and have not been independently confirmed. This article will be updated as facts are established.
-  </div>
-
-  <div class="body-copy">
-    <p class="lede">Nexor Technologies' founder has reportedly received a threatening message allegedly originating from Pakistan, raising concerns about his personal safety and digital security. The nature and full contents of the message have not been publicly disclosed.</p>
-
-    <p>Authorities and relevant security teams are expected to assess the authenticity and origin of the threat in the coming days. No official confirmation of the sender's identity or location has been issued at this time, and the matter remains under review.</p>
-
-    <div class="pull">"Authorities and relevant security teams are expected to assess the authenticity and nature of the threat."</div>
-
-    <p>The incident has prompted renewed attention to the digital security posture of technology founders and small companies operating consumer-facing products, particularly around personal exposure that can come with public-facing leadership roles.</p>
-
-    <p>Further details are awaited as the matter develops. This report will be updated as verified information becomes available.</p>
-  </div>
-
-  <div class="status-block">
-    <h2>Story Status</h2>
-    <ul class="status-list">
-      <li><span class="tag">Verification</span><span>Origin of message unconfirmed — described as "alleged"</span></li>
-      <li><span class="tag">Authorities</span><span>Assessment reportedly pending</span></li>
-      <li><span class="tag">Next update</span><span>Pending new information</span></li>
-    </ul>
-  </div>
-
-  <div class="footer-note">This is a developing story. Details may change as more information becomes available.</div>
+  <footer>
+    <div class="logo"><span class="crime">Crime</span><span class="news">news</span><span class="u">U</span></div>
+    <p>Developing coverage &middot; details unverified until confirmed</p>
+  </footer>
 
 </div>
 </body>
