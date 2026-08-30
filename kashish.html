@@ -145,7 +145,23 @@ img{display:block;max-width:100%;}
 .voice-mic-big.muted{background:#D8D8DD;color:#8B8B93;}
 .voice-mic-big.muted::after{display:none;}
 
-/* ---------- AUTH (login/signup — shared account system) ---------- */
+/* ---------- PROFILE ---------- */
+#screen-profile{padding-top:env(safe-area-inset-top);}
+.profile-scroll{flex:1;overflow-y:auto;padding:28px 24px calc(30px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;}
+.profile-avatar-wrap{position:relative;width:104px;height:104px;margin-bottom:16px;}
+.profile-avatar-big{width:104px;height:104px;border-radius:50%;background:linear-gradient(135deg,#3a3a40,var(--black));background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:34px;box-shadow:0 10px 24px -10px rgba(20,20,22,.35),0 1px 0 rgba(255,255,255,.15) inset;}
+.profile-avatar-edit-badge{position:absolute;right:0;bottom:0;width:32px;height:32px;border-radius:50%;background:linear-gradient(160deg,#2b2b30,var(--black));color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;border:3px solid var(--bg);box-shadow:0 4px 10px -4px rgba(20,20,22,.5);}
+.profile-name-display{font-size:19px;font-weight:800;color:var(--ink);margin-bottom:2px;text-align:center;}
+.profile-handle-display{font-size:13px;color:var(--ink-soft);font-weight:600;margin-bottom:28px;}
+.profile-field{width:100%;margin-bottom:8px;}
+.profile-field label{display:block;font-size:12px;font-weight:700;color:var(--ink-soft);margin-bottom:6px;padding-left:4px;}
+.profile-field input{width:100%;background:linear-gradient(160deg,#f8f8f9,#F1F1F3);border:1px solid var(--border);border-radius:14px;padding:13px 16px;font-size:14.5px;color:var(--ink);font-family:inherit;box-shadow:0 1px 3px rgba(20,20,22,.05) inset;}
+.profile-save-btn{width:100%;background:linear-gradient(160deg,#2b2b30 0%,var(--black) 55%,#0d0d0f 100%);color:#fff;border-radius:999px;padding:14px 0;font-size:14.5px;font-weight:800;text-align:center;margin-top:16px;box-shadow:0 6px 14px -8px rgba(20,20,22,.5),0 1px 0 rgba(255,255,255,.12) inset;}
+.profile-save-btn:active{opacity:.85;}
+.profile-save-btn:disabled{opacity:.6;}
+.profile-logout-btn{width:100%;background:#fff;color:#E0483E;border:1.5px solid #F3CFCB;border-radius:999px;padding:14px 0;font-size:14.5px;font-weight:800;text-align:center;margin-top:38px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 2px 8px -6px rgba(224,72,62,.18);}
+.profile-logout-btn:active{background:#FFF4F3;}
+
 :root{
   --auth-bg:#0B0C10; --auth-surface:#17181D; --auth-surface2:#1E2027; --auth-border:#2A2C33;
   --auth-text:#F5F5F7; --auth-text2:#A7A7B0; --auth-text3:#75757F; --auth-accent:#4FA8FF;
@@ -297,7 +313,7 @@ img{display:block;max-width:100%;}
   <div class="screen" id="screen-home">
     <div class="topbar-home">
       <button class="pill-select" onclick="toggleHomeMenu()">Kashish <i class="ph-bold ph-caret-down"></i></button>
-      <div class="avatar" id="home-avatar" onclick="openAccountMenu()">K</div>
+      <div class="avatar" id="home-avatar" onclick="openProfileScreen()">K</div>
     </div>
     <div class="home-scroll">
       <div class="greeting">
@@ -380,6 +396,33 @@ img{display:block;max-width:100%;}
       <button class="voice-ctrl" onclick="closeVoicePanel()" title="Switch to keyboard"><i class="ph ph-keyboard"></i></button>
       <button class="voice-mic-big" id="voice-mic-big" onclick="toggleVoiceListening()" title="Pause/resume"><i class="ph-fill ph-microphone" id="voice-mic-icon"></i></button>
       <button class="voice-ctrl" onclick="closeVoicePanel()" title="Close"><i class="ph ph-x"></i></button>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ============ PROFILE ============ -->
+  <div class="screen hidden" id="screen-profile">
+    <div class="chat-topbar">
+      <button class="circle-btn" onclick="goHome()"><i class="ph-bold ph-arrow-left"></i></button>
+      <div class="chat-title">Profile</div>
+      <span style="width:38px"></span>
+    </div>
+    <div class="profile-scroll">
+      <div class="profile-avatar-wrap" onclick="document.getElementById('profile-photo-input').click()">
+        <div class="profile-avatar-big" id="profile-avatar-big">K</div>
+        <div class="profile-avatar-edit-badge"><i class="ph-bold ph-camera"></i></div>
+      </div>
+      <input type="file" id="profile-photo-input" accept="image/*" class="hidden" onchange="onProfilePhotoPicked(event)">
+      <div class="profile-name-display" id="profile-name-display">Your name</div>
+      <div class="profile-handle-display" id="profile-handle-display"></div>
+
+      <div class="profile-field">
+        <label>Display name</label>
+        <input type="text" id="profile-name-input" placeholder="Your name">
+      </div>
+      <button class="profile-save-btn" id="profile-save-btn" onclick="saveProfileName()">Save changes</button>
+
+      <button class="profile-logout-btn" onclick="confirmLogout()"><i class="ph-bold ph-sign-out"></i> Log out</button>
     </div>
     <div class="home-indicator"></div>
   </div>
@@ -592,11 +635,76 @@ async function doRegister(){
     setAuthBusy('btn-reg-dob', false, 'Create account');
   }
 }
-function openAccountMenu(){
+function confirmLogout(){
   if(!userCtx) return;
   if(confirm('Log out of Kashish'+(firstName()?(' as '+firstName()):'')+'?')) doLogout();
 }
 function doLogout(){ auth.signOut(); }
+
+// Sets an avatar element to the user's uploaded photo if they have one,
+// otherwise falls back to their initial letter.
+function applyAvatar(el){
+  if(!el) return;
+  if(userCtx && userCtx.photoBase64){
+    el.style.backgroundImage = `url(${userCtx.photoBase64})`;
+    el.style.backgroundSize = 'cover';
+    el.style.backgroundPosition = 'center';
+    el.textContent = '';
+  } else {
+    el.style.backgroundImage = '';
+    el.textContent = firstName() ? firstName()[0].toUpperCase() : 'K';
+  }
+}
+function openProfileScreen(){
+  if(!userCtx) return;
+  document.getElementById('profile-name-input').value = userCtx.name || '';
+  document.getElementById('profile-name-display').textContent = userCtx.name || 'Your name';
+  document.getElementById('profile-handle-display').textContent = userCtx.handle ? '@'+userCtx.handle : '';
+  applyAvatar(document.getElementById('profile-avatar-big'));
+  showScreen('screen-profile');
+}
+function saveProfileName(){
+  if(!userCtx) return;
+  const btn = document.getElementById('profile-save-btn');
+  const val = document.getElementById('profile-name-input').value.trim();
+  if(!val) return;
+  btn.disabled = true; btn.textContent = 'Saving…';
+  db.ref('users/'+userCtx.uid).update({ name: val }).then(()=>{
+    userCtx.name = val;
+    document.getElementById('profile-name-display').textContent = val;
+    btn.disabled = false; btn.textContent = 'Saved ✓';
+    renderHome();
+    setTimeout(()=>{ btn.textContent = 'Save changes'; }, 1500);
+  }).catch(()=>{
+    btn.disabled = false; btn.textContent = 'Save changes';
+    alert("Couldn't save right now — check your connection and try again.");
+  });
+}
+function onProfilePhotoPicked(evt){
+  const file = evt.target.files && evt.target.files[0];
+  evt.target.value = '';
+  if(!file || !file.type.startsWith('image/') || !userCtx) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    const img = new Image();
+    img.onload = ()=>{
+      const size = 300;
+      const canvas = document.createElement('canvas'); canvas.width=size; canvas.height=size;
+      const ctx = canvas.getContext('2d');
+      const minSide = Math.min(img.width, img.height);
+      const sx = (img.width-minSide)/2, sy = (img.height-minSide)/2;
+      ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, size, size);
+      const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+      db.ref('users/'+userCtx.uid).update({ photoBase64: dataUrl }).then(()=>{
+        userCtx.photoBase64 = dataUrl;
+        applyAvatar(document.getElementById('profile-avatar-big'));
+        renderHome();
+      }).catch(()=>{ alert("Couldn't update your photo right now — try again."); });
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
 
 // Gates the whole app behind sign-in. On sign-in, loads the shared profile
 // (so Kashish greets people by their real name) and reveals the app;
@@ -605,12 +713,17 @@ auth.onAuthStateChanged(async (user)=>{
   const authScreen=document.getElementById('auth-screen');
   const app=document.getElementById('app');
   if(user){
-    let name=user.displayName||null;
+    let name=user.displayName||null, handle=null, photoBase64=null;
     try{
-      const snap=await db.ref('users/'+user.uid+'/name').once('value');
-      if(snap.exists()) name=snap.val();
+      const snap=await db.ref('users/'+user.uid).once('value');
+      if(snap.exists()){
+        const v=snap.val();
+        if(v.name) name=v.name;
+        if(v.handle) handle=v.handle;
+        if(v.photoBase64) photoBase64=v.photoBase64;
+      }
     }catch(e){}
-    userCtx={ uid:user.uid, name: name||user.email||null };
+    userCtx={ uid:user.uid, name: name||user.email||null, handle, photoBase64 };
     authScreen.classList.add('hidden');
     app.classList.remove('auth-locked');
     renderHome();
@@ -644,7 +757,7 @@ function truncate(t,n){ t=(t||'').trim(); return t.length>n ? t.slice(0,n-1)+'�
 function renderHome(){
   const n = firstName();
   document.getElementById('greet-hi').textContent = n ? `Hello ${n},` : 'Hello there,';
-  document.getElementById('home-avatar').textContent = n ? n[0].toUpperCase() : 'K';
+  applyAvatar(document.getElementById('home-avatar'));
   const list = document.getElementById('recent-list');
   list.innerHTML='';
   const recent = sessions.filter(s=>s.messages.length).slice(0,5);
@@ -695,7 +808,7 @@ function startAiCreate(){
 
 /* ---------------- navigation ---------------- */
 function showScreen(id){
-  ['screen-home','screen-chat','screen-voice'].forEach(s=>document.getElementById(s).classList.toggle('hidden', s!==id));
+  ['screen-home','screen-chat','screen-voice','screen-profile'].forEach(s=>document.getElementById(s).classList.toggle('hidden', s!==id));
 }
 function goHome(){ renderHome(); showScreen('screen-home'); }
 function goChat(){
