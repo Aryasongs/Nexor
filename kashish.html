@@ -26,14 +26,15 @@
   --bubble-bot:#F1F1F3;
   --body:'Manrope', system-ui, -apple-system, sans-serif;
 }
-html,body{background:var(--bg);color:var(--ink);font-family:var(--body);height:100%;-webkit-font-smoothing:antialiased;overflow:hidden;}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--body);height:100%;-webkit-font-smoothing:antialiased;overflow:hidden;position:fixed;inset:0;width:100%;overscroll-behavior:none;touch-action:pan-y;-webkit-text-size-adjust:100%;}
+*{touch-action:manipulation;}
 button{border:none;background:none;cursor:pointer;color:inherit;font-family:inherit;}
 input{font-family:inherit;outline:none;}
 ::-webkit-scrollbar{width:0;height:0;}
 .hidden{display:none!important;}
 img{display:block;max-width:100%;}
 
-#app{position:fixed;inset:0;width:100vw;height:100vh;height:100dvh;background:var(--bg);overflow:hidden;}
+#app{position:fixed;top:0;left:0;width:100vw;height:100vh;height:100dvh;height:calc(var(--app-vh, 100vh));background:var(--bg);overflow:hidden;}
 .screen{position:absolute;inset:0;display:flex;flex-direction:column;height:100%;}
 
 /* ---------- shared bits ---------- */
@@ -164,8 +165,27 @@ img{display:block;max-width:100%;}
 .profile-save-btn{width:100%;background:linear-gradient(160deg,#2b2b30 0%,var(--black) 55%,#0d0d0f 100%);color:#fff;border-radius:999px;padding:14px 0;font-size:14.5px;font-weight:800;text-align:center;margin-top:16px;box-shadow:0 6px 14px -8px rgba(20,20,22,.5),0 1px 0 rgba(255,255,255,.12) inset;}
 .profile-save-btn:active{opacity:.85;}
 .profile-save-btn:disabled{opacity:.6;}
-.profile-logout-btn{width:100%;background:#fff;color:#E0483E;border:1.5px solid #F3CFCB;border-radius:999px;padding:14px 0;font-size:14.5px;font-weight:800;text-align:center;margin-top:38px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 2px 8px -6px rgba(224,72,62,.18);}
+.profile-logout-btn{width:100%;background:#fff;color:#E0483E;border:1.5px solid #F3CFCB;border-radius:999px;padding:14px 0;font-size:14.5px;font-weight:800;text-align:center;margin-top:16px;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 2px 8px -6px rgba(224,72,62,.18);}
 .profile-logout-btn:active{background:#FFF4F3;}
+
+/* ---------- LEGAL ---------- */
+.legal-section{width:100%;margin-top:30px;}
+.legal-section-title{font-size:12px;font-weight:700;color:var(--ink-soft);margin-bottom:8px;padding-left:4px;text-transform:uppercase;letter-spacing:.02em;}
+.legal-list{position:relative;overflow:hidden;width:100%;background:linear-gradient(150deg,#ffffff 0%,#f4f5f7 50%,#eaecef 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;box-shadow:0 16px 30px -18px rgba(20,20,22,.28),0 2px 0 rgba(255,255,255,1) inset;}
+.legal-item{display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;border-bottom:1px solid var(--border);text-align:left;}
+.legal-item:last-child{border-bottom:none;}
+.legal-item .ic{width:34px;height:34px;border-radius:50%;background:linear-gradient(155deg,#eef7ff 0%,#d9edff 55%,#c3e2ff 100%);display:flex;align-items:center;justify-content:center;font-size:15px;color:#1975CE;flex-shrink:0;}
+.legal-item .lbl{flex:1;font-weight:700;font-size:14px;color:var(--ink);}
+.legal-item .go{font-size:15px;color:var(--ink-soft);flex-shrink:0;}
+.legal-brand-note{width:100%;text-align:center;font-size:11.5px;color:var(--ink-soft);line-height:1.5;margin-top:14px;padding:0 6px;}
+
+.legal-doc-scroll{flex:1;overflow-y:auto;padding:8px 22px calc(30px + env(safe-area-inset-bottom));}
+.legal-doc-updated{font-size:12px;color:var(--ink-soft);font-weight:600;margin-bottom:18px;}
+.legal-doc-body h4{font-size:14.5px;font-weight:800;color:var(--ink);margin:18px 0 6px;}
+.legal-doc-body h4:first-child{margin-top:0;}
+.legal-doc-body p{font-size:13.5px;line-height:1.65;color:#4c4c53;margin-bottom:4px;}
+.legal-doc-body ul{margin:6px 0 4px 18px;}
+.legal-doc-body li{font-size:13.5px;line-height:1.65;color:#4c4c53;margin-bottom:4px;}
 
 :root{
   --auth-bg:#0B0C10; --auth-surface:#17181D; --auth-surface2:#1E2027; --auth-border:#2A2C33;
@@ -563,7 +583,48 @@ img{display:block;max-width:100%;}
       </div>
       <button class="profile-save-btn" id="profile-save-btn" onclick="saveProfileName()">Save changes</button>
 
+      <div class="legal-section">
+        <div class="legal-section-title">Legal</div>
+        <div class="legal-list">
+          <button class="legal-item" onclick="openLegalDoc('privacy')">
+            <span class="ic"><i class="ph-bold ph-shield-check"></i></span>
+            <span class="lbl">Privacy Policy</span>
+            <span class="go"><i class="ph-bold ph-caret-right"></i></span>
+          </button>
+          <button class="legal-item" onclick="openLegalDoc('terms')">
+            <span class="ic"><i class="ph-bold ph-file-text"></i></span>
+            <span class="lbl">Terms of Service</span>
+            <span class="go"><i class="ph-bold ph-caret-right"></i></span>
+          </button>
+          <button class="legal-item" onclick="openLegalDoc('community')">
+            <span class="ic"><i class="ph-bold ph-users-three"></i></span>
+            <span class="lbl">Community Guidelines</span>
+            <span class="go"><i class="ph-bold ph-caret-right"></i></span>
+          </button>
+          <button class="legal-item" onclick="openLegalDoc('licenses')">
+            <span class="ic"><i class="ph-bold ph-scroll"></i></span>
+            <span class="lbl">Third-Party Licenses</span>
+            <span class="go"><i class="ph-bold ph-caret-right"></i></span>
+          </button>
+        </div>
+        <div class="legal-brand-note">Kashish is a product by Nexor Sparks.</div>
+      </div>
+
       <button class="profile-logout-btn" onclick="confirmLogout()"><i class="ph-bold ph-sign-out"></i> Log out</button>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ============ LEGAL DOCUMENT VIEWER ============ -->
+  <div class="screen hidden" id="screen-legal-doc">
+    <div class="chat-topbar">
+      <button class="circle-btn" onclick="showScreen('screen-profile')"><i class="ph-bold ph-arrow-left"></i></button>
+      <div class="chat-title" id="legal-doc-title">Legal</div>
+      <span style="width:38px"></span>
+    </div>
+    <div class="legal-doc-scroll">
+      <div class="legal-doc-updated" id="legal-doc-updated">Last updated —</div>
+      <div class="legal-doc-body" id="legal-doc-body"></div>
     </div>
     <div class="home-indicator"></div>
   </div>
@@ -782,6 +843,103 @@ function confirmLogout(){
 }
 function doLogout(){ auth.signOut(); }
 
+/* ---------------- legal pages ---------------- */
+const LEGAL_DOCS = {
+  privacy:{
+    title:'Privacy Policy',
+    updated:'Last updated — August 2026',
+    html:`
+      <h4>1. Who we are</h4>
+      <p>Kashish is built and operated by Nexor Sparks. This policy explains what information we collect when you use Kashish, why we collect it, and the choices you have.</p>
+      <h4>2. Information we collect</h4>
+      <ul>
+        <li>Account details you provide — name, handle, date of birth, and profile photo.</li>
+        <li>Your conversations with Kashish, so the app can keep chat history and context across sessions.</li>
+        <li>Basic device and usage data, used only to keep the app working reliably.</li>
+      </ul>
+      <h4>3. How we use it</h4>
+      <p>We use your information to run your account, personalize your experience with Kashish, keep the service safe, and improve how Kashish responds over time.</p>
+      <h4>4. Sharing</h4>
+      <p>We do not sell your personal data. Information is shared only with service providers that help us operate Kashish (such as hosting and AI infrastructure providers), and only as needed to run the app.</p>
+      <h4>5. Your choices</h4>
+      <p>You can update your profile details at any time from this screen, and you can request deletion of your account and data by contacting us.</p>
+      <h4>6. Contact</h4>
+      <p>Questions about this policy can be sent to the Nexor Sparks support team through the app.</p>
+    `
+  },
+  terms:{
+    title:'Terms of Service',
+    updated:'Last updated — August 2026',
+    html:`
+      <h4>1. Agreement</h4>
+      <p>By creating an account and using Kashish, a product of Nexor Sparks, you agree to these Terms of Service.</p>
+      <h4>2. Eligibility</h4>
+      <p>You must meet the minimum age required in your region to use Kashish. You are responsible for the accuracy of the account details you provide.</p>
+      <h4>3. Acceptable use</h4>
+      <ul>
+        <li>Don't use Kashish to harass, threaten, or harm others.</li>
+        <li>Don't attempt to misuse, exploit, or interfere with the service.</li>
+        <li>Don't use Kashish for anything illegal, or to generate content prohibited under our Community Guidelines.</li>
+      </ul>
+      <h4>4. Your content</h4>
+      <p>You retain ownership of what you write to Kashish. By using the app, you allow Nexor Sparks to process that content to provide and improve the service.</p>
+      <h4>5. Availability</h4>
+      <p>Kashish is provided "as is." Nexor Sparks may update, suspend, or change features of the service at any time.</p>
+      <h4>6. Termination</h4>
+      <p>We may suspend or terminate accounts that violate these terms or our Community Guidelines.</p>
+      <h4>7. Contact</h4>
+      <p>For questions about these terms, reach out to the Nexor Sparks support team through the app.</p>
+    `
+  },
+  community:{
+    title:'Community Guidelines',
+    updated:'Last updated — August 2026',
+    html:`
+      <h4>Our goal</h4>
+      <p>Kashish, from Nexor Sparks, is meant to be a safe, respectful space. These guidelines apply to everything you send to or through Kashish.</p>
+      <h4>Be respectful</h4>
+      <p>No harassment, hate speech, threats, or content that targets people based on identity, appearance, or beliefs.</p>
+      <h4>Keep it safe</h4>
+      <ul>
+        <li>No content that sexualizes or endangers minors, in any form.</li>
+        <li>No content that promotes self-harm, violence, or illegal activity.</li>
+        <li>No sharing of others' private information without consent.</li>
+      </ul>
+      <h4>Be honest</h4>
+      <p>Don't use Kashish to impersonate real people, spread misinformation, or manipulate others.</p>
+      <h4>Enforcement</h4>
+      <p>Violating these guidelines may lead to warnings, feature restrictions, or account suspension, at the discretion of Nexor Sparks.</p>
+      <h4>Report a concern</h4>
+      <p>If something feels off, you can reach the Nexor Sparks support team through the app to report it.</p>
+    `
+  },
+  licenses:{
+    title:'Third-Party Licenses',
+    updated:'Last updated — August 2026',
+    html:`
+      <p>Kashish, by Nexor Sparks, is built with the help of the following third-party software and assets. We're grateful to these projects and their contributors.</p>
+      <h4>Firebase (App, Auth, Database SDKs)</h4>
+      <p>© Google LLC. Licensed under the Apache License, Version 2.0. Used for account sign-in and data storage.</p>
+      <h4>Phosphor Icons</h4>
+      <p>© Phosphor Icons. Licensed under the MIT License. Used for interface icons throughout the app.</p>
+      <h4>Manrope</h4>
+      <p>© The Manrope Project Authors. Licensed under the SIL Open Font License, Version 1.1. Used as the app's primary typeface, served via Google Fonts.</p>
+      <h4>Yellowtail</h4>
+      <p>© The Yellowtail Project Authors. Licensed under the SIL Open Font License, Version 1.1. Used as a decorative accent typeface, served via Google Fonts.</p>
+      <h4>A note on licenses</h4>
+      <p>Each project above is distributed under its own license terms, independent of Kashish's own Terms of Service. Full license texts are available from the respective project sources.</p>
+    `
+  }
+};
+function openLegalDoc(key){
+  const doc = LEGAL_DOCS[key];
+  if(!doc) return;
+  document.getElementById('legal-doc-title').textContent = doc.title;
+  document.getElementById('legal-doc-updated').textContent = doc.updated;
+  document.getElementById('legal-doc-body').innerHTML = doc.html;
+  showScreen('screen-legal-doc');
+}
+
 // Sets an avatar element to the user's uploaded photo if they have one,
 // otherwise falls back to their initial letter.
 function applyAvatar(el){
@@ -949,7 +1107,7 @@ function startAiCreate(){
 
 /* ---------------- navigation ---------------- */
 function showScreen(id){
-  ['screen-home','screen-chat','screen-voice','screen-profile'].forEach(s=>document.getElementById(s).classList.toggle('hidden', s!==id));
+  ['screen-home','screen-chat','screen-voice','screen-profile','screen-legal-doc'].forEach(s=>document.getElementById(s).classList.toggle('hidden', s!==id));
 }
 function goHome(){ renderHome(); showScreen('screen-home'); }
 function goChat(){
@@ -1584,6 +1742,41 @@ function toggleVoiceListening(){
 // still needs to run once up front so the right screen is active underneath
 // the auth overlay the moment it's dismissed.
 showScreen('screen-home');
+</script>
+
+
+<!-- lock the layout: no zoom, no keyboard-triggered page jump -->
+<script>
+(function(){
+  var root = document.documentElement;
+
+  function setAppHeight(){
+    var h = (window.visualViewport ? window.visualViewport.height : window.innerHeight);
+    root.style.setProperty('--app-vh', h + 'px');
+    // keep the app pinned to the top of the visible area (stops it sliding
+    // up behind the keyboard / address bar on iOS & Android)
+    window.scrollTo(0, 0);
+  }
+  setAppHeight();
+  window.addEventListener('resize', setAppHeight);
+  if(window.visualViewport){
+    window.visualViewport.addEventListener('resize', setAppHeight);
+    window.visualViewport.addEventListener('scroll', setAppHeight);
+  }
+
+  // fully disable pinch-zoom / double-tap-zoom / gesture-zoom
+  document.addEventListener('gesturestart', function(e){ e.preventDefault(); }, {passive:false});
+  document.addEventListener('gesturechange', function(e){ e.preventDefault(); }, {passive:false});
+  var lastTouchEnd = 0;
+  document.addEventListener('touchend', function(e){
+    var now = Date.now();
+    if(now - lastTouchEnd <= 300){ e.preventDefault(); }
+    lastTouchEnd = now;
+  }, {passive:false});
+  document.addEventListener('touchmove', function(e){
+    if(e.touches && e.touches.length > 1){ e.preventDefault(); } // pinch
+  }, {passive:false});
+})();
 </script>
 
 <!-- liquid-glass tap feedback: small squish + ripple on any tappable surface -->
