@@ -130,6 +130,16 @@ img{display:block;max-width:100%;}
 .stop-gen .dot{width:15px;height:15px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;}
 .stop-gen .dot i{font-size:6px;color:#fff;}
 
+/* deep-search indicator — shown while Kashish is actively searching/reading
+   sources, before it starts composing the combined answer. Visually
+   distinct from the plain typing dots so the user can see the extra
+   "research" step happening, like Claude/ChatGPT's search indicators. */
+.search-indicator{align-self:flex-start;display:flex;align-items:center;gap:9px;background:linear-gradient(160deg,#f8f8f9,var(--bubble-bot));color:var(--ink);font-size:12.5px;font-weight:700;padding:10px 16px;border-radius:19px;border-bottom-left-radius:6px;margin:2px 0;box-shadow:0 4px 12px -8px rgba(20,20,22,.12),0 1px 0 rgba(255,255,255,.9) inset;}
+.search-indicator .si-ic{width:20px;height:20px;border-radius:50%;background:linear-gradient(155deg,var(--accent-soft-1) 0%,var(--accent-soft-2) 55%,var(--accent-soft-3) 100%);display:flex;align-items:center;justify-content:center;color:var(--accent);font-size:11px;flex-shrink:0;animation:searchSpin 1.1s linear infinite;}
+.search-indicator .si-text{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+@keyframes searchSpin{0%{transform:rotate(0deg);}100%{transform:rotate(360deg);}}
+html[data-theme="dark"] .search-indicator{background:linear-gradient(160deg,#232326 0%,var(--bubble-bot) 55%,#1a1a1c 100%);}
+
 .chat-input-wrap{flex-shrink:0;padding:8px 14px calc(12px + env(safe-area-inset-bottom));background:rgba(245,245,246,.7);backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%);border-top:1px solid rgba(235,235,238,.9);}
 .attach-preview{display:flex;align-items:center;gap:10px;margin:0 2px 8px;background:linear-gradient(160deg,#ffffff,#fafafb);border:1px solid var(--border);border-radius:14px;padding:7px 10px;box-shadow:0 2px 8px -6px rgba(20,20,22,.15),0 1px 0 rgba(255,255,255,.8) inset;}
 .video-results{display:flex;flex-direction:column;gap:8px;margin-top:6px;max-width:82%;}
@@ -148,6 +158,31 @@ img{display:block;max-width:100%;}
 .weather-card .wc-item{display:flex;flex-direction:column;}
 .weather-card .wc-item .v{font-weight:800;font-size:13px;color:var(--ink);}
 .weather-card .wc-item .l{font-size:10.5px;color:var(--ink-soft);}
+
+/* Knowledge Graph — compact verified-entity card */
+.kg-card{position:relative;overflow:hidden;max-width:88%;margin-top:6px;background:linear-gradient(150deg,#ffffff 0%,#f4f5f7 50%,#eaecef 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 10px 22px -14px rgba(20,20,22,.25);text-align:left;width:100%;}
+.kg-card:active{background:var(--bubble-bot);}
+.kg-card .kg-thumb{width:52px;height:52px;border-radius:12px;overflow:hidden;flex-shrink:0;background:var(--bubble-bot);}
+.kg-card .kg-thumb img{width:100%;height:100%;object-fit:cover;}
+.kg-card .kg-body{min-width:0;flex:1;}
+.kg-card .kg-name{font-weight:800;font-size:14px;color:var(--ink);}
+.kg-card .kg-desc{font-size:11.5px;color:var(--ink-soft);margin-top:1px;}
+.kg-card .kg-detail{font-size:12px;color:var(--ink);line-height:1.45;margin-top:6px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
+.kg-card .kg-src{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--ink-soft);margin-top:8px;font-weight:700;}
+html[data-theme="dark"] .kg-card{background:linear-gradient(150deg,#1E1E21 0%,#1A1A1D 50%,#151517 100%);}
+
+/* Fact Check Tools — rated claim cards */
+.factcheck-results{display:flex;flex-direction:column;gap:8px;margin-top:6px;max-width:88%;}
+.factcheck-card{display:block;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:11px 13px;text-align:left;width:100%;box-shadow:0 4px 10px -8px rgba(20,20,22,.25);}
+.factcheck-card:active{background:var(--bubble-bot);}
+.factcheck-card .fc-claim{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.4;}
+.factcheck-card .fc-meta{display:flex;align-items:center;gap:7px;margin-top:7px;}
+.factcheck-card .fc-rating{font-size:10px;font-weight:800;padding:3px 9px;border-radius:999px;color:#fff;flex-shrink:0;text-transform:capitalize;}
+.factcheck-card .fc-rating.true{background:#1FA855;}
+.factcheck-card .fc-rating.false{background:#E0473F;}
+.factcheck-card .fc-rating.mixed{background:#D99A2B;}
+.factcheck-card .fc-rating.unknown{background:#8B8B93;}
+.factcheck-card .fc-publisher{font-size:11px;color:var(--ink-soft);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .news-results{display:flex;flex-direction:column;gap:8px;margin-top:6px;max-width:88%;}
 .news-card{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:9px 10px;text-align:left;width:100%;box-shadow:0 4px 10px -8px rgba(20,20,22,.25);}
 .news-card:active{background:var(--bubble-bot);}
@@ -156,6 +191,18 @@ img{display:block;max-width:100%;}
 .news-card .nmeta{flex:1;min-width:0;}
 .news-card .ntitle{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .news-card .nsource{font-size:11px;color:var(--ink-soft);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+/* web-search sources — small tappable chips shown under a combined-answer
+   reply, like the "Sources" row under a ChatGPT/Claude web-search answer. */
+.web-sources-wrap{align-self:flex-start;max-width:88%;margin-top:2px;}
+.sources-label{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:700;color:var(--ink-soft);margin:2px 0 6px 2px;}
+.sources-label i{font-size:12px;}
+.web-sources{display:flex;flex-wrap:wrap;gap:6px;}
+.web-source-chip{display:flex;align-items:center;gap:6px;background:linear-gradient(160deg,#ffffff,#f4f5f7);border:1px solid var(--border);border-radius:999px;padding:6px 12px 6px 7px;max-width:180px;box-shadow:0 3px 8px -6px rgba(20,20,22,.15);}
+.web-source-chip:active{background:var(--bubble-bot);}
+.web-source-chip .num{width:16px;height:16px;border-radius:50%;background:var(--accent-soft-2);color:var(--accent);font-size:9.5px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.web-source-chip .domain{font-size:11.5px;font-weight:700;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+html[data-theme="dark"] .web-source-chip{background:linear-gradient(160deg,#1E1E21,#18181A);}
 .video-card{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:8px;text-align:left;width:100%;box-shadow:0 4px 10px -8px rgba(20,20,22,.25);}
 .video-card:active{background:var(--bubble-bot);}
 .video-card .thumb{position:relative;width:88px;height:56px;border-radius:9px;overflow:hidden;flex-shrink:0;background:#000;}
@@ -985,6 +1032,12 @@ const CFAI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 const SERPER_API_KEY = '19098c06ea81e0f575d04fa60a1c96ebd4d2b184';
 const GOOGLE_CSE_API_KEY = 'AIzaSyBGPLQccc8Yt_wFlI9DkIEATNwQLjaTW1g';
 const GOOGLE_CSE_ID = '951c20955565e4914';
+// Same Google Cloud API key also powers the extra free Google APIs below —
+// YouTube Data API v3, Knowledge Graph Search API, Fact Check Tools API —
+// as long as each one is individually switched ON for this key's project
+// in Google Cloud Console (APIs & Services > Library). One key, several
+// free toggles.
+const GOOGLE_API_KEY = GOOGLE_CSE_API_KEY;
 
 /* ============================================================
    AUTH — shared Firebase project. Logging into Kashish signs into
@@ -1950,6 +2003,25 @@ function renderChat(){
       wc.appendChild(grid);
       scroll.appendChild(wc);
     }
+    if(m.kgCard){
+      const kg = m.kgCard;
+      const kc = document.createElement('button'); kc.className='kg-card';
+      kc.onclick=()=>{ if(kg.url) window.open(kg.url,'_blank'); };
+      if(kg.image){
+        const th=document.createElement('div'); th.className='kg-thumb';
+        const im=document.createElement('img'); im.src=kg.image; im.alt=''; th.appendChild(im);
+        kc.appendChild(th);
+      }
+      const body=document.createElement('div'); body.className='kg-body';
+      const nm=document.createElement('div'); nm.className='kg-name'; nm.textContent=kg.name;
+      body.appendChild(nm);
+      if(kg.description){ const ds=document.createElement('div'); ds.className='kg-desc'; ds.textContent=kg.description; body.appendChild(ds); }
+      if(kg.detail){ const dt=document.createElement('div'); dt.className='kg-detail'; dt.textContent=kg.detail; body.appendChild(dt); }
+      const src=document.createElement('div'); src.className='kg-src'; src.innerHTML='<i class="ph-bold ph-brain"></i> Google Knowledge Graph';
+      body.appendChild(src);
+      kc.appendChild(body);
+      scroll.appendChild(kc);
+    }
     if(m.newsResults && m.newsResults.length){
       const nwrap=document.createElement('div'); nwrap.className='news-results';
       m.newsResults.forEach(n=>{
@@ -1965,6 +2037,38 @@ function renderChat(){
         nwrap.appendChild(card);
       });
       scroll.appendChild(nwrap);
+    }
+    if(m.webSources && m.webSources.length){
+      const swrap=document.createElement('div'); swrap.className='web-sources-wrap';
+      const label=document.createElement('div'); label.className='sources-label';
+      label.innerHTML='<i class="ph-bold ph-globe-hemisphere-west"></i> Sources';
+      swrap.appendChild(label);
+      const chipRow=document.createElement('div'); chipRow.className='web-sources';
+      m.webSources.forEach((s,i)=>{
+        const chip=document.createElement('button'); chip.className='web-source-chip';
+        chip.onclick=()=>window.open(s.link,'_blank');
+        const num=document.createElement('span'); num.className='num'; num.textContent=(i+1);
+        const dom=document.createElement('span'); dom.className='domain'; dom.textContent=s.domain||s.title;
+        chip.appendChild(num); chip.appendChild(dom);
+        chipRow.appendChild(chip);
+      });
+      swrap.appendChild(chipRow);
+      scroll.appendChild(swrap);
+    }
+    if(m.factCheckResults && m.factCheckResults.length){
+      const fwrap=document.createElement('div'); fwrap.className='factcheck-results';
+      m.factCheckResults.forEach(f=>{
+        const card=document.createElement('button'); card.className='factcheck-card';
+        card.onclick=()=>window.open(f.link,'_blank');
+        const claim=document.createElement('div'); claim.className='fc-claim'; claim.textContent=f.claim;
+        const meta=document.createElement('div'); meta.className='fc-meta';
+        const rate=document.createElement('span'); rate.className='fc-rating '+classifyRating(f.rating); rate.textContent=f.rating;
+        const pub=document.createElement('span'); pub.className='fc-publisher'; pub.textContent=f.publisher;
+        meta.appendChild(rate); meta.appendChild(pub);
+        card.appendChild(claim); card.appendChild(meta);
+        fwrap.appendChild(card);
+      });
+      scroll.appendChild(fwrap);
     }
     if(m.videoResults && m.videoResults.length){
       const vwrap=document.createElement('div'); vwrap.className='video-results';
@@ -2027,6 +2131,29 @@ function addTyping(){
   scroll.appendChild(b); scroll.scrollTop=scroll.scrollHeight;
 }
 function removeTyping(){ const el=document.getElementById('typing-indicator'); if(el) el.remove(); }
+// Deep-search indicator — a distinct pill (spinning magnifier + status text)
+// shown while Kashish is actively out searching/reading sources, before it
+// switches to the normal typing dots to compose the combined answer. The
+// text is updated in-place through the stages so it feels alive, like
+// Claude/ChatGPT's "Searching… / Reading N sources… / Writing…" flow.
+function addSearchIndicator(text){
+  removeTyping();
+  const scroll = document.getElementById('chat-scroll');
+  let el = document.getElementById('search-indicator');
+  if(!el){
+    el = document.createElement('div'); el.className='search-indicator'; el.id='search-indicator';
+    el.innerHTML='<span class="si-ic"><i class="ph-bold ph-magnifying-glass"></i></span><span class="si-text"></span>';
+    scroll.appendChild(el);
+  }
+  el.querySelector('.si-text').textContent = text;
+  scroll.scrollTop = scroll.scrollHeight;
+}
+function updateSearchIndicator(text){
+  const el=document.getElementById('search-indicator');
+  if(el){ el.querySelector('.si-text').textContent = text; const scroll=document.getElementById('chat-scroll'); scroll.scrollTop=scroll.scrollHeight; }
+  else addSearchIndicator(text);
+}
+function removeSearchIndicator(){ const el=document.getElementById('search-indicator'); if(el) el.remove(); }
 function addStopGen(){
   const scroll = document.getElementById('chat-scroll');
   const d=document.createElement('div'); d.className='stop-gen'; d.id='stop-gen-pill';
@@ -2128,7 +2255,7 @@ function formatSerperResults(data){
     parts.push(`Info: ${kg.title||''} — ${kg.description||''}`.trim());
   }
   if(Array.isArray(data.organic)){
-    data.organic.slice(0,5).forEach((r,i)=>{
+    data.organic.slice(0,6).forEach((r,i)=>{
       parts.push(`${i+1}. ${r.title} — ${r.snippet||''}`);
     });
   }
@@ -2136,8 +2263,33 @@ function formatSerperResults(data){
 }
 function formatGoogleCseResults(data){
   if(!data.items || !data.items.length) return null;
-  return data.items.slice(0,5).map((r,i)=>`${i+1}. ${r.title} — ${r.snippet||''}`).join('\n');
+  return data.items.slice(0,6).map((r,i)=>`${i+1}. ${r.title} — ${r.snippet||''}`).join('\n');
 }
+// Pulls out a clean hostname ("bbc.com" not "https://www.bbc.com/news/x")
+// so source chips can show a short, tappable domain label.
+function safeDomain(url){
+  try{ return new URL(url).hostname.replace(/^www\./,''); }catch(e){ return url||''; }
+}
+// Structured source list (title/link/domain) for the tappable "Sources"
+// chips shown under a combined-answer reply — separate from the plain-text
+// context string that gets fed to the model.
+function extractSerperSources(data){
+  const out=[];
+  if(Array.isArray(data.organic)){
+    data.organic.slice(0,6).forEach(r=>{
+      if(r.link) out.push({ title:r.title||safeDomain(r.link), link:r.link, domain:safeDomain(r.link) });
+    });
+  }
+  return out;
+}
+function extractGoogleCseSources(data){
+  if(!data.items || !data.items.length) return [];
+  return data.items.slice(0,6).filter(r=>r.link).map(r=>({ title:r.title||safeDomain(r.link), link:r.link, domain:safeDomain(r.link) }));
+}
+// Returns { context, sources } — `context` is the plain-text digest fed to
+// the model so it can write one combined answer; `sources` is the
+// structured list of links shown to the user as small chips underneath.
+// Returns null if nothing usable came back from either provider.
 async function webSearch(query){
   try{
     const res=await fetch('https://google.serper.dev/search', {
@@ -2148,7 +2300,7 @@ async function webSearch(query){
     if(!res.ok) throw new Error('Serper HTTP '+res.status);
     const data=await res.json();
     const formatted=formatSerperResults(data);
-    if(formatted) return formatted;
+    if(formatted) return { context: formatted, sources: extractSerperSources(data) };
     throw new Error('Serper returned no usable results');
   }catch(e1){
     console.warn('[KASHISH] Serper search failed, trying Google CSE:', e1);
@@ -2157,12 +2309,98 @@ async function webSearch(query){
       const res2=await fetch(url);
       if(!res2.ok) throw new Error('Google CSE HTTP '+res2.status);
       const data2=await res2.json();
-      return formatGoogleCseResults(data2);
+      const formatted2=formatGoogleCseResults(data2);
+      if(!formatted2) return null;
+      return { context: formatted2, sources: extractGoogleCseSources(data2) };
     }catch(e2){
       console.warn('[KASHISH] Google CSE also failed:', e2);
       return null;
     }
   }
+}
+
+/* ---------------- Google Knowledge Graph — quick verified entity facts ---------------- */
+// Free API, no separate billing needed beyond the shared Google Cloud key.
+// Runs alongside a normal web search for factual "who/what is X" style
+// questions and, if it finds a matching entity, shows a compact card with
+// name/description/blurb/image straight from Google's graph.
+async function knowledgeGraphLookup(query){
+  try{
+    const url = `https://kgsearch.googleapis.com/v1/entities:search?query=${encodeURIComponent(query)}&key=${GOOGLE_API_KEY}&limit=1&indent=false`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('Knowledge Graph HTTP '+res.status);
+    const data = await res.json();
+    const el = data.itemListElement && data.itemListElement[0] && data.itemListElement[0].result;
+    if(!el || !el.name) return null;
+    return {
+      name: el.name,
+      description: el.description || '',
+      detail: (el.detailedDescription && el.detailedDescription.articleBody) || '',
+      image: (el.image && el.image.contentUrl) || null,
+      url: (el.detailedDescription && el.detailedDescription.url) || null
+    };
+  }catch(e){ console.warn('[KASHISH] Knowledge Graph lookup failed:', e); return null; }
+}
+
+/* ---------------- Google Fact Check Tools — claim verification ---------------- */
+// Free API. Fires when the user is explicitly asking whether something
+// going around is true, so Kashish can point to actual published
+// fact-checks instead of just guessing.
+const FACTCHECK_TRIGGER_PATTERNS = [
+  /\bfact\s*-?\s*check\b/i, /\bis\s+(this|it)\s+(true|real|fake)\b/i,
+  /\bkya\s+ye[h]?\s+sach\s+(hai|me[i]?n)\b/i, /\bsach\s+hai\s+kya\b/i,
+  /\bfake\s+news\b/i, /\bhoax\b/i, /\bviral\s+(claim|message|post|khabar)\b/i,
+  /\bkya\s+.*\s+sach\s+me[i]?\b/i, /\byeh\s+sach\s+hai\b/i
+];
+function needsFactCheck(text){
+  if(!appSettings.autoWebSearch) return false;
+  const t=(text||'').trim();
+  if(!t) return false;
+  return FACTCHECK_TRIGGER_PATTERNS.some(p=>p.test(t));
+}
+function cleanFactCheckQuery(text){
+  return text
+    .replace(/\bfact\s*-?\s*check\b/gi,'')
+    .replace(/\bis\s+(this|it)\s+(true|real|fake)\b/gi,'')
+    .replace(/\bkya\s+ye[h]?\s+sach\s+(hai|me[i]?n)\b/gi,'')
+    .replace(/\bsach\s+hai\s+kya\b/gi,'')
+    .replace(/\bfake\s+news\b/gi,'')
+    .replace(/\byeh\s+sach\s+hai\b/gi,'')
+    .trim() || text;
+}
+// Buckets a fact-checker's free-text rating into a color category for the
+// little badge — most publishers phrase ratings differently, so this is a
+// loose keyword match rather than an exact enum.
+function classifyRating(text){
+  const t=(text||'').toLowerCase();
+  if(/\b(false|fake|incorrect|hoax|misleading|pants on fire|debunk)/.test(t)) return 'false';
+  if(/\b(mixed|partly|partially|half|unproven|unverified)/.test(t)) return 'mixed';
+  if(/\b(true|correct|accurate|verified|real)/.test(t)) return 'true';
+  return 'unknown';
+}
+async function factCheckSearch(query){
+  const q = cleanFactCheckQuery(query);
+  try{
+    const url = `https://factchecktools.googleapis.com/v1alpha1/claims:search?query=${encodeURIComponent(q)}&key=${GOOGLE_API_KEY}&languageCode=en`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('Fact Check Tools HTTP '+res.status);
+    const data = await res.json();
+    const claims = Array.isArray(data.claims) ? data.claims : [];
+    return claims.slice(0,4).map(c=>{
+      const review = c.claimReview && c.claimReview[0];
+      return {
+        claim: c.text || 'Claim',
+        publisher: (review && review.publisher && review.publisher.name) || 'Fact-checker',
+        rating: (review && review.textualRating) || 'Unrated',
+        link: review && review.url
+      };
+    }).filter(c=>c.link);
+  }catch(e){ console.warn('[KASHISH] Fact Check Tools search failed:', e); return []; }
+}
+function formatFactCheckResultsForModel(results){
+  if(!results || !results.length) return null;
+  return 'Live fact-check results for the user\'s claim, from independent fact-checkers (already shown to them as tappable rated cards below your reply — do NOT repeat them verbatim, just briefly explain the overall verdict in your own words, in plain language):\n'
+    + results.map((r,i)=>`${i+1}. Claim: "${r.claim}" — ${r.publisher}'s rating: ${r.rating}`).join('\n');
 }
 
 /* ---------------- YouTube video search ---------------- */
@@ -2195,26 +2433,45 @@ function cleanVideoQuery(text){
 async function youtubeSearch(query){
   const q = cleanVideoQuery(query);
   try{
-    const res = await fetch('https://google.serper.dev/videos', {
-      method:'POST',
-      headers:{'X-API-KEY': SERPER_API_KEY, 'Content-Type':'application/json'},
-      body: JSON.stringify({ q: q + ' youtube' })
-    });
-    if(!res.ok) throw new Error('Serper videos HTTP '+res.status);
+    const url = `https://www.googleapis.com/youtube/v3/search?part=snippet&type=video&maxResults=3&q=${encodeURIComponent(q)}&key=${GOOGLE_API_KEY}`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('YouTube Data API HTTP '+res.status);
     const data = await res.json();
-    const items = Array.isArray(data.videos) ? data.videos : [];
-    return items
-      .filter(v=> v.link && /youtube\.com|youtu\.be/.test(v.link))
-      .slice(0,3)
+    const items = Array.isArray(data.items) ? data.items : [];
+    const mapped = items
+      .filter(v=> v.id && v.id.videoId)
       .map(v=>({
-        title: v.title || 'Untitled video',
-        link: v.link,
-        thumbnail: v.imageUrl || null,
-        channel: v.channel || v.source || 'YouTube'
+        title: (v.snippet && v.snippet.title) || 'Untitled video',
+        link: `https://www.youtube.com/watch?v=${v.id.videoId}`,
+        thumbnail: (v.snippet && v.snippet.thumbnails && (v.snippet.thumbnails.medium || v.snippet.thumbnails.default) || {}).url || null,
+        channel: (v.snippet && v.snippet.channelTitle) || 'YouTube'
       }));
-  }catch(e){
-    console.warn('[KASHISH] YouTube video search failed:', e);
-    return [];
+    if(mapped.length) return mapped;
+    throw new Error('YouTube Data API returned no items');
+  }catch(e1){
+    console.warn('[KASHISH] YouTube Data API failed, trying Serper videos:', e1);
+    try{
+      const res2 = await fetch('https://google.serper.dev/videos', {
+        method:'POST',
+        headers:{'X-API-KEY': SERPER_API_KEY, 'Content-Type':'application/json'},
+        body: JSON.stringify({ q: q + ' youtube' })
+      });
+      if(!res2.ok) throw new Error('Serper videos HTTP '+res2.status);
+      const data2 = await res2.json();
+      const items2 = Array.isArray(data2.videos) ? data2.videos : [];
+      return items2
+        .filter(v=> v.link && /youtube\.com|youtu\.be/.test(v.link))
+        .slice(0,3)
+        .map(v=>({
+          title: v.title || 'Untitled video',
+          link: v.link,
+          thumbnail: v.imageUrl || null,
+          channel: v.channel || v.source || 'YouTube'
+        }));
+    }catch(e2){
+      console.warn('[KASHISH] Serper video fallback also failed:', e2);
+      return [];
+    }
   }
 }
 function formatVideoResultsForModel(results){
@@ -2501,7 +2758,7 @@ function buildMessages(history, searchContext){
   const msgs = [{role:'system', content:sys}];
   if(searchContext){
     msgs.push({role:'system', content:
-      `Live web search results for the user's latest message (retrieved just now, treat as current/accurate):\n\n${searchContext}\n\nUse this to answer accurately and naturally — weave the info into your reply conversationally, don't just dump a list, and don't say "according to search results" unless it feels natural.`});
+      `Live web search results for the user's latest message (retrieved just now, treat as current/accurate):\n\n${searchContext}\n\nThese came from several different sources — synthesize them into ONE clear, complete answer, combining and cross-checking the info rather than just summarizing a single source or listing results one by one. Write it as a natural, well-organized reply (short paragraphs, or a tight list only if that genuinely fits). The individual sources are already shown to the user as small tappable chips right below your reply, so don't paste URLs or say "according to search results" — just answer like you already know it.`});
   }
   history.slice(-40).forEach(m=>msgs.push({role: m.role==='user'?'user':'assistant', content:m.text||''}));
   return msgs;
@@ -2583,11 +2840,11 @@ function sendLocal(){
   }, 400);
 }
 
-function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults){
+function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults, webSources, kgCard, factCheckResults){
   const sess = getSession(currentSessionId);
   if(!sess) return;
   const qr = appSettings.trendingSearches ? (quickReplies||null) : null;
-  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, ts: Date.now()});
+  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, webSources: (webSources&&webSources.length)?webSources:null, kgCard: kgCard||null, factCheckResults: (factCheckResults&&factCheckResults.length)?factCheckResults:null, ts: Date.now()});
   sess.preview = truncate(text, 60);
   sess.updatedAt = Date.now();
   upsertSession(sess);
@@ -2807,17 +3064,31 @@ async function send(){
       pushBotMessage("Kya search karu? '/search' ke baad apna query likho — jaise '/search IPL 2026 winner'.", null);
       return;
     }
-    addTyping();
-    let searchContext = null;
-    try{ searchContext = await webSearch(forcedSearchQuery); }
-    catch(e){ console.warn('[KASHISH] /search web search failed:', e); }
+    addSearchIndicator('Searching the web…');
+    let searchContext = null, webSources = null, kgCard = null;
+    try{
+      const [searchResult, kg] = await Promise.all([
+        webSearch(forcedSearchQuery),
+        knowledgeGraphLookup(forcedSearchQuery)
+      ]);
+      if(searchResult){
+        searchContext = searchResult.context;
+        webSources = searchResult.sources;
+      }
+      if(kg && (kg.detail || kg.description)){
+        kgCard = kg;
+        searchContext = (searchContext ? searchContext+'\n\n' : '') + `Knowledge Graph verified entity match: ${kg.name} — ${kg.description||''}. ${kg.detail||''}`.trim();
+      }
+      updateSearchIndicator(webSources && webSources.length ? `Reading ${webSources.length} sources…` : 'Putting together an answer…');
+    }catch(e){ console.warn('[KASHISH] /search web search failed:', e); }
+    updateSearchIndicator('Putting together an answer…');
     const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
     try{
       const result = await kashishReply(historyForModel, searchContext);
-      removeTyping();
-      pushBotMessage(result.reply, result.quickReplies);
+      removeSearchIndicator();
+      pushBotMessage(result.reply, result.quickReplies, null, null, null, null, null, webSources, kgCard);
     }catch(e){
-      removeTyping();
+      removeSearchIndicator();
       pushBotMessage("Search abhi kaam nahi kar raha — thodi der baad try karo.", null);
     }
     return;
@@ -2900,23 +3171,47 @@ async function send(){
   let searchContext = null;
   let videoResults = null;
   let newsResults = null;
-  if(!img && needsNews(text)){
+  let webSources = null;
+  let kgCard = null;
+  let factCheckResults = null;
+  if(!img && needsFactCheck(text)){
+    addSearchIndicator('Checking fact-checkers…');
+    factCheckResults = await factCheckSearch(text);
+    searchContext = formatFactCheckResultsForModel(factCheckResults);
+    updateSearchIndicator('Putting together an answer…');
+  } else if(!img && needsNews(text)){
     newsResults = await newsSearch(text);
     searchContext = formatNewsResultsForModel(newsResults);
   } else if(!img && needsVideoSearch(text)){
     videoResults = await youtubeSearch(text);
     searchContext = formatVideoResultsForModel(videoResults);
   } else if(!img && needsWebSearch(text)){
-    try{ searchContext = await webSearch(text); }
-    catch(e){ console.warn('[KASHISH] web search step failed, continuing without it:', e); }
+    addSearchIndicator('Searching the web…');
+    try{
+      const [searchResult, kg] = await Promise.all([
+        webSearch(text),
+        knowledgeGraphLookup(text)
+      ]);
+      if(searchResult){
+        searchContext = searchResult.context;
+        webSources = searchResult.sources;
+      }
+      if(kg && (kg.detail || kg.description)){
+        kgCard = kg;
+        searchContext = (searchContext ? searchContext+'\n\n' : '') + `Knowledge Graph verified entity match: ${kg.name} — ${kg.description||''}. ${kg.detail||''}`.trim();
+      }
+      updateSearchIndicator(webSources && webSources.length ? `Reading ${webSources.length} sources…` : 'Putting together an answer…');
+    }catch(e){ console.warn('[KASHISH] web search step failed, continuing without it:', e); }
+    updateSearchIndicator('Putting together an answer…');
   }
 
   try{
     const result = await kashishReply(historyForModel, searchContext);
-    removeTyping();
-    pushBotMessage(result.reply, result.quickReplies, videoResults, null, null, null, newsResults);
+    removeTyping(); removeSearchIndicator();
+    pushBotMessage(result.reply, result.quickReplies, videoResults, null, null, null, newsResults, webSources, kgCard, factCheckResults);
   }catch(e){
     console.error('[KASHISH] all providers failed, falling back to local:', e);
+    removeSearchIndicator();
     sendLocal();
   }
 }
