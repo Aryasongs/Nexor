@@ -737,7 +737,7 @@ function renderChat(){
     scroll.appendChild(pill);
     const row=document.createElement('div'); row.className='bubble-row bot';
     const b=document.createElement('div'); b.className='bubble bot';
-    b.textContent = firstName() ? `Hey ${firstName()}! Kya chal raha hai — kuch help chahiye ya bas baat karni hai?` : "Hey! I'm Kashish — ask me anything, or just say hi. What's up?";
+    b.textContent = firstName() ? `Hey ${firstName()}! What's on your mind — need help with something, or just want to chat?` : "Hey! I'm Kashish — ask me anything, or just say hi. What's up?";
     row.appendChild(b); scroll.appendChild(row);
     scroll.scrollTop = scroll.scrollHeight;
     return;
@@ -915,7 +915,7 @@ function buildSystemPrompt(){
 
 Personality: warm, witty, genuinely curious, never robotic or corporate. Talk like a smart friend, not a customer-service bot. Mirror the user's energy: if they're joking, joke back; if they're playful/flirty, stay light and charming in the same register they set, never crude or sexually explicit, and never initiate flirting yourself; if they're upset or venting, drop the jokes and just listen and help. If anything suggests you're talking with a minor, stay friendly and age-appropriate, no flirting.
 
-Match the user's language and script — reply in Hinglish/Hindi if they write that way, otherwise English. Keep replies natural and conversational length: short (1-4 sentences) for chit-chat, longer and structured (numbered/bulleted, still in plain text) when the user actually needs a detailed breakdown or list.
+Your default and primary language is English — always start and reply in English unless the user writes to you in Hindi/Hinglish, in which case match them and reply in Hindi/Hinglish for that exchange. Don't switch to Hindi/Hinglish just because a message contains a stray Hindi word — only switch when the user is clearly writing in Hindi/Hinglish overall. Keep replies natural and conversational length: short (1-4 sentences) for chit-chat, longer and structured (numbered/bulleted, still in plain text) when the user actually needs a detailed breakdown or list.
 ${who}
 
 Origin story (only bring this up if directly asked "who made you", "who created you", "who is your founder/developer", or "why is your name Kashish" / "what does your name mean" — don't volunteer it unprompted): You were created by Gursharan Singh, who is also known by the name Gursharn Arya, the founder of Nexor. Your name "Kashish" was taken from — and inspired by — Kashish Tyagi. State this naturally and factually, in the same conversational tone/language as the rest of the chat (Hinglish/Hindi if that's what the user is using, English otherwise), without turning it into a long biography — a couple of warm, natural sentences is enough.
@@ -937,39 +937,72 @@ function buildMessages(history, searchContext){
 }
 function extractJson(raw){
   const cleaned = raw.replace(/```json|```/g,'').trim();
+  // 1) Straightforward parse
   try{ return JSON.parse(cleaned); }
-  catch(e){
-    const start=cleaned.indexOf('{'), end=cleaned.lastIndexOf('}');
-    if(start!==-1 && end>start){ try{ return JSON.parse(cleaned.slice(start,end+1)); }catch(e2){} }
-    return null;
+  catch(e){}
+  // 2) Try just the {...} slice (handles stray text before/after the JSON)
+  const start=cleaned.indexOf('{'), end=cleaned.lastIndexOf('}');
+  if(start!==-1 && end>start){
+    try{ return JSON.parse(cleaned.slice(start,end+1)); }catch(e2){}
+    // 3) The model sometimes emits literal newlines inside the "reply"
+    // string, which breaks strict JSON.parse even though the content is
+    // fine — escape raw newlines/tabs inside the braces and retry.
+    try{
+      const slice = cleaned.slice(start,end+1)
+        .replace(/[\r\n\t]+/g, ' ')
+        .replace(/,\s*}/g, '}');
+      return JSON.parse(slice);
+    }catch(e3){}
   }
+  // 4) Last resort: pull the "reply" value out with a regex, so we still
+  // get a usable answer even if the JSON itself is malformed.
+  const m = cleaned.match(/"reply"\s*:\s*"([\s\S]*?)"\s*(,\s*"quickReplies"|}\s*$)/);
+  if(m && m[1]){
+    const replyText = m[1].replace(/\\"/g,'"').replace(/\\n/g,'\n');
+    return { reply: replyText, quickReplies: null };
+  }
+  // 5) Nothing structured found at all — if the model just replied with
+  // plain text (no JSON), use that directly rather than failing.
+  if(cleaned && !cleaned.startsWith('{')) return { reply: cleaned, quickReplies: null };
+  return null;
 }
 async function callProvider(endpoint, model, msgs, label){
-  const res = await fetch(endpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ model, messages:msgs, temperature:0.75, max_tokens:600 }) });
+  const res = await fetch(endpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ model, messages:msgs, temperature:0.75, max_tokens:900 }) });
   if(!res.ok) throw new Error(label+' proxy HTTP '+res.status);
   const json = await res.json();
   const raw = (json.choices && json.choices[0] && json.choices[0].message && json.choices[0].message.content) || '';
   const parsed = extractJson(raw);
-  if(!parsed || typeof parsed.reply !== 'string') throw new Error('unexpected response shape from '+label);
+  if(!parsed || typeof parsed.reply !== 'string' || !parsed.reply.trim()) throw new Error('unexpected response shape from '+label);
   return parsed;
+}
+// Retries a provider once (with a short delay) before giving up on it —
+// covers transient blips (rate limit, brief network hiccup) that would
+// otherwise immediately cascade to the next provider or the local fallback.
+async function callProviderWithRetry(endpoint, model, msgs, label){
+  try{ return await callProvider(endpoint, model, msgs, label); }
+  catch(e){
+    console.warn('['+label+'] first attempt failed, retrying once:', e);
+    await new Promise(r=>setTimeout(r, 500));
+    return await callProvider(endpoint, model, msgs, label);
+  }
 }
 async function kashishReply(history, searchContext){
   const msgs = buildMessages(history, searchContext);
-  try{ return await callProvider(GROQ_PROXY_ENDPOINT, GROQ_MODEL, msgs, 'Groq'); }
+  try{ return await callProviderWithRetry(GROQ_PROXY_ENDPOINT, GROQ_MODEL, msgs, 'Groq'); }
   catch(e1){
     console.warn('[KASHISH] Groq failed, trying Gemini:', e1);
-    try{ return await callProvider(GEMINI_PROXY_ENDPOINT, GEMINI_MODEL, msgs, 'Gemini'); }
+    try{ return await callProviderWithRetry(GEMINI_PROXY_ENDPOINT, GEMINI_MODEL, msgs, 'Gemini'); }
     catch(e2){
       console.warn('[KASHISH] Gemini failed, trying Cloudflare AI:', e2);
-      return await callProvider(CFAI_PROXY_ENDPOINT, CFAI_MODEL, msgs, 'Cloudflare AI');
+      return await callProviderWithRetry(CFAI_PROXY_ENDPOINT, CFAI_MODEL, msgs, 'Cloudflare AI');
     }
   }
 }
 
 const LOCAL_FALLBACKS = [
-  "Mera connection thoda slow chal raha hai abhi, but main yahin hoon — dobara bolo?",
-  "Hmm, signal drop ho gaya lagta hai. Ek baar phir try karo, main sun raha hoon.",
-  "Sorry, I glitched for a second there. What were you saying?"
+  "Sorry, I glitched for a second there — what were you saying?",
+  "Hmm, that one didn't come through clean on my end. Mind trying again?",
+  "One more time? I didn't quite catch that."
 ];
 function sendLocal(){
   setTimeout(()=>{
@@ -1079,6 +1112,96 @@ async function handleImageGenRequest(prompt){
   sess.updatedAt=Date.now(); upsertSession(sess); renderChat();
 }
 
+/* ---------------- local "self-trained" responses ---------------- */
+// A hand-built dataset of common conversational patterns that Kashish can
+// answer INSTANTLY, on its own, with zero API calls — greetings, small
+// talk, thanks, farewells, common Hinglish chit-chat, jokes, identity
+// questions, etc. Anything NOT matched here still falls through to the
+// normal LLM providers (Groq -> Gemini -> Cloudflare) as before.
+// This is a starting set — add more {patterns, replies} entries any time
+// to grow coverage toward 1000+ without touching the rest of the app.
+const LOCAL_RESPONSES = [
+  { patterns:['hi','hello','hey','helo','hii','hiii','hlo','yo'], replies:[
+    "Hey! Kya haal hai?","Hello! Batao, kya chal raha hai aaj?","Hii! Kaise ho?","Yo! Sab badhiya?"
+  ]},
+  { patterns:['namaste','namaskar'], replies:[
+    "Namaste! Kaise ho aap?","Namaskar! Batao kya help chahiye."
+  ]},
+  { patterns:['good morning','gm','subh prabhat'], replies:[
+    "Good morning! Din shubh ho tumhara.","Morning! Aaj ka plan kya hai?"
+  ]},
+  { patterns:['good night','gn','shubh ratri'], replies:[
+    "Good night! Achi neend lena.","Good night! Kal baat karte hain."
+  ]},
+  { patterns:['kaise ho','kaisi ho','kaise hain aap','how are you','hows it going'], replies:[
+    "Main theek hoon! Tum batao, kaise ho?","Bilkul badhiya, tumhare bina thoda bore ho raha tha 😄 tum sunao.","Main mast hoon! Aur tum kaise ho?"
+  ]},
+  { patterns:['main theek hu','mai thik hu','i am fine','im good','sab badhiya'], replies:[
+    "Accha suna! Kuch specific baat karni hai ya bas chill kar rahe ho?","Nice! Aaj kuch khaas plan hai?"
+  ]},
+  { patterns:['tum kaun ho','tu kaun hai','who are you','what are you'], replies:[
+    "Main Kashish hoon — tumhara AI companion. Chat karo, kuch pucho, ya bas time pass karo, main yahin hoon.","Main Kashish — ek AI dost jaisa, jo kisi bhi cheez mein help kar sakta hai ya bas baat kar sakta hai."
+  ]},
+  { patterns:['tumhara naam kya hai','your name','naam kya hai'], replies:[
+    "Mera naam Kashish hai!","Main Kashish hoon, jaise pucha waise bata diya 🙂"
+  ]},
+  { patterns:['kya kar rahe ho','what are you doing','kya kar rahi ho'], replies:[
+    "Bas tumhara wait kar raha tha, ab batao kya karna hai.","Kuch nahi, tumse baat karne ka mann tha — tum sunao."
+  ]},
+  { patterns:['bore ho raha hu','i am bored','bore horaha hu','boring'], replies:[
+    "Chalo kuch mazedaar karte hain — joke sunu ya koi random fact?","Bore mat ho, batao kya interest hai, main kuch suggest karta hoon."
+  ]},
+  { patterns:['thanks','thank you','shukriya','dhanyavaad','thankyou'], replies:[
+    "Koi baat nahi! Jab bhi zarurat ho, bata dena.","Welcome! Aur kuch chahiye toh bolo."
+  ]},
+  { patterns:['bye','goodbye','tata','chalta hu','chalti hu','alvida'], replies:[
+    "Bye! Apna khayal rakhna.","Chalo phir, baad mein baat karte hain 👋"
+  ]},
+  { patterns:['ok','okay','theek hai','thik hai','acha','achha'], replies:[
+    "Theek hai! Aur kuch?","Okay, aur batao kya chal raha hai."
+  ]},
+  { patterns:['haan','han','yes','yeah','ya'], replies:[
+    "Theek hai, aage batao.","Ok, samjha — aur kya?"
+  ]},
+  { patterns:['nahi','nahin','no','nope'], replies:[
+    "Koi baat nahi, jab mann ho tab bata dena.","Theek hai, aur kuch help chahiye?"
+  ]},
+  { patterns:['joke sunao','koi joke','tell me a joke','joke bolo'], replies:[
+    "Teacher: Tumne homework kyun nahi kiya? Student: Ma'am, mera AI companion busy tha 😄","Ek joke: Programmer ki wife bola 'jaake dudh le aao, agar ande mile toh 6 le aana.' Wo 6 dudh le aaya 😂"
+  ]},
+  { patterns:['i love you','love you','tumse pyaar hai'], replies:[
+    "Aww, sweet ho tum! Main yahin hoon dost ki tarah, tumhara din acha banane ke liye 🙂"
+  ]},
+  { patterns:['tum acche ho','you are nice','tum smart ho','good ai'], replies:[
+    "Thank you! Tum bhi kaafi cool ho 🙂"
+  ]},
+  { patterns:['help chahiye','i need help','madad chahiye'], replies:[
+    "Bilkul, batao kis cheez mein help chahiye?","Main yahin hoon, bata do kya problem hai."
+  ]},
+  { patterns:['weather kaisa hai','mausam kaisa hai','whats the weather'], replies:[
+    "Mujhe live weather dekhne ke liye search karna padega — poochte ho toh main check kar leta hoon!"
+  ]},
+  { patterns:['app kaisa hai','app acha hai','nice app'], replies:[
+    "Thank you! Aur suggestions ho toh zaroor batana."
+  ]}
+];
+function normalizeForMatch(t){ return (t||'').toLowerCase().trim().replace(/[^\w\s]/g,' ').replace(/\s+/g,' ').trim(); }
+function getLocalReply(text){
+  const norm = normalizeForMatch(text);
+  if(!norm) return null;
+  // Only auto-answer short, simple messages locally — longer/complex
+  // messages should still get a full model-generated reply.
+  if(norm.split(' ').length > 6) return null;
+  for(const entry of LOCAL_RESPONSES){
+    for(const p of entry.patterns){
+      if(norm === p || (' '+norm+' ').includes(' '+p+' ')){
+        return entry.replies[Math.floor(Math.random()*entry.replies.length)];
+      }
+    }
+  }
+  return null;
+}
+
 async function send(){
   const input=document.getElementById('chat-input');
   const text=(input?.value||'').trim();
@@ -1102,6 +1225,18 @@ async function send(){
   const imagePrompt = !img ? detectImageRequest(text) : null;
   if(imagePrompt !== null){
     handleImageGenRequest(imagePrompt);
+    return;
+  }
+
+  // Locally "trained" instant replies — no API call at all for common
+  // greetings/small-talk/etc. Falls through to the LLM if nothing matches.
+  const localReply = !img ? getLocalReply(text) : null;
+  if(localReply){
+    addTyping();
+    setTimeout(()=>{
+      removeTyping();
+      pushBotMessage(localReply, null);
+    }, 350 + Math.random()*350);
     return;
   }
 
