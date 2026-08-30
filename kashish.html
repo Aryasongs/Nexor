@@ -133,6 +133,29 @@ img{display:block;max-width:100%;}
 .chat-input-wrap{flex-shrink:0;padding:8px 14px calc(12px + env(safe-area-inset-bottom));background:rgba(245,245,246,.7);backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%);border-top:1px solid rgba(235,235,238,.9);}
 .attach-preview{display:flex;align-items:center;gap:10px;margin:0 2px 8px;background:linear-gradient(160deg,#ffffff,#fafafb);border:1px solid var(--border);border-radius:14px;padding:7px 10px;box-shadow:0 2px 8px -6px rgba(20,20,22,.15),0 1px 0 rgba(255,255,255,.8) inset;}
 .video-results{display:flex;flex-direction:column;gap:8px;margin-top:6px;max-width:82%;}
+.video-embed{position:relative;width:100%;max-width:82%;margin-top:6px;border-radius:14px;overflow:hidden;background:#000;box-shadow:0 8px 20px -12px rgba(20,20,22,.35);}
+.video-embed .ratio{position:relative;width:100%;padding-top:56.25%;}
+.video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
+.video-embed .ve-title{padding:8px 12px;font-size:12px;font-weight:700;color:var(--ink);background:var(--card);}
+.weather-card{max-width:82%;margin-top:6px;background:linear-gradient(155deg,#eef6ff 0%,#f6f9ff 55%,#ffffff 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:16px 18px;box-shadow:0 10px 24px -14px rgba(30,70,150,.28);}
+.weather-card .wc-top{display:flex;align-items:center;justify-content:space-between;}
+.weather-card .wc-place{font-size:13px;font-weight:800;color:var(--ink);}
+.weather-card .wc-sub{font-size:11px;color:var(--ink-soft);margin-top:2px;}
+.weather-card .wc-icon{font-size:34px;line-height:1;}
+.weather-card .wc-temp{font-size:32px;font-weight:800;color:var(--ink);margin-top:6px;}
+.weather-card .wc-desc{font-size:12.5px;color:var(--ink-soft);margin-top:-2px;}
+.weather-card .wc-grid{display:flex;gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(20,20,22,.08);}
+.weather-card .wc-item{display:flex;flex-direction:column;}
+.weather-card .wc-item .v{font-weight:800;font-size:13px;color:var(--ink);}
+.weather-card .wc-item .l{font-size:10.5px;color:var(--ink-soft);}
+.news-results{display:flex;flex-direction:column;gap:8px;margin-top:6px;max-width:88%;}
+.news-card{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:9px 10px;text-align:left;width:100%;box-shadow:0 4px 10px -8px rgba(20,20,22,.25);}
+.news-card:active{background:var(--bubble-bot);}
+.news-card .nthumb{width:60px;height:60px;border-radius:9px;overflow:hidden;flex-shrink:0;background:var(--bubble-bot);}
+.news-card .nthumb img{width:100%;height:100%;object-fit:cover;}
+.news-card .nmeta{flex:1;min-width:0;}
+.news-card .ntitle{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.news-card .nsource{font-size:11px;color:var(--ink-soft);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .video-card{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:8px;text-align:left;width:100%;box-shadow:0 4px 10px -8px rgba(20,20,22,.25);}
 .video-card:active{background:var(--bubble-bot);}
 .video-card .thumb{position:relative;width:88px;height:56px;border-radius:9px;overflow:hidden;flex-shrink:0;background:#000;}
@@ -151,9 +174,18 @@ img{display:block;max-width:100%;}
 .pulse-profile-card .pp-stat .n{font-weight:800;font-size:15px;color:var(--ink);}
 .pulse-profile-card .pp-stat .l{font-size:11px;color:var(--ink-soft);}
 .pulse-profile-card .pp-note{font-size:11px;color:var(--ink-soft);margin-top:10px;padding-top:10px;border-top:1px solid var(--border);line-height:1.5;}
-.msg-copy-btn{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:11.5px;font-weight:700;color:var(--ink-soft);padding:4px 8px 4px 2px;align-self:flex-start;}
-.msg-copy-btn i{font-size:14px;}
-.msg-copy-btn.copied{color:var(--accent);}
+.msg-actions{display:flex;align-items:center;gap:14px;margin:2px 4px 6px;align-self:flex-start;}
+.msg-actions button{color:var(--ink-soft);font-size:16px;display:flex;align-items:center;justify-content:center;}
+.msg-actions button.active{color:var(--accent);}
+.msg-actions button:active{opacity:.6;}
+.msg-actions .divider{width:1px;height:14px;background:var(--border);}
+.msg-more-menu{position:fixed;z-index:60;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 12px 30px -10px rgba(20,20,22,.35);min-width:170px;overflow:hidden;}
+.msg-more-menu button{display:flex;align-items:center;gap:9px;width:100%;padding:12px 14px;font-size:13.5px;font-weight:600;color:var(--ink);text-align:left;}
+.msg-more-menu button:active{background:var(--bubble-bot);}
+.msg-more-menu button.danger{color:#E5484D;}
+.msg-more-backdrop{position:fixed;inset:0;z-index:59;}
+.kashish-toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(10px);background:rgba(20,20,22,.92);color:#fff;font-size:12.5px;font-weight:600;padding:9px 16px;border-radius:999px;z-index:70;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap;}
+.kashish-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .attach-preview img{width:38px;height:38px;object-fit:cover;border-radius:8px;flex-shrink:0;}
 .attach-preview .lbl{flex:1;font-size:11.5px;color:var(--ink-soft);}
 .attach-preview .rm{color:var(--ink-soft);font-size:17px;flex-shrink:0;}
@@ -1617,6 +1649,15 @@ function renderHome(){
   });
 }
 function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+// Small toast used for copy/share/feedback/delete confirmations.
+function showKashishToast(text){
+  let el = document.getElementById('kashish-toast');
+  if(!el){ el=document.createElement('div'); el.id='kashish-toast'; el.className='kashish-toast'; document.body.appendChild(el); }
+  el.textContent = text;
+  requestAnimationFrame(()=>el.classList.add('show'));
+  clearTimeout(el._t);
+  el._t = setTimeout(()=>el.classList.remove('show'), 1800);
+}
 // Copy-to-clipboard for bot messages (Pulse drafts, captions, any reply) —
 // same idea as ChatGPT's copy button under each response.
 async function copyMessageText(btn, text){
@@ -1629,16 +1670,143 @@ async function copyMessageText(btn, text){
       document.body.appendChild(ta); ta.focus(); ta.select();
       document.execCommand('copy'); document.body.removeChild(ta);
     }
-    const icon=btn.querySelector('i'); const label=btn.querySelector('span');
-    btn.classList.add('copied');
+    const icon=btn.querySelector('i');
     if(icon) icon.className='ph-fill ph-check';
-    if(label) label.textContent='Copied';
-    setTimeout(()=>{
-      btn.classList.remove('copied');
-      if(icon) icon.className='ph ph-copy';
-      if(label) label.textContent='Copy';
-    }, 1500);
+    showKashishToast('Copied to clipboard');
+    setTimeout(()=>{ if(icon) icon.className='ph ph-copy'; }, 1500);
   }catch(e){ console.warn('[KASHISH] copy failed:', e); }
+}
+/* ---------------- read-aloud (text to speech) ---------------- */
+let ttsActiveBtn=null;
+function resetSpeakBtn(){
+  if(ttsActiveBtn){ ttsActiveBtn.innerHTML='<i class="ph ph-speaker-high"></i>'; ttsActiveBtn.classList.remove('active'); }
+  ttsActiveBtn=null;
+}
+function toggleReadAloud(btn, text){
+  if(!('speechSynthesis' in window)){ showKashishToast("Voice playback isn't supported in this browser."); return; }
+  if(ttsActiveBtn===btn && window.speechSynthesis.speaking){
+    window.speechSynthesis.cancel();
+    resetSpeakBtn();
+    return;
+  }
+  window.speechSynthesis.cancel();
+  resetSpeakBtn();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = /[\u0900-\u097F]/.test(text) ? 'hi-IN' : (navigator.language || 'en-US');
+  u.onend = resetSpeakBtn;
+  u.onerror = resetSpeakBtn;
+  ttsActiveBtn = btn;
+  btn.innerHTML = '<i class="ph-fill ph-stop-circle"></i>';
+  btn.classList.add('active');
+  window.speechSynthesis.speak(u);
+}
+/* ---------------- like/dislike feedback ---------------- */
+function setMessageFeedback(m, val){
+  m.feedback = (m.feedback===val) ? null : val;
+  const sess = getSession(currentSessionId);
+  if(sess) upsertSession(sess);
+  renderChat();
+  if(m.feedback) showKashishToast(m.feedback==='up' ? 'Thanks for the feedback!' : "Thanks — noted, I'll try to do better.");
+}
+/* ---------------- share ---------------- */
+async function shareMessageText(text){
+  if(navigator.share){
+    try{ await navigator.share({text}); }catch(e){ /* user cancelled — nothing to do */ }
+  } else {
+    try{
+      if(navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(text);
+      showKashishToast("Sharing isn't supported here — copied instead.");
+    }catch(e){}
+  }
+}
+/* ---------------- regenerate / delete ---------------- */
+async function regenerateMessage(m){
+  const sess = getSession(currentSessionId);
+  if(!sess) return;
+  const idx = sess.messages.indexOf(m);
+  if(idx===-1) return;
+  let uIdx = idx-1;
+  while(uIdx>=0 && sess.messages[uIdx].role!=='user') uIdx--;
+  if(uIdx<0) return;
+  sess.messages.splice(idx,1);
+  upsertSession(sess); renderChat();
+  addTyping();
+  const historyForModel = sess.messages.slice(0, uIdx+1)
+    .map(mm=> mm.role==='user' ? {role:'user', text:mm.text} : {role:'model', text:mm.text});
+  try{
+    const result = await kashishReply(historyForModel, null);
+    removeTyping();
+    pushBotMessage(result.reply, result.quickReplies);
+  }catch(e){
+    removeTyping();
+    sendLocal();
+  }
+}
+function deleteMessage(m){
+  const sess = getSession(currentSessionId);
+  if(!sess) return;
+  const idx = sess.messages.indexOf(m);
+  if(idx===-1) return;
+  sess.messages.splice(idx,1);
+  upsertSession(sess);
+  renderChat();
+  showKashishToast('Message deleted');
+}
+/* ---------------- "..." more menu ---------------- */
+function closeMsgMoreMenu(){
+  document.querySelectorAll('.msg-more-menu,.msg-more-backdrop').forEach(el=>el.remove());
+}
+function openMsgMoreMenu(evt, m){
+  closeMsgMoreMenu();
+  const backdrop=document.createElement('div'); backdrop.className='msg-more-backdrop';
+  backdrop.onclick=closeMsgMoreMenu;
+  document.body.appendChild(backdrop);
+  const menu=document.createElement('div'); menu.className='msg-more-menu';
+  const rect = evt.currentTarget.getBoundingClientRect();
+  menu.style.top = (rect.bottom+6)+'px';
+  menu.style.right = (window.innerWidth-rect.right)+'px';
+  const regenBtn=document.createElement('button');
+  regenBtn.innerHTML='<i class="ph ph-arrow-clockwise"></i> Regenerate';
+  regenBtn.onclick=()=>{ closeMsgMoreMenu(); regenerateMessage(m); };
+  const delBtn=document.createElement('button'); delBtn.className='danger';
+  delBtn.innerHTML='<i class="ph ph-trash"></i> Delete';
+  delBtn.onclick=()=>{ closeMsgMoreMenu(); deleteMessage(m); };
+  menu.appendChild(regenBtn); menu.appendChild(delBtn);
+  document.body.appendChild(menu);
+}
+/* ---------------- action row builder ---------------- */
+function buildMsgActions(m){
+  const wrap=document.createElement('div'); wrap.className='msg-actions';
+
+  const copyBtn=document.createElement('button'); copyBtn.innerHTML='<i class="ph ph-copy"></i>';
+  copyBtn.onclick=()=>copyMessageText(copyBtn, m.text);
+  wrap.appendChild(copyBtn);
+
+  const speakBtn=document.createElement('button'); speakBtn.innerHTML='<i class="ph ph-speaker-high"></i>';
+  speakBtn.onclick=()=>toggleReadAloud(speakBtn, m.text);
+  wrap.appendChild(speakBtn);
+
+  const likeBtn=document.createElement('button');
+  likeBtn.innerHTML = '<i class="ph'+(m.feedback==='up'?'-fill':'')+' ph-thumbs-up"></i>';
+  if(m.feedback==='up') likeBtn.classList.add('active');
+  likeBtn.onclick=()=>setMessageFeedback(m,'up');
+  wrap.appendChild(likeBtn);
+
+  const dislikeBtn=document.createElement('button');
+  dislikeBtn.innerHTML = '<i class="ph'+(m.feedback==='down'?'-fill':'')+' ph-thumbs-down"></i>';
+  if(m.feedback==='down') dislikeBtn.classList.add('active');
+  dislikeBtn.onclick=()=>setMessageFeedback(m,'down');
+  wrap.appendChild(dislikeBtn);
+
+  const shareBtn=document.createElement('button'); shareBtn.innerHTML='<i class="ph ph-export"></i>';
+  shareBtn.onclick=()=>shareMessageText(m.text);
+  wrap.appendChild(shareBtn);
+
+  const moreBtn=document.createElement('button'); moreBtn.innerHTML='<i class="ph ph-dots-three"></i>';
+  moreBtn.onclick=(e)=>openMsgMoreMenu(e, m);
+  wrap.appendChild(moreBtn);
+
+  return wrap;
 }
 
 function toggleHomeMenu(){ /* reserved for future settings */ }
@@ -1740,13 +1908,63 @@ function renderChat(){
     row.appendChild(b);
     const t=document.createElement('div'); t.className='bubble-time'; t.textContent=fmtTime(m.ts); row.appendChild(t);
     scroll.appendChild(row);
-    // Copy button under bot text replies (Pulse drafts/captions/any reply) —
-    // same idea as ChatGPT's copy-to-clipboard under each response.
+    // Action row under bot text replies — copy, read aloud, like/dislike
+    // feedback, share, and a "more" menu (regenerate / delete).
     if(m.role!=='user' && m.text && !m.genPending){
-      const cp=document.createElement('button'); cp.className='msg-copy-btn';
-      cp.innerHTML='<i class="ph ph-copy"></i><span>Copy</span>';
-      cp.onclick=()=>copyMessageText(cp, m.text);
-      scroll.appendChild(cp);
+      scroll.appendChild(buildMsgActions(m));
+    }
+    if(m.playEmbed){
+      const pe = m.playEmbed;
+      const ewrap=document.createElement('div'); ewrap.className='video-embed';
+      const ratio=document.createElement('div'); ratio.className='ratio';
+      const ifr=document.createElement('iframe');
+      ifr.src = `https://www.youtube.com/embed/${pe.videoId}?autoplay=1&playsinline=1`;
+      ifr.allow = 'autoplay; encrypted-media; picture-in-picture';
+      ifr.allowFullscreen = true;
+      ratio.appendChild(ifr); ewrap.appendChild(ratio);
+      const ttl=document.createElement('div'); ttl.className='ve-title'; ttl.textContent=pe.title;
+      ewrap.appendChild(ttl);
+      scroll.appendChild(ewrap);
+    }
+    if(m.weatherCard){
+      const w = m.weatherCard;
+      const wc = document.createElement('div'); wc.className='weather-card';
+      const top = document.createElement('div'); top.className='wc-top';
+      const left = document.createElement('div');
+      const placeEl=document.createElement('div'); placeEl.className='wc-place'; placeEl.textContent=w.place;
+      const subEl=document.createElement('div'); subEl.className='wc-sub'; subEl.textContent=`H:${w.hi}° L:${w.lo}°`;
+      left.appendChild(placeEl); left.appendChild(subEl);
+      const iconEl=document.createElement('i'); iconEl.className='wc-icon ph-fill '+w.icon;
+      top.appendChild(left); top.appendChild(iconEl);
+      wc.appendChild(top);
+      const tempEl=document.createElement('div'); tempEl.className='wc-temp'; tempEl.textContent=w.temp+'°C';
+      const descEl=document.createElement('div'); descEl.className='wc-desc'; descEl.textContent=w.desc+' · Feels like '+w.feelsLike+'°C';
+      wc.appendChild(tempEl); wc.appendChild(descEl);
+      const grid=document.createElement('div'); grid.className='wc-grid';
+      [[w.humidity+'%','Humidity'],[w.wind+' km/h','Wind']].forEach(([v,l])=>{
+        const it=document.createElement('div'); it.className='wc-item';
+        const vv=document.createElement('div'); vv.className='v'; vv.textContent=v;
+        const ll=document.createElement('div'); ll.className='l'; ll.textContent=l;
+        it.appendChild(vv); it.appendChild(ll); grid.appendChild(it);
+      });
+      wc.appendChild(grid);
+      scroll.appendChild(wc);
+    }
+    if(m.newsResults && m.newsResults.length){
+      const nwrap=document.createElement('div'); nwrap.className='news-results';
+      m.newsResults.forEach(n=>{
+        const card=document.createElement('button'); card.className='news-card';
+        card.onclick=()=>window.open(n.link,'_blank');
+        const thumb=document.createElement('div'); thumb.className='nthumb';
+        if(n.thumbnail){ const im=document.createElement('img'); im.src=n.thumbnail; im.alt=''; thumb.appendChild(im); }
+        const meta=document.createElement('div'); meta.className='nmeta';
+        const nt=document.createElement('div'); nt.className='ntitle'; nt.textContent=n.title;
+        const ns=document.createElement('div'); ns.className='nsource'; ns.textContent=n.source+(n.date?(' · '+n.date):'');
+        meta.appendChild(nt); meta.appendChild(ns);
+        card.appendChild(thumb); card.appendChild(meta);
+        nwrap.appendChild(card);
+      });
+      scroll.appendChild(nwrap);
     }
     if(m.videoResults && m.videoResults.length){
       const vwrap=document.createElement('div'); vwrap.className='video-results';
@@ -1890,6 +2108,15 @@ function needsWebSearch(text){
   if(appSettings.autoSwitch && t.trim().split(/\s+/).length>14 && /\?/.test(t)) return true;
   return false;
 }
+// "/search <query>" slash command — an explicit, unconditional way to force
+// a live web search, bypassing all the usual heuristics above. Returns the
+// query string, '' if the command was used with nothing after it, or null
+// if the message isn't a /search command at all.
+function extractSlashSearchQuery(text){
+  const m = (text||'').match(/^\/search\s*(.*)$/i);
+  if(!m) return null;
+  return m[1] ? m[1].trim() : '';
+}
 function formatSerperResults(data){
   const parts=[];
   if(data.answerBox){
@@ -1995,6 +2222,184 @@ function formatVideoResultsForModel(results){
   return 'Found these YouTube videos for the user (already shown to them as tappable cards below your reply — do NOT repeat the links or titles verbatim, just briefly acknowledge you found some and let them tap through):\n'
     + results.map((r,i)=>`${i+1}. ${r.title} — ${r.channel}`).join('\n');
 }
+// "Play [song/video]" — an explicit play request plays the top result
+// directly in an embedded, autoplaying player instead of just showing
+// tappable cards.
+const PLAY_VIDEO_PATTERNS = [
+  /\bplay\b/i,
+  /\bchala\s*(do|de)\b/i,
+  /\bbaja\s*(do|de)\b/i,
+  /\blaga\s*(do|de)\b/i,
+  /\bsuna\s*(do|de)\b/i
+];
+function needsPlayVideo(text){
+  if(!appSettings.autoWebSearch) return false;
+  const t=(text||'').trim();
+  if(!t) return false;
+  // Don't treat "play a game/chess/cricket/with me" etc. as a video request.
+  if(/\bplay\s+(a\s+|some\s+)?(game|games|chess|cricket|carrom|ludo|cards|antakshari|truth or dare|charades|with me|along)\b/i.test(t)) return false;
+  return PLAY_VIDEO_PATTERNS.some(p=>p.test(t));
+}
+function cleanPlayQuery(text){
+  return text
+    .replace(/\bkashish\b/gi,'')
+    .replace(/\bplease\b/gi,'')
+    .replace(/\byoutube\b/gi,'')
+    .replace(/\bplay\b/gi,'')
+    .replace(/\b(chala|baja|laga|suna)\s*(do|de)\b/gi,'')
+    .replace(/\bvideo\b/gi,'')
+    .replace(/\s{2,}/g,' ')
+    .trim() || text;
+}
+function extractYoutubeId(link){
+  if(!link) return null;
+  const m = link.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([a-zA-Z0-9_-]{6,})/);
+  return m ? m[1] : null;
+}
+async function youtubePlayTop(query){
+  const q = cleanPlayQuery(query);
+  const results = await youtubeSearch(q);
+  if(!results.length) return null;
+  const top = results[0];
+  const videoId = extractYoutubeId(top.link);
+  if(!videoId) return null;
+  return { videoId, title: top.title, channel: top.channel, link: top.link };
+}
+
+/* ---------------- real-time weather (Open-Meteo — no API key needed) ---------------- */
+const WEATHER_TRIGGER_PATTERNS = [
+  /\bweather\b/i, /\bmausam\b/i, /\btemperature\b/i, /\bforecast\b/i,
+  /\bbarish\b/i, /\brain(y|ing)?\b/i, /\bgarmi\b/i, /\bthand\b/i, /\bthandi\b/i,
+  /\bhumidity\b/i, /\bkitni?\s+garmi\b/i
+];
+function needsWeather(text){
+  const t=(text||'').trim();
+  if(!t) return false;
+  return WEATHER_TRIGGER_PATTERNS.some(p=>p.test(t));
+}
+// Pulls a city name out of phrasing like "Delhi ka mausam", "weather in
+// Mumbai", "mausam kaisa hai Jaipur mein". Returns null if none found,
+// in which case we fall back to the device's current location.
+function extractWeatherCity(text){
+  let m = text.match(/(?:weather|mausam|forecast|temperature)\s+(?:in|of|at)\s+([a-zA-Z\s]+)/i);
+  if(m && m[1]) return m[1].trim();
+  m = text.match(/([a-zA-Z]+)\s+(?:ka|ki|mein|ke)\s+(?:weather|mausam|forecast|temperature)/i);
+  if(m && m[1]) return m[1].trim();
+  m = text.match(/([a-zA-Z]+)\s+mein\s+(?:kitni?\s+)?(?:garmi|thand|barish)/i);
+  if(m && m[1]) return m[1].trim();
+  return null;
+}
+async function geocodeCity(city){
+  try{
+    const res = await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(city)}&count=1&language=en&format=json`);
+    if(!res.ok) return null;
+    const data = await res.json();
+    const r = data.results && data.results[0];
+    if(!r) return null;
+    return { lat:r.latitude, lon:r.longitude, name:r.name, country:r.country };
+  }catch(e){ console.warn('[KASHISH] geocoding failed:', e); return null; }
+}
+function getDeviceLocation(){
+  return new Promise((resolve)=>{
+    if(!navigator.geolocation){ resolve(null); return; }
+    navigator.geolocation.getCurrentPosition(
+      pos=>resolve({lat:pos.coords.latitude, lon:pos.coords.longitude, name:null, country:null}),
+      ()=>resolve(null),
+      { timeout:6000 }
+    );
+  });
+}
+// WMO weather codes -> friendly description + icon.
+const WMO_CODES = {
+  0:['Clear sky','ph-sun'],1:['Mainly clear','ph-sun'],2:['Partly cloudy','ph-cloud-sun'],3:['Overcast','ph-cloud'],
+  45:['Foggy','ph-cloud-fog'],48:['Foggy','ph-cloud-fog'],
+  51:['Light drizzle','ph-cloud-drizzle'],53:['Drizzle','ph-cloud-drizzle'],55:['Heavy drizzle','ph-cloud-drizzle'],
+  61:['Light rain','ph-cloud-rain'],63:['Rain','ph-cloud-rain'],65:['Heavy rain','ph-cloud-rain'],
+  71:['Light snow','ph-cloud-snow'],73:['Snow','ph-cloud-snow'],75:['Heavy snow','ph-cloud-snow'],
+  80:['Rain showers','ph-cloud-rain'],81:['Rain showers','ph-cloud-rain'],82:['Violent showers','ph-cloud-rain'],
+  95:['Thunderstorm','ph-cloud-lightning'],96:['Thunderstorm + hail','ph-cloud-lightning'],99:['Thunderstorm + hail','ph-cloud-lightning']
+};
+function describeWeatherCode(code){ return WMO_CODES[code] || ['Weather', 'ph-cloud']; }
+async function fetchWeather(lat, lon){
+  const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,precipitation,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&timezone=auto`;
+  const res = await fetch(url);
+  if(!res.ok) throw new Error('Open-Meteo HTTP '+res.status);
+  return res.json();
+}
+async function handleWeatherRequest(text){
+  let place = extractWeatherCity(text);
+  let loc = null, placeLabel = null;
+  if(place){
+    loc = await geocodeCity(place);
+    if(loc) placeLabel = loc.country ? `${loc.name}, ${loc.country}` : loc.name;
+  }
+  if(!loc){
+    loc = await getDeviceLocation();
+    placeLabel = placeLabel || 'Your location';
+  }
+  if(!loc) return null;
+  try{
+    const data = await fetchWeather(loc.lat, loc.lon);
+    const [desc, icon] = describeWeatherCode(data.current.weather_code);
+    return {
+      place: placeLabel,
+      temp: Math.round(data.current.temperature_2m),
+      feelsLike: Math.round(data.current.apparent_temperature),
+      humidity: data.current.relative_humidity_2m,
+      wind: Math.round(data.current.wind_speed_10m),
+      hi: Math.round(data.daily.temperature_2m_max[0]),
+      lo: Math.round(data.daily.temperature_2m_min[0]),
+      desc, icon
+    };
+  }catch(e){ console.warn('[KASHISH] weather fetch failed:', e); return null; }
+}
+
+/* ---------------- real-time news (via existing Serper key) ---------------- */
+const NEWS_TRIGGER_PATTERNS = [
+  /\bnews\b/i, /\bkhabar(ein)?\b/i, /\bheadlines?\b/i, /\blatest\s+(on|about)\b/i,
+  /\bkya\s+chal\s*raha\s*hai\b/i, /\baaj\s+ki\s+news\b/i
+];
+function needsNews(text){
+  const t=(text||'').trim();
+  if(!t) return false;
+  return NEWS_TRIGGER_PATTERNS.some(p=>p.test(t));
+}
+function cleanNewsQuery(text){
+  return text
+    .replace(/\bkashish\b/gi,'')
+    .replace(/\b(please|batao|bata\s*do|dikhao|dikha\s*do)\b/gi,'')
+    .replace(/\bnews\b/gi,'')
+    .replace(/\bkhabar(ein)?\b/gi,'')
+    .replace(/\bheadlines?\b/gi,'')
+    .replace(/\blatest\s+(on|about)\b/gi,'')
+    .replace(/\s{2,}/g,' ')
+    .trim();
+}
+async function newsSearch(query){
+  const q = cleanNewsQuery(query) || 'today';
+  try{
+    const res = await fetch('https://google.serper.dev/news', {
+      method:'POST',
+      headers:{'X-API-KEY': SERPER_API_KEY, 'Content-Type':'application/json'},
+      body: JSON.stringify({ q })
+    });
+    if(!res.ok) throw new Error('Serper news HTTP '+res.status);
+    const data = await res.json();
+    const items = Array.isArray(data.news) ? data.news : [];
+    return items.slice(0,4).map(n=>({
+      title: n.title || 'Untitled',
+      link: n.link,
+      source: n.source || 'News',
+      date: n.date || '',
+      thumbnail: n.imageUrl || null
+    }));
+  }catch(e){ console.warn('[KASHISH] news search failed:', e); return []; }
+}
+function formatNewsResultsForModel(results){
+  if(!results || !results.length) return null;
+  return 'Live news results for the user\'s request (already shown to them as tappable headline cards below your reply — do NOT repeat the links, just briefly set up what you found in a sentence or two, in your own words, no direct quotes from headlines):\n'
+    + results.map((r,i)=>`${i+1}. ${r.title} — ${r.source}${r.date?(' ('+r.date+')'):''}`).join('\n');
+}
 
 /* ---------------- public profile lookup ("is user ka pulse/likes batao") ---------------- */
 // Reads ONLY public-facing fields (name, handle, bio, verified, and public
@@ -2037,20 +2442,51 @@ async function lookupPublicProfile(handle){
   }
 }
 
+/* ---------------- long-term memory ---------------- */
+// Lightweight persistent memory: things explicitly asked to be remembered
+// ("yaad rakhna ki...", "remember that...") get saved per-account and
+// injected into every future system prompt, so Kashish can recall them
+// even in a brand-new chat session, not just within the current one.
+function memoryStorageKey(){
+  return 'kashishMemory_' + ((userCtx && userCtx.uid) || 'guest');
+}
+function loadMemories(){
+  try{ return JSON.parse(localStorage.getItem(memoryStorageKey())||'[]'); }
+  catch(e){ return []; }
+}
+function saveMemory(fact){
+  if(!fact || !fact.trim()) return;
+  const mems = loadMemories();
+  mems.push(fact.trim());
+  while(mems.length > 30) mems.shift(); // keep the most recent 30 facts
+  try{ localStorage.setItem(memoryStorageKey(), JSON.stringify(mems)); }catch(e){}
+}
+const REMEMBER_PATTERN = /\b(yaad rakh(na|o)?|yaad rakhna ki|mat bhoolna|mat bhulna|remember (that|this)|don'?t forget)\b/i;
+function extractMemoryFact(text){
+  if(!REMEMBER_PATTERN.test(text)) return null;
+  // Strip the trigger phrase itself so we store just the fact, e.g.
+  // "yaad rakhna ki mujhe cricket pasand hai" -> "mujhe cricket pasand hai".
+  let fact = text.replace(/\b(yaad rakh(na|o)?( ki)?|mat bhoolna( ki)?|mat bhulna( ki)?|remember (that|this)?|don'?t forget( that)?)\b/gi,'').trim();
+  fact = fact.replace(/^[:,\-–]\s*/,'').trim();
+  return fact || text.trim();
+}
+
 function buildSystemPrompt(){
   const who = firstName()
     ? `You're talking with ${firstName()}. You may use their name naturally sometimes, but don't overdo it.`
     : `You don't know this person's name yet — that's fine, keep things warm and natural.`;
-  const langPref = appSettings.language==='hi'
-    ? `The user has set their preferred app language to Hindi/Hinglish — lean toward replying in Hindi/Hinglish by default, but still mirror English if they clearly write in English.`
-    : `Your default and primary language is English — always start and reply in English unless the user writes to you in Hindi/Hinglish, in which case match them and reply in Hindi/Hinglish for that exchange.`;
+  const langPref = `Your default and primary language is always English, regardless of any app language setting — always start and reply in English unless the user is clearly writing to you in Hindi/Hinglish in that message, in which case match them and reply in Hindi/Hinglish for that exchange only.`;
+  const memories = loadMemories();
+  const memoryBlock = memories.length
+    ? `\nThings to remember about this person from earlier conversations (use naturally when relevant, don't just recite the list): ${memories.join(' | ')}\n`
+    : '';
   return `You are KASHISH — a general-purpose AI companion. You are NOT built for, limited to, or branded around any single company, app, or product's help desk. People come to you for anything: casual conversation, venting, jokes, advice, explanations, help planning things, writing help, learning something new, or just killing time. Treat "just chatting" as equally valid as "getting help" — never redirect a casual conversation back into "how can I assist you" support-mode.
 
-Personality: warm, witty, genuinely curious, never robotic or corporate. Talk like a smart friend, not a customer-service bot. Mirror the user's energy: if they're joking, joke back; if they're playful/flirty, stay light and charming in the same register they set, never crude or sexually explicit, and never initiate flirting yourself; if they're upset or venting, drop the jokes and just listen and help. If anything suggests you're talking with a minor, stay friendly and age-appropriate, no flirting.
+Personality: warm, witty, genuinely curious, never robotic or corporate. Talk like a smart friend, not a customer-service bot. Mirror the user's energy: if they're joking, joke back; if they're playful/flirty, stay light and charming in the same register they set, never crude or sexually explicit, and never initiate flirting yourself; if they're upset or venting, drop the jokes and just listen and help. If anything suggests you're talking with a minor, stay friendly and age-appropriate, no flirting. You can sprinkle in the occasional emoji when it genuinely fits the vibe — especially in light, funny, or playful exchanges — but don't force one into every message, and drop them entirely when the topic is serious.
 
 ${langPref} Don't switch to Hindi/Hinglish just because a message contains a stray Hindi word — only switch when the user is clearly writing in Hindi/Hinglish overall. Keep replies natural and conversational length: short (1-4 sentences) for chit-chat, longer and structured (numbered/bulleted, still in plain text) when the user actually needs a detailed breakdown or list.
 ${who}
-
+${memoryBlock}
 Origin story (only bring this up if directly asked "who made you", "who created you", "who is your founder/developer", or "why is your name Kashish" / "what does your name mean" — don't volunteer it unprompted): You were created by Gursharan Singh, who is also known by the name Gursharn Arya, the founder of Nexor. Your name "Kashish" was taken from — and inspired by — Kashish Tyagi. State this naturally and factually, in the same conversational tone/language as the rest of the chat (Hinglish/Hindi if that's what the user is using, English otherwise), without turning it into a long biography — a couple of warm, natural sentences is enough.
 
 You can optionally offer 1-2 short "quickReplies" (single words or short phrases, like "Yes" or "Tell me more") when a natural yes/no or follow-up moment fits — don't force this on every message, only when it genuinely fits the flow.
@@ -2067,7 +2503,7 @@ function buildMessages(history, searchContext){
     msgs.push({role:'system', content:
       `Live web search results for the user's latest message (retrieved just now, treat as current/accurate):\n\n${searchContext}\n\nUse this to answer accurately and naturally — weave the info into your reply conversationally, don't just dump a list, and don't say "according to search results" unless it feels natural.`});
   }
-  history.slice(-16).forEach(m=>msgs.push({role: m.role==='user'?'user':'assistant', content:m.text||''}));
+  history.slice(-40).forEach(m=>msgs.push({role: m.role==='user'?'user':'assistant', content:m.text||''}));
   return msgs;
 }
 function extractJson(raw){
@@ -2147,11 +2583,11 @@ function sendLocal(){
   }, 400);
 }
 
-function pushBotMessage(text, quickReplies, videoResults, profileCard){
+function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults){
   const sess = getSession(currentSessionId);
   if(!sess) return;
   const qr = appSettings.trendingSearches ? (quickReplies||null) : null;
-  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, ts: Date.now()});
+  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, ts: Date.now()});
   sess.preview = truncate(text, 60);
   sess.updatedAt = Date.now();
   upsertSession(sess);
@@ -2315,9 +2751,6 @@ const LOCAL_RESPONSES = [
   { patterns:['help chahiye','i need help','madad chahiye'], replies:[
     "Bilkul, batao kis cheez mein help chahiye?","Main yahin hoon, bata do kya problem hai."
   ]},
-  { patterns:['weather kaisa hai','mausam kaisa hai','whats the weather'], replies:[
-    "Mujhe live weather dekhne ke liye search karna padega — poochte ho toh main check kar leta hoon!"
-  ]},
   { patterns:['app kaisa hai','app acha hai','nice app'], replies:[
     "Thank you! Aur suggestions ho toh zaroor batana."
   ]}
@@ -2357,6 +2790,38 @@ async function send(){
   input.value=''; clearAttachment(); updateSendBtn();
   showScreen('screen-chat');
   renderChat();
+
+  // Explicit "yaad rakhna / remember that..." — save as a long-term memory
+  // fact right away, independent of whatever else happens with this message.
+  if(!img){
+    const fact = extractMemoryFact(text);
+    if(fact) saveMemory(fact);
+  }
+
+  // "/search <query>" — force a live web search regardless of what the
+  // heuristics would normally decide, so the user has a guaranteed way
+  // to trigger a real-time lookup for anything.
+  const forcedSearchQuery = !img ? extractSlashSearchQuery(text) : null;
+  if(forcedSearchQuery !== null){
+    if(!forcedSearchQuery){
+      pushBotMessage("Kya search karu? '/search' ke baad apna query likho — jaise '/search IPL 2026 winner'.", null);
+      return;
+    }
+    addTyping();
+    let searchContext = null;
+    try{ searchContext = await webSearch(forcedSearchQuery); }
+    catch(e){ console.warn('[KASHISH] /search web search failed:', e); }
+    const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
+    try{
+      const result = await kashishReply(historyForModel, searchContext);
+      removeTyping();
+      pushBotMessage(result.reply, result.quickReplies);
+    }catch(e){
+      removeTyping();
+      pushBotMessage("Search abhi kaam nahi kar raha — thodi der baad try karo.", null);
+    }
+    return;
+  }
 
   // "AI create" — image generation, triggered by #imagine / "image ..." / etc.
   const imagePrompt = !img ? detectImageRequest(text) : null;
@@ -2398,6 +2863,35 @@ async function send(){
     return;
   }
 
+  // "Weather/mausam" — handled directly with live Open-Meteo data (no
+  // API key needed) so the numbers are accurate, not just an LLM guess.
+  if(!img && needsWeather(text)){
+    addTyping();
+    const wx = await handleWeatherRequest(text);
+    removeTyping();
+    if(!wx){
+      pushBotMessage("Mujhe weather nahi mil paya — city ka naam bata do (jaise \"Delhi ka mausam\"), ya location access allow kar do.", null);
+    } else {
+      pushBotMessage(`${wx.place} mein abhi ${wx.temp}°C hai, ${wx.desc.toLowerCase()}.`, null, null, null, null, wx);
+    }
+    return;
+  }
+
+  // "Play <song/video title>" — explicit play request. Handled directly:
+  // search, then embed the top result as an autoplaying player right in
+  // the chat, instead of just a tappable link-out card.
+  if(!img && needsPlayVideo(text)){
+    addTyping();
+    const played = await youtubePlayTop(text);
+    removeTyping();
+    if(!played){
+      pushBotMessage(`Mujhe "${cleanPlayQuery(text)}" ka video nahi mil paya — naam thoda aur specific bata sakte ho?`, null);
+    } else {
+      pushBotMessage(`Yeh raha — "${played.title}" chala diya 🎬`, null, null, null, played);
+    }
+    return;
+  }
+
   addTyping();
 
   const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text: m.text + (m.imageDataUrl && m===sess.messages[sess.messages.length-1] ? ` [Attached photo: ${img?img.name:''}]` : '')} : {role:'model', text:m.text});
@@ -2405,7 +2899,11 @@ async function send(){
   // If the message looks like it needs current/real-world info, search first.
   let searchContext = null;
   let videoResults = null;
-  if(!img && needsVideoSearch(text)){
+  let newsResults = null;
+  if(!img && needsNews(text)){
+    newsResults = await newsSearch(text);
+    searchContext = formatNewsResultsForModel(newsResults);
+  } else if(!img && needsVideoSearch(text)){
     videoResults = await youtubeSearch(text);
     searchContext = formatVideoResultsForModel(videoResults);
   } else if(!img && needsWebSearch(text)){
@@ -2416,7 +2914,7 @@ async function send(){
   try{
     const result = await kashishReply(historyForModel, searchContext);
     removeTyping();
-    pushBotMessage(result.reply, result.quickReplies, videoResults);
+    pushBotMessage(result.reply, result.quickReplies, videoResults, null, null, null, newsResults);
   }catch(e){
     console.error('[KASHISH] all providers failed, falling back to local:', e);
     sendLocal();
