@@ -401,6 +401,23 @@ const CFAI_PROXY_ENDPOINT = 'https://sparky-cfai.sgursharn076.workers.dev';
 const CFAI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 
 /* ============================================================
+   LIVE WEB SEARCH — gives Kashish access to current/real-time
+   information (news, scores, prices, "who is", weather, etc.)
+   that the LLM's own training data can't know about.
+   Serper.dev is tried first (fast, simple JSON API); if it
+   fails, falls back to Google Programmable Search (Custom
+   Search JSON API).
+   NOTE: these keys are visible in client-side code, which means
+   anyone using this page can read and reuse them. Fine for
+   personal/testing use, but for a public production app these
+   calls should go through your own backend/proxy so the keys
+   never ship to the browser.
+   ============================================================ */
+const SERPER_API_KEY = '19098c06ea81e0f575d04fa60a1c96ebd4d2b184';
+const GOOGLE_CSE_API_KEY = 'AIzaSyBGPLQccc8Yt_wFlI9DkIEATNwQLjaTW1g';
+const GOOGLE_CSE_ID = '951c20955565e4914';
+
+/* ============================================================
    AUTH — shared Firebase project. Logging into Kashish signs into
    the SAME account system used elsewhere, so a user's login here
    is the same account (and password) as on the other app.
@@ -824,6 +841,72 @@ function clearAttachment(){
 }
 
 /* ---------------- model plumbing ---------------- */
+/* ---------------- live web search ---------------- */
+// Lightweight heuristic: only fire a real web search when the message
+// looks like it needs current/real-world info, so we don't burn API
+// quota on every casual "hi" or "how are you".
+const SEARCH_TRIGGER_WORDS = [
+  'today','latest','current','currently','news','breaking','score','scores',
+  'live','result','results','weather','temperature','forecast','price','prices',
+  'stock','share price','exchange rate','rate of','value of','update','updates',
+  'recent','this week','this month','right now','abhi','aaj','ajj','kal',
+  'is week','current price','who is the','who is current','what is the current',
+  'election','match','ipl','world cup','release date','when is','when did',
+  'kitna hai','kaun hai','kya hua','naya','recently'
+];
+function needsWebSearch(text){
+  const t=(text||'').toLowerCase();
+  if(!t.trim()) return false;
+  return SEARCH_TRIGGER_WORDS.some(w=>t.includes(w));
+}
+function formatSerperResults(data){
+  const parts=[];
+  if(data.answerBox){
+    const ab=data.answerBox;
+    parts.push(`Answer: ${ab.title||''} — ${ab.answer||ab.snippet||''}`.trim());
+  }
+  if(data.knowledgeGraph){
+    const kg=data.knowledgeGraph;
+    parts.push(`Info: ${kg.title||''} — ${kg.description||''}`.trim());
+  }
+  if(Array.isArray(data.organic)){
+    data.organic.slice(0,5).forEach((r,i)=>{
+      parts.push(`${i+1}. ${r.title} — ${r.snippet||''}`);
+    });
+  }
+  return parts.filter(Boolean).length ? parts.filter(Boolean).join('\n') : null;
+}
+function formatGoogleCseResults(data){
+  if(!data.items || !data.items.length) return null;
+  return data.items.slice(0,5).map((r,i)=>`${i+1}. ${r.title} — ${r.snippet||''}`).join('\n');
+}
+async function webSearch(query){
+  try{
+    const res=await fetch('https://google.serper.dev/search', {
+      method:'POST',
+      headers:{'X-API-KEY': SERPER_API_KEY, 'Content-Type':'application/json'},
+      body: JSON.stringify({ q: query })
+    });
+    if(!res.ok) throw new Error('Serper HTTP '+res.status);
+    const data=await res.json();
+    const formatted=formatSerperResults(data);
+    if(formatted) return formatted;
+    throw new Error('Serper returned no usable results');
+  }catch(e1){
+    console.warn('[KASHISH] Serper search failed, trying Google CSE:', e1);
+    try{
+      const url=`https://www.googleapis.com/customsearch/v1?key=${GOOGLE_CSE_API_KEY}&cx=${GOOGLE_CSE_ID}&q=${encodeURIComponent(query)}`;
+      const res2=await fetch(url);
+      if(!res2.ok) throw new Error('Google CSE HTTP '+res2.status);
+      const data2=await res2.json();
+      return formatGoogleCseResults(data2);
+    }catch(e2){
+      console.warn('[KASHISH] Google CSE also failed:', e2);
+      return null;
+    }
+  }
+}
+
 function buildSystemPrompt(){
   const who = firstName()
     ? `You're talking with ${firstName()}. You may use their name naturally sometimes, but don't overdo it.`
@@ -842,9 +925,13 @@ You can optionally offer 1-2 short "quickReplies" (single words or short phrases
 Respond with ONLY compact JSON, no markdown fences, no extra text outside the JSON:
 {"reply":"your natural conversational reply as plain text","quickReplies":["optional","short chips"]}`;
 }
-function buildMessages(history){
+function buildMessages(history, searchContext){
   const sys = buildSystemPrompt();
   const msgs = [{role:'system', content:sys}];
+  if(searchContext){
+    msgs.push({role:'system', content:
+      `Live web search results for the user's latest message (retrieved just now, treat as current/accurate):\n\n${searchContext}\n\nUse this to answer accurately and naturally — weave the info into your reply conversationally, don't just dump a list, and don't say "according to search results" unless it feels natural.`});
+  }
   history.slice(-16).forEach(m=>msgs.push({role: m.role==='user'?'user':'assistant', content:m.text||''}));
   return msgs;
 }
@@ -866,8 +953,8 @@ async function callProvider(endpoint, model, msgs, label){
   if(!parsed || typeof parsed.reply !== 'string') throw new Error('unexpected response shape from '+label);
   return parsed;
 }
-async function kashishReply(history){
-  const msgs = buildMessages(history);
+async function kashishReply(history, searchContext){
+  const msgs = buildMessages(history, searchContext);
   try{ return await callProvider(GROQ_PROXY_ENDPOINT, GROQ_MODEL, msgs, 'Groq'); }
   catch(e1){
     console.warn('[KASHISH] Groq failed, trying Gemini:', e1);
@@ -1022,8 +1109,15 @@ async function send(){
 
   const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text: m.text + (m.imageDataUrl && m===sess.messages[sess.messages.length-1] ? ` [Attached photo: ${img?img.name:''}]` : '')} : {role:'model', text:m.text});
 
+  // If the message looks like it needs current/real-world info, search first.
+  let searchContext = null;
+  if(!img && needsWebSearch(text)){
+    try{ searchContext = await webSearch(text); }
+    catch(e){ console.warn('[KASHISH] web search step failed, continuing without it:', e); }
+  }
+
   try{
-    const result = await kashishReply(historyForModel);
+    const result = await kashishReply(historyForModel, searchContext);
     removeTyping();
     pushBotMessage(result.reply, result.quickReplies);
   }catch(e){
