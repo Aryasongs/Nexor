@@ -25,8 +25,23 @@
   --black:#141416;
   --bubble-bot:#F1F1F3;
   --body:'Manrope', system-ui, -apple-system, sans-serif;
+  --accent:#1975CE;
+  --accent-soft-1:#eef7ff; --accent-soft-2:#d9edff; --accent-soft-3:#c3e2ff;
 }
 html,body{background:var(--bg);color:var(--ink);font-family:var(--body);height:100%;-webkit-font-smoothing:antialiased;overflow:hidden;position:fixed;inset:0;width:100%;overscroll-behavior:none;touch-action:pan-y;-webkit-text-size-adjust:100%;}
+html[data-theme="dark"]{
+  --bg:#141416; --card:#1C1C1F; --border:#2A2A2E; --ink:#F5F5F6; --ink-soft:#9A9AA4; --black:#3a3a40; --bubble-bot:#2A2A2E;
+}
+html[data-theme="dark"] #app,html[data-theme="dark"] #screen-home{background:var(--bg);}
+html[data-theme="dark"] .circle-btn,html[data-theme="dark"] .voice-ctrl{background:#1C1C1F;color:var(--ink);}
+html[data-theme="dark"] .pill-select,html[data-theme="dark"] .nav-pill,html[data-theme="dark"] .attach-preview{background:linear-gradient(160deg,#1E1E21,#18181A);}
+html[data-theme="dark"] .gcard{background:linear-gradient(150deg,#232326 0%,#1c1c1f 45%,#151517 100%);border-color:rgba(255,255,255,.06);}
+html[data-theme="dark"] .recent-list,html[data-theme="dark"] .legal-list{background:linear-gradient(150deg,#1E1E21 0%,#1A1A1D 50%,#151517 100%);border-color:rgba(255,255,255,.06);}
+html[data-theme="dark"] .chat-topbar{background:rgba(20,20,22,.72);border-bottom:1px solid rgba(255,255,255,.06);}
+html[data-theme="dark"] .bubble.bot,html[data-theme="dark"] .typing-bubble{background:linear-gradient(160deg,#232326 0%,var(--bubble-bot) 55%,#1a1a1c 100%);}
+html[data-theme="dark"] .profile-field input,html[data-theme="dark"] #chat-input{background:linear-gradient(160deg,#1E1E21,#18181A);color:var(--ink);}
+html[data-theme="dark"] .profile-logout-btn{background:#1C1C1F;border-color:#4a2320;}
+html[data-theme="dark"] .day-pill{background:linear-gradient(180deg,#1E1E21,#18181A);}
 *{touch-action:manipulation;}
 button{border:none;background:none;cursor:pointer;color:inherit;font-family:inherit;}
 input{font-family:inherit;outline:none;}
@@ -62,7 +77,7 @@ img{display:block;max-width:100%;}
 .gcard:active{transform:scale(.97);}
 .gcard.tall{grid-row:span 2;min-height:190px;}
 .gcard .top-row{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;}
-.gcard .ic{position:relative;z-index:1;width:36px;height:36px;border-radius:50%;background:linear-gradient(155deg,#eef7ff 0%,#d9edff 55%,#c3e2ff 100%);display:flex;align-items:center;justify-content:center;font-size:16px;color:#1975CE;box-shadow:0 4px 10px -4px rgba(25,117,206,.35),0 1px 0 rgba(255,255,255,.9) inset;}
+.gcard .ic{position:relative;z-index:1;width:36px;height:36px;border-radius:50%;background:linear-gradient(155deg,var(--accent-soft-1) 0%,var(--accent-soft-2) 55%,var(--accent-soft-3) 100%);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--accent);box-shadow:0 4px 10px -4px rgba(25,117,206,.35),0 1px 0 rgba(255,255,255,.9) inset;}
 .gcard .go{position:relative;z-index:1;font-size:15px;color:var(--ink-soft);}
 .gcard .lbl{position:relative;z-index:1;font-weight:800;color:var(--ink);}
 .gcard.tall .lbl{font-size:20px;line-height:1.25;margin-top:14px;}
@@ -117,6 +132,25 @@ img{display:block;max-width:100%;}
 
 .chat-input-wrap{flex-shrink:0;padding:8px 14px calc(12px + env(safe-area-inset-bottom));background:rgba(245,245,246,.7);backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%);border-top:1px solid rgba(235,235,238,.9);}
 .attach-preview{display:flex;align-items:center;gap:10px;margin:0 2px 8px;background:linear-gradient(160deg,#ffffff,#fafafb);border:1px solid var(--border);border-radius:14px;padding:7px 10px;box-shadow:0 2px 8px -6px rgba(20,20,22,.15),0 1px 0 rgba(255,255,255,.8) inset;}
+.video-results{display:flex;flex-direction:column;gap:8px;margin-top:6px;max-width:82%;}
+.video-card{display:flex;gap:10px;align-items:center;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:8px;text-align:left;width:100%;box-shadow:0 4px 10px -8px rgba(20,20,22,.25);}
+.video-card:active{background:var(--bubble-bot);}
+.video-card .thumb{position:relative;width:88px;height:56px;border-radius:9px;overflow:hidden;flex-shrink:0;background:#000;}
+.video-card .thumb img{width:100%;height:100%;object-fit:cover;}
+.video-card .thumb i{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;text-shadow:0 1px 4px rgba(0,0,0,.5);}
+.video-card .meta{flex:1;min-width:0;}
+.video-card .vtitle{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.video-card .vchannel{font-size:11px;color:var(--ink-soft);margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pulse-profile-card{max-width:82%;margin-top:6px;background:linear-gradient(150deg,#ffffff 0%,#f4f5f7 50%,#eaecef 100%);border:1px solid rgba(255,255,255,.9);border-radius:16px;padding:14px 16px;box-shadow:0 10px 22px -14px rgba(20,20,22,.28);}
+.pulse-profile-card .pp-head{display:flex;align-items:center;gap:9px;}
+.pulse-profile-card .pp-name{font-weight:800;font-size:14.5px;color:var(--ink);display:flex;align-items:center;gap:4px;}
+.pulse-profile-card .pp-handle{font-size:12.5px;color:var(--ink-soft);}
+.pulse-profile-card .pp-bio{font-size:12.5px;color:var(--ink-soft);margin-top:8px;line-height:1.5;}
+.pulse-profile-card .pp-stats{display:flex;gap:18px;margin-top:12px;}
+.pulse-profile-card .pp-stat{display:flex;flex-direction:column;}
+.pulse-profile-card .pp-stat .n{font-weight:800;font-size:15px;color:var(--ink);}
+.pulse-profile-card .pp-stat .l{font-size:11px;color:var(--ink-soft);}
+.pulse-profile-card .pp-note{font-size:11px;color:var(--ink-soft);margin-top:10px;padding-top:10px;border-top:1px solid var(--border);line-height:1.5;}
 .attach-preview img{width:38px;height:38px;object-fit:cover;border-radius:8px;flex-shrink:0;}
 .attach-preview .lbl{flex:1;font-size:11.5px;color:var(--ink-soft);}
 .attach-preview .rm{color:var(--ink-soft);font-size:17px;flex-shrink:0;}
@@ -174,7 +208,7 @@ img{display:block;max-width:100%;}
 .legal-list{position:relative;overflow:hidden;width:100%;background:linear-gradient(150deg,#ffffff 0%,#f4f5f7 50%,#eaecef 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;box-shadow:0 16px 30px -18px rgba(20,20,22,.28),0 2px 0 rgba(255,255,255,1) inset;}
 .legal-item{display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;border-bottom:1px solid var(--border);text-align:left;}
 .legal-item:last-child{border-bottom:none;}
-.legal-item .ic{width:34px;height:34px;border-radius:50%;background:linear-gradient(155deg,#eef7ff 0%,#d9edff 55%,#c3e2ff 100%);display:flex;align-items:center;justify-content:center;font-size:15px;color:#1975CE;flex-shrink:0;}
+.legal-item .ic{width:34px;height:34px;border-radius:50%;background:linear-gradient(155deg,var(--accent-soft-1) 0%,var(--accent-soft-2) 55%,var(--accent-soft-3) 100%);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--accent);flex-shrink:0;}
 .legal-item .lbl{flex:1;font-weight:700;font-size:14px;color:var(--ink);}
 .legal-item .go{font-size:15px;color:var(--ink-soft);flex-shrink:0;}
 .legal-brand-note{width:100%;text-align:center;font-size:11.5px;color:var(--ink-soft);line-height:1.5;margin-top:14px;padding:0 6px;}
@@ -187,6 +221,42 @@ img{display:block;max-width:100%;}
 .legal-doc-body p strong{color:var(--ink);font-weight:800;}
 .legal-doc-body ul{margin:6px 0 4px 18px;}
 .legal-doc-body li{font-size:13.5px;line-height:1.65;color:#4c4c53;margin-bottom:4px;}
+
+/* ---------- SETTINGS ---------- */
+.settings-scroll{flex:1;overflow-y:auto;padding:16px 20px calc(30px + env(safe-area-inset-bottom));}
+.settings-section{margin-bottom:22px;}
+.settings-section-title{font-size:12px;font-weight:700;color:var(--ink-soft);margin-bottom:8px;padding-left:4px;text-transform:uppercase;letter-spacing:.02em;}
+.settings-list{position:relative;overflow:hidden;width:100%;background:linear-gradient(150deg,#ffffff 0%,#f4f5f7 50%,#eaecef 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;box-shadow:0 16px 30px -18px rgba(20,20,22,.28),0 2px 0 rgba(255,255,255,1) inset;}
+html[data-theme="dark"] .settings-list{background:linear-gradient(150deg,#1E1E21 0%,#1A1A1D 50%,#151517 100%);border-color:rgba(255,255,255,.06);}
+.settings-row{display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;border-bottom:1px solid var(--border);text-align:left;min-height:24px;}
+.settings-row:last-child{border-bottom:none;}
+.settings-row .ic{width:34px;height:34px;border-radius:50%;background:linear-gradient(155deg,var(--accent-soft-1) 0%,var(--accent-soft-2) 55%,var(--accent-soft-3) 100%);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--accent);flex-shrink:0;}
+.settings-row .body{flex:1;min-width:0;}
+.settings-row .lbl{font-weight:700;font-size:14px;color:var(--ink);}
+.settings-row .sub{font-size:12px;color:var(--ink-soft);font-weight:600;margin-top:2px;line-height:1.4;}
+.settings-row .val{font-size:13px;color:var(--ink-soft);font-weight:700;flex-shrink:0;}
+.settings-row .go{font-size:15px;color:var(--ink-soft);flex-shrink:0;}
+.settings-row.disabled{opacity:.5;}
+
+.tswitch{position:relative;width:46px;height:27px;border-radius:999px;background:#D8D8DD;flex-shrink:0;transition:background .2s;}
+.tswitch::after{content:'';position:absolute;top:2.5px;left:2.5px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(20,20,22,.25);transition:transform .2s;}
+.tswitch.on{background:#3DC65F;}
+.tswitch.on::after{transform:translateX(19px);}
+
+.accent-row{display:flex;align-items:center;gap:12px;padding:14px 16px;}
+.accent-dot{width:26px;height:26px;border-radius:50%;flex-shrink:0;border:2px solid transparent;}
+.accent-dot.on{border-color:var(--ink);}
+.accent-picker{display:flex;gap:10px;}
+
+.theme-seg{display:flex;background:var(--bubble-bot);border-radius:999px;padding:3px;gap:2px;}
+.theme-seg button{flex:1;padding:7px 0;border-radius:999px;font-size:12.5px;font-weight:700;color:var(--ink-soft);text-align:center;}
+.theme-seg button.on{background:var(--card);color:var(--ink);box-shadow:0 2px 5px rgba(20,20,22,.12);}
+
+.lang-opt{display:flex;align-items:center;justify-content:space-between;width:100%;padding:14px 16px;border-bottom:1px solid var(--border);text-align:left;}
+.lang-opt:last-child{border-bottom:none;}
+.lang-opt .lbl{font-weight:700;font-size:14px;color:var(--ink);}
+.lang-opt .chk{font-size:17px;color:var(--accent);visibility:hidden;}
+.lang-opt.on .chk{visibility:visible;}
 
 :root{
   --auth-bg:#0B0C10; --auth-surface:#17181D; --auth-surface2:#1E2027; --auth-border:#2A2C33;
@@ -567,7 +637,7 @@ img{display:block;max-width:100%;}
     <div class="chat-topbar">
       <button class="circle-btn" onclick="goHome()"><i class="ph-bold ph-arrow-left"></i></button>
       <div class="chat-title">Profile</div>
-      <span style="width:38px"></span>
+      <button class="circle-btn" onclick="openSettingsScreen()"><i class="ph-bold ph-gear-six"></i></button>
     </div>
     <div class="profile-scroll">
       <div class="profile-avatar-wrap" onclick="document.getElementById('profile-photo-input').click()">
@@ -604,7 +674,7 @@ img{display:block;max-width:100%;}
           </button>
           <button class="legal-item" onclick="openLegalDoc('licenses')">
             <span class="ic"><i class="ph-bold ph-scroll"></i></span>
-            <span class="lbl">Third-Party Licenses</span>
+            <span class="lbl">Software & Platform Credits</span>
             <span class="go"><i class="ph-bold ph-caret-right"></i></span>
           </button>
         </div>
@@ -626,6 +696,221 @@ img{display:block;max-width:100%;}
     <div class="legal-doc-scroll">
       <div class="legal-doc-updated" id="legal-doc-updated">Last updated —</div>
       <div class="legal-doc-body" id="legal-doc-body"></div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ============ SETTINGS (main) ============ -->
+  <div class="screen hidden" id="screen-settings">
+    <div class="chat-topbar">
+      <button class="circle-btn" onclick="showScreen('screen-profile')"><i class="ph-bold ph-arrow-left"></i></button>
+      <div class="chat-title">Settings</div>
+      <span style="width:38px"></span>
+    </div>
+    <div class="settings-scroll">
+
+      <div class="settings-section">
+        <div class="settings-section-title">Account</div>
+        <div class="settings-list">
+          <div class="settings-row">
+            <span class="ic"><i class="ph-bold ph-envelope"></i></span>
+            <div class="body"><div class="lbl">Email</div></div>
+            <span class="val" id="settings-email-val">—</span>
+          </div>
+          <div class="settings-row">
+            <span class="ic"><i class="ph-bold ph-plus-circle"></i></span>
+            <div class="body"><div class="lbl">Subscription</div></div>
+            <span class="val">Free</span>
+          </div>
+          <button class="settings-row disabled" onclick="return false;">
+            <span class="ic"><i class="ph-bold ph-sparkle"></i></span>
+            <div class="body"><div class="lbl">Upgrade plan</div><div class="sub">Coming soon</div></div>
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Theme</div>
+        <div class="settings-list">
+          <div class="settings-row">
+            <span class="ic"><i class="ph-bold ph-moon"></i></span>
+            <div class="body"><div class="lbl">Appearance</div></div>
+            <div class="theme-seg" id="theme-seg">
+              <button onclick="setTheme('light')" id="theme-opt-light">Light</button>
+              <button onclick="setTheme('dark')" id="theme-opt-dark">Dark</button>
+            </div>
+          </div>
+          <div style="padding:14px 16px;">
+            <div class="lbl" style="font-weight:700;font-size:14px;color:var(--ink);margin-bottom:10px;display:flex;align-items:center;gap:12px;"><span class="ic" style="display:inline-flex;"><i class="ph-bold ph-palette"></i></span> Accent color</div>
+            <div class="accent-picker" id="accent-picker" style="padding-left:4px;">
+              <button class="accent-dot" data-accent="blue" style="background:#1975CE" onclick="setAccentColor('blue')"></button>
+              <button class="accent-dot" data-accent="green" style="background:#1E9E5A" onclick="setAccentColor('green')"></button>
+              <button class="accent-dot" data-accent="purple" style="background:#7C4DFF" onclick="setAccentColor('purple')"></button>
+              <button class="accent-dot" data-accent="rose" style="background:#E0487E" onclick="setAccentColor('rose')"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">App settings</div>
+        <div class="settings-list">
+          <button class="settings-row" onclick="showScreen('screen-settings-general')">
+            <span class="ic"><i class="ph-bold ph-gear-six"></i></span>
+            <div class="body"><div class="lbl">General</div></div>
+            <span class="go"><i class="ph-bold ph-caret-right"></i></span>
+          </button>
+          <button class="settings-row" onclick="showScreen('screen-settings-notifications')">
+            <span class="ic"><i class="ph-bold ph-bell"></i></span>
+            <div class="body"><div class="lbl">Notifications</div></div>
+            <span class="go"><i class="ph-bold ph-caret-right"></i></span>
+          </button>
+          <button class="settings-row" onclick="showScreen('screen-settings-voice')">
+            <span class="ic"><i class="ph-bold ph-waveform"></i></span>
+            <div class="body"><div class="lbl">Voice</div></div>
+            <span class="go"><i class="ph-bold ph-caret-right"></i></span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ============ SETTINGS: GENERAL ============ -->
+  <div class="screen hidden" id="screen-settings-general">
+    <div class="chat-topbar">
+      <button class="circle-btn" onclick="showScreen('screen-settings')"><i class="ph-bold ph-arrow-left"></i></button>
+      <div class="chat-title">General</div>
+      <span style="width:38px"></span>
+    </div>
+    <div class="settings-scroll">
+      <div class="settings-section">
+        <div class="settings-list">
+          <button class="settings-row" onclick="showScreen('screen-settings-language')">
+            <span class="ic"><i class="ph-bold ph-globe"></i></span>
+            <div class="body"><div class="lbl">App language</div></div>
+            <span class="val" id="settings-lang-val">English</span>
+            <span class="go"><i class="ph-bold ph-caret-right"></i></span>
+          </button>
+          <div class="settings-row">
+            <span class="ic"><i class="ph-bold ph-text-aa"></i></span>
+            <div class="body"><div class="lbl">Auto-correct spelling</div></div>
+            <button class="tswitch" id="sw-autocorrect" onclick="toggleSetting('autoCorrect','sw-autocorrect')"></button>
+          </div>
+          <div class="settings-row">
+            <span class="ic"><i class="ph-bold ph-device-mobile"></i></span>
+            <div class="body"><div class="lbl">Haptic feedback</div></div>
+            <button class="tswitch" id="sw-haptics" onclick="toggleSetting('haptics','sw-haptics')"></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Intelligence</div>
+        <div class="settings-list">
+          <div class="settings-row">
+            <span class="ic"><i class="ph-bold ph-shuffle"></i></span>
+            <div class="body"><div class="lbl">Auto switch</div><div class="sub">Use higher intelligence for complex questions</div></div>
+            <button class="tswitch" id="sw-autoswitch" onclick="toggleSetting('autoSwitch','sw-autoswitch')"></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Suggestions</div>
+        <div class="settings-list">
+          <div class="settings-row">
+            <span class="ic"><i class="ph-bold ph-magic-wand"></i></span>
+            <div class="body"><div class="lbl">Autocomplete</div></div>
+            <button class="tswitch" id="sw-autocomplete" onclick="toggleSetting('autocomplete','sw-autocomplete')"></button>
+          </div>
+          <div class="settings-row">
+            <span class="ic"><i class="ph-bold ph-trend-up"></i></span>
+            <div class="body"><div class="lbl">Trending searches</div></div>
+            <button class="tswitch" id="sw-trending" onclick="toggleSetting('trendingSearches','sw-trending')"></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Automatically use</div>
+        <div class="settings-list">
+          <div class="settings-row">
+            <span class="ic"><i class="ph-bold ph-globe"></i></span>
+            <div class="body"><div class="lbl">Web search</div><div class="sub">Search the web for real-time info.</div></div>
+            <button class="tswitch" id="sw-websearch" onclick="toggleSetting('autoWebSearch','sw-websearch')"></button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ============ SETTINGS: LANGUAGE PICKER ============ -->
+  <div class="screen hidden" id="screen-settings-language">
+    <div class="chat-topbar">
+      <button class="circle-btn" onclick="showScreen('screen-settings-general')"><i class="ph-bold ph-arrow-left"></i></button>
+      <div class="chat-title">App language</div>
+      <span style="width:38px"></span>
+    </div>
+    <div class="settings-scroll">
+      <div class="settings-list">
+        <button class="lang-opt" id="lang-opt-en" onclick="setLanguage('en')">
+          <span class="lbl">English</span><span class="chk"><i class="ph-bold ph-check"></i></span>
+        </button>
+        <button class="lang-opt" id="lang-opt-hi" onclick="setLanguage('hi')">
+          <span class="lbl">Hindi / Hinglish</span><span class="chk"><i class="ph-bold ph-check"></i></span>
+        </button>
+      </div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ============ SETTINGS: NOTIFICATIONS ============ -->
+  <div class="screen hidden" id="screen-settings-notifications">
+    <div class="chat-topbar">
+      <button class="circle-btn" onclick="showScreen('screen-settings')"><i class="ph-bold ph-arrow-left"></i></button>
+      <div class="chat-title">Notifications</div>
+      <span style="width:38px"></span>
+    </div>
+    <div class="settings-scroll">
+      <div class="settings-list">
+        <div class="settings-row">
+          <span class="ic"><i class="ph-bold ph-chat-circle-dots"></i></span>
+          <div class="body"><div class="lbl">Chat notifications</div><div class="sub">Get notified when Kashish replies while you're away</div></div>
+          <button class="tswitch" id="sw-notifchat" onclick="toggleSetting('notifChat','sw-notifchat')"></button>
+        </div>
+        <div class="settings-row">
+          <span class="ic"><i class="ph-bold ph-speaker-high"></i></span>
+          <div class="body"><div class="lbl">Sound</div><div class="sub">Play a sound for new messages</div></div>
+          <button class="tswitch" id="sw-notifsound" onclick="toggleSetting('notifSound','sw-notifsound')"></button>
+        </div>
+      </div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ============ SETTINGS: VOICE ============ -->
+  <div class="screen hidden" id="screen-settings-voice">
+    <div class="chat-topbar">
+      <button class="circle-btn" onclick="showScreen('screen-settings')"><i class="ph-bold ph-arrow-left"></i></button>
+      <div class="chat-title">Voice</div>
+      <span style="width:38px"></span>
+    </div>
+    <div class="settings-scroll">
+      <div class="settings-list">
+        <div class="settings-row">
+          <span class="ic"><i class="ph-bold ph-paper-plane-tilt"></i></span>
+          <div class="body"><div class="lbl">Auto-send after pause</div><div class="sub">Send automatically once you stop talking</div></div>
+          <button class="tswitch" id="sw-voiceautosend" onclick="toggleSetting('voiceAutoSend','sw-voiceautosend')"></button>
+        </div>
+        <div class="settings-row">
+          <span class="ic"><i class="ph-bold ph-vibrate"></i></span>
+          <div class="body"><div class="lbl">Haptic on listen</div><div class="sub">Vibrate when the mic starts listening</div></div>
+          <button class="tswitch" id="sw-voicehaptic" onclick="toggleSetting('voiceHaptic','sw-voicehaptic')"></button>
+        </div>
+      </div>
     </div>
     <div class="home-indicator"></div>
   </div>
@@ -682,6 +967,130 @@ const db = firebase.database();
 
 let userCtx = null; // {name, uid} of the signed-in account, once known
 function firstName(){ return userCtx && userCtx.name ? userCtx.name.split(' ')[0] : null; }
+
+/* ---------------- settings ---------------- */
+const SETTINGS_DEFAULTS = {
+  language:'en', theme:'light', accentColor:'blue',
+  autoCorrect:true, haptics:true, autoSwitch:true,
+  autocomplete:true, trendingSearches:true, autoWebSearch:true,
+  notifChat:true, notifSound:true,
+  voiceAutoSend:true, voiceHaptic:true
+};
+const ACCENT_PALETTES = {
+  blue:{accent:'#1975CE', s1:'#eef7ff', s2:'#d9edff', s3:'#c3e2ff'},
+  green:{accent:'#1E9E5A', s1:'#eafff3', s2:'#cdf5df', s3:'#a9ecc7'},
+  purple:{accent:'#7C4DFF', s1:'#f3efff', s2:'#e3d9ff', s3:'#cbb8ff'},
+  rose:{accent:'#E0487E', s1:'#fff0f5', s2:'#ffd9e6', s3:'#ffb8d1'}
+};
+let appSettings = {...SETTINGS_DEFAULTS};
+
+function applySettings(){
+  document.documentElement.setAttribute('data-theme', appSettings.theme==='dark' ? 'dark' : 'light');
+  const pal = ACCENT_PALETTES[appSettings.accentColor] || ACCENT_PALETTES.blue;
+  const r = document.documentElement.style;
+  r.setProperty('--accent', pal.accent);
+  r.setProperty('--accent-soft-1', pal.s1);
+  r.setProperty('--accent-soft-2', pal.s2);
+  r.setProperty('--accent-soft-3', pal.s3);
+  const ci = document.getElementById('chat-input');
+  if(ci){
+    ci.spellcheck = !!appSettings.autoCorrect;
+    ci.setAttribute('autocomplete', appSettings.autocomplete ? 'on' : 'off');
+  }
+}
+function renderSettingsUI(){
+  document.getElementById('settings-email-val') && (document.getElementById('settings-email-val').textContent = (userCtx && (firebase.auth().currentUser && firebase.auth().currentUser.email)) || '—');
+  document.getElementById('settings-lang-val') && (document.getElementById('settings-lang-val').textContent = appSettings.language==='hi' ? 'Hindi / Hinglish' : 'English');
+  document.getElementById('theme-opt-light') && document.getElementById('theme-opt-light').classList.toggle('on', appSettings.theme!=='dark');
+  document.getElementById('theme-opt-dark') && document.getElementById('theme-opt-dark').classList.toggle('on', appSettings.theme==='dark');
+  document.querySelectorAll('.accent-dot').forEach(d=> d.classList.toggle('on', d.dataset.accent===appSettings.accentColor));
+  document.getElementById('lang-opt-en') && document.getElementById('lang-opt-en').classList.toggle('on', appSettings.language!=='hi');
+  document.getElementById('lang-opt-hi') && document.getElementById('lang-opt-hi').classList.toggle('on', appSettings.language==='hi');
+  const map = {
+    'sw-autocorrect':'autoCorrect','sw-haptics':'haptics','sw-autoswitch':'autoSwitch',
+    'sw-autocomplete':'autocomplete','sw-trending':'trendingSearches','sw-websearch':'autoWebSearch',
+    'sw-notifchat':'notifChat','sw-notifsound':'notifSound',
+    'sw-voiceautosend':'voiceAutoSend','sw-voicehaptic':'voiceHaptic'
+  };
+  Object.keys(map).forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.classList.toggle('on', !!appSettings[map[id]]);
+  });
+}
+function saveSettings(){
+  if(userCtx && userCtx.uid){
+    db.ref('users/'+userCtx.uid+'/settings').set(appSettings).catch(()=>{});
+  }
+}
+async function loadSettings(){
+  appSettings = {...SETTINGS_DEFAULTS};
+  if(userCtx && userCtx.uid){
+    try{
+      const snap = await db.ref('users/'+userCtx.uid+'/settings').once('value');
+      if(snap.exists()) appSettings = {...SETTINGS_DEFAULTS, ...snap.val()};
+    }catch(e){}
+  }
+  applySettings();
+}
+function toggleSetting(key, switchId){
+  appSettings[key] = !appSettings[key];
+  const el = document.getElementById(switchId);
+  if(el) el.classList.toggle('on', appSettings[key]);
+  triggerHaptic();
+  applySettings();
+  saveSettings();
+  if(key==='notifChat' && appSettings.notifChat) requestNotifPermission();
+}
+function setTheme(t){
+  appSettings.theme = t;
+  applySettings();
+  renderSettingsUI();
+  saveSettings();
+}
+function setAccentColor(name){
+  if(!ACCENT_PALETTES[name]) return;
+  appSettings.accentColor = name;
+  applySettings();
+  renderSettingsUI();
+  saveSettings();
+}
+function setLanguage(lang){
+  appSettings.language = lang;
+  renderSettingsUI();
+  saveSettings();
+  showScreen('screen-settings-general');
+}
+function openSettingsScreen(){
+  renderSettingsUI();
+  showScreen('screen-settings');
+}
+function triggerHaptic(){
+  if(appSettings.haptics && navigator.vibrate){ try{ navigator.vibrate(10); }catch(e){} }
+}
+function requestNotifPermission(){
+  if('Notification' in window && Notification.permission==='default'){
+    Notification.requestPermission().catch(()=>{});
+  }
+}
+function playNotifSound(){
+  if(!appSettings.notifSound) return;
+  try{
+    const ctx = new (window.AudioContext||window.webkitAudioContext)();
+    const osc = ctx.createOscillator(); const gain = ctx.createGain();
+    osc.type='sine'; osc.frequency.value=880;
+    gain.gain.setValueAtTime(0.08, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime+0.35);
+    osc.connect(gain); gain.connect(ctx.destination);
+    osc.start(); osc.stop(ctx.currentTime+0.35);
+  }catch(e){}
+}
+function notifyNewBotMessage(text){
+  if(document.hidden && appSettings.notifChat && 'Notification' in window && Notification.permission==='granted'){
+    try{ new Notification('Kashish', { body: truncate(text,90) }); }catch(e){}
+  }
+  if(appSettings.notifSound) playNotifSound();
+}
+
 
 function toggleAuthPass(inputId, iconEl){
   const input=document.getElementById(inputId); if(!input) return;
@@ -1030,10 +1439,12 @@ const LEGAL_DOCS = {
     `
   },
   licenses:{
-    title:'Third-Party Licenses',
+    title:'Software & Platform Credits',
     updated:'Last updated — August 2026',
     html:`
-      <p>Kashish, by Nexor Sparks, is built with the help of the following third-party software and assets. We're grateful to these projects and their contributors.</p>
+      <p>Kashish is built with the help of the following software, assets, and platform services. We're grateful to these projects and their contributors.</p>
+      <h4>Nexor Sparks</h4>
+      <p>© Nexor Sparks. Kashish is a product by Nexor Sparks and shares its account system — signing in to Kashish uses the same Nexor Sparks account as the rest of the platform. Use of Kashish is also subject to the Nexor Sparks Terms of Service and Privacy Policy where applicable.</p>
       <h4>Firebase (App, Auth, Database SDKs)</h4>
       <p>© Google LLC. Licensed under the Apache License, Version 2.0. Used for account sign-in and data storage.</p>
       <h4>Phosphor Icons</h4>
@@ -1043,7 +1454,7 @@ const LEGAL_DOCS = {
       <h4>Yellowtail</h4>
       <p>© The Yellowtail Project Authors. Licensed under the SIL Open Font License, Version 1.1. Used as a decorative accent typeface, served via Google Fonts.</p>
       <h4>A note on licenses</h4>
-      <p>Each project above is distributed under its own license terms, independent of Kashish's own Terms of Service. Full license texts are available from the respective project sources.</p>
+      <p>Each project and service above is distributed under its own license or terms, independent of Kashish's own Terms of Service. Full license texts are available from the respective project sources.</p>
     `
   }
 };
@@ -1139,11 +1550,14 @@ auth.onAuthStateChanged(async (user)=>{
       }
     }catch(e){}
     userCtx={ uid:user.uid, name: name||user.email||null, handle, photoBase64 };
+    await loadSettings();
     authScreen.classList.add('hidden');
     app.classList.remove('auth-locked');
     renderHome();
   }else{
     userCtx=null;
+    appSettings = {...SETTINGS_DEFAULTS};
+    applySettings();
     authGoLanding();
     authScreen.classList.remove('hidden');
     app.classList.add('auth-locked');
@@ -1223,7 +1637,7 @@ function startAiCreate(){
 
 /* ---------------- navigation ---------------- */
 function showScreen(id){
-  ['screen-home','screen-chat','screen-voice','screen-profile','screen-legal-doc'].forEach(s=>document.getElementById(s).classList.toggle('hidden', s!==id));
+  ['screen-home','screen-chat','screen-voice','screen-profile','screen-legal-doc','screen-settings','screen-settings-general','screen-settings-language','screen-settings-notifications','screen-settings-voice'].forEach(s=>document.getElementById(s).classList.toggle('hidden', s!==id));
 }
 function goHome(){ renderHome(); showScreen('screen-home'); }
 function goChat(){
@@ -1253,6 +1667,12 @@ function chatMenu(){
 /* ---------------- CHAT rendering ---------------- */
 let pendingImage = null;
 
+function fmtCompact(n){
+  n = Number(n)||0;
+  if(n>=1000000) return (n/1000000).toFixed(n%1000000===0?0:1)+'M';
+  if(n>=1000) return (n/1000).toFixed(n%1000===0?0:1)+'K';
+  return String(n);
+}
 function fmtTime(ts){
   const d = new Date(ts);
   let h = d.getHours(); const m = d.getMinutes();
@@ -1294,6 +1714,48 @@ function renderChat(){
     row.appendChild(b);
     const t=document.createElement('div'); t.className='bubble-time'; t.textContent=fmtTime(m.ts); row.appendChild(t);
     scroll.appendChild(row);
+    if(m.videoResults && m.videoResults.length){
+      const vwrap=document.createElement('div'); vwrap.className='video-results';
+      m.videoResults.forEach(v=>{
+        const card=document.createElement('button'); card.className='video-card';
+        card.onclick=()=>window.open(v.link,'_blank');
+        const thumb=document.createElement('div'); thumb.className='thumb';
+        if(v.thumbnail){ const im=document.createElement('img'); im.src=v.thumbnail; im.alt=''; thumb.appendChild(im); }
+        const play=document.createElement('i'); play.className='ph-fill ph-play-circle'; thumb.appendChild(play);
+        const meta=document.createElement('div'); meta.className='meta';
+        const vt=document.createElement('div'); vt.className='vtitle'; vt.textContent=v.title;
+        const vc=document.createElement('div'); vc.className='vchannel'; vc.textContent=v.channel;
+        meta.appendChild(vt); meta.appendChild(vc);
+        card.appendChild(thumb); card.appendChild(meta);
+        vwrap.appendChild(card);
+      });
+      scroll.appendChild(vwrap);
+    }
+    if(m.profileCard){
+      const p = m.profileCard;
+      const pc = document.createElement('div'); pc.className='pulse-profile-card';
+      const head = document.createElement('div'); head.className='pp-head';
+      const nameWrap = document.createElement('div');
+      const nameEl = document.createElement('div'); nameEl.className='pp-name';
+      nameEl.textContent = p.name + (p.verified ? ' ✓' : '');
+      const handleEl = document.createElement('div'); handleEl.className='pp-handle'; handleEl.textContent = '@'+p.handle;
+      nameWrap.appendChild(nameEl); nameWrap.appendChild(handleEl);
+      head.appendChild(nameWrap);
+      pc.appendChild(head);
+      if(p.bio){ const bioEl=document.createElement('div'); bioEl.className='pp-bio'; bioEl.textContent=p.bio; pc.appendChild(bioEl); }
+      const stats = document.createElement('div'); stats.className='pp-stats';
+      [['posts','Posts'],['likes','Likes'],['followers','Followers'],['following','Following']].forEach(([k,label])=>{
+        const s=document.createElement('div'); s.className='pp-stat';
+        const n=document.createElement('div'); n.className='n'; n.textContent=fmtCompact(p[k]||0);
+        const l=document.createElement('div'); l.className='l'; l.textContent=label;
+        s.appendChild(n); s.appendChild(l); stats.appendChild(s);
+      });
+      pc.appendChild(stats);
+      const note=document.createElement('div'); note.className='pp-note';
+      note.textContent='Public profile info only — login/activity time and other private data aren\'t shared.';
+      pc.appendChild(note);
+      scroll.appendChild(pc);
+    }
     if(m.quickReplies && m.quickReplies.length){
       const qr=document.createElement('div'); qr.className='quick-replies';
       m.quickReplies.forEach(q=>{
@@ -1386,9 +1848,13 @@ const SEARCH_TRIGGER_WORDS = [
   'kitna hai','kaun hai','kya hua','naya','recently'
 ];
 function needsWebSearch(text){
+  if(!appSettings.autoWebSearch) return false;
   const t=(text||'').toLowerCase();
   if(!t.trim()) return false;
-  return SEARCH_TRIGGER_WORDS.some(w=>t.includes(w));
+  if(SEARCH_TRIGGER_WORDS.some(w=>t.includes(w))) return true;
+  // "Auto switch" — lean on search a bit more for longer, complex-looking questions.
+  if(appSettings.autoSwitch && t.trim().split(/\s+/).length>14 && /\?/.test(t)) return true;
+  return false;
 }
 function formatSerperResults(data){
   const parts=[];
@@ -1438,15 +1904,117 @@ async function webSearch(query){
   }
 }
 
+/* ---------------- YouTube video search ---------------- */
+// Similar heuristic/trigger approach as web search above — only fire a
+// video search when the message actually looks like it's asking to find
+// or watch a video, so we don't burn API quota on every message.
+const VIDEO_TRIGGER_PATTERNS = [
+  /\byoutube\b/i,
+  /\bvideo\s+(dhund|dhundo|dhoond|dhoondo|dikha|dikhao|bhej|bhejo|khojo|search|find|link|de\b|do\b)/i,
+  /\b(find|search|show|play|send)\s+(me\s+)?(a\s+|the\s+)?video\b/i,
+  /\bvideo\s+(chahiye|chaiye)\b/i,
+  /\bgaana\s+ka\s+video\b/i,
+  /\bmusic\s+video\b/i
+];
+function needsVideoSearch(text){
+  if(!appSettings.autoWebSearch) return false;
+  const t=(text||'').trim();
+  if(!t) return false;
+  return VIDEO_TRIGGER_PATTERNS.some(p=>p.test(t));
+}
+// Strips the "find me a video of / youtube pe / video dhundo" scaffolding
+// off the message so the actual search query is cleaner.
+function cleanVideoQuery(text){
+  return text
+    .replace(/\byoutube\b/gi,'')
+    .replace(/\bvideo\s+(dhund|dhundo|dhoond|dhoondo|dikha|dikhao|bhej|bhejo|khojo|search|find|link|de|do|chahiye|chaiye)\b/gi,'')
+    .replace(/\b(find|search|show|play|send)\s+(me\s+)?(a\s+|the\s+)?video\s*(of|on|for|about)?\b/gi,'')
+    .trim() || text;
+}
+async function youtubeSearch(query){
+  const q = cleanVideoQuery(query);
+  try{
+    const res = await fetch('https://google.serper.dev/videos', {
+      method:'POST',
+      headers:{'X-API-KEY': SERPER_API_KEY, 'Content-Type':'application/json'},
+      body: JSON.stringify({ q: q + ' youtube' })
+    });
+    if(!res.ok) throw new Error('Serper videos HTTP '+res.status);
+    const data = await res.json();
+    const items = Array.isArray(data.videos) ? data.videos : [];
+    return items
+      .filter(v=> v.link && /youtube\.com|youtu\.be/.test(v.link))
+      .slice(0,3)
+      .map(v=>({
+        title: v.title || 'Untitled video',
+        link: v.link,
+        thumbnail: v.imageUrl || null,
+        channel: v.channel || v.source || 'YouTube'
+      }));
+  }catch(e){
+    console.warn('[KASHISH] YouTube video search failed:', e);
+    return [];
+  }
+}
+function formatVideoResultsForModel(results){
+  if(!results || !results.length) return null;
+  return 'Found these YouTube videos for the user (already shown to them as tappable cards below your reply — do NOT repeat the links or titles verbatim, just briefly acknowledge you found some and let them tap through):\n'
+    + results.map((r,i)=>`${i+1}. ${r.title} — ${r.channel}`).join('\n');
+}
+
+/* ---------------- public profile lookup ("is user ka pulse/likes batao") ---------------- */
+// Reads ONLY public-facing fields (name, handle, bio, verified, and public
+// counts) from the same Firebase project Nexor Sparks uses. Deliberately
+// never reads or surfaces private data: email, DOB, gender, location,
+// presence/"active now" status, login time, or anything from userPrivate/.
+const PROFILE_LOOKUP_KEYWORDS = /profile|pulse|like|post|follow|stats?|account|kitne|batao|bata\b/i;
+const SENSITIVE_ASK_PATTERN = /\b(login|log[- ]?in|online|active|last seen|session|kab se|kitni der se|screen ?time)\b/i;
+function extractProfileLookupHandle(text){
+  if(!text) return null;
+  const m = text.match(/@([a-zA-Z0-9_]{2,30})/);
+  if(!m) return null;
+  if(!PROFILE_LOOKUP_KEYWORDS.test(text)) return null;
+  return m[1].toLowerCase();
+}
+async function lookupPublicProfile(handle){
+  try{
+    const hSnap = await db.ref('handleIndex/'+handle).once('value');
+    if(!hSnap.exists()) return {notFound:true};
+    const val = hSnap.val();
+    const uid = typeof val==='string' ? val : (val && val.uid);
+    if(!uid) return {notFound:true};
+    const uSnap = await db.ref('users/'+uid).once('value');
+    if(!uSnap.exists()) return {notFound:true};
+    const u = uSnap.val() || {};
+    return {
+      notFound:false,
+      name: u.name || handle,
+      handle: u.handle || handle,
+      bio: u.bio || '',
+      verified: !!u.verified,
+      followers: u.followersCount || 0,
+      following: u.followingCount || 0,
+      posts: u.pulsesCount || 0,
+      likes: u.totalLikes || 0
+    };
+  }catch(e){
+    console.warn('[KASHISH] public profile lookup failed:', e);
+    return {error:true};
+  }
+}
+
 function buildSystemPrompt(){
   const who = firstName()
     ? `You're talking with ${firstName()}. You may use their name naturally sometimes, but don't overdo it.`
     : `You don't know this person's name yet — that's fine, keep things warm and natural.`;
+  const langPref = appSettings.language==='hi'
+    ? `The user has set their preferred app language to Hindi/Hinglish — lean toward replying in Hindi/Hinglish by default, but still mirror English if they clearly write in English.`
+    : `Your default and primary language is English — always start and reply in English unless the user writes to you in Hindi/Hinglish, in which case match them and reply in Hindi/Hinglish for that exchange.`;
   return `You are KASHISH — a general-purpose AI companion. You are NOT built for, limited to, or branded around any single company, app, or product's help desk. People come to you for anything: casual conversation, venting, jokes, advice, explanations, help planning things, writing help, learning something new, or just killing time. Treat "just chatting" as equally valid as "getting help" — never redirect a casual conversation back into "how can I assist you" support-mode.
 
 Personality: warm, witty, genuinely curious, never robotic or corporate. Talk like a smart friend, not a customer-service bot. Mirror the user's energy: if they're joking, joke back; if they're playful/flirty, stay light and charming in the same register they set, never crude or sexually explicit, and never initiate flirting yourself; if they're upset or venting, drop the jokes and just listen and help. If anything suggests you're talking with a minor, stay friendly and age-appropriate, no flirting.
 
-Your default and primary language is English — always start and reply in English unless the user writes to you in Hindi/Hinglish, in which case match them and reply in Hindi/Hinglish for that exchange. Don't switch to Hindi/Hinglish just because a message contains a stray Hindi word — only switch when the user is clearly writing in Hindi/Hinglish overall. Keep replies natural and conversational length: short (1-4 sentences) for chit-chat, longer and structured (numbered/bulleted, still in plain text) when the user actually needs a detailed breakdown or list.
+${langPref} Don't switch to Hindi/Hinglish just because a message contains a stray Hindi word — only switch when the user is clearly writing in Hindi/Hinglish overall. Keep replies natural and conversational length: short (1-4 sentences) for chit-chat, longer and structured (numbered/bulleted, still in plain text) when the user actually needs a detailed breakdown or list.
 ${who}
 
 Origin story (only bring this up if directly asked "who made you", "who created you", "who is your founder/developer", or "why is your name Kashish" / "what does your name mean" — don't volunteer it unprompted): You were created by Gursharan Singh, who is also known by the name Gursharn Arya, the founder of Nexor. Your name "Kashish" was taken from — and inspired by — Kashish Tyagi. State this naturally and factually, in the same conversational tone/language as the rest of the chat (Hinglish/Hindi if that's what the user is using, English otherwise), without turning it into a long biography — a couple of warm, natural sentences is enough.
@@ -1543,14 +2111,16 @@ function sendLocal(){
   }, 400);
 }
 
-function pushBotMessage(text, quickReplies){
+function pushBotMessage(text, quickReplies, videoResults, profileCard){
   const sess = getSession(currentSessionId);
   if(!sess) return;
-  sess.messages.push({role:'model', text, quickReplies: quickReplies||null, ts: Date.now()});
+  const qr = appSettings.trendingSearches ? (quickReplies||null) : null;
+  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, ts: Date.now()});
   sess.preview = truncate(text, 60);
   sess.updatedAt = Date.now();
   upsertSession(sess);
   renderChat();
+  notifyNewBotMessage(text);
 }
 
 /* ---------------- AI image creation ("AI create") ---------------- */
@@ -1771,13 +2341,38 @@ async function send(){
     return;
   }
 
+  // "Is user ka pulse/likes/profile batao" — public-profile lookup.
+  // Handled directly (no LLM call) so we control exactly which fields
+  // can ever be shown, and never accidentally leak private data.
+  const lookupHandle = !img ? extractProfileLookupHandle(text) : null;
+  if(lookupHandle){
+    addTyping();
+    const profile = await lookupPublicProfile(lookupHandle);
+    removeTyping();
+    const askedSensitive = SENSITIVE_ASK_PATTERN.test(text);
+    if(profile.notFound){
+      pushBotMessage(`Mujhe @${lookupHandle} naam ka koi user Nexor Sparks par nahi mila — spelling check kar lo?`, null);
+    } else if(profile.error){
+      pushBotMessage(`@${lookupHandle} ka profile abhi load nahi ho paya — thodi der baad try karo.`, null);
+    } else {
+      let reply = `Yeh raha @${profile.handle} ka public profile.`;
+      if(askedSensitive) reply += ` Login/activity time jaisi private info main share nahi karta — sirf public stats dikha sakta hoon.`;
+      pushBotMessage(reply, null, null, profile);
+    }
+    return;
+  }
+
   addTyping();
 
   const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text: m.text + (m.imageDataUrl && m===sess.messages[sess.messages.length-1] ? ` [Attached photo: ${img?img.name:''}]` : '')} : {role:'model', text:m.text});
 
   // If the message looks like it needs current/real-world info, search first.
   let searchContext = null;
-  if(!img && needsWebSearch(text)){
+  let videoResults = null;
+  if(!img && needsVideoSearch(text)){
+    videoResults = await youtubeSearch(text);
+    searchContext = formatVideoResultsForModel(videoResults);
+  } else if(!img && needsWebSearch(text)){
     try{ searchContext = await webSearch(text); }
     catch(e){ console.warn('[KASHISH] web search step failed, continuing without it:', e); }
   }
@@ -1785,7 +2380,7 @@ async function send(){
   try{
     const result = await kashishReply(historyForModel, searchContext);
     removeTyping();
-    pushBotMessage(result.reply, result.quickReplies);
+    pushBotMessage(result.reply, result.quickReplies, videoResults);
   }catch(e){
     console.error('[KASHISH] all providers failed, falling back to local:', e);
     sendLocal();
@@ -1807,9 +2402,10 @@ function closeVoicePanel(){ stopVoiceListening(); goChat(); }
 function startVoiceListening(){
   const Ctor=getSpeechCtor(); if(!Ctor) return;
   voiceRecognition = new Ctor();
-  voiceRecognition.lang = navigator.language||'en-US';
+  voiceRecognition.lang = appSettings.language==='hi' ? 'hi-IN' : (navigator.language||'en-US');
   voiceRecognition.continuous = true;
   voiceRecognition.interimResults = true;
+  if(appSettings.voiceHaptic && navigator.vibrate){ try{ navigator.vibrate(10); }catch(e){} }
   let finalText='';
   voiceRecognition.onstart=()=>{
     voiceListening=true;
@@ -1832,8 +2428,13 @@ function startVoiceListening(){
     if(finalText.trim()){
       if(!currentSessionId) startSessionSilently();
       document.getElementById('chat-input') && (document.getElementById('chat-input').value = finalText.trim());
-      closeVoicePanel();
-      setTimeout(()=>{ updateSendBtn(); send(); }, 60);
+      if(appSettings.voiceAutoSend){
+        closeVoicePanel();
+        setTimeout(()=>{ updateSendBtn(); send(); }, 60);
+      } else {
+        closeVoicePanel();
+        setTimeout(()=>{ updateSendBtn(); document.getElementById('chat-input').focus(); }, 60);
+      }
     }
   };
   try{ voiceRecognition.start(); }catch(e){}
