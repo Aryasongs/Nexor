@@ -330,6 +330,25 @@ img{display:block;max-width:100%;}
   -webkit-backdrop-filter:blur(6px);
   border:1px solid rgba(255,255,255,.25);
 }
+
+/* ---------- liquid-glass tap feedback (squish + ripple) ---------- */
+@keyframes liquidTap{
+  0%{transform:scale(1);}
+  40%{transform:scale(.93);}
+  72%{transform:scale(1.035);}
+  100%{transform:scale(1);}
+}
+.liquid-tap{animation:liquidTap .42s cubic-bezier(.34,1.56,.64,1);}
+@keyframes liquidRipple{
+  0%{transform:scale(0);opacity:.5;}
+  100%{transform:scale(1);opacity:0;}
+}
+.liquid-ripple{
+  position:absolute;border-radius:50%;pointer-events:none;z-index:5;
+  background:radial-gradient(circle,rgba(255,255,255,.9) 0%,rgba(255,255,255,.3) 45%,rgba(255,255,255,0) 75%);
+  animation:liquidRipple .5s ease-out forwards;
+  mix-blend-mode:overlay;
+}
 </style>
 </head>
 <body>
@@ -1565,6 +1584,35 @@ function toggleVoiceListening(){
 // still needs to run once up front so the right screen is active underneath
 // the auth overlay the moment it's dismissed.
 showScreen('screen-home');
+</script>
+
+<!-- liquid-glass tap feedback: small squish + ripple on any tappable surface -->
+<script>
+(function(){
+  var SEL = 'button, .gcard, .recent-item, .pill-select, .auth-gender-opt, .avatar';
+  document.addEventListener('pointerdown', function(e){
+    var el = e.target.closest(SEL);
+    if(!el || el.disabled) return;
+
+    el.classList.remove('liquid-tap');
+    void el.offsetWidth; // restart animation
+    el.classList.add('liquid-tap');
+
+    var cs = getComputedStyle(el);
+    if(cs.position === 'static') el.style.position = 'relative';
+    if(cs.overflow === 'visible') el.style.overflow = 'hidden';
+
+    var rect = el.getBoundingClientRect();
+    var size = Math.max(rect.width, rect.height) * 1.3;
+    var ripple = document.createElement('span');
+    ripple.className = 'liquid-ripple';
+    ripple.style.width = ripple.style.height = size + 'px';
+    ripple.style.left = (e.clientX - rect.left - size/2) + 'px';
+    ripple.style.top = (e.clientY - rect.top - size/2) + 'px';
+    el.appendChild(ripple);
+    ripple.addEventListener('animationend', function(){ ripple.remove(); });
+  }, {passive:true});
+})();
 </script>
 </body>
 </html>
