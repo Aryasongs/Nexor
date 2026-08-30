@@ -184,6 +184,7 @@ img{display:block;max-width:100%;}
 .legal-doc-body h4{font-size:14.5px;font-weight:800;color:var(--ink);margin:18px 0 6px;}
 .legal-doc-body h4:first-child{margin-top:0;}
 .legal-doc-body p{font-size:13.5px;line-height:1.65;color:#4c4c53;margin-bottom:4px;}
+.legal-doc-body p strong{color:var(--ink);font-weight:800;}
 .legal-doc-body ul{margin:6px 0 4px 18px;}
 .legal-doc-body li{font-size:13.5px;line-height:1.65;color:#4c4c53;margin-bottom:4px;}
 
@@ -849,46 +850,135 @@ const LEGAL_DOCS = {
     title:'Privacy Policy',
     updated:'Last updated — August 2026',
     html:`
-      <h4>1. Who we are</h4>
-      <p>Kashish is built and operated by Nexor Sparks. This policy explains what information we collect when you use Kashish, why we collect it, and the choices you have.</p>
+      <h4>1. Introduction</h4>
+      <p>This Privacy Policy explains how Nexor Sparks ("we", "us", "our") collects, uses, shares, and protects your information when you use Kashish (the "App"). By creating an account or using the App, you agree to the practices described here. If you don't agree, please don't use the App.</p>
+
       <h4>2. Information we collect</h4>
+      <p><strong>a) Information you give us</strong></p>
       <ul>
-        <li>Account details you provide — name, handle, date of birth, and profile photo.</li>
-        <li>Your conversations with Kashish, so the app can keep chat history and context across sessions.</li>
-        <li>Basic device and usage data, used only to keep the app working reliably.</li>
+        <li>Account information — name, chosen handle, email or phone used to sign in, and date of birth (used to confirm you meet our minimum age requirement).</li>
+        <li>Profile information — profile photo, display name, and any other details you choose to add.</li>
+        <li>Content you create — messages, voice interactions, and any images you generate or upload while chatting with Kashish.</li>
       </ul>
-      <h4>3. How we use it</h4>
-      <p>We use your information to run your account, personalize your experience with Kashish, keep the service safe, and improve how Kashish responds over time.</p>
-      <h4>4. Sharing</h4>
-      <p>We do not sell your personal data. Information is shared only with service providers that help us operate Kashish (such as hosting and AI infrastructure providers), and only as needed to run the app.</p>
-      <h4>5. Your choices</h4>
-      <p>You can update your profile details at any time from this screen, and you can request deletion of your account and data by contacting us.</p>
-      <h4>6. Contact</h4>
-      <p>Questions about this policy can be sent to the Nexor Sparks support team through the app.</p>
+      <p><strong>b) Information collected automatically</strong></p>
+      <ul>
+        <li>Device information — device type, operating system, and app version, used for compatibility and bug fixing.</li>
+        <li>Usage data — which features you use and how often, to help us understand what's working and what isn't.</li>
+        <li>Approximate technical data such as IP-based region, used for security and abuse prevention.</li>
+      </ul>
+      <p><strong>c) Information from third parties</strong></p>
+      <p>If you sign in using a third-party provider, we receive basic profile information (such as name and email) from that provider, as permitted by your settings with them.</p>
+
+      <h4>3. How we use your information</h4>
+      <ul>
+        <li>To create and maintain your account, and keep you signed in across sessions.</li>
+        <li>To let Kashish remember conversation history and context so replies feel personal and continuous.</li>
+        <li>To operate core features, including text chat, voice, and image generation.</li>
+        <li>To detect, prevent, and respond to abuse, fraud, security incidents, and violations of our Terms or Community Guidelines.</li>
+        <li>To fix bugs, improve reliability, and understand how the App is used so we can improve it.</li>
+        <li>To communicate with you about your account, updates, or support requests.</li>
+        <li>To comply with legal obligations where applicable.</li>
+      </ul>
+
+      <h4>4. How your data is processed</h4>
+      <p>Your messages are sent to the AI systems that power Kashish's responses, along with recent conversation history, so the app can generate a relevant reply. This processing happens through infrastructure operated by Nexor Sparks and its service providers.</p>
+
+      <h4>5. Sharing of information</h4>
+      <p>We do not sell your personal information. We share information only in these situations:</p>
+      <ul>
+        <li>With service providers who help us operate the App — such as hosting, authentication, database, and AI-processing providers — strictly to perform services on our behalf.</li>
+        <li>If required by law, legal process, or to protect the rights, safety, or property of Nexor Sparks, our users, or the public.</li>
+        <li>In connection with a merger, acquisition, or sale of assets, where your information may be transferred as part of that transaction, subject to this policy.</li>
+        <li>With your consent, for any other purpose we disclose to you at the time.</li>
+      </ul>
+
+      <h4>6. Data retention</h4>
+      <p>We retain your account information and conversation history for as long as your account is active, so Kashish can maintain context and history. If you delete your account, we delete or anonymize your personal data within a reasonable period, except where we're required to retain certain data for legal, security, or fraud-prevention purposes.</p>
+
+      <h4>7. Data security</h4>
+      <p>We use reasonable technical and organizational measures — including authentication and access controls — to protect your information. No method of transmission or storage is completely secure, so we can't guarantee absolute security.</p>
+
+      <h4>8. Children and minors</h4>
+      <p>Kashish is not intended for children under the minimum age required in their region. We do not knowingly collect personal information from children below that age. If we learn that we have, we will take steps to delete it.</p>
+
+      <h4>9. Your rights and choices</h4>
+      <ul>
+        <li>You can view and update your profile information at any time from the Profile screen.</li>
+        <li>You can request a copy of your data, or ask us to delete your account and associated data, by contacting support through the app.</li>
+        <li>Depending on your location, you may have additional rights under local law, such as the right to object to or restrict certain processing.</li>
+      </ul>
+
+      <h4>10. International data transfers</h4>
+      <p>Your information may be processed on servers located outside your country of residence. Where this happens, we take steps to ensure your data continues to receive an appropriate level of protection.</p>
+
+      <h4>11. Changes to this policy</h4>
+      <p>We may update this Privacy Policy from time to time. If we make material changes, we'll take reasonable steps to notify you, such as an in-app notice. Continued use of the App after changes take effect means you accept the updated policy.</p>
+
+      <h4>12. Contact us</h4>
+      <p>For questions, requests, or concerns about this Privacy Policy or your data, please contact the Nexor Sparks support team through the app.</p>
     `
   },
   terms:{
     title:'Terms of Service',
     updated:'Last updated — August 2026',
     html:`
-      <h4>1. Agreement</h4>
-      <p>By creating an account and using Kashish, a product of Nexor Sparks, you agree to these Terms of Service.</p>
+      <h4>1. Acceptance of terms</h4>
+      <p>These Terms of Service ("Terms") form an agreement between you and Nexor Sparks governing your use of Kashish (the "App"). By creating an account or using the App, you agree to be bound by these Terms. If you don't agree, please don't use the App.</p>
+
       <h4>2. Eligibility</h4>
-      <p>You must meet the minimum age required in your region to use Kashish. You are responsible for the accuracy of the account details you provide.</p>
-      <h4>3. Acceptable use</h4>
+      <p>You must meet the minimum age required by the laws of your region to create an account. If you're under the age of majority where you live, you may only use the App with the involvement of a parent or legal guardian, where required by local law. By creating an account, you confirm that the information you provide, including your date of birth, is accurate.</p>
+
+      <h4>3. Your account</h4>
       <ul>
-        <li>Don't use Kashish to harass, threaten, or harm others.</li>
-        <li>Don't attempt to misuse, exploit, or interfere with the service.</li>
-        <li>Don't use Kashish for anything illegal, or to generate content prohibited under our Community Guidelines.</li>
+        <li>You're responsible for keeping your account credentials secure and for all activity under your account.</li>
+        <li>You agree to provide accurate account information and to keep it up to date.</li>
+        <li>You must notify us promptly if you suspect unauthorized use of your account.</li>
       </ul>
-      <h4>4. Your content</h4>
-      <p>You retain ownership of what you write to Kashish. By using the app, you allow Nexor Sparks to process that content to provide and improve the service.</p>
-      <h4>5. Availability</h4>
-      <p>Kashish is provided "as is." Nexor Sparks may update, suspend, or change features of the service at any time.</p>
-      <h4>6. Termination</h4>
-      <p>We may suspend or terminate accounts that violate these terms or our Community Guidelines.</p>
-      <h4>7. Contact</h4>
-      <p>For questions about these terms, reach out to the Nexor Sparks support team through the app.</p>
+
+      <h4>4. Nature of the service</h4>
+      <p>Kashish is an AI companion app. Responses are generated by artificial intelligence and are not from a human being. Kashish's replies may sometimes be inaccurate, incomplete, or inappropriate — you should use your own judgment and not rely on Kashish for medical, legal, financial, or other professional advice.</p>
+
+      <h4>5. Acceptable use</h4>
+      <p>When using Kashish, you agree not to:</p>
+      <ul>
+        <li>Harass, threaten, defame, or harm any person.</li>
+        <li>Attempt to generate content that sexualizes or endangers minors, in any form.</li>
+        <li>Use the App for anything illegal, fraudulent, or deceptive.</li>
+        <li>Attempt to bypass, disable, or interfere with safety features, rate limits, or security measures.</li>
+        <li>Reverse-engineer, scrape, or misuse the App's underlying technology or infrastructure.</li>
+        <li>Impersonate any person or entity, or misrepresent your affiliation with anyone.</li>
+        <li>Use the App to violate our Community Guidelines.</li>
+      </ul>
+
+      <h4>6. Your content</h4>
+      <p>You retain ownership of the messages and content you submit to Kashish ("Your Content"). By submitting Your Content, you grant Nexor Sparks a worldwide, non-exclusive, royalty-free license to use, store, process, and display Your Content solely to operate, maintain, and improve the App. You're responsible for ensuring you have the rights to anything you submit.</p>
+
+      <h4>7. AI-generated content</h4>
+      <p>Content generated by Kashish (text, voice, or images) is provided for personal, non-commercial use unless we state otherwise. We don't guarantee that AI-generated content is accurate, original, or free of errors. You should independently verify anything important before relying on it.</p>
+
+      <h4>8. Intellectual property</h4>
+      <p>The Kashish name, branding, design, and underlying software are the property of Nexor Sparks and its licensors. Nothing in these Terms grants you any right to use Nexor Sparks' trademarks or branding without prior written permission.</p>
+
+      <h4>9. Third-party services</h4>
+      <p>Kashish relies on third-party infrastructure (such as authentication, database, and AI-processing providers) to operate. Your use of the App is also subject to the applicable terms of those providers where relevant.</p>
+
+      <h4>10. Disclaimers</h4>
+      <p>The App is provided "as is" and "as available," without warranties of any kind, whether express or implied, including warranties of merchantability, fitness for a particular purpose, or non-infringement. We don't warrant that the App will be uninterrupted, error-free, or completely secure.</p>
+
+      <h4>11. Limitation of liability</h4>
+      <p>To the maximum extent permitted by law, Nexor Sparks will not be liable for any indirect, incidental, special, consequential, or punitive damages, or any loss of data, arising from your use of the App.</p>
+
+      <h4>12. Termination</h4>
+      <p>We may suspend or terminate your account, with or without notice, if we reasonably believe you've violated these Terms or our Community Guidelines, or if required by law. You may stop using the App and delete your account at any time.</p>
+
+      <h4>13. Changes to these terms</h4>
+      <p>We may update these Terms from time to time. If we make material changes, we'll take reasonable steps to notify you, such as an in-app notice. Continued use of the App after changes take effect means you accept the updated Terms.</p>
+
+      <h4>14. Governing law</h4>
+      <p>These Terms are governed by the laws applicable in the jurisdiction where Nexor Sparks operates, without regard to conflict-of-law principles, unless local law requires otherwise.</p>
+
+      <h4>15. Contact us</h4>
+      <p>For questions about these Terms, please contact the Nexor Sparks support team through the app.</p>
     `
   },
   community:{
@@ -896,21 +986,47 @@ const LEGAL_DOCS = {
     updated:'Last updated — August 2026',
     html:`
       <h4>Our goal</h4>
-      <p>Kashish, from Nexor Sparks, is meant to be a safe, respectful space. These guidelines apply to everything you send to or through Kashish.</p>
-      <h4>Be respectful</h4>
-      <p>No harassment, hate speech, threats, or content that targets people based on identity, appearance, or beliefs.</p>
-      <h4>Keep it safe</h4>
+      <p>Kashish, from Nexor Sparks, is meant to be a safe, respectful, and genuinely helpful space to talk, vent, learn, or just hang out. These guidelines apply to everything you send to or through Kashish, and exist to keep that space safe for everyone.</p>
+
+      <h4>1. Be respectful</h4>
       <ul>
-        <li>No content that sexualizes or endangers minors, in any form.</li>
-        <li>No content that promotes self-harm, violence, or illegal activity.</li>
-        <li>No sharing of others' private information without consent.</li>
+        <li>No harassment, bullying, threats, or targeted abuse toward any person.</li>
+        <li>No hate speech or content that attacks people based on race, ethnicity, religion, gender, sexual orientation, disability, or other identity traits.</li>
+        <li>No content designed to demean, humiliate, or intimidate someone.</li>
       </ul>
-      <h4>Be honest</h4>
-      <p>Don't use Kashish to impersonate real people, spread misinformation, or manipulate others.</p>
-      <h4>Enforcement</h4>
-      <p>Violating these guidelines may lead to warnings, feature restrictions, or account suspension, at the discretion of Nexor Sparks.</p>
-      <h4>Report a concern</h4>
-      <p>If something feels off, you can reach the Nexor Sparks support team through the app to report it.</p>
+
+      <h4>2. Keep it safe</h4>
+      <ul>
+        <li>Zero tolerance for any content that sexualizes, exploits, or endangers minors, in any form — this includes text, roleplay, or generated images.</li>
+        <li>No content that promotes, glorifies, or provides instructions for self-harm, suicide, or violence.</li>
+        <li>No promotion of illegal activity, dangerous behavior, or the creation of weapons, drugs, or other harmful substances.</li>
+        <li>If you're struggling, please reach out to a crisis helpline or trusted professional in your area — Kashish is not a substitute for professional support.</li>
+      </ul>
+
+      <h4>3. Respect privacy</h4>
+      <ul>
+        <li>Don't share someone else's private or identifying information without their consent (doxxing).</li>
+        <li>Don't use Kashish to stalk, track, or surveil another person.</li>
+      </ul>
+
+      <h4>4. Be honest</h4>
+      <ul>
+        <li>Don't use Kashish to impersonate real people, including public figures, without clear indication that it's fictional.</li>
+        <li>Don't use Kashish to generate or spread deliberate misinformation, or to manipulate or deceive others.</li>
+        <li>Don't misrepresent AI-generated content as being from a real human being when it could mislead someone.</li>
+      </ul>
+
+      <h4>5. Respect intellectual property</h4>
+      <p>Don't use Kashish to infringe on others' copyrights, trademarks, or other intellectual property rights.</p>
+
+      <h4>6. Enforcement</h4>
+      <p>Violating these guidelines may lead to a warning, temporary restriction of features, or permanent suspension of your account, depending on the severity and frequency of the violation, at the discretion of Nexor Sparks. We may also be required to report certain illegal content, such as content involving child exploitation, to relevant authorities.</p>
+
+      <h4>7. Appeals</h4>
+      <p>If you believe an enforcement action was taken in error, you can contact the Nexor Sparks support team through the app to request a review.</p>
+
+      <h4>8. Report a concern</h4>
+      <p>If you see something that violates these guidelines, or if something about your experience feels unsafe, please reach the Nexor Sparks support team through the app to report it.</p>
     `
   },
   licenses:{
