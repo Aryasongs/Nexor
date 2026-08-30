@@ -151,6 +151,9 @@ img{display:block;max-width:100%;}
 .pulse-profile-card .pp-stat .n{font-weight:800;font-size:15px;color:var(--ink);}
 .pulse-profile-card .pp-stat .l{font-size:11px;color:var(--ink-soft);}
 .pulse-profile-card .pp-note{font-size:11px;color:var(--ink-soft);margin-top:10px;padding-top:10px;border-top:1px solid var(--border);line-height:1.5;}
+.msg-copy-btn{display:flex;align-items:center;gap:5px;margin-top:3px;font-size:11.5px;font-weight:700;color:var(--ink-soft);padding:4px 8px 4px 2px;align-self:flex-start;}
+.msg-copy-btn i{font-size:14px;}
+.msg-copy-btn.copied{color:var(--accent);}
 .attach-preview img{width:38px;height:38px;object-fit:cover;border-radius:8px;flex-shrink:0;}
 .attach-preview .lbl{flex:1;font-size:11.5px;color:var(--ink-soft);}
 .attach-preview .rm{color:var(--ink-soft);font-size:17px;flex-shrink:0;}
@@ -1614,6 +1617,29 @@ function renderHome(){
   });
 }
 function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+// Copy-to-clipboard for bot messages (Pulse drafts, captions, any reply) —
+// same idea as ChatGPT's copy button under each response.
+async function copyMessageText(btn, text){
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      await navigator.clipboard.writeText(text);
+    } else {
+      const ta=document.createElement('textarea');
+      ta.value=text; ta.style.position='fixed'; ta.style.opacity='0';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta);
+    }
+    const icon=btn.querySelector('i'); const label=btn.querySelector('span');
+    btn.classList.add('copied');
+    if(icon) icon.className='ph-fill ph-check';
+    if(label) label.textContent='Copied';
+    setTimeout(()=>{
+      btn.classList.remove('copied');
+      if(icon) icon.className='ph ph-copy';
+      if(label) label.textContent='Copy';
+    }, 1500);
+  }catch(e){ console.warn('[KASHISH] copy failed:', e); }
+}
 
 function toggleHomeMenu(){ /* reserved for future settings */ }
 function pingBell(){ /* no unread notifications right now */ }
@@ -1714,6 +1740,14 @@ function renderChat(){
     row.appendChild(b);
     const t=document.createElement('div'); t.className='bubble-time'; t.textContent=fmtTime(m.ts); row.appendChild(t);
     scroll.appendChild(row);
+    // Copy button under bot text replies (Pulse drafts/captions/any reply) —
+    // same idea as ChatGPT's copy-to-clipboard under each response.
+    if(m.role!=='user' && m.text && !m.genPending){
+      const cp=document.createElement('button'); cp.className='msg-copy-btn';
+      cp.innerHTML='<i class="ph ph-copy"></i><span>Copy</span>';
+      cp.onclick=()=>copyMessageText(cp, m.text);
+      scroll.appendChild(cp);
+    }
     if(m.videoResults && m.videoResults.length){
       const vwrap=document.createElement('div'); vwrap.className='video-results';
       m.videoResults.forEach(v=>{
@@ -2020,6 +2054,8 @@ ${who}
 Origin story (only bring this up if directly asked "who made you", "who created you", "who is your founder/developer", or "why is your name Kashish" / "what does your name mean" — don't volunteer it unprompted): You were created by Gursharan Singh, who is also known by the name Gursharn Arya, the founder of Nexor. Your name "Kashish" was taken from — and inspired by — Kashish Tyagi. State this naturally and factually, in the same conversational tone/language as the rest of the chat (Hinglish/Hindi if that's what the user is using, English otherwise), without turning it into a long biography — a couple of warm, natural sentences is enough.
 
 You can optionally offer 1-2 short "quickReplies" (single words or short phrases, like "Yes" or "Tell me more") when a natural yes/no or follow-up moment fits — don't force this on every message, only when it genuinely fits the flow.
+
+Nexor Sparks help: since Kashish shares its account system with Nexor Sparks (the social app where people post "Pulses", follow each other, and get likes/followers), you're happy to help when asked things like "how do I post", "how do I get more followers", "how do I grow on Nexor", or "write me a pulse/caption about X". Give practical, concrete tips (posting consistently, writing an engaging first line, using relevant hashtags, replying to comments, posting when your audience is active, having a clear bio/profile photo, engaging with others' Pulses too, avoiding spammy/bought engagement). When asked to draft a Pulse/caption/post for them, write the ready-to-post text itself (no meta-commentary like "here's a draft", no surrounding quote marks) so it's clean to copy and paste straight into Nexor Sparks — the app already shows a copy button under your message for this.
 
 Respond with ONLY compact JSON, no markdown fences, no extra text outside the JSON:
 {"reply":"your natural conversational reply as plain text","quickReplies":["optional","short chips"]}`;
