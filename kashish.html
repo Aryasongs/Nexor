@@ -3138,6 +3138,15 @@ function pickStreamingLink(providersForRegion, title){
   // page for that title/region if TMDB gave us one, else a plain search.
   return { name:'Watch options', url: (providersForRegion && providersForRegion.link) || `https://www.google.com/search?q=${q}+watch+online` };
 }
+// Plain fetch() has no built-in timeout — on a blocked/slow connection the
+// promise can just hang for a minute or two before the browser gives up,
+// which looks like Kashish being stuck "thinking". This wraps fetch with
+// an AbortController so it fails fast and we can fall back cleanly.
+function fetchWithTimeout(url, opts, ms){
+  const controller = new AbortController();
+  const timer = setTimeout(()=>controller.abort(), ms||8000);
+  return fetch(url, {...(opts||{}), signal: controller.signal}).finally(()=>clearTimeout(timer));
+}
 async function movieSuggest(text){
   const apiKey = (appSettings.tmdbApiKey||'').trim();
   if(!apiKey) return { movies:null, needsKey:true };
@@ -3148,13 +3157,18 @@ async function movieSuggest(text){
     let discoverUrl = `https://api.themoviedb.org/3/discover/movie?api_key=${apiKey}&sort_by=popularity.desc&include_adult=false&page=1&region=${region}`;
     if(genreId) discoverUrl += `&with_genres=${genreId}`;
     if(bollywood) discoverUrl += `&with_original_language=hi`;
-    const res = await fetch(discoverUrl);
-    if(!res.ok) throw new Error('TMDB discover HTTP '+res.status);
+    const res = await fetchWithTimeout(discoverUrl, null, 8000);
+    if(!res.ok){
+      let detail = '';
+      try{ const errBody = await res.json(); detail = errBody.status_message || ''; }catch(e){}
+      throw new Error('TMDB discover HTTP '+res.status+(detail?(' — '+detail):''));
+    }
     const data = await res.json();
     const candidates = (data.results||[]).slice(0,8);
+    if(!candidates.length) return { movies:[], needsKey:false };
     const withProviders = await Promise.all(candidates.slice(0,5).map(async m=>{
       try{
-        const pRes = await fetch(`https://api.themoviedb.org/3/movie/${m.id}/watch/providers?api_key=${apiKey}`);
+        const pRes = await fetchWithTimeout(`https://api.themoviedb.org/3/movie/${m.id}/watch/providers?api_key=${apiKey}`, null, 6000);
         const pData = await pRes.json();
         const forRegion = pData.results && pData.results[region];
         const link = pickStreamingLink(forRegion, m.title);
@@ -3169,6 +3183,8 @@ async function movieSuggest(text){
           redirectUrl: link.url
         };
       }catch(e){
+        // Provider lookup timed out/failed for this one title — still show
+        // the card, just route the tap to a general search instead.
         return {
           id:m.id, title:m.title, year:(m.release_date||'').slice(0,4),
           rating: m.vote_average ? m.vote_average.toFixed(1) : null,
@@ -3180,7 +3196,8 @@ async function movieSuggest(text){
     return { movies: withProviders.filter(m=>m.poster).slice(0,4), needsKey:false };
   }catch(e){
     console.warn('[KASHISH] TMDB movie suggest failed:', e);
-    return { movies:[], needsKey:false, error:true };
+    const authError = /HTTP 401/.test(e.message||'');
+    return { movies:[], needsKey:false, error:true, authError };
   }
 }
 function formatMovieResultsForModel(results){
@@ -4447,6 +4464,10 @@ async function send(){
     const movieResult = await movieSuggest(text);
     if(movieResult.needsKey){
       searchContext = 'The user asked for a movie suggestion, but no TMDB API key is set up yet. Tell them (in your normal reply style) that they need to add a free TMDB API key in Settings -> Movies & OTT to unlock movie suggestions, and offer to still suggest something from general knowledge in the meantime.';
+    } else if(movieResult.error){
+      searchContext = movieResult.authError
+        ? 'The user asked for a movie suggestion, but the TMDB API key in Settings -> Movies & OTT looks invalid or rejected (401). Tell them (in your normal reply style) to double-check the key was pasted correctly, and offer to still suggest something from general knowledge in the meantime.'
+        : 'The user asked for a movie suggestion, but the movie lookup timed out or failed (network issue). Tell them (in your normal reply style) that the movie search didn\'t come through and to try again in a moment, and offer to still suggest something from general knowledge in the meantime.';
     } else {
       movieResults = movieResult.movies;
       searchContext = formatMovieResultsForModel(movieResults);
