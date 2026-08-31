@@ -2023,7 +2023,6 @@ function renderChat(){
       if(m.text){ const span=document.createElement('div'); span.textContent=m.text; b.appendChild(span); }
     }
     row.appendChild(b);
-    const t=document.createElement('div'); t.className='bubble-time'; t.textContent=fmtTime(m.ts); row.appendChild(t);
     scroll.appendChild(row);
     // Action row under bot text replies — copy, read aloud, like/dislike
     // feedback, share, and a "more" menu (regenerate / delete).
@@ -2970,7 +2969,7 @@ function extractStockSymbol(text){
   if(m) return m[1];
   return null;
 }
-async function fetchStockQuote(symbol){
+async function fetchStockQuoteYahoo(symbol){
   try{
     const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=1d`;
     const res = await fetch(url);
@@ -2993,7 +2992,57 @@ async function fetchStockQuote(symbol){
       dayLow: meta.regularMarketDayLow!=null?meta.regularMarketDayLow:null,
       exchange: meta.fullExchangeName || meta.exchangeName || ''
     };
-  }catch(e){ console.warn('[KASHISH] stock fetch failed:', e); return null; }
+  }catch(e){ console.warn('[KASHISH] Yahoo stock fetch failed:', e); return null; }
+}
+// Fallback when Yahoo's endpoint is unreachable/blocked: pull the price
+// straight off Google's search result (via the same Serper key already
+// used elsewhere in the app) since Google shows a finance panel for most
+// ticker/company queries.
+async function fetchStockQuoteSerper(query){
+  try{
+    const res = await fetch('https://google.serper.dev/search', {
+      method:'POST',
+      headers:{'X-API-KEY': SERPER_API_KEY, 'Content-Type':'application/json'},
+      body: JSON.stringify({ q: `${query} share price stock` })
+    });
+    if(!res.ok) throw new Error('Serper HTTP '+res.status);
+    const data = await res.json();
+    const ab = data.answerBox || {};
+    const kg = data.knowledgeGraph || {};
+    const attrs = Object.assign({}, kg.attributes||{}, ab.attributes||{});
+    let priceRaw = ab.answer || attrs['Price'] || attrs['Current price'] || attrs['price'] || null;
+    if(!priceRaw){
+      const blob = [ab.title, ab.snippet, kg.title, kg.description,
+        Array.isArray(data.organic)?data.organic.slice(0,3).map(r=>r.title+' '+(r.snippet||'')).join(' '):''
+      ].filter(Boolean).join(' ');
+      const m = blob.match(/(?:₹|Rs\.?|INR\s?|\$)\s?[\d,]+\.?\d*/i);
+      if(m) priceRaw = m[0];
+    }
+    if(!priceRaw) return null;
+    const numMatch = String(priceRaw).replace(/,/g,'').match(/[\d.]+/);
+    if(!numMatch) return null;
+    const price = parseFloat(numMatch[0]);
+    if(isNaN(price)) return null;
+    const currency = /₹|Rs\.?|INR/i.test(priceRaw) ? 'INR' : (/\$/.test(priceRaw) ? 'USD' : '');
+    let change=0, changePct=0;
+    const changeRaw = attrs["Today's change"] || attrs['Todays change'] || attrs['Change'] || ab.snippet || '';
+    const pctMatch = String(changeRaw).match(/-?\d+\.?\d*\s*%/);
+    if(pctMatch) changePct = parseFloat(pctMatch[0]);
+    const chMatch = String(changeRaw).replace(/,/g,'').match(/[-+]\s?[\d.]+(?!\s*%)/);
+    if(chMatch) change = parseFloat(chMatch[0].replace(/\s/g,''));
+    return {
+      symbol: (kg.title || ab.title || query).toString().split(' ')[0],
+      name: kg.title || ab.title || query,
+      price, currency, change, changePct,
+      dayHigh: null, dayLow: null,
+      exchange: kg.type || ''
+    };
+  }catch(e){ console.warn('[KASHISH] Serper stock fetch failed:', e); return null; }
+}
+async function fetchStockQuote(symbol, displayQuery){
+  const viaYahoo = await fetchStockQuoteYahoo(symbol);
+  if(viaYahoo) return viaYahoo;
+  return await fetchStockQuoteSerper(displayQuery || symbol);
 }
 
 /* ---------------- location / nearby / map (OpenStreetMap — no key) ---------------- */
@@ -3048,20 +3097,80 @@ async function reverseGeocode(lat, lon){
     return { label, address: data.display_name||'' };
   }catch(e){ console.warn('[KASHISH] reverseGeocode failed:', e); return null; }
 }
-// Finds the nearest matching place (cafe, hospital, atm, etc.) around a
-// given lat/lon by bounding the search to a small box around the user.
+// Category -> OpenStreetMap tag, so "cafe near me" / "atm near me" find
+// actual nearby places by type. Nominatim's /search only matches literal
+// names ("Cafe Coffee Day"), not categories, so plain category words like
+// "cafe" need Overpass's tag-based POI search instead.
+const NEARBY_CATEGORY_MAP = {
+  'cafe':'amenity=cafe','coffee shop':'amenity=cafe','coffee':'amenity=cafe',
+  'restaurant':'amenity=restaurant','food':'amenity=restaurant','dhaba':'amenity=restaurant','khana':'amenity=restaurant',
+  'hospital':'amenity=hospital','clinic':'amenity=clinic',
+  'atm':'amenity=atm','bank':'amenity=bank',
+  'pharmacy':'amenity=pharmacy','medical store':'amenity=pharmacy','medical':'amenity=pharmacy','chemist':'amenity=pharmacy',
+  'petrol pump':'amenity=fuel','gas station':'amenity=fuel','fuel':'amenity=fuel','petrol':'amenity=fuel',
+  'hotel':'tourism=hotel','park':'leisure=park','school':'amenity=school','college':'amenity=college',
+  'gym':'leisure=fitness_centre','mall':'shop=mall','supermarket':'shop=supermarket','grocery':'shop=supermarket','kirana':'shop=supermarket',
+  'temple':'amenity=place_of_worship','mandir':'amenity=place_of_worship','mosque':'amenity=place_of_worship','masjid':'amenity=place_of_worship','church':'amenity=place_of_worship',
+  'police station':'amenity=police','police':'amenity=police',
+  'railway station':'railway=station','train station':'railway=station',
+  'bus stop':'highway=bus_stop','airport':'aeroway=aerodrome','salon':'shop=hairdresser','parking':'amenity=parking'
+};
+function matchNearbyCategory(query){
+  const q = (query||'').toLowerCase();
+  let best=null, bestLen=0;
+  Object.keys(NEARBY_CATEGORY_MAP).forEach(k=>{
+    if(q.includes(k) && k.length>bestLen){ best=NEARBY_CATEGORY_MAP[k]; bestLen=k.length; }
+  });
+  return best;
+}
+// Real category-based POI search via Overpass (OpenStreetMap's query API,
+// no key needed) — returns the nearest matching place with an actual name.
+async function findNearbyOverpass(tag, lat, lon, radius){
+  try{
+    const q = `[out:json][timeout:15];(node[${tag}](around:${radius||4000},${lat},${lon});way[${tag}](around:${radius||4000},${lat},${lon}););out center 8;`;
+    const res = await fetch('https://overpass-api.de/api/interpreter', { method:'POST', body:'data='+encodeURIComponent(q) });
+    if(!res.ok) return null;
+    const data = await res.json();
+    const els = (data.elements||[]).filter(e=>e.tags && e.tags.name);
+    if(!els.length) return null;
+    let best=null, bestD=Infinity;
+    els.forEach(e=>{
+      const elat = e.lat!=null ? e.lat : (e.center && e.center.lat);
+      const elon = e.lon!=null ? e.lon : (e.center && e.center.lon);
+      if(elat==null || elon==null) return;
+      const d = Math.hypot(elat-lat, elon-lon);
+      if(d<bestD){
+        bestD=d;
+        const addrParts = [e.tags['addr:street'], e.tags['addr:suburb']||e.tags['addr:city']].filter(Boolean);
+        best = { lat:elat, lon:elon, label:e.tags.name, address:addrParts.join(', ') };
+      }
+    });
+    return best;
+  }catch(e){ console.warn('[KASHISH] Overpass nearby failed:', e); return null; }
+}
+// Finds the nearest matching place (cafe, hospital, atm, a named brand,
+// etc.) around a given lat/lon. Tries a category-based Overpass search
+// first (works for generic words like "cafe"/"atm"), then falls back to a
+// literal name search bounded around the user (works for brand names like
+// "Starbucks near me").
 async function findNearby(query, lat, lon){
+  const tag = matchNearbyCategory(query);
+  if(tag){
+    const spot = await findNearbyOverpass(tag, lat, lon, 4000);
+    if(spot) return spot;
+  }
   try{
     const d = 0.06; // roughly a 6-7km box
     const viewbox = `${lon-d},${lat+d},${lon+d},${lat-d}`;
     const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&bounded=1&viewbox=${viewbox}`;
     const res = await fetch(url, { headers:{'Accept':'application/json'} });
-    if(!res.ok) return null;
-    const data = await res.json();
-    const r = data && data[0];
-    if(!r) return null;
-    return { lat:parseFloat(r.lat), lon:parseFloat(r.lon), label:(r.display_name||query).split(',')[0].trim(), address:r.display_name||'' };
-  }catch(e){ console.warn('[KASHISH] findNearby failed:', e); return null; }
+    if(res.ok){
+      const data = await res.json();
+      const r = data && data[0];
+      if(r) return { lat:parseFloat(r.lat), lon:parseFloat(r.lon), label:(r.display_name||query).split(',')[0].trim(), address:r.display_name||'' };
+    }
+  }catch(e){ console.warn('[KASHISH] nearby name search failed:', e); }
+  return null;
 }
 function staticMapUrl(lat, lon, zoom){
   return `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lon}&zoom=${zoom||15}&size=640x300&maptype=mapnik&markers=${lat},${lon},lightblue1`;
@@ -3079,8 +3188,11 @@ async function handleLocationRequest(parsed){
     return { lat:loc.lat, lon:loc.lon, label: rev?rev.label:'Your location', address: rev?rev.address:'', mode:'me', query:null };
   }
   const spot = await findNearby(parsed.query, loc.lat, loc.lon);
-  if(!spot) return null;
-  return { lat:spot.lat, lon:spot.lon, label:spot.label, address:spot.address, mode:'nearby', query:parsed.query };
+  if(spot) return { lat:spot.lat, lon:spot.lon, label:spot.label, address:spot.address, mode:'nearby', query:parsed.query };
+  // Couldn't pinpoint an exact match nearby — still return a named card
+  // (the user's own area) instead of dead-ending with nothing shown.
+  const rev = await reverseGeocode(loc.lat, loc.lon);
+  return { lat:loc.lat, lon:loc.lon, label: rev?rev.label:'Your area', address: rev?rev.address:'', mode:'nearby-miss', query:parsed.query };
 }
 
 /* ---------------- real-time news (via existing Serper key) ---------------- */
@@ -3746,7 +3858,7 @@ async function send(){
     const symbol = extractStockSymbol(text);
     if(symbol){
       addTyping();
-      const quote = await fetchStockQuote(symbol);
+      const quote = await fetchStockQuote(symbol, symbol.replace(/\.(NS|BO)$/,'').replace(/^\^/,''));
       removeTyping();
       if(!quote){
         pushBotMessage(`Mujhe "${symbol}" ka stock price nahi mil paya — symbol check kar lo ya thodi der baad try karo.`, null);
@@ -3777,6 +3889,7 @@ async function send(){
       let reply;
       if(loc.mode==='me') reply = `Yeh raha tumhara current location — ${loc.label}. Map par mark kar diya hai.`;
       else if(loc.mode==='nearby') reply = `Sabse paas "${loc.query}" — ${loc.label} mila. Map par mark kar diya hai.`;
+      else if(loc.mode==='nearby-miss') reply = `Mujhe exact "${loc.query}" nearby nahi mila, lekin yeh raha tumhara current area — ${loc.label}. Map par mark kar diya hai.`;
       else reply = `${loc.label} yahan hai. Map par mark kar diya hai.`;
       pushBotMessage(reply, null, null, null, null, null, null, null, null, null, null, null, null, mapCard);
     }
