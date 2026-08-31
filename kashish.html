@@ -4192,9 +4192,26 @@ function pickBestVoice(lang){
   return bestScore>-1 ? best : null;
 }
 function getSpeechCtor(){ return window.SpeechRecognition || window.webkitSpeechRecognition || null; }
+// Mobile browsers (iOS Safari, many Android WebViews) only allow
+// speechSynthesis.speak() to actually produce sound if it's called
+// synchronously inside a real user tap — a speak() fired later, after an
+// async network reply comes back, gets silently swallowed otherwise. So we
+// "unlock" the speech engine with a near-silent utterance right inside the
+// tap that opens voice mode; that unlocks audio output for the rest of
+// this page session, including the later automatic replies.
+function unlockSpeechSynthesis(){
+  if(!('speechSynthesis' in window)) return;
+  try{
+    window.speechSynthesis.resume();
+    const u = new SpeechSynthesisUtterance(' ');
+    u.volume = 0;
+    window.speechSynthesis.speak(u);
+  }catch(e){}
+}
 function openVoicePanel(){
   const Ctor=getSpeechCtor();
   if(!Ctor){ alert("Voice input isn't supported in this browser — try typing instead."); return; }
+  unlockSpeechSynthesis();
   voiceModeActive = true;
   showScreen('screen-voice');
   document.getElementById('voice-transcript').textContent='';
@@ -4231,6 +4248,7 @@ function speakVoiceModeReply(text){
     return;
   }
   window.speechSynthesis.cancel();
+  window.speechSynthesis.resume();
   const cleanText = text.replace(/[*_`#]+/g,'').trim();
   if(!cleanText){ resumeListening(); return; }
   const u = new SpeechSynthesisUtterance(cleanText);
@@ -4254,6 +4272,14 @@ function startVoiceListening(){
   voiceRecognition.interimResults = true;
   if(appSettings.voiceHaptic && navigator.vibrate){ try{ navigator.vibrate(10); }catch(e){} }
   let finalText='';
+  let silenceTimer=null;
+  const SILENCE_MS=1400; // pause length that counts as "done talking"
+  const armSilenceTimer=()=>{
+    clearTimeout(silenceTimer);
+    silenceTimer=setTimeout(()=>{
+      if(finalText.trim()){ try{ voiceRecognition.stop(); }catch(e){} }
+    }, SILENCE_MS);
+  };
   voiceRecognition.onstart=()=>{
     voiceListening=true;
     document.getElementById('voice-status').textContent="Go ahead, I'm listening";
@@ -4268,10 +4294,15 @@ function startVoiceListening(){
     }
     document.getElementById('voice-status').textContent = (finalText||interim) ? 'I heard:' : "Go ahead, I'm listening";
     document.getElementById('voice-transcript').textContent=(finalText+interim).trim();
+    // Every time speech comes in, push the "you've gone quiet" deadline
+    // back out — so recognition auto-stops (and sends) shortly after the
+    // user actually stops talking, instead of listening forever.
+    armSilenceTimer();
   };
   voiceRecognition.onerror=()=>{ document.getElementById('voice-status').textContent="Didn't catch that — try again"; };
   voiceRecognition.onend=()=>{
     voiceListening=false;
+    clearTimeout(silenceTimer);
     if(finalText.trim()){
       if(!currentSessionId) startSessionSilently();
       document.getElementById('chat-input') && (document.getElementById('chat-input').value = finalText.trim());
@@ -4298,6 +4329,7 @@ function stopVoiceListening(){
   voiceRecognition=null; voiceListening=false;
 }
 function toggleVoiceListening(){
+  unlockSpeechSynthesis();
   if(voiceSpeaking){
     // Barge-in: tapping the mic while Kashish is talking interrupts her
     // and starts listening right away, like cutting in on a real call.
