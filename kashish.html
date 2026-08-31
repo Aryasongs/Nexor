@@ -271,6 +271,25 @@ html[data-theme="dark"] .web-source-chip{background:linear-gradient(160deg,#1E1E
 .pulse-profile-card .pp-stat .l{font-size:11px;color:var(--ink-soft);}
 .pulse-profile-card .pp-note{font-size:11px;color:var(--ink-soft);margin-top:10px;padding-top:10px;border-top:1px solid var(--border);line-height:1.5;}
 
+/* Merged Nexor + Google Knowledge Graph structured card (known-person lookup) */
+.person-card{max-width:88%;margin-top:6px;background:linear-gradient(150deg,#ffffff 0%,#f4f5f7 50%,#eaecef 100%);border:1px solid rgba(255,255,255,.9);border-radius:16px;overflow:hidden;box-shadow:0 10px 22px -14px rgba(20,20,22,.28);}
+.person-card .pc-thumb{width:100%;aspect-ratio:16/9;overflow:hidden;background:var(--bubble-bot);}
+.person-card .pc-thumb img{width:100%;height:100%;object-fit:cover;}
+.person-card .pc-body{padding:14px 16px;}
+.person-card .pc-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
+.person-card .pc-name{font-weight:800;font-size:15px;color:var(--ink);}
+.person-card .pc-handle{font-size:12.5px;color:var(--ink-soft);}
+.person-card .pc-row-label{font-size:11px;font-weight:700;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;margin-top:10px;}
+.person-card .pc-bio{font-size:12.5px;color:var(--ink);margin-top:3px;line-height:1.5;}
+.person-card .pc-section-label{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:800;color:var(--accent);margin-top:14px;padding-top:12px;border-top:1px solid var(--border);}
+.person-card .pc-stats{display:flex;gap:18px;margin-top:10px;flex-wrap:wrap;}
+.person-card .pc-stat{display:flex;flex-direction:column;}
+.person-card .pc-stat .n{font-weight:800;font-size:15px;color:var(--ink);}
+.person-card .pc-stat .l{font-size:11px;color:var(--ink-soft);}
+.person-card .pc-kg-desc{font-size:12.5px;font-weight:700;color:var(--ink);margin-top:8px;}
+.person-card .pc-kg-detail{font-size:12.5px;color:var(--ink-soft);margin-top:6px;line-height:1.55;}
+.person-card .pc-note{font-size:11px;color:var(--ink-soft);margin-top:12px;padding-top:10px;border-top:1px solid var(--border);line-height:1.5;}
+
 /* Nexor Sparks Pulse (post) card — shown when a /p/POST_ID link is pasted. */
 .pulse-post-card{max-width:88%;margin-top:6px;background:linear-gradient(150deg,#ffffff 0%,#f4f5f7 50%,#eaecef 100%);border:1px solid rgba(255,255,255,.9);border-radius:16px;padding:14px 16px;box-shadow:0 10px 22px -14px rgba(20,20,22,.28);}
 .pulse-post-card .pk-head{display:flex;align-items:center;gap:9px;}
@@ -320,8 +339,10 @@ html[data-theme="dark"] .web-source-chip{background:linear-gradient(160deg,#1E1E
 .orb{width:170px;height:170px;border-radius:50%;
   background:radial-gradient(circle at 32% 26%, #F1FAFF 0%, #9BD9FF 42%, #2E93EE 78%, #1975CE 100%);
   box-shadow:0 30px 60px -18px rgba(30,134,232,.5), inset 0 0 34px rgba(255,255,255,.55);
-  animation:orbFloat 2.8s ease-in-out infinite;}
+  animation:orbFloat 2.8s ease-in-out infinite;transition:box-shadow .2s;}
 @keyframes orbFloat{0%,100%{transform:scale(1);}50%{transform:scale(1.05);}}
+.orb.speaking{animation:orbSpeak .85s ease-in-out infinite;box-shadow:0 30px 70px -14px rgba(30,134,232,.7), inset 0 0 34px rgba(255,255,255,.7);}
+@keyframes orbSpeak{0%,100%{transform:scale(1);}50%{transform:scale(1.1);}}
 .voice-msg{font-size:19px;font-weight:800;color:var(--ink);line-height:1.42;max-width:300px;min-height:1.4em;}
 .voice-hint{font-size:13.5px;color:var(--ink-soft);font-weight:600;}
 .voice-controls{flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:26px;padding:18px 24px calc(26px + env(safe-area-inset-bottom));}
@@ -768,13 +789,13 @@ html[data-theme="dark"] .settings-list{background:linear-gradient(150deg,#1E1E21
       <button class="circle-btn" onclick="chatMenu()"><i class="ph-bold ph-dots-three"></i></button>
     </div>
     <div class="voice-body">
-      <div class="orb-outer"><div class="orb"></div></div>
+      <div class="orb-outer"><div class="orb" id="orb-el"></div></div>
       <div class="voice-msg" id="voice-transcript"></div>
       <div class="voice-hint" id="voice-status">Go ahead, I'm listening</div>
     </div>
     <div class="voice-controls">
       <button class="voice-ctrl" onclick="closeVoicePanel()" title="Switch to keyboard"><i class="ph ph-keyboard"></i></button>
-      <button class="voice-mic-big" id="voice-mic-big" onclick="toggleVoiceListening()" title="Pause/resume"><i class="ph-fill ph-microphone" id="voice-mic-icon"></i></button>
+      <button class="voice-mic-big" id="voice-mic-big" onclick="toggleVoiceListening()" title="Pause/resume/interrupt"><i class="ph-fill ph-microphone" id="voice-mic-icon"></i></button>
       <button class="voice-ctrl" onclick="closeVoicePanel()" title="Close"><i class="ph ph-x"></i></button>
     </div>
     <div class="home-indicator"></div>
@@ -1050,7 +1071,7 @@ html[data-theme="dark"] .settings-list{background:linear-gradient(150deg,#1E1E21
       <div class="settings-list">
         <div class="settings-row">
           <span class="ic"><i class="ph-bold ph-paper-plane-tilt"></i></span>
-          <div class="body"><div class="lbl">Auto-send after pause</div><div class="sub">Send automatically once you stop talking</div></div>
+          <div class="body"><div class="lbl">Hands-free voice chat</div><div class="sub">Auto-send after you stop talking, and keep the conversation going — Kashish replies out loud, then listens again</div></div>
           <button class="tswitch" id="sw-voiceautosend" onclick="toggleSetting('voiceAutoSend','sw-voiceautosend')"></button>
         </div>
         <div class="settings-row">
@@ -1797,6 +1818,7 @@ async function copyMessageText(btn, text){
 }
 /* ---------------- read-aloud (text to speech) ---------------- */
 let ttsActiveBtn=null;
+if('speechSynthesis' in window){ loadVoicesAsync().then(v=>{ cachedVoices=v||[]; }); }
 function resetSpeakBtn(){
   if(ttsActiveBtn){ ttsActiveBtn.innerHTML='<i class="ph ph-speaker-high"></i>'; ttsActiveBtn.classList.remove('active'); }
   ttsActiveBtn=null;
@@ -1812,6 +1834,9 @@ function toggleReadAloud(btn, text){
   resetSpeakBtn();
   const u = new SpeechSynthesisUtterance(text);
   u.lang = /[\u0900-\u097F]/.test(text) ? 'hi-IN' : (navigator.language || 'en-US');
+  const voice = pickBestVoice(u.lang);
+  if(voice) u.voice = voice;
+  u.rate = 1.0; u.pitch = 1.0;
   u.onend = resetSpeakBtn;
   u.onerror = resetSpeakBtn;
   ttsActiveBtn = btn;
@@ -2175,6 +2200,46 @@ function renderChat(){
       body.appendChild(src);
       kc.appendChild(body);
       scroll.appendChild(kc);
+    }
+    if(m.personCard){
+      const p = m.personCard;
+      const pc = document.createElement('div'); pc.className='person-card';
+      if(p.kgImage){
+        const th=document.createElement('div'); th.className='pc-thumb';
+        const im=document.createElement('img'); im.src=p.kgImage; im.alt=''; th.appendChild(im);
+        pc.appendChild(th);
+      }
+      const body=document.createElement('div'); body.className='pc-body';
+      const head=document.createElement('div'); head.className='pc-head';
+      const nameEl=document.createElement('div'); nameEl.className='pc-name'; nameEl.textContent=p.name+(p.verified?' ✓':'');
+      head.appendChild(nameEl);
+      if(p.handle){ const h=document.createElement('div'); h.className='pc-handle'; h.textContent='@'+p.handle; head.appendChild(h); }
+      body.appendChild(head);
+      if(p.bio){ const b=document.createElement('div'); b.className='pc-row-label'; b.textContent='Bio'; body.appendChild(b);
+        const bv=document.createElement('div'); bv.className='pc-bio'; bv.textContent=p.bio; body.appendChild(bv); }
+      if(p.nexorStats){
+        const lbl=document.createElement('div'); lbl.className='pc-section-label'; lbl.innerHTML='<i class="ph-fill ph-chart-bar"></i> Nexor Sparks';
+        body.appendChild(lbl);
+        const stats=document.createElement('div'); stats.className='pc-stats';
+        [['posts','Posts'],['likes','Likes'],['followers','Followers'],['following','Following']].forEach(([k,label])=>{
+          const s=document.createElement('div'); s.className='pc-stat';
+          const n=document.createElement('div'); n.className='n'; n.textContent=fmtCompact(p.nexorStats[k]||0);
+          const l=document.createElement('div'); l.className='l'; l.textContent=label;
+          s.appendChild(n); s.appendChild(l); stats.appendChild(s);
+        });
+        body.appendChild(stats);
+      }
+      if(p.kgDescription || p.kgDetail){
+        const lbl=document.createElement('div'); lbl.className='pc-section-label'; lbl.innerHTML='<i class="ph-fill ph-brain"></i> Google Knowledge Graph';
+        body.appendChild(lbl);
+        if(p.kgDescription){ const d=document.createElement('div'); d.className='pc-kg-desc'; d.textContent=p.kgDescription; body.appendChild(d); }
+        if(p.kgDetail){ const d=document.createElement('div'); d.className='pc-kg-detail'; d.textContent=p.kgDetail; body.appendChild(d); }
+      }
+      const note=document.createElement('div'); note.className='pc-note';
+      note.textContent='Public info only, combined from Nexor Sparks and Google.';
+      body.appendChild(note);
+      pc.appendChild(body);
+      scroll.appendChild(pc);
     }
     if(m.newsResults && m.newsResults.length){
       const nwrap=document.createElement('div'); nwrap.className='news-results';
@@ -3306,21 +3371,28 @@ function formatNewsResultsForModel(results){
 // presence/"active now" status, login time, or anything from userPrivate/.
 const PROFILE_LOOKUP_KEYWORDS = /profile|pulse|like|post|follow|stats?|account|kitne|batao|bata\b/i;
 const SENSITIVE_ASK_PATTERN = /\b(login|log[- ]?in|online|active|last seen|session|kab se|kitni der se|screen ?time)\b/i;
-// Lets people ask about a couple of specific named individuals (Kashish's
-// founder/namesake) by NAME rather than needing their exact @handle, and
-// still get the same live, public-only Nexor Sparks profile card as the
-// @handle flow below — same privacy boundary, just an extra name trigger.
-const KNOWN_PERSON_HANDLES = [
-  { pattern: /\b(gursharn\s*arya|gursharan\s*singh)\b/i, handle: 'gursharan' },
-  { pattern: /\bkashish\s*tyagi\b/i, handle: 'kashishtyagi0999' }
-];
-const PERSON_INFO_KEYWORDS = /\b(kaun|who\s+is|who'?s|about|info(rmation)?|jaankari|jankari|detail|batao|bata\s*do|tell\s+me\s+about|kya\s+hai|kaise\s+hai)\b/i;
 function extractProfileLookupHandle(text){
   if(!text) return null;
   const m = text.match(/@([a-zA-Z0-9_]{2,30})/);
-  if(m && PROFILE_LOOKUP_KEYWORDS.test(text)) return m[1].toLowerCase();
-  for(const entry of KNOWN_PERSON_HANDLES){
-    if(entry.pattern.test(text) && PERSON_INFO_KEYWORDS.test(text)) return entry.handle;
+  if(!m) return null;
+  if(!PROFILE_LOOKUP_KEYWORDS.test(text)) return null;
+  return m[1].toLowerCase();
+}
+// Lets people ask about a couple of specific named individuals (Kashish's
+// founder/namesake) by NAME rather than needing their exact @handle. For
+// these two, an info-style ask pulls BOTH the live Nexor Sparks public
+// profile card AND a Google Knowledge Graph card (since Gursharn Arya has
+// a verified public KG entity) so the reply is fuller/more structured,
+// same as it would be if you pasted a Nexor profile link directly.
+const KNOWN_PERSON_ENTRIES = [
+  { pattern: /\b(gursharn\s*arya|gursharan\s*singh)\b/i, handle: 'gursharan', kgQuery: 'Gursharn Arya' },
+  { pattern: /\bkashish\s*tyagi\b/i, handle: 'kashishtyagi0999', kgQuery: 'Kashish Tyagi' }
+];
+const PERSON_INFO_KEYWORDS = /\b(kaun|who\s+is|who'?s|about|info(rmation)?|jaankari|jankari|detail|batao|bata\s*do|tell\s+me\s+about|kya\s+hai|kaise\s+hai)\b/i;
+function extractKnownPerson(text){
+  if(!text) return null;
+  for(const entry of KNOWN_PERSON_ENTRIES){
+    if(entry.pattern.test(text) && PERSON_INFO_KEYWORDS.test(text)) return entry;
   }
   return null;
 }
@@ -3553,16 +3625,17 @@ function sendLocal(){
   }, 400);
 }
 
-function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults, webSources, kgCard, factCheckResults, postCard, conversionCard, stockCard, mapCard){
+function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults, webSources, kgCard, factCheckResults, postCard, conversionCard, stockCard, mapCard, personCard){
   const sess = getSession(currentSessionId);
   if(!sess) return;
   const qr = appSettings.trendingSearches ? (quickReplies||null) : null;
-  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, webSources: (webSources&&webSources.length)?webSources:null, kgCard: kgCard||null, factCheckResults: (factCheckResults&&factCheckResults.length)?factCheckResults:null, postCard: postCard||null, conversionCard: conversionCard||null, stockCard: stockCard||null, mapCard: mapCard||null, ts: Date.now()});
+  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, webSources: (webSources&&webSources.length)?webSources:null, kgCard: kgCard||null, factCheckResults: (factCheckResults&&factCheckResults.length)?factCheckResults:null, postCard: postCard||null, conversionCard: conversionCard||null, stockCard: stockCard||null, mapCard: mapCard||null, personCard: personCard||null, ts: Date.now()});
   sess.preview = truncate(text, 60);
   sess.updatedAt = Date.now();
   upsertSession(sess);
   renderChat();
   notifyNewBotMessage(text);
+  if(voiceModeActive) speakVoiceModeReply(text);
 }
 
 /* ---------------- AI image creation ("AI create") ---------------- */
@@ -3758,7 +3831,12 @@ async function send(){
   upsertSession(sess);
 
   input.value=''; clearAttachment(); updateSendBtn();
-  showScreen('screen-chat');
+  if(voiceModeActive){
+    document.getElementById('voice-status') && (document.getElementById('voice-status').textContent = 'Thinking...');
+    document.getElementById('voice-transcript') && (document.getElementById('voice-transcript').textContent = '');
+  } else {
+    showScreen('screen-chat');
+  }
   renderChat();
 
   // Explicit "yaad rakhna / remember that..." — save as a long-term memory
@@ -3857,6 +3935,40 @@ async function send(){
         const dateStr = post.createdAt ? new Date(post.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '';
         pushBotMessage(`Yeh raha @${post.creatorHandle||'user'} ka Pulse${dateStr?` (${dateStr})`:''}.`, null, null, null, null, null, null, null, null, null, post);
       }
+    }
+    return;
+  }
+
+  // "Gursharn Arya / Kashish Tyagi ke baare mein batao" — known-person
+  // lookup by name. Pulls the Nexor Sparks public profile AND a Google
+  // Knowledge Graph entity in parallel, then merges both into ONE
+  // structured "personCard" (instead of two separate cards) so the reply
+  // reads as a single, organized info block — Nexor stats + Google's
+  // verified facts together.
+  const knownPerson = !img ? extractKnownPerson(text) : null;
+  if(knownPerson){
+    addTyping();
+    const [profile, kg] = await Promise.all([
+      lookupPublicProfile(knownPerson.handle),
+      knowledgeGraphLookup(knownPerson.kgQuery)
+    ]);
+    removeTyping();
+    const hasProfile = !profile.notFound && !profile.error;
+    if(!hasProfile && !kg){
+      pushBotMessage(`Mujhe iske baare mein abhi koi jaankari nahi mil paayi.`, null);
+    } else {
+      const merged = {
+        name: (hasProfile && profile.name) || (kg && kg.name) || knownPerson.kgQuery,
+        handle: hasProfile ? profile.handle : null,
+        verified: hasProfile ? !!profile.verified : false,
+        bio: hasProfile ? (profile.bio||'') : '',
+        nexorStats: hasProfile ? { posts: profile.posts||0, likes: profile.likes||0, followers: profile.followers||0, following: profile.following||0 } : null,
+        kgDescription: kg ? (kg.description||'') : '',
+        kgDetail: kg ? (kg.detail||'') : '',
+        kgImage: kg ? kg.image : null,
+        kgUrl: kg ? kg.url : null
+      };
+      pushBotMessage(`Yeh raha ${merged.name} ke baare mein ek structured summary — Nexor Sparks aur Google, dono se.`, null, null, null, null, null, null, null, null, null, null, null, null, null, merged);
     }
     return;
   }
@@ -4034,16 +4146,106 @@ async function send(){
 
 /* ---------------- voice ---------------- */
 let voiceRecognition=null, voiceListening=false;
+// "Voice mode" — true while the voice screen is driving a hands-free,
+// speak-and-listen conversation (as opposed to just using the mic to
+// dictate one message and going back to typing). While this is true,
+// every bot reply is read aloud automatically and, once it finishes
+// speaking, the mic re-opens by itself so the user can just keep talking —
+// no extra taps needed, like a real back-and-forth conversation.
+let voiceModeActive=false;
+let voiceSpeaking=false;
+let cachedVoices=[];
+function loadVoicesAsync(){
+  return new Promise(resolve=>{
+    if(!('speechSynthesis' in window)) return resolve([]);
+    let v = window.speechSynthesis.getVoices();
+    if(v && v.length) return resolve(v);
+    const onchange=()=>{ v=window.speechSynthesis.getVoices(); if(v&&v.length){ window.speechSynthesis.onvoiceschanged=null; resolve(v); } };
+    window.speechSynthesis.onvoiceschanged = onchange;
+    // fallback in case onvoiceschanged never fires on this browser
+    setTimeout(()=>resolve(window.speechSynthesis.getVoices()||[]), 400);
+  });
+}
+// Picks the most natural-sounding SYSTEM voice available for a language —
+// free, no API key needed. Browsers/OSes now ship proper neural voices
+// (marked "Natural"/"Neural"/"Online" on Edge & Android, high-quality
+// "Google ..." voices on Chrome) alongside old robotic offline ones, so we
+// rank by quality signal in the voice name and prefer an exact-locale,
+// non-offline match before falling back to anything in the right language.
+function pickBestVoice(lang){
+  const voices = cachedVoices;
+  if(!voices || !voices.length) return null;
+  const langBase = lang.split('-')[0];
+  const score = v=>{
+    let s=0;
+    const n=(v.name||'').toLowerCase();
+    if(v.lang===lang) s+=6; else if(v.lang && v.lang.split('-')[0]===langBase) s+=3; else return -1;
+    if(/natural|neural|online|premium/.test(n)) s+=5;
+    if(/google/.test(n)) s+=3;
+    if(/microsoft/.test(n)) s+=2;
+    if(/compact|espeak|robot/.test(n)) s-=4;
+    if(v.localService===false) s+=1; // cloud voices usually sound better
+    return s;
+  };
+  let best=null, bestScore=-Infinity;
+  for(const v of voices){ const s=score(v); if(s>bestScore){ bestScore=s; best=v; } }
+  return bestScore>-1 ? best : null;
+}
 function getSpeechCtor(){ return window.SpeechRecognition || window.webkitSpeechRecognition || null; }
 function openVoicePanel(){
   const Ctor=getSpeechCtor();
   if(!Ctor){ alert("Voice input isn't supported in this browser — try typing instead."); return; }
+  voiceModeActive = true;
   showScreen('screen-voice');
   document.getElementById('voice-transcript').textContent='';
   document.getElementById('voice-status').textContent="Go ahead, I'm listening";
+  document.getElementById('orb-el') && document.getElementById('orb-el').classList.remove('speaking');
   startVoiceListening();
 }
-function closeVoicePanel(){ stopVoiceListening(); goChat(); }
+function closeVoicePanel(){
+  voiceModeActive = false;
+  if('speechSynthesis' in window) window.speechSynthesis.cancel();
+  voiceSpeaking = false;
+  stopVoiceListening();
+  goChat();
+}
+// Speaks a bot reply aloud in voice mode, then — once it's done talking —
+// automatically re-opens the mic so the conversation keeps flowing without
+// the user needing to tap anything, like a real two-way voice chat.
+function speakVoiceModeReply(text){
+  if(!voiceModeActive) return;
+  const status = document.getElementById('voice-status');
+  const transcriptEl = document.getElementById('voice-transcript');
+  const orb = document.getElementById('orb-el');
+  const resumeListening = ()=>{
+    voiceSpeaking = false;
+    orb && orb.classList.remove('speaking');
+    if(!voiceModeActive) return;
+    startVoiceListening();
+  };
+  if(!('speechSynthesis' in window)){
+    // Can't speak — just show the reply text and keep the conversation going.
+    if(status) status.textContent = "Here's what I found:";
+    if(transcriptEl) transcriptEl.textContent = text;
+    setTimeout(resumeListening, 1200);
+    return;
+  }
+  window.speechSynthesis.cancel();
+  const cleanText = text.replace(/[*_`#]+/g,'').trim();
+  if(!cleanText){ resumeListening(); return; }
+  const u = new SpeechSynthesisUtterance(cleanText);
+  u.lang = /[\u0900-\u097F]/.test(cleanText) ? 'hi-IN' : (appSettings.language==='hi' ? 'hi-IN' : (navigator.language||'en-US'));
+  const voice = pickBestVoice(u.lang);
+  if(voice) u.voice = voice;
+  u.rate = 1.0; u.pitch = 1.0;
+  voiceSpeaking = true;
+  if(status) status.textContent = 'Speaking...';
+  if(transcriptEl) transcriptEl.textContent = text;
+  orb && orb.classList.add('speaking');
+  u.onend = resumeListening;
+  u.onerror = resumeListening;
+  window.speechSynthesis.speak(u);
+}
 function startVoiceListening(){
   const Ctor=getSpeechCtor(); if(!Ctor) return;
   voiceRecognition = new Ctor();
@@ -4074,8 +4276,15 @@ function startVoiceListening(){
       if(!currentSessionId) startSessionSilently();
       document.getElementById('chat-input') && (document.getElementById('chat-input').value = finalText.trim());
       if(appSettings.voiceAutoSend){
-        closeVoicePanel();
-        setTimeout(()=>{ updateSendBtn(); send(); }, 60);
+        if(voiceModeActive){
+          // Stay in the voice screen — send() will show "Thinking..." and
+          // speakVoiceModeReply() will pick the mic back up once the bot
+          // finishes talking, keeping the conversation hands-free.
+          updateSendBtn(); send();
+        } else {
+          closeVoicePanel();
+          setTimeout(()=>{ updateSendBtn(); send(); }, 60);
+        }
       } else {
         closeVoicePanel();
         setTimeout(()=>{ updateSendBtn(); document.getElementById('chat-input').focus(); }, 60);
@@ -4089,6 +4298,15 @@ function stopVoiceListening(){
   voiceRecognition=null; voiceListening=false;
 }
 function toggleVoiceListening(){
+  if(voiceSpeaking){
+    // Barge-in: tapping the mic while Kashish is talking interrupts her
+    // and starts listening right away, like cutting in on a real call.
+    if('speechSynthesis' in window) window.speechSynthesis.cancel();
+    voiceSpeaking = false;
+    document.getElementById('orb-el') && document.getElementById('orb-el').classList.remove('speaking');
+    startVoiceListening();
+    return;
+  }
   if(voiceListening){
     if(voiceRecognition) try{ voiceRecognition.onend=null; voiceRecognition.stop(); }catch(e){}
     voiceListening=false;
