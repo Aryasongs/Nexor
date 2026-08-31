@@ -2134,7 +2134,7 @@ function renderChat(){
         sc.appendChild(grid);
       }
       const live=document.createElement('div'); live.className='sc-live';
-      live.innerHTML='<span class="dot"></span> Live price';
+      live.innerHTML = s.approx ? '<span class="dot"></span> Approx price (via search)' : '<span class="dot"></span> Live price';
       sc.appendChild(live);
       scroll.appendChild(sc);
     }
@@ -3020,47 +3020,66 @@ async function fetchStockQuoteYahoo(symbol){
       dayHigh: meta.regularMarketDayHigh!=null?meta.regularMarketDayHigh:null,
       dayLow: meta.regularMarketDayLow!=null?meta.regularMarketDayLow:null,
       exchange: meta.fullExchangeName || meta.exchangeName || '',
-      sparkline
+      sparkline,
+      approx: false
     };
   }catch(e){ console.warn('[KASHISH] Yahoo stock fetch failed:', e); return null; }
 }
-// Fallback when Yahoo's endpoint is unreachable/blocked: pull the price
-// straight off Google's search result (via the same Serper key already
-// used elsewhere in the app). Only trusts Google's own structured
-// answer/knowledge-graph fields — never scans organic snippets, since
-// those can quote an old article's price and give a wrong number.
+// Fallback when Yahoo's endpoint is unreachable/blocked (Yahoo has been
+// increasingly blocking non-browser traffic to this endpoint): pull the
+// price off Google's search result instead, via the same Serper key
+// already used elsewhere in the app. Google's own answer/knowledge-graph
+// fields are checked first (most reliable); if those are empty, we scan
+// the top organic snippets for a clearly-priced number (currency symbol +
+// two decimal places, e.g. "$227.55" or "₹2,945.10") since financial sites
+// almost always put the live price directly in their title/snippet.
 async function fetchStockQuoteSerper(query){
   try{
     const res = await fetch('https://google.serper.dev/search', {
       method:'POST',
       headers:{'X-API-KEY': SERPER_API_KEY, 'Content-Type':'application/json'},
-      body: JSON.stringify({ q: `${query} stock price` })
+      body: JSON.stringify({ q: `${query} stock price today` })
     });
     if(!res.ok) throw new Error('Serper HTTP '+res.status);
     const data = await res.json();
     const ab = data.answerBox || {};
     const kg = data.knowledgeGraph || {};
     const attrs = Object.assign({}, kg.attributes||{}, ab.attributes||{});
+    const PRICE_RE = /(?:₹|Rs\.?\s?|INR\s?|\$|US\$)\s?\d{1,3}(?:,\d{2,3})*\.\d{2}\b/;
     let priceRaw = ab.answer || attrs['Price'] || attrs['Current price'] || attrs['price'] || null;
-    if(!priceRaw) return null; // no structured price field — don't guess
+    let title = kg.title || ab.title || null;
+    if(!priceRaw){
+      const abBlob = [ab.title, ab.snippet].filter(Boolean).join(' ');
+      let m = abBlob.match(PRICE_RE);
+      if(m) priceRaw = m[0];
+    }
+    if(!priceRaw && Array.isArray(data.organic)){
+      for(const r of data.organic.slice(0,5)){
+        const blob = [r.title, r.snippet].filter(Boolean).join(' ');
+        const m = blob.match(PRICE_RE);
+        if(m){ priceRaw = m[0]; if(!title) title = r.title; break; }
+      }
+    }
+    if(!priceRaw) return null;
     const numMatch = String(priceRaw).replace(/,/g,'').match(/[\d.]+/);
     if(!numMatch) return null;
     const price = parseFloat(numMatch[0]);
     if(isNaN(price)) return null;
     const currency = /₹|Rs\.?|INR/i.test(priceRaw) ? 'INR' : (/\$/.test(priceRaw) ? 'USD' : '');
     let change=0, changePct=0;
-    const changeRaw = attrs["Today's change"] || attrs['Todays change'] || attrs['Change'] || '';
-    const pctMatch = String(changeRaw).match(/-?\d+\.?\d*\s*%/);
+    const changeRaw = attrs["Today's change"] || attrs['Todays change'] || attrs['Change'] || (ab.snippet||'') + ' ' + (title||'');
+    const pctMatch = String(changeRaw).match(/[-+]?\d+\.?\d*\s*%/);
     if(pctMatch) changePct = parseFloat(pctMatch[0]);
-    const chMatch = String(changeRaw).replace(/,/g,'').match(/[-+]\s?[\d.]+(?!\s*%)/);
+    const chMatch = String(changeRaw).replace(/,/g,'').match(/[-+]\s?\d+\.\d+(?!\s*%)/);
     if(chMatch) change = parseFloat(chMatch[0].replace(/\s/g,''));
     return {
-      symbol: (kg.title || ab.title || query).toString().split(' ')[0],
-      name: kg.title || ab.title || query,
+      symbol: (title || query).toString().split(/[\s(]/)[0],
+      name: title || query,
       price, currency, change, changePct,
       dayHigh: null, dayLow: null,
       exchange: kg.type || '',
-      sparkline: null
+      sparkline: null,
+      approx: true
     };
   }catch(e){ console.warn('[KASHISH] Serper stock fetch failed:', e); return null; }
 }
