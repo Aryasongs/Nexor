@@ -173,6 +173,39 @@ html[data-theme="dark"] .search-indicator{background:linear-gradient(160deg,#232
 .currency-card .cc-live .dot{width:6px;height:6px;border-radius:50%;background:#1FA855;animation:liveDotPulse 1.4s ease-in-out infinite;}
 @keyframes liveDotPulse{0%,100%{opacity:1;}50%{opacity:.35;}}
 
+/* Stock/share price card — live quote from Yahoo Finance chart API, no
+   API key needed. Works for NSE tickers (RELIANCE.NS), US tickers (AAPL),
+   and indices (^NSEI, ^BSESN). */
+.stock-card{max-width:88%;margin-top:6px;background:linear-gradient(155deg,#fff7ec 0%,#fffaf3 55%,#ffffff 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:16px 18px;box-shadow:0 10px 24px -14px rgba(180,120,20,.22);}
+.stock-card .sc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
+.stock-card .sc-name{font-size:13.5px;font-weight:800;color:var(--ink);line-height:1.3;}
+.stock-card .sc-sym{font-size:11px;color:var(--ink-soft);margin-top:2px;}
+.stock-card .sc-badge{flex-shrink:0;font-size:10px;font-weight:800;color:var(--ink-soft);background:var(--bubble-bot);border-radius:999px;padding:4px 9px;}
+.stock-card .sc-price{font-size:28px;font-weight:800;color:var(--ink);margin-top:10px;}
+.stock-card .sc-change{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:800;margin-top:2px;}
+.stock-card .sc-change.up{color:#1FA855;}
+.stock-card .sc-change.down{color:#E0433C;}
+.stock-card .sc-grid{display:flex;gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(20,20,22,.08);}
+.stock-card .sc-item{display:flex;flex-direction:column;}
+.stock-card .sc-item .v{font-weight:800;font-size:13px;color:var(--ink);}
+.stock-card .sc-item .l{font-size:10.5px;color:var(--ink-soft);}
+.stock-card .sc-live{display:inline-flex;align-items:center;gap:4px;font-size:9.5px;font-weight:800;color:#B4780F;text-transform:uppercase;letter-spacing:.03em;margin-top:10px;}
+.stock-card .sc-live .dot{width:6px;height:6px;border-radius:50%;background:#B4780F;animation:liveDotPulse 1.4s ease-in-out infinite;}
+
+/* Location / map card — Kashish drops a pin using OpenStreetMap (static
+   render, no API key) for "mera location", "X kaha hai", or "cafe near me"
+   style requests. */
+.map-card{position:relative;overflow:hidden;max-width:88%;width:100%;margin-top:6px;background:var(--card);border:1px solid rgba(255,255,255,.9);border-radius:18px;box-shadow:0 10px 24px -14px rgba(20,20,22,.28);text-align:left;}
+.map-card .mc-imgwrap{position:relative;width:100%;height:150px;background:var(--bubble-bot);overflow:hidden;}
+.map-card .mc-imgwrap img{width:100%;height:100%;object-fit:cover;}
+.map-card .mc-pin{position:absolute;left:50%;top:50%;transform:translate(-50%,-100%);font-size:30px;color:#E0433C;filter:drop-shadow(0 3px 4px rgba(0,0,0,.35));pointer-events:none;}
+.map-card .mc-body{padding:12px 16px 14px;}
+.map-card .mc-label{font-size:14px;font-weight:800;color:var(--ink);}
+.map-card .mc-address{font-size:11.5px;color:var(--ink-soft);margin-top:3px;line-height:1.4;}
+.map-card .mc-open{display:inline-flex;align-items:center;gap:6px;margin-top:10px;font-size:12px;font-weight:800;color:var(--accent);}
+html[data-theme="dark"] .stock-card{background:linear-gradient(155deg,#2a2318 0%,#221d15 55%,#1c1810 100%);}
+html[data-theme="dark"] .map-card{background:linear-gradient(150deg,#1E1E21 0%,#1A1A1D 50%,#151517 100%);border-color:rgba(255,255,255,.06);}
+
 /* Knowledge Graph — compact verified-entity card */
 .kg-card{position:relative;overflow:hidden;max-width:88%;margin-top:6px;background:linear-gradient(150deg,#ffffff 0%,#f4f5f7 50%,#eaecef 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 10px 22px -14px rgba(20,20,22,.25);text-align:left;width:100%;}
 .kg-card:active{background:var(--bubble-bot);}
@@ -2067,6 +2100,57 @@ function renderChat(){
       cc.appendChild(live);
       scroll.appendChild(cc);
     }
+    if(m.stockCard){
+      const s = m.stockCard;
+      const sc = document.createElement('div'); sc.className='stock-card';
+      const top = document.createElement('div'); top.className='sc-top';
+      const left = document.createElement('div');
+      const nameEl=document.createElement('div'); nameEl.className='sc-name'; nameEl.textContent=s.name;
+      const symEl=document.createElement('div'); symEl.className='sc-sym'; symEl.textContent=s.symbol+(s.exchange?' · '+s.exchange:'');
+      left.appendChild(nameEl); left.appendChild(symEl);
+      const badge=document.createElement('div'); badge.className='sc-badge'; badge.textContent=s.currency||'';
+      top.appendChild(left); top.appendChild(badge);
+      sc.appendChild(top);
+      const priceEl=document.createElement('div'); priceEl.className='sc-price'; priceEl.textContent=fmtConvAmount(s.price)+(s.currency?' '+s.currency:'');
+      sc.appendChild(priceEl);
+      const up = s.change>=0;
+      const chEl=document.createElement('div'); chEl.className='sc-change '+(up?'up':'down');
+      chEl.innerHTML = `<i class="ph-bold ph-arrow-${up?'up':'down'}-right"></i> ${up?'+':''}${fmtConvAmount(s.change)} (${up?'+':''}${s.changePct.toFixed(2)}%)`;
+      sc.appendChild(chEl);
+      if(s.dayHigh!=null && s.dayLow!=null){
+        const grid=document.createElement('div'); grid.className='sc-grid';
+        [[fmtConvAmount(s.dayHigh),'Day High'],[fmtConvAmount(s.dayLow),'Day Low']].forEach(([v,l])=>{
+          const it=document.createElement('div'); it.className='sc-item';
+          const vv=document.createElement('div'); vv.className='v'; vv.textContent=v;
+          const ll=document.createElement('div'); ll.className='l'; ll.textContent=l;
+          it.appendChild(vv); it.appendChild(ll); grid.appendChild(it);
+        });
+        sc.appendChild(grid);
+      }
+      const live=document.createElement('div'); live.className='sc-live';
+      live.innerHTML='<span class="dot"></span> Live price';
+      sc.appendChild(live);
+      scroll.appendChild(sc);
+    }
+    if(m.mapCard){
+      const mp = m.mapCard;
+      const mc = document.createElement('button'); mc.className='map-card';
+      mc.onclick=()=>{ if(mp.mapsUrl) window.open(mp.mapsUrl,'_blank'); };
+      const imgwrap=document.createElement('div'); imgwrap.className='mc-imgwrap';
+      const im=document.createElement('img'); im.src=mp.mapImg; im.alt='Map';
+      const pin=document.createElement('i'); pin.className='mc-pin ph-fill ph-map-pin';
+      imgwrap.appendChild(im); imgwrap.appendChild(pin);
+      mc.appendChild(imgwrap);
+      const body=document.createElement('div'); body.className='mc-body';
+      const lbl=document.createElement('div'); lbl.className='mc-label'; lbl.textContent=mp.label;
+      body.appendChild(lbl);
+      if(mp.address){ const addr=document.createElement('div'); addr.className='mc-address'; addr.textContent=mp.address; body.appendChild(addr); }
+      const openEl=document.createElement('div'); openEl.className='mc-open';
+      openEl.innerHTML='<i class="ph-bold ph-arrow-square-out"></i> Open in Maps';
+      body.appendChild(openEl);
+      mc.appendChild(body);
+      scroll.appendChild(mc);
+    }
     if(m.kgCard){
       const kg = m.kgCard;
       const kc = document.createElement('button'); kc.className='kg-card';
@@ -2839,6 +2923,166 @@ async function handleWeatherRequest(text){
   }catch(e){ console.warn('[KASHISH] weather fetch failed:', e); return null; }
 }
 
+/* ---------------- real-time stock price (Yahoo Finance chart API — no key) ---------------- */
+// Common name/alias -> ticker map so "TCS ka stock price" or "reliance
+// share price" resolves without the user needing to know the exact symbol.
+const STOCK_ALIASES = {
+  'reliance':'RELIANCE.NS','reliance industries':'RELIANCE.NS',
+  'tcs':'TCS.NS','tata consultancy':'TCS.NS','tata consultancy services':'TCS.NS',
+  'infosys':'INFY.NS','infy':'INFY.NS',
+  'hdfc bank':'HDFCBANK.NS','hdfc':'HDFCBANK.NS',
+  'icici bank':'ICICIBANK.NS','icici':'ICICIBANK.NS',
+  'sbi':'SBIN.NS','state bank of india':'SBIN.NS','state bank':'SBIN.NS',
+  'itc':'ITC.NS','wipro':'WIPRO.NS',
+  'airtel':'BHARTIARTL.NS','bharti airtel':'BHARTIARTL.NS',
+  'adani':'ADANIENT.NS','adani enterprises':'ADANIENT.NS',
+  'tata motors':'TATAMOTORS.NS','maruti':'MARUTI.NS','maruti suzuki':'MARUTI.NS',
+  'lt':'LT.NS','larsen':'LT.NS','larsen and toubro':'LT.NS',
+  'axis bank':'AXISBANK.NS','kotak':'KOTAKBANK.NS','kotak bank':'KOTAKBANK.NS',
+  'hindustan unilever':'HINDUNILVR.NS','hul':'HINDUNILVR.NS',
+  'nifty':'^NSEI','nifty 50':'^NSEI','sensex':'^BSESN',
+  'apple':'AAPL','tesla':'TSLA','google':'GOOGL','alphabet':'GOOGL',
+  'microsoft':'MSFT','amazon':'AMZN','meta':'META','facebook':'META',
+  'netflix':'NFLX','nvidia':'NVDA','amd':'AMD'
+};
+const STOCK_TRIGGER_PATTERNS = [
+  /\bstock\s*price\b/i, /\bshare\s*price\b/i, /\bstock\s+market\b/i,
+  /\bka\s+stock\b/i, /\bki\s+stock\b/i, /\bstock\s+kitna\b/i, /\bshare\s+kitna\b/i,
+  /\bstock\s+kaisa\b/i, /\bshares?\s+kaisa\b/i, /\b(nifty|sensex)\b/i
+];
+function needsStock(text){
+  const t=(text||'').trim();
+  if(!t) return false;
+  return STOCK_TRIGGER_PATTERNS.some(p=>p.test(t));
+}
+// Resolves a company name / alias mentioned anywhere in the text to a
+// ticker symbol. Longest alias match wins so "state bank of india" beats
+// the shorter "sbi"-adjacent words etc.
+function extractStockSymbol(text){
+  const t=(text||'').toLowerCase();
+  let best=null, bestLen=0;
+  Object.keys(STOCK_ALIASES).forEach(alias=>{
+    if(t.includes(alias) && alias.length>bestLen){ best=STOCK_ALIASES[alias]; bestLen=alias.length; }
+  });
+  if(best) return best;
+  // fall back to a bare uppercase ticker typed directly, e.g. "AAPL stock price"
+  const m = (text||'').match(/\b([A-Z]{1,5})\b\s+(?:stock|share)/);
+  if(m) return m[1];
+  return null;
+}
+async function fetchStockQuote(symbol){
+  try{
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=1d`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('Yahoo Finance HTTP '+res.status);
+    const data = await res.json();
+    const result = data.chart && data.chart.result && data.chart.result[0];
+    if(!result || !result.meta) return null;
+    const meta = result.meta;
+    const price = meta.regularMarketPrice;
+    const prevClose = meta.chartPreviousClose!=null ? meta.chartPreviousClose : meta.previousClose;
+    if(price==null) return null;
+    const change = prevClose!=null ? (price-prevClose) : 0;
+    const changePct = prevClose ? (change/prevClose*100) : 0;
+    return {
+      symbol: meta.symbol || symbol,
+      name: meta.longName || meta.shortName || meta.symbol || symbol,
+      price, currency: meta.currency||'',
+      change, changePct,
+      dayHigh: meta.regularMarketDayHigh!=null?meta.regularMarketDayHigh:null,
+      dayLow: meta.regularMarketDayLow!=null?meta.regularMarketDayLow:null,
+      exchange: meta.fullExchangeName || meta.exchangeName || ''
+    };
+  }catch(e){ console.warn('[KASHISH] stock fetch failed:', e); return null; }
+}
+
+/* ---------------- location / nearby / map (OpenStreetMap — no key) ---------------- */
+const LOCATION_TRIGGER_PATTERNS = [
+  /\bmera\s+location\b/i, /\bmeri\s+location\b/i, /\bmy\s+location\b/i,
+  /\bwhere\s+am\s*i\b/i, /\bkaha\s+hoon\b/i, /\bkahan\s+hoon\b/i, /\bmain\s+kaha[np]?\s*hoon\b/i,
+  /\bnear\s*by\b/i, /\bnear\s+me\b/i, /\bmere\s+(aas[- ]?paas|paas)\b/i, /\bnazdeek\b/i,
+  /\bmap\s+(dikha|batao|dikhao|par)\b/i, /\blocation\s+(dikha|batao|dikhao|par|mark)\b/i,
+  /\bkaha[np]?\s+hai\b/i, /\bkaha[np]?\s+par\s+hai\b/i, /\bwhere\s+is\b/i
+];
+function needsLocation(text){
+  const t=(text||'').trim();
+  if(!t) return false;
+  return LOCATION_TRIGGER_PATTERNS.some(p=>p.test(t));
+}
+// Figures out whether the user wants their own position, a nearby category
+// of place ("cafe near me"), or a specific named place ("Eiffel Tower kaha hai").
+function parseLocationQuery(text){
+  const t=(text||'').trim();
+  let m = t.match(/(.+?)\s+near\s*(?:me|by)\b/i);
+  if(m && m[1].trim()) return {mode:'nearby', query:m[1].trim()};
+  m = t.match(/mere\s+(?:aas[- ]?paas|paas)\s+(?:koi\s+)?(.+?)(?:\s+hai|\s+chahiye|\?|$)/i);
+  if(m && m[1].trim()) return {mode:'nearby', query:m[1].trim()};
+  if(/\b(mera|meri)\s+location\b/i.test(t) || /\bmy\s+location\b/i.test(t) || /\bwhere\s+am\s*i\b/i.test(t)
+     || /\bkaha[np]?\s+hoon\b/i.test(t) || /\bmain\s+kaha[np]?\s*hoon\b/i.test(t)) return {mode:'me'};
+  m = t.match(/^(?:mujhe\s+)?(.+?)\s+kaha[np]?\s+(?:hai|hain|par\s+hai)\b/i);
+  if(m && m[1].trim()) return {mode:'place', query:m[1].trim()};
+  m = t.match(/where\s+is\s+(.+)/i);
+  if(m && m[1].trim()) return {mode:'place', query:m[1].trim().replace(/\?$/,'')};
+  return {mode:'me'};
+}
+async function geocodePlace(query){
+  try{
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&addressdetails=1`;
+    const res = await fetch(url, { headers:{'Accept':'application/json'} });
+    if(!res.ok) return null;
+    const data = await res.json();
+    const r = data && data[0];
+    if(!r) return null;
+    return { lat:parseFloat(r.lat), lon:parseFloat(r.lon), label:(r.display_name||query).split(',')[0].trim(), address:r.display_name||'' };
+  }catch(e){ console.warn('[KASHISH] geocodePlace failed:', e); return null; }
+}
+async function reverseGeocode(lat, lon){
+  try{
+    const url = `https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json&addressdetails=1`;
+    const res = await fetch(url, { headers:{'Accept':'application/json'} });
+    if(!res.ok) return null;
+    const data = await res.json();
+    if(!data) return null;
+    const addr = data.address||{};
+    const label = data.name || addr.suburb || addr.neighbourhood || addr.road || addr.city || addr.town || 'Your location';
+    return { label, address: data.display_name||'' };
+  }catch(e){ console.warn('[KASHISH] reverseGeocode failed:', e); return null; }
+}
+// Finds the nearest matching place (cafe, hospital, atm, etc.) around a
+// given lat/lon by bounding the search to a small box around the user.
+async function findNearby(query, lat, lon){
+  try{
+    const d = 0.06; // roughly a 6-7km box
+    const viewbox = `${lon-d},${lat+d},${lon+d},${lat-d}`;
+    const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&limit=1&bounded=1&viewbox=${viewbox}`;
+    const res = await fetch(url, { headers:{'Accept':'application/json'} });
+    if(!res.ok) return null;
+    const data = await res.json();
+    const r = data && data[0];
+    if(!r) return null;
+    return { lat:parseFloat(r.lat), lon:parseFloat(r.lon), label:(r.display_name||query).split(',')[0].trim(), address:r.display_name||'' };
+  }catch(e){ console.warn('[KASHISH] findNearby failed:', e); return null; }
+}
+function staticMapUrl(lat, lon, zoom){
+  return `https://staticmap.openstreetmap.de/staticmap.php?center=${lat},${lon}&zoom=${zoom||15}&size=640x300&maptype=mapnik&markers=${lat},${lon},lightblue1`;
+}
+async function handleLocationRequest(parsed){
+  if(parsed.mode==='place'){
+    const geo = await geocodePlace(parsed.query);
+    if(!geo) return null;
+    return { lat:geo.lat, lon:geo.lon, label:geo.label, address:geo.address, mode:'place', query:parsed.query };
+  }
+  const loc = await getDeviceLocation();
+  if(!loc) return null;
+  if(parsed.mode==='me'){
+    const rev = await reverseGeocode(loc.lat, loc.lon);
+    return { lat:loc.lat, lon:loc.lon, label: rev?rev.label:'Your location', address: rev?rev.address:'', mode:'me', query:null };
+  }
+  const spot = await findNearby(parsed.query, loc.lat, loc.lon);
+  if(!spot) return null;
+  return { lat:spot.lat, lon:spot.lon, label:spot.label, address:spot.address, mode:'nearby', query:parsed.query };
+}
+
 /* ---------------- real-time news (via existing Serper key) ---------------- */
 const NEWS_TRIGGER_PATTERNS = [
   /\bnews\b/i, /\bkhabar(ein)?\b/i, /\bheadlines?\b/i, /\blatest\s+(on|about)\b/i,
@@ -3129,11 +3373,11 @@ function sendLocal(){
   }, 400);
 }
 
-function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults, webSources, kgCard, factCheckResults, postCard, conversionCard){
+function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults, webSources, kgCard, factCheckResults, postCard, conversionCard, stockCard, mapCard){
   const sess = getSession(currentSessionId);
   if(!sess) return;
   const qr = appSettings.trendingSearches ? (quickReplies||null) : null;
-  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, webSources: (webSources&&webSources.length)?webSources:null, kgCard: kgCard||null, factCheckResults: (factCheckResults&&factCheckResults.length)?factCheckResults:null, postCard: postCard||null, conversionCard: conversionCard||null, ts: Date.now()});
+  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, webSources: (webSources&&webSources.length)?webSources:null, kgCard: kgCard||null, factCheckResults: (factCheckResults&&factCheckResults.length)?factCheckResults:null, postCard: postCard||null, conversionCard: conversionCard||null, stockCard: stockCard||null, mapCard: mapCard||null, ts: Date.now()});
   sess.preview = truncate(text, 60);
   sess.updatedAt = Date.now();
   upsertSession(sess);
@@ -3491,6 +3735,50 @@ async function send(){
       pushBotMessage("Mujhe weather nahi mil paya — city ka naam bata do (jaise \"Delhi ka mausam\"), ya location access allow kar do.", null);
     } else {
       pushBotMessage(`${wx.place} mein abhi ${wx.temp}°C hai, ${wx.desc.toLowerCase()}.`, null, null, null, null, wx);
+    }
+    return;
+  }
+
+  // "TCS stock price / reliance ka stock / nifty" — handled directly with
+  // a live Yahoo Finance quote (no API key needed), same "real numbers, not
+  // a guess" reasoning as weather/conversion above.
+  if(!img && needsStock(text)){
+    const symbol = extractStockSymbol(text);
+    if(symbol){
+      addTyping();
+      const quote = await fetchStockQuote(symbol);
+      removeTyping();
+      if(!quote){
+        pushBotMessage(`Mujhe "${symbol}" ka stock price nahi mil paya — symbol check kar lo ya thodi der baad try karo.`, null);
+      } else {
+        const up = quote.change>=0;
+        const reply = `${quote.name} (${quote.symbol}) abhi ${fmtConvAmount(quote.price)} ${quote.currency} par hai, ${up?'+':''}${fmtConvAmount(quote.change)} (${up?'+':''}${quote.changePct.toFixed(2)}%) ${up?'up':'down'} aaj.`;
+        pushBotMessage(reply, null, null, null, null, null, null, null, null, null, null, null, quote);
+      }
+      return;
+    }
+    // No recognizable symbol/company — let it fall through to the LLM
+    // rather than dead-ending the conversation.
+  }
+
+  // "Mera location / X kaha hai / cafe near me" — handled directly with a
+  // live OpenStreetMap lookup + static map card (no API key needed).
+  if(!img && needsLocation(text)){
+    addTyping();
+    const parsed = parseLocationQuery(text);
+    const loc = await handleLocationRequest(parsed);
+    removeTyping();
+    if(!loc){
+      pushBotMessage(parsed.mode==='me'
+        ? "Mujhe tumhara location nahi mil paaya — location access allow karo browser mein."
+        : `Mujhe "${parsed.query}" nahi mil paya nearby — thoda aur specific naam try karo.`, null);
+    } else {
+      const mapCard = { lat:loc.lat, lon:loc.lon, label:loc.label, address:loc.address, mapImg: staticMapUrl(loc.lat, loc.lon), mapsUrl: `https://www.google.com/maps?q=${loc.lat},${loc.lon}` };
+      let reply;
+      if(loc.mode==='me') reply = `Yeh raha tumhara current location — ${loc.label}. Map par mark kar diya hai.`;
+      else if(loc.mode==='nearby') reply = `Sabse paas "${loc.query}" — ${loc.label} mila. Map par mark kar diya hai.`;
+      else reply = `${loc.label} yahan hai. Map par mark kar diya hai.`;
+      pushBotMessage(reply, null, null, null, null, null, null, null, null, null, null, null, null, mapCard);
     }
     return;
   }
