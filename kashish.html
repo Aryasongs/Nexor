@@ -3080,16 +3080,15 @@ function formatVideoResultsForModel(results){
 // Video, etc.) search for that title, so the user lands right where it's
 // actually watchable instead of a generic movie-info page.
 const MOVIE_TRIGGER_PATTERNS = [
-  /\bmovie\s*(suggest|recommend|batao|bata|dikha|dikhao|chahiye|dekhu|dekhna|dekhne)\b/i,
-  /\bsuggest\s+(me\s+)?(a\s+|some\s+)?movies?\b/i,
-  /\brecommend\s+(me\s+)?(a\s+|some\s+)?(movie|film)s?\b/i,
   /\b(koi|ek)\s+(achi|acchi|badhiya)?\s*movie\b/i,
   /\bkya\s*(movie|film)\s*dekhu\b/i,
   /\bkaunsi\s*movie\s*dekhu\b/i,
   /\bwhat\s+movie\s+(should|to)\s+(i\s+)?watch\b/i,
-  /\bmovie\s+ideas?\b/i,
-  /\bfilm\s+suggest\b/i
+  /\bwhat\s+(should|to)\s+(i\s+)?watch\b/i,
+  /\bmovie\s+ideas?\b/i
 ];
+const MOVIE_INTENT_WORDS = /\b(suggest|recommend|batao|bata|dikha|dikhao|dekhu|dekhna|dekhne|pick|ideas?|chahiye|chaiye)\b/i;
+const MOVIE_NOUN_WORDS = /\b(movie|movies|film|films)\b/i;
 const MOVIE_GENRE_MAP = {
   action:28, comedy:35, romance:10749, romantic:10749, horror:27,
   thriller:53, drama:18, 'sci-fi':878, scifi:878, science:878,
@@ -3100,6 +3099,12 @@ const MOVIE_GENRE_MAP = {
 function needsMovieSuggestion(text){
   const t=(text||'').trim();
   if(!t) return false;
+  // Primary check: intent word + "movie/film" word ANYWHERE in the message
+  // — order-independent, so "suggest me a thriller movie" still matches
+  // even though a genre word sits between "suggest" and "movie".
+  if(MOVIE_INTENT_WORDS.test(t) && MOVIE_NOUN_WORDS.test(t)) return true;
+  // Fallback: phrasing that implies "movie" without saying the intent word
+  // right next to it (e.g. "koi achi movie", "kya dekhu").
   return MOVIE_TRIGGER_PATTERNS.some(p=>p.test(t));
 }
 function guessMovieGenreId(text){
