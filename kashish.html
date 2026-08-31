@@ -186,6 +186,8 @@ html[data-theme="dark"] .search-indicator{background:linear-gradient(160deg,#232
 .stock-card .sc-change.up{color:#1FA855;}
 .stock-card .sc-change.down{color:#E0433C;}
 .stock-card .sc-grid{display:flex;gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(20,20,22,.08);}
+.stock-card .sc-spark{margin-top:10px;line-height:0;}
+.stock-card .sc-spark svg{display:block;}
 .stock-card .sc-item{display:flex;flex-direction:column;}
 .stock-card .sc-item .v{font-weight:800;font-size:13px;color:var(--ink);}
 .stock-card .sc-item .l{font-size:10.5px;color:var(--ink-soft);}
@@ -2116,6 +2118,11 @@ function renderChat(){
       const chEl=document.createElement('div'); chEl.className='sc-change '+(up?'up':'down');
       chEl.innerHTML = `<i class="ph-bold ph-arrow-${up?'up':'down'}-right"></i> ${up?'+':''}${fmtConvAmount(s.change)} (${up?'+':''}${s.changePct.toFixed(2)}%)`;
       sc.appendChild(chEl);
+      if(s.sparkline && s.sparkline.length>1){
+        const spark=document.createElement('div'); spark.className='sc-spark';
+        spark.innerHTML = buildSparklineSvg(s.sparkline, up);
+        sc.appendChild(spark);
+      }
       if(s.dayHigh!=null && s.dayLow!=null){
         const grid=document.createElement('div'); grid.className='sc-grid';
         [[fmtConvAmount(s.dayHigh),'Day High'],[fmtConvAmount(s.dayLow),'Day Low']].forEach(([v,l])=>{
@@ -2867,12 +2874,27 @@ async function geocodeCity(city){
     return { lat:r.latitude, lon:r.longitude, name:r.name, country:r.country };
   }catch(e){ console.warn('[KASHISH] geocoding failed:', e); return null; }
 }
+// IP-based location — a fallback that works with no GPS permission and no
+// HTTPS requirement, for when browser geolocation is blocked/denied/
+// unavailable (e.g. testing over plain http or as a local file). Less
+// precise than GPS but always returns something usable.
+async function ipGeolocate(){
+  try{
+    const res = await fetch('https://ipwho.is/');
+    if(!res.ok) return null;
+    const data = await res.json();
+    if(data && data.success!==false && data.latitude!=null && data.longitude!=null){
+      return { lat:data.latitude, lon:data.longitude, name:data.city||null, country:data.country||null };
+    }
+    return null;
+  }catch(e){ console.warn('[KASHISH] IP geolocation failed:', e); return null; }
+}
 function getDeviceLocation(){
   return new Promise((resolve)=>{
-    if(!navigator.geolocation){ resolve(null); return; }
+    if(!navigator.geolocation){ ipGeolocate().then(resolve); return; }
     navigator.geolocation.getCurrentPosition(
       pos=>resolve({lat:pos.coords.latitude, lon:pos.coords.longitude, name:null, country:null}),
-      ()=>resolve(null),
+      ()=>{ ipGeolocate().then(resolve); },
       { timeout:6000 }
     );
   });
@@ -2971,7 +2993,7 @@ function extractStockSymbol(text){
 }
 async function fetchStockQuoteYahoo(symbol){
   try{
-    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=1d&range=1d`;
+    const url = `https://query1.finance.yahoo.com/v8/finance/chart/${encodeURIComponent(symbol)}?interval=5m&range=1d`;
     const res = await fetch(url);
     if(!res.ok) throw new Error('Yahoo Finance HTTP '+res.status);
     const data = await res.json();
@@ -2983,6 +3005,13 @@ async function fetchStockQuoteYahoo(symbol){
     if(price==null) return null;
     const change = prevClose!=null ? (price-prevClose) : 0;
     const changePct = prevClose ? (change/prevClose*100) : 0;
+    // Today's intraday closes, for the little up/down line on the card.
+    let sparkline = null;
+    const closes = result.indicators && result.indicators.quote && result.indicators.quote[0] && result.indicators.quote[0].close;
+    if(Array.isArray(closes)){
+      sparkline = closes.filter(v=>v!=null);
+      if(sparkline.length<2) sparkline = null;
+    }
     return {
       symbol: meta.symbol || symbol,
       name: meta.longName || meta.shortName || meta.symbol || symbol,
@@ -2990,20 +3019,22 @@ async function fetchStockQuoteYahoo(symbol){
       change, changePct,
       dayHigh: meta.regularMarketDayHigh!=null?meta.regularMarketDayHigh:null,
       dayLow: meta.regularMarketDayLow!=null?meta.regularMarketDayLow:null,
-      exchange: meta.fullExchangeName || meta.exchangeName || ''
+      exchange: meta.fullExchangeName || meta.exchangeName || '',
+      sparkline
     };
   }catch(e){ console.warn('[KASHISH] Yahoo stock fetch failed:', e); return null; }
 }
 // Fallback when Yahoo's endpoint is unreachable/blocked: pull the price
 // straight off Google's search result (via the same Serper key already
-// used elsewhere in the app) since Google shows a finance panel for most
-// ticker/company queries.
+// used elsewhere in the app). Only trusts Google's own structured
+// answer/knowledge-graph fields — never scans organic snippets, since
+// those can quote an old article's price and give a wrong number.
 async function fetchStockQuoteSerper(query){
   try{
     const res = await fetch('https://google.serper.dev/search', {
       method:'POST',
       headers:{'X-API-KEY': SERPER_API_KEY, 'Content-Type':'application/json'},
-      body: JSON.stringify({ q: `${query} share price stock` })
+      body: JSON.stringify({ q: `${query} stock price` })
     });
     if(!res.ok) throw new Error('Serper HTTP '+res.status);
     const data = await res.json();
@@ -3011,21 +3042,14 @@ async function fetchStockQuoteSerper(query){
     const kg = data.knowledgeGraph || {};
     const attrs = Object.assign({}, kg.attributes||{}, ab.attributes||{});
     let priceRaw = ab.answer || attrs['Price'] || attrs['Current price'] || attrs['price'] || null;
-    if(!priceRaw){
-      const blob = [ab.title, ab.snippet, kg.title, kg.description,
-        Array.isArray(data.organic)?data.organic.slice(0,3).map(r=>r.title+' '+(r.snippet||'')).join(' '):''
-      ].filter(Boolean).join(' ');
-      const m = blob.match(/(?:₹|Rs\.?|INR\s?|\$)\s?[\d,]+\.?\d*/i);
-      if(m) priceRaw = m[0];
-    }
-    if(!priceRaw) return null;
+    if(!priceRaw) return null; // no structured price field — don't guess
     const numMatch = String(priceRaw).replace(/,/g,'').match(/[\d.]+/);
     if(!numMatch) return null;
     const price = parseFloat(numMatch[0]);
     if(isNaN(price)) return null;
     const currency = /₹|Rs\.?|INR/i.test(priceRaw) ? 'INR' : (/\$/.test(priceRaw) ? 'USD' : '');
     let change=0, changePct=0;
-    const changeRaw = attrs["Today's change"] || attrs['Todays change'] || attrs['Change'] || ab.snippet || '';
+    const changeRaw = attrs["Today's change"] || attrs['Todays change'] || attrs['Change'] || '';
     const pctMatch = String(changeRaw).match(/-?\d+\.?\d*\s*%/);
     if(pctMatch) changePct = parseFloat(pctMatch[0]);
     const chMatch = String(changeRaw).replace(/,/g,'').match(/[-+]\s?[\d.]+(?!\s*%)/);
@@ -3035,7 +3059,8 @@ async function fetchStockQuoteSerper(query){
       name: kg.title || ab.title || query,
       price, currency, change, changePct,
       dayHigh: null, dayLow: null,
-      exchange: kg.type || ''
+      exchange: kg.type || '',
+      sparkline: null
     };
   }catch(e){ console.warn('[KASHISH] Serper stock fetch failed:', e); return null; }
 }
@@ -3044,14 +3069,27 @@ async function fetchStockQuote(symbol, displayQuery){
   if(viaYahoo) return viaYahoo;
   return await fetchStockQuoteSerper(displayQuery || symbol);
 }
+// Builds a tiny inline SVG line chart from an array of prices — the
+// "kitna upar/down gaya" visual on the stock card.
+function buildSparklineSvg(values, up){
+  const w=200, h=48, pad=3;
+  const min=Math.min.apply(null, values), max=Math.max.apply(null, values);
+  const range = (max-min) || 1;
+  const step = values.length>1 ? (w-pad*2)/(values.length-1) : 0;
+  const pts = values.map((v,i)=> `${(pad+i*step).toFixed(1)},${(h-pad-((v-min)/range)*(h-pad*2)).toFixed(1)}`).join(' ');
+  const color = up ? '#1FA855' : '#E0433C';
+  return `<svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" width="100%" height="44"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
 
 /* ---------------- location / nearby / map (OpenStreetMap — no key) ---------------- */
 const LOCATION_TRIGGER_PATTERNS = [
-  /\bmera\s+location\b/i, /\bmeri\s+location\b/i, /\bmy\s+location\b/i,
+  /\bmera\s+location\b/i, /\bmeri\s+location\b/i, /\bmy\s+location\b/i, /\bcurrent\s+location\b/i,
   /\bwhere\s+am\s*i\b/i, /\bkaha\s+hoon\b/i, /\bkahan\s+hoon\b/i, /\bmain\s+kaha[np]?\s*hoon\b/i,
   /\bnear\s*by\b/i, /\bnear\s+me\b/i, /\bmere\s+(aas[- ]?paas|paas)\b/i, /\bnazdeek\b/i,
-  /\bmap\s+(dikha|batao|dikhao|par)\b/i, /\blocation\s+(dikha|batao|dikhao|par|mark)\b/i,
-  /\bkaha[np]?\s+hai\b/i, /\bkaha[np]?\s+par\s+hai\b/i, /\bwhere\s+is\b/i
+  /\bmap\s+(dikha|batao|dikhao|par|khol)\b/i, /\blocation\s+(dikha|batao|dikhao|par|mark|bhej)\b/i,
+  /\bkaha[np]?\s+hai\b/i, /\bkaha[np]?\s+par\s+hai\b/i, /\bwhere\s+is\b/i,
+  /\bshow\s+(me\s+)?(the\s+)?map\b/i, /\bshow\s+(me\s+)?(my\s+)?location\b/i,
+  /^location$/i, /^map$/i, /\bmujhe\s+(mera\s+)?location\b/i, /\blocation\s+share\b/i
 ];
 function needsLocation(text){
   const t=(text||'').trim();
