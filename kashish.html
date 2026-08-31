@@ -147,6 +147,7 @@ html[data-theme="dark"] .search-indicator{background:linear-gradient(160deg,#232
 .video-embed .ratio{position:relative;width:100%;padding-top:56.25%;}
 .video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
 .video-embed .ve-title{padding:8px 12px;font-size:12px;font-weight:700;color:var(--ink);background:var(--card);}
+.video-embed .ve-openlink{display:flex;align-items:center;gap:6px;padding:8px 12px 10px;font-size:11.5px;font-weight:700;color:var(--accent);background:var(--card);border-top:1px solid var(--border);}
 .weather-card{max-width:82%;margin-top:6px;background:linear-gradient(155deg,#eef6ff 0%,#f6f9ff 55%,#ffffff 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:16px 18px;box-shadow:0 10px 24px -14px rgba(30,70,150,.28);}
 .weather-card .wc-top{display:flex;align-items:center;justify-content:space-between;}
 .weather-card .wc-place{font-size:13px;font-weight:800;color:var(--ink);}
@@ -158,6 +159,19 @@ html[data-theme="dark"] .search-indicator{background:linear-gradient(160deg,#232
 .weather-card .wc-item{display:flex;flex-direction:column;}
 .weather-card .wc-item .v{font-weight:800;font-size:13px;color:var(--ink);}
 .weather-card .wc-item .l{font-size:10.5px;color:var(--ink-soft);}
+
+/* Currency/crypto converter card — live rate from open.er-api.com (fiat)
+   or CoinGecko (crypto), no API key needed for either. */
+.currency-card{max-width:88%;margin-top:6px;background:linear-gradient(155deg,#eefaf1 0%,#f6fdf8 55%,#ffffff 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:16px 18px;box-shadow:0 10px 24px -14px rgba(20,120,70,.22);}
+.currency-card .cc-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
+.currency-card .cc-amt{font-size:20px;font-weight:800;color:var(--ink);}
+.currency-card .cc-eq{font-size:13px;color:var(--ink-soft);}
+.currency-card .cc-result{font-size:20px;font-weight:800;color:#1FA855;}
+.currency-card .cc-rate{font-size:11px;color:var(--ink-soft);margin-top:6px;}
+.currency-card .cc-secondary{font-size:12.5px;color:var(--ink);margin-top:8px;padding-top:8px;border-top:1px solid var(--border);}
+.currency-card .cc-live{display:inline-flex;align-items:center;gap:4px;font-size:9.5px;font-weight:800;color:#1FA855;text-transform:uppercase;letter-spacing:.03em;margin-top:8px;}
+.currency-card .cc-live .dot{width:6px;height:6px;border-radius:50%;background:#1FA855;animation:liveDotPulse 1.4s ease-in-out infinite;}
+@keyframes liveDotPulse{0%,100%{opacity:1;}50%{opacity:.35;}}
 
 /* Knowledge Graph — compact verified-entity card */
 .kg-card{position:relative;overflow:hidden;max-width:88%;margin-top:6px;background:linear-gradient(150deg,#ffffff 0%,#f4f5f7 50%,#eaecef 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 10px 22px -14px rgba(20,20,22,.25);text-align:left;width:100%;}
@@ -221,6 +235,23 @@ html[data-theme="dark"] .web-source-chip{background:linear-gradient(160deg,#1E1E
 .pulse-profile-card .pp-stat .n{font-weight:800;font-size:15px;color:var(--ink);}
 .pulse-profile-card .pp-stat .l{font-size:11px;color:var(--ink-soft);}
 .pulse-profile-card .pp-note{font-size:11px;color:var(--ink-soft);margin-top:10px;padding-top:10px;border-top:1px solid var(--border);line-height:1.5;}
+
+/* Nexor Sparks Pulse (post) card — shown when a /p/POST_ID link is pasted. */
+.pulse-post-card{max-width:88%;margin-top:6px;background:linear-gradient(150deg,#ffffff 0%,#f4f5f7 50%,#eaecef 100%);border:1px solid rgba(255,255,255,.9);border-radius:16px;padding:14px 16px;box-shadow:0 10px 22px -14px rgba(20,20,22,.28);}
+.pulse-post-card .pk-head{display:flex;align-items:center;gap:9px;}
+.pulse-post-card .pk-avatar{width:34px;height:34px;border-radius:50%;overflow:hidden;flex-shrink:0;background:var(--bubble-bot);display:flex;align-items:center;justify-content:center;font-weight:800;color:var(--accent);font-size:13px;}
+.pulse-post-card .pk-avatar img{width:100%;height:100%;object-fit:cover;}
+.pulse-post-card .pk-name{font-weight:800;font-size:13.5px;color:var(--ink);}
+.pulse-post-card .pk-handle{font-size:11.5px;color:var(--ink-soft);}
+.pulse-post-card .pk-text{font-size:13px;color:var(--ink);margin-top:10px;line-height:1.5;white-space:pre-wrap;}
+.pulse-post-card .pk-media{margin-top:10px;border-radius:12px;overflow:hidden;background:var(--bubble-bot);}
+.pulse-post-card .pk-media img{width:100%;max-height:260px;object-fit:cover;display:block;}
+.pulse-post-card .pk-video-note{margin-top:10px;padding:9px 11px;border-radius:10px;background:var(--bubble-bot);font-size:11.5px;font-weight:700;color:var(--ink-soft);display:flex;align-items:center;gap:6px;}
+.pulse-post-card .pk-stats{display:flex;gap:18px;margin-top:12px;}
+.pulse-post-card .pk-stat{display:flex;flex-direction:column;}
+.pulse-post-card .pk-stat .n{font-weight:800;font-size:14px;color:var(--ink);}
+.pulse-post-card .pk-stat .l{font-size:10.5px;color:var(--ink-soft);}
+.pulse-post-card .pk-note{font-size:11px;color:var(--ink-soft);margin-top:10px;padding-top:10px;border-top:1px solid var(--border);line-height:1.5;}
 .msg-actions{display:flex;align-items:center;gap:14px;margin:2px 4px 6px;align-self:flex-start;}
 .msg-actions button{color:var(--ink-soft);font-size:16px;display:flex;align-items:center;justify-content:center;}
 .msg-actions button.active{color:var(--accent);}
@@ -1974,9 +2005,19 @@ function renderChat(){
       ifr.src = `https://www.youtube.com/embed/${pe.videoId}?autoplay=1&playsinline=1`;
       ifr.allow = 'autoplay; encrypted-media; picture-in-picture';
       ifr.allowFullscreen = true;
+      ifr.referrerPolicy = 'strict-origin-when-cross-origin';
       ratio.appendChild(ifr); ewrap.appendChild(ratio);
       const ttl=document.createElement('div'); ttl.className='ve-title'; ttl.textContent=pe.title;
       ewrap.appendChild(ttl);
+      // Fallback link — some videos have embedding disabled by the owner, in
+      // which case the player above shows blank/an error with no way for us
+      // to detect that (cross-origin iframe). This link always works, so
+      // playback is never a dead end even if the inline embed can't play.
+      const openLink=document.createElement('a'); openLink.className='ve-openlink';
+      openLink.href = pe.link || `https://www.youtube.com/watch?v=${pe.videoId}`;
+      openLink.target='_blank'; openLink.rel='noopener';
+      openLink.innerHTML = '<i class="ph-bold ph-arrow-square-out"></i> Video nahi chal raha? YouTube app mein khole';
+      ewrap.appendChild(openLink);
       scroll.appendChild(ewrap);
     }
     if(m.weatherCard){
@@ -2002,6 +2043,29 @@ function renderChat(){
       });
       wc.appendChild(grid);
       scroll.appendChild(wc);
+    }
+    if(m.conversionCard){
+      const c = m.conversionCard;
+      const cc = document.createElement('div'); cc.className='currency-card';
+      const row = document.createElement('div'); row.className='cc-row';
+      const amt=document.createElement('span'); amt.className='cc-amt'; amt.textContent=fmtConvAmount(c.amount)+' '+endpointLabel(c.from);
+      const eq=document.createElement('span'); eq.className='cc-eq'; eq.textContent='=';
+      const res=document.createElement('span'); res.className='cc-result'; res.textContent=fmtConvAmount(c.result)+' '+endpointLabel(c.to);
+      row.appendChild(amt); row.appendChild(eq); row.appendChild(res);
+      cc.appendChild(row);
+      const rateEl=document.createElement('div'); rateEl.className='cc-rate';
+      rateEl.textContent = `1 ${endpointLabel(c.from)} = ${fmtConvAmount(c.rate)} ${endpointLabel(c.to)}`;
+      cc.appendChild(rateEl);
+      if(c.secondary){
+        const s=c.secondary;
+        const secEl=document.createElement('div'); secEl.className='cc-secondary';
+        secEl.textContent = `${fmtConvAmount(s.amount)} ${endpointLabel(s.from)} = ${fmtConvAmount(s.result)} ${endpointLabel(s.to)}`;
+        cc.appendChild(secEl);
+      }
+      const live=document.createElement('div'); live.className='cc-live';
+      live.innerHTML='<span class="dot"></span> Live rate';
+      cc.appendChild(live);
+      scroll.appendChild(cc);
     }
     if(m.kgCard){
       const kg = m.kgCard;
@@ -2111,6 +2175,44 @@ function renderChat(){
       note.textContent='Public profile info only — login/activity time and other private data aren\'t shared.';
       pc.appendChild(note);
       scroll.appendChild(pc);
+    }
+    if(m.postCard){
+      const p = m.postCard;
+      const pk = document.createElement('div'); pk.className='pulse-post-card';
+      const head = document.createElement('div'); head.className='pk-head';
+      const av = document.createElement('div'); av.className='pk-avatar';
+      if(p.creatorPhoto){ const im=document.createElement('img'); im.src=p.creatorPhoto; im.alt=''; av.appendChild(im); }
+      else av.textContent = (p.creatorName||'?').charAt(0).toUpperCase();
+      const nameWrap = document.createElement('div');
+      const nameEl = document.createElement('div'); nameEl.className='pk-name'; nameEl.textContent = p.creatorName;
+      const handleEl = document.createElement('div'); handleEl.className='pk-handle'; handleEl.textContent = '@'+(p.creatorHandle||'user') + (p.createdAt ? ' · '+fmtTime(p.createdAt) : '');
+      nameWrap.appendChild(nameEl); nameWrap.appendChild(handleEl);
+      head.appendChild(av); head.appendChild(nameWrap);
+      pk.appendChild(head);
+      if(p.text){ const txt=document.createElement('div'); txt.className='pk-text'; txt.textContent=p.text; pk.appendChild(txt); }
+      if(p.image){
+        const media=document.createElement('div'); media.className='pk-media';
+        const im=document.createElement('img'); im.src=p.image; im.alt=''; media.appendChild(im);
+        pk.appendChild(media);
+      } else if(p.hasVideo){
+        const vn=document.createElement('div'); vn.className='pk-video-note';
+        vn.innerHTML='<i class="ph-bold ph-play-circle"></i> Yeh Pulse ek video hai — poora dekhne ke liye Nexor par khole';
+        pk.appendChild(vn);
+      }
+      if(!p.hideCounts){
+        const stats=document.createElement('div'); stats.className='pk-stats';
+        [['likes','Likes'],['replies','Replies'],['reposts','Reposts'],['views','Views']].forEach(([k,label])=>{
+          const s=document.createElement('div'); s.className='pk-stat';
+          const n=document.createElement('div'); n.className='n'; n.textContent=fmtCompact(p[k]||0);
+          const l=document.createElement('div'); l.className='l'; l.textContent=label;
+          s.appendChild(n); s.appendChild(l); stats.appendChild(s);
+        });
+        pk.appendChild(stats);
+      }
+      const note=document.createElement('div'); note.className='pk-note';
+      note.textContent = p.hideCounts ? 'Is Pulse ke counts author ne sabse hide kiye hain.' : 'Public Pulse info only.';
+      pk.appendChild(note);
+      scroll.appendChild(pk);
     }
     if(m.quickReplies && m.quickReplies.length){
       const qr=document.createElement('div'); qr.className='quick-replies';
@@ -2403,6 +2505,130 @@ function formatFactCheckResultsForModel(results){
     + results.map((r,i)=>`${i+1}. Claim: "${r.claim}" — ${r.publisher}'s rating: ${r.rating}`).join('\n');
 }
 
+/* ---------------- Currency / crypto converter ---------------- */
+// Two free, keyless APIs: open.er-api.com for fiat-to-fiat rates, and
+// CoinGecko for anything involving crypto (it also accepts most fiat
+// codes directly as vs_currencies, so crypto<->fiat needs only one call).
+function escapeRegex(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+const CURRENCY_ALIASES = {
+  'dollar':'USD','dollars':'USD','usd':'USD',
+  'rupee':'INR','rupees':'INR','rupaye':'INR','rupaya':'INR','rupya':'INR','inr':'INR',
+  'euro':'EUR','euros':'EUR','eur':'EUR',
+  'pound':'GBP','pounds':'GBP','gbp':'GBP',
+  'yen':'JPY','jpy':'JPY',
+  'dirham':'AED','dirhams':'AED','aed':'AED',
+  'riyal':'SAR','riyals':'SAR','sar':'SAR',
+  'cad':'CAD','aud':'AUD','sgd':'SGD','cny':'CNY','yuan':'CNY'
+};
+const CRYPTO_ALIASES = {
+  'bitcoin':'bitcoin','btc':'bitcoin',
+  'ethereum':'ethereum','eth':'ethereum',
+  'dogecoin':'dogecoin','doge':'dogecoin',
+  'solana':'solana','sol':'solana',
+  'litecoin':'litecoin','ltc':'litecoin',
+  'ripple':'ripple','xrp':'ripple',
+  'tether':'tether','usdt':'tether',
+  'binance coin':'binancecoin','bnb':'binancecoin',
+  'cardano':'cardano','ada':'cardano',
+  'polygon':'matic-network','matic':'matic-network',
+  'shiba inu':'shiba-inu','shib':'shiba-inu'
+};
+const CRYPTO_DISPLAY = { bitcoin:'BTC', ethereum:'ETH', dogecoin:'DOGE', solana:'SOL', litecoin:'LTC', ripple:'XRP', tether:'USDT', binancecoin:'BNB', cardano:'ADA', 'matic-network':'MATIC', 'shiba-inu':'SHIB' };
+const CONVERSION_HINT_PATTERN = /\b(convert|price|rate|kitne|kitna|value|worth|exchange|today)\b|[$₹€£]/i;
+function needsConversion(text){
+  const t=(text||'').trim();
+  if(!t) return false;
+  const low = t.toLowerCase();
+  const hasCurrencyWord = Object.keys(CURRENCY_ALIASES).some(k=> new RegExp('(?:^|[^a-z0-9])'+escapeRegex(k)+'(?:$|[^a-z0-9])','i').test(low)) || /[$₹€£]/.test(t);
+  const hasCryptoWord = Object.keys(CRYPTO_ALIASES).some(k=> new RegExp('(?:^|[^a-z0-9])'+escapeRegex(k)+'(?:$|[^a-z0-9])','i').test(low));
+  if(!hasCurrencyWord && !hasCryptoWord) return false;
+  return hasCryptoWord || CONVERSION_HINT_PATTERN.test(low);
+}
+function findTokenMatches(text, aliasMap){
+  const t = text.toLowerCase();
+  const out = [];
+  Object.keys(aliasMap).forEach(alias=>{
+    const re = new RegExp('(?:^|[^a-z0-9])'+escapeRegex(alias)+'(?:$|[^a-z0-9])','ig');
+    let m;
+    while((m = re.exec(t))){ out.push({ index: m.index, value: aliasMap[alias] }); }
+  });
+  return out;
+}
+// Picks amount + up to two currency/crypto tokens, in the order they
+// appear, so "50 euro to dollar" reads as from=EUR, to=USD. A single
+// crypto mention (e.g. "bitcoin price") defaults to converting into INR;
+// a single fiat mention defaults to INR<->USD, whichever isn't the source.
+function parseConversionQuery(text){
+  const currencyMatches = findTokenMatches(text, CURRENCY_ALIASES).map(m=>({index:m.index, type:'fiat', value:m.value}));
+  const cryptoMatches = findTokenMatches(text, CRYPTO_ALIASES).map(m=>({index:m.index, type:'crypto', value:m.value}));
+  let all = currencyMatches.concat(cryptoMatches).sort((a,b)=>a.index-b.index);
+  const dedup = [];
+  all.forEach(m=>{
+    const last = dedup[dedup.length-1];
+    if(last && last.type===m.type && last.value===m.value && Math.abs(last.index-m.index)<6) return;
+    dedup.push(m);
+  });
+  all = dedup;
+  if(!all.length) return null;
+  const numMatch = text.match(/(\d+(?:[.,]\d+)?)/);
+  const amount = numMatch ? parseFloat(numMatch[1].replace(/,/g,'')) : 1;
+  const mkEndpoint = (m)=> m.type==='fiat' ? {type:'fiat', code:m.value} : {type:'crypto', id:m.value};
+  if(all.length >= 2){
+    const from = mkEndpoint(all[0]), to = mkEndpoint(all[1]);
+    if(from.type==='fiat' && to.type==='fiat' && from.code===to.code) return null;
+    if(from.type==='crypto' && to.type==='crypto' && from.id===to.id) return null;
+    return { amount, from, to };
+  }
+  const only = mkEndpoint(all[0]);
+  if(only.type==='crypto') return { amount, from: only, to: {type:'fiat', code:'INR'}, alsoUsd:true };
+  const to = only.code==='INR' ? {type:'fiat', code:'USD'} : {type:'fiat', code:'INR'};
+  return { amount, from: only, to };
+}
+function endpointLabel(e){ return e.type==='fiat' ? e.code : (CRYPTO_DISPLAY[e.id] || e.id.toUpperCase()); }
+async function performConversion(amount, from, to){
+  try{
+    if(from.type==='crypto' || to.type==='crypto'){
+      const ids = []; if(from.type==='crypto') ids.push(from.id); if(to.type==='crypto') ids.push(to.id);
+      const vs = []; if(from.type==='fiat') vs.push(from.code.toLowerCase()); if(to.type==='fiat') vs.push(to.code.toLowerCase());
+      if(!vs.length) vs.push('usd');
+      const url = `https://api.coingecko.com/api/v3/simple/price?ids=${ids.join(',')}&vs_currencies=${vs.join(',')}`;
+      const res = await fetch(url);
+      if(!res.ok) throw new Error('CoinGecko HTTP '+res.status);
+      const data = await res.json();
+      if(from.type==='crypto' && to.type==='fiat'){
+        const price = data[from.id] && data[from.id][to.code.toLowerCase()];
+        if(price==null) throw new Error('No price data');
+        return { amount, from, to, result: amount*price, rate: price };
+      }
+      if(from.type==='fiat' && to.type==='crypto'){
+        const price = data[to.id] && data[to.id][from.code.toLowerCase()];
+        if(price==null) throw new Error('No price data');
+        return { amount, from, to, result: amount/price, rate: 1/price };
+      }
+      const p1 = data[from.id] && data[from.id]['usd'];
+      const p2 = data[to.id] && data[to.id]['usd'];
+      if(!p1 || !p2) throw new Error('No price data');
+      const rate = p1/p2;
+      return { amount, from, to, result: amount*rate, rate };
+    }
+    const url = `https://open.er-api.com/v6/latest/${from.code}`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('Exchange rate HTTP '+res.status);
+    const data = await res.json();
+    if(data.result!=='success' || !data.rates || data.rates[to.code]==null) throw new Error('No rate data');
+    const rate = data.rates[to.code];
+    return { amount, from, to, result: amount*rate, rate };
+  }catch(e){ console.warn('[KASHISH] currency/crypto conversion failed:', e); return null; }
+}
+function fmtConvAmount(n){
+  if(n==null || isNaN(n)) return '-';
+  const abs = Math.abs(n);
+  if(abs >= 1000) return n.toLocaleString('en-IN', {maximumFractionDigits:2});
+  if(abs >= 1) return n.toLocaleString('en-IN', {maximumFractionDigits:4});
+  if(abs === 0) return '0';
+  return n.toPrecision(4);
+}
+
 /* ---------------- YouTube video search ---------------- */
 // Similar heuristic/trigger approach as web search above — only fire a
 // video search when the message actually looks like it's asking to find
@@ -2516,9 +2742,11 @@ function extractYoutubeId(link){
 async function youtubePlayTop(query){
   const q = cleanPlayQuery(query);
   const results = await youtubeSearch(q);
+  console.log('[KASHISH] play-video search results for "'+q+'":', results);
   if(!results.length) return null;
   const top = results[0];
   const videoId = extractYoutubeId(top.link);
+  console.log('[KASHISH] extracted videoId:', videoId, 'from link:', top.link);
   if(!videoId) return null;
   return { videoId, title: top.title, channel: top.channel, link: top.link };
 }
@@ -2699,6 +2927,67 @@ async function lookupPublicProfile(handle){
   }
 }
 
+/* ---------------- Nexor Sparks post/profile link lookup ---------------- */
+// Detects a shared https://nexorsparks.com/@handle or .../p/POST_ID (or
+// legacy ?pulse=ID) link pasted into chat, and answers in the matching
+// format automatically — profile link -> profile card, post link -> post
+// card — instead of needing an explicit "@handle + keyword" trigger.
+const NEXOR_HOSTS = /^(www\.)?nexorsparks\.com$|^nexor-f4d\.pages\.dev$/i;
+function extractNexorLink(text){
+  if(!text) return null;
+  const urlMatch = text.match(/https?:\/\/[^\s]+/);
+  if(!urlMatch) return null;
+  let u;
+  try{ u = new URL(urlMatch[0]); }catch(e){ return null; }
+  if(!NEXOR_HOSTS.test(u.hostname)) return null;
+  const postMatch = u.pathname.match(/^\/p\/([^\/?#]+)\/?$/);
+  const pulseId = postMatch ? decodeURIComponent(postMatch[1]) : (u.searchParams.get('pulse') || null);
+  if(pulseId) return { type:'post', id: pulseId };
+  const handleMatch = u.pathname.match(/^\/@([^\/?#]+)\/?$/);
+  if(handleMatch) return { type:'profile', handle: decodeURIComponent(handleMatch[1]).toLowerCase() };
+  return null;
+}
+// Reads a single Pulse (post) plus a light privacy check on its author.
+// Deliberately never surfaces a post from a private account through a
+// shared link — same boundary as the profile lookup above — and hides
+// like/reply/repost counts if the author has that privacy setting on.
+async function lookupPublicPost(pulseId){
+  try{
+    const snap = await db.ref('pulses/'+pulseId).once('value');
+    if(!snap.exists()) return {notFound:true};
+    const p = snap.val() || {};
+    if(p.removed || p.deletedAt) return {notFound:true};
+    let authorPrivate = false, hideCounts = false;
+    if(p.uid){
+      try{
+        const uSnap = await db.ref('users/'+p.uid).once('value');
+        const u = uSnap.val() || {};
+        authorPrivate = !!u.private;
+        hideCounts = !!u.hideLikeCounts;
+      }catch(e){}
+    }
+    if(authorPrivate) return {private:true};
+    return {
+      notFound:false,
+      text: p.text || '',
+      image: p.image || p.photoBase64 || null,
+      hasVideo: !!(p.video || p.videoUrl || p.videoBase64),
+      creatorName: p.creatorName || 'Someone',
+      creatorHandle: p.creatorHandle || '',
+      creatorPhoto: p.creatorPhoto || null,
+      createdAt: p.createdAt || null,
+      hideCounts,
+      likes: p.likes || 0,
+      replies: p.replies || 0,
+      reposts: p.reposts || 0,
+      views: Math.max(p.views||0, p.viewsBoost||0)
+    };
+  }catch(e){
+    console.warn('[KASHISH] public post lookup failed:', e);
+    return {error:true};
+  }
+}
+
 /* ---------------- long-term memory ---------------- */
 // Lightweight persistent memory: things explicitly asked to be remembered
 // ("yaad rakhna ki...", "remember that...") get saved per-account and
@@ -2840,11 +3129,11 @@ function sendLocal(){
   }, 400);
 }
 
-function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults, webSources, kgCard, factCheckResults){
+function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults, webSources, kgCard, factCheckResults, postCard, conversionCard){
   const sess = getSession(currentSessionId);
   if(!sess) return;
   const qr = appSettings.trendingSearches ? (quickReplies||null) : null;
-  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, webSources: (webSources&&webSources.length)?webSources:null, kgCard: kgCard||null, factCheckResults: (factCheckResults&&factCheckResults.length)?factCheckResults:null, ts: Date.now()});
+  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, webSources: (webSources&&webSources.length)?webSources:null, kgCard: kgCard||null, factCheckResults: (factCheckResults&&factCheckResults.length)?factCheckResults:null, postCard: postCard||null, conversionCard: conversionCard||null, ts: Date.now()});
   sess.preview = truncate(text, 60);
   sess.updatedAt = Date.now();
   upsertSession(sess);
@@ -3113,6 +3402,41 @@ async function send(){
     return;
   }
 
+  // "Nexor post/profile link pasted" — direct URL lookup. Detects a
+  // nexorsparks.com/@handle or .../p/POST_ID (or ?pulse=ID) link and
+  // answers in the matching format automatically: profile link -> profile
+  // card, post link -> post card. Handled directly (no LLM call), same as
+  // the @handle lookup below, so we fully control what data can leak.
+  const nexorLink = !img ? extractNexorLink(text) : null;
+  if(nexorLink){
+    addTyping();
+    if(nexorLink.type==='profile'){
+      const profile = await lookupPublicProfile(nexorLink.handle);
+      removeTyping();
+      if(profile.notFound){
+        pushBotMessage(`Mujhe @${nexorLink.handle} naam ka koi user Nexor Sparks par nahi mila.`, null);
+      } else if(profile.error){
+        pushBotMessage(`@${nexorLink.handle} ka profile abhi load nahi ho paya — thodi der baad try karo.`, null);
+      } else {
+        pushBotMessage(`Yeh raha @${profile.handle} ka public profile.`, null, null, profile);
+      }
+    } else {
+      const post = await lookupPublicPost(nexorLink.id);
+      removeTyping();
+      if(post.notFound){
+        pushBotMessage(`Yeh Pulse ab exist nahi karta — delete ho chuka hoga ya link galat hai.`, null);
+      } else if(post.private){
+        pushBotMessage(`Yeh ek private account ka Pulse hai, isliye main iski details share nahi kar sakti.`, null);
+      } else if(post.error){
+        pushBotMessage(`Yeh Pulse abhi load nahi ho paya — thodi der baad try karo.`, null);
+      } else {
+        const dateStr = post.createdAt ? new Date(post.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '';
+        pushBotMessage(`Yeh raha @${post.creatorHandle||'user'} ka Pulse${dateStr?` (${dateStr})`:''}.`, null, null, null, null, null, null, null, null, null, post);
+      }
+    }
+    return;
+  }
+
   // "Is user ka pulse/likes/profile batao" — public-profile lookup.
   // Handled directly (no LLM call) so we control exactly which fields
   // can ever be shown, and never accidentally leak private data.
@@ -3132,6 +3456,29 @@ async function send(){
       pushBotMessage(reply, null, null, profile);
     }
     return;
+  }
+
+  // "1 dollar kitne rupaye / bitcoin price / convert X to Y" — handled
+  // directly with live rates (open.er-api.com for fiat, CoinGecko for
+  // crypto), same reasoning as weather below: real numbers, not a guess.
+  if(!img && needsConversion(text)){
+    const parsed = parseConversionQuery(text);
+    if(parsed){
+      addTyping();
+      const primary = await performConversion(parsed.amount, parsed.from, parsed.to);
+      let secondary = null;
+      if(primary && parsed.alsoUsd){
+        secondary = await performConversion(parsed.amount, parsed.from, {type:'fiat', code:'USD'});
+      }
+      removeTyping();
+      if(!primary){
+        pushBotMessage("Live rate abhi fetch nahi ho paya — thodi der baad try karo.", null);
+      } else {
+        const reply = `Abhi ke live rate ke hisaab se, ${fmtConvAmount(primary.amount)} ${endpointLabel(primary.from)} = ${fmtConvAmount(primary.result)} ${endpointLabel(primary.to)}.`;
+        pushBotMessage(reply, null, null, null, null, null, null, null, null, null, null, {...primary, secondary});
+      }
+      return;
+    }
   }
 
   // "Weather/mausam" — handled directly with live Open-Meteo data (no
