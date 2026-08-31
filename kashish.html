@@ -3306,12 +3306,23 @@ function formatNewsResultsForModel(results){
 // presence/"active now" status, login time, or anything from userPrivate/.
 const PROFILE_LOOKUP_KEYWORDS = /profile|pulse|like|post|follow|stats?|account|kitne|batao|bata\b/i;
 const SENSITIVE_ASK_PATTERN = /\b(login|log[- ]?in|online|active|last seen|session|kab se|kitni der se|screen ?time)\b/i;
+// Lets people ask about a couple of specific named individuals (Kashish's
+// founder/namesake) by NAME rather than needing their exact @handle, and
+// still get the same live, public-only Nexor Sparks profile card as the
+// @handle flow below — same privacy boundary, just an extra name trigger.
+const KNOWN_PERSON_HANDLES = [
+  { pattern: /\b(gursharn\s*arya|gursharan\s*singh)\b/i, handle: 'gursharan' },
+  { pattern: /\bkashish\s*tyagi\b/i, handle: 'kashishtyagi0999' }
+];
+const PERSON_INFO_KEYWORDS = /\b(kaun|who\s+is|who'?s|about|info(rmation)?|jaankari|jankari|detail|batao|bata\s*do|tell\s+me\s+about|kya\s+hai|kaise\s+hai)\b/i;
 function extractProfileLookupHandle(text){
   if(!text) return null;
   const m = text.match(/@([a-zA-Z0-9_]{2,30})/);
-  if(!m) return null;
-  if(!PROFILE_LOOKUP_KEYWORDS.test(text)) return null;
-  return m[1].toLowerCase();
+  if(m && PROFILE_LOOKUP_KEYWORDS.test(text)) return m[1].toLowerCase();
+  for(const entry of KNOWN_PERSON_HANDLES){
+    if(entry.pattern.test(text) && PERSON_INFO_KEYWORDS.test(text)) return entry.handle;
+  }
+  return null;
 }
 async function lookupPublicProfile(handle){
   try{
