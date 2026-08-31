@@ -14,6 +14,9 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<!-- jsPDF — used to turn plain text/chat content into a downloadable PDF
+     on request ("isko pdf bana do" / "export as pdf"), fully client-side. -->
+<script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -300,6 +303,8 @@ html[data-theme="dark"] .web-source-chip{background:linear-gradient(160deg,#1E1E
 .person-card .pc-kg-desc{font-size:12.5px;font-weight:700;color:var(--ink);margin-top:8px;}
 .person-card .pc-kg-detail{font-size:12.5px;color:var(--ink-soft);margin-top:6px;line-height:1.55;}
 .person-card .pc-note{font-size:11px;color:var(--ink-soft);margin-top:12px;padding-top:10px;border-top:1px solid var(--border);line-height:1.5;}
+.person-card .pc-gallery{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 4px;margin-top:8px;}
+.person-card .pc-gallery img{width:84px;height:84px;flex-shrink:0;object-fit:cover;border-radius:12px;background:var(--bubble-bot);box-shadow:0 1px 0 rgba(255,255,255,.8) inset;}
 
 /* Nexor Sparks Pulse (post) card — shown when a /p/POST_ID link is pasted. */
 .pulse-post-card{max-width:88%;margin-top:6px;background:linear-gradient(150deg,#ffffff 0%,#f4f5f7 50%,#eaecef 100%);border:1px solid rgba(255,255,255,.9);border-radius:16px;padding:14px 16px;box-shadow:0 10px 22px -14px rgba(20,20,22,.28);}
@@ -2425,8 +2430,19 @@ function renderChat(){
         if(p.kgDescription){ const d=document.createElement('div'); d.className='pc-kg-desc'; d.textContent=p.kgDescription; body.appendChild(d); }
         if(p.kgDetail){ const d=document.createElement('div'); d.className='pc-kg-detail'; d.textContent=p.kgDetail; body.appendChild(d); }
       }
+      if(p.images && p.images.length){
+        const glbl=document.createElement('div'); glbl.className='pc-section-label'; glbl.innerHTML='<i class="ph-fill ph-images"></i> Photos';
+        body.appendChild(glbl);
+        const gal=document.createElement('div'); gal.className='pc-gallery';
+        p.images.forEach(im=>{
+          const el=document.createElement('img'); el.src=im.url; el.alt=im.title||''; el.loading='lazy';
+          el.onclick=()=>window.open(im.url,'_blank');
+          gal.appendChild(el);
+        });
+        body.appendChild(gal);
+      }
       const note=document.createElement('div'); note.className='pc-note';
-      note.textContent='Public info only, combined from Nexor Sparks and Google.';
+      note.textContent='Public info only, combined from Nexor Sparks, Google, and live web search.';
       body.appendChild(note);
       pc.appendChild(body);
       scroll.appendChild(pc);
@@ -2787,6 +2803,43 @@ async function webSearch(query){
   }
 }
 
+/* ---------------- link crawling — read any pasted URL ---------------- */
+// When the user pastes a link (any site, not just Nexor Sparks), fetch and
+// read the actual page content so Kashish can summarize/answer questions
+// about it instead of guessing from the URL alone. Uses Serper's scrape
+// endpoint (same API key already used for web search) since a plain
+// browser fetch() to an arbitrary third-party site is blocked by CORS.
+function extractCrawlableUrl(text){
+  if(!text) return null;
+  const m = (text||'').match(/https?:\/\/[^\s<>()"]+/);
+  if(!m) return null;
+  let u;
+  try{ u = new URL(m[0]); }catch(e){ return null; }
+  if(NEXOR_HOSTS.test(u.hostname)) return null; // Nexor links have their own handler
+  return u.toString();
+}
+async function crawlUrl(url){
+  try{
+    const res = await fetch('https://scrape.serper.dev', {
+      method:'POST',
+      headers:{'X-API-KEY': SERPER_API_KEY, 'Content-Type':'application/json'},
+      body: JSON.stringify({ url })
+    });
+    if(!res.ok) throw new Error('Serper scrape HTTP '+res.status);
+    const data = await res.json();
+    const title = data.metadata && (data.metadata.title || data.metadata['og:title']);
+    const bodyText = (data.text || data.markdown || '').trim();
+    if(!bodyText) return null;
+    // Keep the page content to a sane size — plenty for a summary/answer,
+    // without blowing past the model's context budget.
+    const clipped = bodyText.length > 8000 ? bodyText.slice(0, 8000)+'…' : bodyText;
+    return { title: title || safeDomain(url), text: clipped, url };
+  }catch(e){ console.warn('[KASHISH] link crawl failed:', e); return null; }
+}
+function formatCrawlResultForModel(crawled, userText){
+  return `The user shared this link: ${crawled.url}\nPage title: ${crawled.title}\n\nHere is the actual page content, fetched just now (treat it as accurate/current):\n\n${crawled.text}\n\nAnswer the user's message using this content. If they didn't ask anything specific, give a short, natural summary of what the page is about. Don't dump the raw content back at them — synthesize it in your own words, in your normal reply style.`;
+}
+
 /* ---------------- Google Knowledge Graph — quick verified entity facts ---------------- */
 // Free API, no separate billing needed beyond the shared Google Cloud key.
 // Runs alongside a normal web search for factual "who/what is X" style
@@ -3062,6 +3115,38 @@ async function youtubeSearch(query){
         }));
     }catch(e2){
       console.warn('[KASHISH] Serper video fallback also failed:', e2);
+      return [];
+    }
+  }
+}
+/* ---------------- person image search (for known-person lookups) ---------------- */
+// Pulls a small gallery of real photos for a named person — used only by
+// the known-person merge below, not for general chat. Tries Serper images
+// first, falls back to Google Custom Search image mode.
+async function personImageSearch(query){
+  try{
+    const res = await fetch('https://google.serper.dev/images', {
+      method:'POST',
+      headers:{'X-API-KEY': SERPER_API_KEY, 'Content-Type':'application/json'},
+      body: JSON.stringify({ q: query })
+    });
+    if(!res.ok) throw new Error('Serper images HTTP '+res.status);
+    const data = await res.json();
+    const items = Array.isArray(data.images) ? data.images : [];
+    const mapped = items.filter(i=>i.imageUrl).slice(0,6).map(i=>({ url:i.imageUrl, title:i.title||query }));
+    if(mapped.length) return mapped;
+    throw new Error('Serper images returned nothing usable');
+  }catch(e1){
+    console.warn('[KASHISH] Serper image search failed, trying Google CSE images:', e1);
+    try{
+      const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_CSE_API_KEY}&cx=${GOOGLE_CSE_ID}&searchType=image&num=6&q=${encodeURIComponent(query)}`;
+      const res2 = await fetch(url);
+      if(!res2.ok) throw new Error('Google CSE images HTTP '+res2.status);
+      const data2 = await res2.json();
+      const items2 = Array.isArray(data2.items) ? data2.items : [];
+      return items2.filter(i=>i.link).slice(0,6).map(i=>({ url:i.link, title:i.title||query }));
+    }catch(e2){
+      console.warn('[KASHISH] Google CSE image fallback also failed:', e2);
       return [];
     }
   }
@@ -3723,21 +3808,52 @@ function extractProfileLookupHandle(text){
   if(!PROFILE_LOOKUP_KEYWORDS.test(text)) return null;
   return m[1].toLowerCase();
 }
-// Lets people ask about a couple of specific named individuals (Kashish's
-// founder/namesake) by NAME rather than needing their exact @handle. For
-// these two, an info-style ask pulls BOTH the live Nexor Sparks public
-// profile card AND a Google Knowledge Graph card (since Gursharn Arya has
-// a verified public KG entity) so the reply is fuller/more structured,
-// same as it would be if you pasted a Nexor profile link directly.
-const KNOWN_PERSON_ENTRIES = [
+// Lets people ask about ANY named person — not just a hardcoded shortlist —
+// by name rather than needing their exact @handle. A couple of specific
+// individuals (Kashish's founder/namesake) still get their known Nexor
+// @handle attached directly, so their reply also includes the live Nexor
+// Sparks public profile card; everyone else still gets the full KG + web
+// search + image treatment, just without a guessed Nexor handle. If none
+// of the lookups turn up anything real, the model is told (via the empty
+// combinedContext + the honesty rule in the system prompt) to say it
+// honestly doesn't know rather than inventing details — this applies
+// equally to every name, famous or not, not just a special few.
+const KNOWN_PERSON_HANDLES = [
   { pattern: /\b(gursharn\s*arya|gursharan\s*singh)\b/i, handle: 'gursharan', kgQuery: 'Gursharn Arya' },
   { pattern: /\bkashish\s*tyagi\b/i, handle: 'kashishtyagi0999', kgQuery: 'Kashish Tyagi' }
 ];
 const PERSON_INFO_KEYWORDS = /\b(kaun|who\s+is|who'?s|about|info(rmation)?|jaankari|jankari|detail|batao|bata\s*do|tell\s+me\s+about|kya\s+hai|kaise\s+hai)\b/i;
+// Generic "who is <Name>" / "<Name> ke baare mein batao" extractor — pulls
+// out a plausible person name from the phrasing itself instead of matching
+// against a fixed list, so this works for any name the user types.
+const GENERIC_PERSON_PATTERNS = [
+  /\bwho\s+is\s+([a-z][a-z.'\-]*(?:\s+[a-z][a-z.'\-]*){0,3})\??$/i,
+  /\bwho'?s\s+([a-z][a-z.'\-]*(?:\s+[a-z][a-z.'\-]*){0,3})\??$/i,
+  /\btell\s+me\s+about\s+([a-z][a-z.'\-]*(?:\s+[a-z][a-z.'\-]*){0,3})\??$/i,
+  /^([a-z][a-z.'\-]*(?:\s+[a-z][a-z.'\-]*){0,3})\s+ke\s+baare\s+me[i]?n\s+(batao|bata\s*do|jaankari|jankari|kuch)\b/i,
+  /^([a-z][a-z.'\-]*(?:\s+[a-z][a-z.'\-]*){0,3})\s+kaun\s+(hai|hain|tha|thi)\b/i
+];
+// Words that would otherwise false-positive as a "name" — Nexor's own
+// terms, generic pronouns, etc. — so we don't fire the person-lookup flow
+// on things like "who is your founder" (handled separately) or "about you".
+const NON_PERSON_NAME_WORDS = /^(you|yourself|kashish|nexor|nexor\s*sparks|this|that|it|me|us|him|her|them)$/i;
 function extractKnownPerson(text){
   if(!text) return null;
-  for(const entry of KNOWN_PERSON_ENTRIES){
-    if(entry.pattern.test(text) && PERSON_INFO_KEYWORDS.test(text)) return entry;
+  const trimmed = text.trim();
+  for(const entry of KNOWN_PERSON_HANDLES){
+    if(entry.pattern.test(trimmed) && PERSON_INFO_KEYWORDS.test(trimmed)) return entry;
+  }
+  for(const pat of GENERIC_PERSON_PATTERNS){
+    const m = trimmed.match(pat);
+    if(m && m[1]){
+      const name = m[1].trim().replace(/\s+/g,' ');
+      if(name.length < 2 || name.length > 60) continue;
+      if(NON_PERSON_NAME_WORDS.test(name)) continue;
+      // Needs at least a plausible name-shaped token (letters), and skip
+      // single common words that aren't really "who is X" about a person.
+      if(!/[a-z]{2,}/i.test(name)) continue;
+      return { handle: null, kgQuery: name };
+    }
   }
   return null;
 }
@@ -3878,6 +3994,8 @@ Origin story (only bring this up if directly asked "who made you", "who created 
 
 You can optionally offer 1-2 short "quickReplies" (single words or short phrases, like "Yes" or "Tell me more") when a natural yes/no or follow-up moment fits — don't force this on every message, only when it genuinely fits the flow.
 
+Honesty about people (applies to EVERYONE you're asked about — not just anyone specific, and not just people you happen to know well): if you're asked about a named individual and no context block below actually contains real information about them, say plainly and warmly that you don't have reliable info on that person, instead of inventing a bio, job, achievements, or other "facts". This is especially important for people who aren't broadly famous — don't guess who they might be or fabricate plausible-sounding details just because a name sounds familiar. It's completely fine to say "I don't know who that is" — that's more helpful than confidently making something up.
+
 Nexor Sparks help: since Kashish shares its account system with Nexor Sparks (the social app where people post "Pulses", follow each other, and get likes/followers), you're happy to help when asked things like "how do I post", "how do I get more followers", "how do I grow on Nexor", or "write me a pulse/caption about X". Give practical, concrete tips (posting consistently, writing an engaging first line, using relevant hashtags, replying to comments, posting when your audience is active, having a clear bio/profile photo, engaging with others' Pulses too, avoiding spammy/bought engagement). When asked to draft a Pulse/caption/post for them, write the ready-to-post text itself (no meta-commentary like "here's a draft", no surrounding quote marks) so it's clean to copy and paste straight into Nexor Sparks — the app already shows a copy button under your message for this.
 
 Respond with ONLY compact JSON, no markdown fences, no extra text outside the JSON:
@@ -3988,6 +4106,46 @@ function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed
 // no API key needed client-side, the Worker holds the AI binding.
 const KASHISH_IMAGE_WORKER_URL = 'https://nexorai.sgursharn076.workers.dev/';
 const KASHISH_IMAGE_PREFIXES = ['#imagine','imagine ','image ','img ','generate image','make image','create image','draw ','pic ','photo ','picture ','tasveer','tasveer bana','image bana','pic bana','photo bana'];
+/* ---------------- text -> PDF export ---------------- */
+// Lets the user turn plain text (something they paste, or Kashish's own
+// last reply) into a downloadable PDF, fully client-side via jsPDF — no
+// server round-trip needed.
+const PDF_TRIGGER_PATTERN = /\bpdf\b/i;
+const PDF_ACTION_PATTERN = /\b(bana|banado|banao|convert|export|download|save|de\s*do|karo|kar\s*do|de\s*de)\b/i;
+const PDF_FILLER_WORDS = /\b(pdf|bana\s*do|banado|banao|bana|convert(ed)?|export|download|save(\s+as)?|file|mein|de\s*do|de\s*de|karo|kar\s*do|isko|iss|this|into|as|a|an|please|plz|kar|de)\b/gi;
+function detectPdfRequest(text){
+  if(!text) return null;
+  const t = text.trim();
+  if(!PDF_TRIGGER_PATTERN.test(t)) return null;
+  if(!PDF_ACTION_PATTERN.test(t) && !/pdf\s+file/i.test(t)) return null;
+  // If the user embedded real content alongside the request (e.g. "isko pdf
+  // bana do: <long text>" or a big paste ending with "pdf bana do"), use
+  // that as the PDF content instead of falling back to the last reply.
+  const stripped = t.replace(PDF_FILLER_WORDS, ' ').replace(/\s+/g,' ').replace(/^[:,\-–\s]+/,'').trim();
+  return { inlineContent: stripped.length > 25 ? stripped : null };
+}
+function generateTextPdf(text, title){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({ unit:'pt', format:'a4' });
+  const margin = 48;
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const pageHeight = doc.internal.pageSize.getHeight();
+  const usableWidth = pageWidth - margin*2;
+  doc.setFont('helvetica','bold'); doc.setFontSize(15);
+  const titleLines = doc.splitTextToSize(title || 'Kashish', usableWidth);
+  doc.text(titleLines, margin, margin);
+  let y = margin + titleLines.length*18 + 10;
+  doc.setFont('helvetica','normal'); doc.setFontSize(11.5);
+  const bodyLines = doc.splitTextToSize(text, usableWidth);
+  const lineHeight = 16;
+  bodyLines.forEach(line=>{
+    if(y > pageHeight - margin){ doc.addPage(); y = margin; }
+    doc.text(line, margin, y);
+    y += lineHeight;
+  });
+  const filename = (title||'kashish-export').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'').slice(0,50) || 'kashish-export';
+  doc.save(filename + '.pdf');
+}
 function detectImageRequest(text){
   const t=(text||'').trim().toLowerCase();
   if(!t) return null;
@@ -4237,6 +4395,35 @@ async function send(){
     return;
   }
 
+  // "isko pdf bana do" / "export this as pdf" — turn text into a
+  // downloadable PDF, fully client-side. Uses any content the user typed
+  // alongside the request if there's enough of it, otherwise falls back to
+  // Kashish's own most recent reply in this chat.
+  const pdfRequest = !img ? detectPdfRequest(text) : null;
+  if(pdfRequest){
+    let content = pdfRequest.inlineContent;
+    if(!content){
+      const lastBot = [...sess.messages].reverse().find(m => m.role !== 'user' && m.text && m.text.trim());
+      if(lastBot) content = lastBot.text.trim();
+    }
+    if(!content){
+      pushBotMessage("Kis text ka PDF banaun? Woh text yahan bhej do, ya pehle mujhse kuch likhwao aur phir bolo 'isko pdf bana do'.", null);
+      return;
+    }
+    addTyping();
+    setTimeout(()=>{
+      removeTyping();
+      try{
+        generateTextPdf(content, sess.title || 'Kashish chat');
+        pushBotMessage("PDF ban gaya — download shuru ho gaya hai. ", null);
+      }catch(e){
+        console.warn('[KASHISH] PDF generation failed:', e);
+        pushBotMessage("PDF banane mein dikkat aa gayi, thodi der baad dobara try karo.", null);
+      }
+    }, 300);
+    return;
+  }
+
   // Locally "trained" instant replies — no API call at all for common
   // greetings/small-talk/etc. Falls through to the LLM if nothing matches.
   const localReply = !img ? getLocalReply(text) : null;
@@ -4284,23 +4471,89 @@ async function send(){
     return;
   }
 
+  // "https://... (any link)" — crawl the actual page and use its real
+  // content as context for the reply, same idea as a live web search but
+  // for a specific page the user handed us directly.
+  const crawlableUrl = !img ? extractCrawlableUrl(text) : null;
+  if(crawlableUrl){
+    addSearchIndicator('Reading the link…');
+    const crawled = await crawlUrl(crawlableUrl);
+    updateSearchIndicator('Putting together an answer…');
+    const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
+    const crawlContext = crawled ? formatCrawlResultForModel(crawled, text) : null;
+    try{
+      const result = await kashishReply(historyForModel, crawlContext);
+      removeSearchIndicator();
+      if(crawled){
+        pushBotMessage(result.reply, result.quickReplies);
+      } else {
+        pushBotMessage(`Us link ko main abhi crawl/open nahi kar payi — page block ho sakta hai ya link expired/private hai. Kya us page ka koi text yahan paste kar sakte ho, main uspe seedhe help kar dungi?`, null);
+      }
+    }catch(e){
+      removeSearchIndicator();
+      pushBotMessage("Link padhne ke baad reply banane mein dikkat aa gayi — thodi der baad try karo.", null);
+    }
+    return;
+  }
+
   // "Gursharn Arya / Kashish Tyagi ke baare mein batao" — known-person
-  // lookup by name. Pulls the Nexor Sparks public profile AND a Google
-  // Knowledge Graph entity in parallel, then merges both into ONE
-  // structured "personCard" (instead of two separate cards) so the reply
-  // reads as a single, organized info block — Nexor stats + Google's
-  // verified facts together.
+  // lookup by name. Runs FOUR things in parallel — Kashish's own built-in
+  // knowledge (via the LLM, same as any normal question), a live web
+  // search, a Google Knowledge Graph entity lookup, and the Nexor Sparks
+  // database profile — plus a small real-photo gallery, then merges
+  // everything into ONE synthesized answer with a structured personCard
+  // underneath (instead of several separate, disconnected cards).
   const knownPerson = !img ? extractKnownPerson(text) : null;
   if(knownPerson){
-    addTyping();
-    const [profile, kg] = await Promise.all([
-      lookupPublicProfile(knownPerson.handle),
-      knowledgeGraphLookup(knownPerson.kgQuery)
-    ]);
-    removeTyping();
-    const hasProfile = !profile.notFound && !profile.error;
-    if(!hasProfile && !kg){
-      pushBotMessage(`Mujhe iske baare mein abhi koi jaankari nahi mil paayi.`, null);
+    addSearchIndicator('Looking that up…');
+    let profile=null, kg=null, searchResult=null, images=[];
+    try{
+      [profile, kg, searchResult, images] = await Promise.all([
+        knownPerson.handle ? lookupPublicProfile(knownPerson.handle) : Promise.resolve(null),
+        knowledgeGraphLookup(knownPerson.kgQuery),
+        webSearch(knownPerson.kgQuery),
+        personImageSearch(knownPerson.kgQuery)
+      ]);
+    }catch(e){ console.warn('[KASHISH] known-person parallel lookups failed:', e); }
+    const hasProfile = profile && !profile.notFound && !profile.error;
+    const webSources = (searchResult && searchResult.sources) || null;
+
+    // Build one combined context block — Nexor's own database record,
+    // Google's verified Knowledge Graph entity, and live web search
+    // results — so the model synthesizes all of it (plus what it already
+    // knows) into a single natural-language reply, same as a normal
+    // web-search answer, rather than just filling in a static template.
+    const contextParts = [];
+    if(hasProfile){
+      contextParts.push(`Nexor Sparks database profile: name "${profile.name}", handle @${profile.handle}${profile.verified?' (verified)':''}${profile.bio?(', bio: "'+profile.bio+'"'):''}, ${profile.posts||0} posts, ${profile.followers||0} followers.`);
+    }
+    if(kg && (kg.description || kg.detail)){
+      contextParts.push(`Google Knowledge Graph verified entity: ${kg.name} — ${kg.description||''}. ${kg.detail||''}`.trim());
+    }
+    if(searchResult && searchResult.context){
+      contextParts.push(`Live web search results:\n${searchResult.context}`);
+    }
+    const combinedContext = contextParts.length ? contextParts.join('\n\n') : null;
+
+    updateSearchIndicator('Putting together an answer…');
+    const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
+    let replyText, quickReplies=null;
+    try{
+      const result = await kashishReply(historyForModel, combinedContext);
+      replyText = result.reply; quickReplies = result.quickReplies;
+    }catch(e){
+      console.warn('[KASHISH] known-person merged reply failed:', e);
+      replyText = hasProfile || kg ? `Yeh raha ${(hasProfile&&profile.name)||(kg&&kg.name)||knownPerson.kgQuery} ke baare mein jo mil paaya.` : `Mujhe "${knownPerson.kgQuery}" ke baare mein koi bharosemand jaankari nahi mil paayi — shayad yeh koi kam-jaana-pehchana naam hai. Main jhooth nahi bolungi, sach mein nahi pata.`;
+    }
+    removeSearchIndicator();
+
+    // Nothing came back from Nexor, the Knowledge Graph, or a live web
+    // search — rather than let the model guess/hallucinate a biography, be
+    // upfront that there's no reliable info on this person, for anyone,
+    // not just names Kashish doesn't specially recognize.
+    if(!hasProfile && !kg && !combinedContext){
+      const honestReply = `Mujhe "${knownPerson.kgQuery}" ke baare mein kahin bhi koi bharosemand jaankari nahi mil paayi — na Nexor par, na web par. Ho sakta hai yeh naam kam jaana-pehchana ho ya spelling thodi alag ho. Main galat/banayi hui jaankari nahi dena chahti, isliye seedha keh rahi hoon: mujhe nahi pata.`;
+      pushBotMessage(honestReply, quickReplies);
     } else {
       const merged = {
         name: (hasProfile && profile.name) || (kg && kg.name) || knownPerson.kgQuery,
@@ -4311,9 +4564,10 @@ async function send(){
         kgDescription: kg ? (kg.description||'') : '',
         kgDetail: kg ? (kg.detail||'') : '',
         kgImage: kg ? kg.image : null,
-        kgUrl: kg ? kg.url : null
+        kgUrl: kg ? kg.url : null,
+        images: images && images.length ? images : null
       };
-      pushBotMessage(`Yeh raha ${merged.name} ke baare mein ek structured summary — Nexor Sparks aur Google, dono se.`, null, null, null, null, null, null, null, null, null, null, null, null, null, merged);
+      pushBotMessage(replyText, quickReplies, null, null, null, null, null, webSources, null, null, null, null, null, null, merged);
     }
     return;
   }
