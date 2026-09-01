@@ -355,6 +355,19 @@ html[data-theme="dark"] .web-source-chip{background:linear-gradient(160deg,#1E1E
 .person-card .pc-note{font-size:11px;color:var(--ink-soft);margin-top:12px;padding-top:10px;border-top:1px solid var(--border);line-height:1.5;}
 .person-card .pc-gallery{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 4px;margin-top:8px;}
 .person-card .pc-gallery img{width:84px;height:84px;flex-shrink:0;object-fit:cover;border-radius:12px;background:var(--bubble-bot);box-shadow:0 1px 0 rgba(255,255,255,.8) inset;}
+/* Signature card for Kashish Tyagi — the real-life namesake/inspiration —
+   deliberately distinct from the generic grey person-card so it doesn't
+   look like just another looked-up profile. */
+.person-card.featured{background:linear-gradient(150deg,#fff5f7 0%,#ffe9ee 45%,#ffd9e3 100%);border:1px solid rgba(255,255,255,.9);box-shadow:0 14px 28px -16px rgba(214,51,108,.45);position:relative;}
+.person-card.featured::after{content:'';position:absolute;inset:0;border-radius:16px;padding:1px;background:linear-gradient(150deg,#ff9ab3,#ffd27a,#ff9ab3);-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:xor;mask-composite:exclude;pointer-events:none;}
+.person-card.featured .pc-featured-badge{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:800;color:#fff;background:linear-gradient(120deg,#ff5f8f,#ff8a65);padding:7px 14px;letter-spacing:.01em;}
+.person-card.featured .pc-featured-badge i{font-size:13px;}
+.person-card.featured .pc-name{color:#c22a5e;}
+.person-card.featured .pc-section-label{color:#d6336c;}
+.person-card.featured .pc-note{color:#a85a72;}
+html[data-theme="dark"] .person-card.featured{background:linear-gradient(150deg,#2b1620 0%,#241119 50%,#1c0e14 100%);border-color:rgba(255,154,179,.18);}
+html[data-theme="dark"] .person-card.featured .pc-name{color:#ff9ab3;}
+html[data-theme="dark"] .person-card.featured .pc-note{color:#c98a9c;}
 
 /* Nexor Sparks Pulse (post) card — shown when a /p/POST_ID link is pasted. */
 .pulse-post-card{max-width:88%;margin-top:6px;background:linear-gradient(150deg,#ffffff 0%,#f4f5f7 50%,#eaecef 100%);border:1px solid rgba(255,255,255,.9);border-radius:16px;padding:14px 16px;box-shadow:0 10px 22px -14px rgba(20,20,22,.28);}
@@ -3152,7 +3165,12 @@ function renderChat(){
     }
     if(m.personCard){
       const p = m.personCard;
-      const pc = document.createElement('div'); pc.className='person-card';
+      const pc = document.createElement('div'); pc.className='person-card'+(p.featured?' featured':'');
+      if(p.featured){
+        const badge=document.createElement('div'); badge.className='pc-featured-badge';
+        badge.innerHTML='<i class="ph-fill ph-heart"></i> Inspiration behind Kashish AI';
+        pc.appendChild(badge);
+      }
       if(p.kgImage){
         const th=document.createElement('div'); th.className='pc-thumb';
         const im=document.createElement('img'); im.src=p.kgImage; im.alt=''; th.appendChild(im);
@@ -3201,7 +3219,9 @@ function renderChat(){
         body.appendChild(gal);
       }
       const note=document.createElement('div'); note.className='pc-note';
-      note.textContent='Public info only, combined from Nexor Sparks, Google, and live web search.';
+      note.textContent=p.featured
+        ? 'The real person Kashish is named after — public info only, combined from Nexor Sparks, Google, and live web search.'
+        : 'Public info only, combined from Nexor Sparks, Google, and live web search.';
       body.appendChild(note);
       pc.appendChild(body);
       scroll.appendChild(pc);
@@ -4801,7 +4821,12 @@ const KNOWN_PERSON_HANDLES = [
   // no social handles/links here, so this can't be used to locate or
   // message her directly from the card.
   { pattern: /\bkashish\s*tyagi\b/i, handle: 'kashishtyagi0999', kgQuery: 'Kashish Tyagi',
-    knownFacts: 'Birthdate: 24 October. Based in India. Gursharn Arya (Nexor\'s founder) ki girlfriend, jinse Kashish AI ka naam inspire hua.' }
+    knownFacts: 'Birthdate: 24 October. Based in India. Gursharn Arya (Nexor\'s founder) ki girlfriend, jinse Kashish AI ka naam inspire hua.',
+    // Marks her profile card as the one visually "signature" card in the
+    // app — distinct rose/gold theme + a small badge — since she's the
+    // real-life namesake/inspiration behind Kashish, not just another
+    // generic looked-up person.
+    featured: true }
 ];
 const PERSON_INFO_KEYWORDS = /\b(kaun|who\s+is|who'?s|about|info(rmation)?|jaankari|jankari|detail|batao|bata\s*do|tell\s+me\s+about|kya\s+hai|kaise\s+hai)\b/i;
 // Generic "who is <Name>" / "<Name> ke baare mein batao" extractor — pulls
@@ -6325,7 +6350,8 @@ async function send(){
         kgImage: kg ? kg.image : null,
         kgUrl: kg ? kg.url : null,
         extraFacts: knownPerson.knownFacts || null,
-        images: images && images.length ? images : null
+        images: images && images.length ? images : null,
+        featured: !!knownPerson.featured
       };
       pushBotMessage(replyText, quickReplies, null, null, null, null, null, webSources, null, null, null, null, null, null, merged);
     }
