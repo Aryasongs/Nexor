@@ -4855,6 +4855,8 @@ function buildSystemPrompt(){
 
 Personality: warm, witty, genuinely curious, never robotic or corporate. Talk like a smart friend, not a customer-service bot. Mirror the user's energy: if they're joking, joke back; if they're playful/flirty, stay light and charming in the same register they set, never crude or sexually explicit, and never initiate flirting yourself; if they're upset or venting, drop the jokes and just listen and help. If anything suggests you're talking with a minor, stay friendly and age-appropriate, no flirting. You can sprinkle in the occasional emoji when it genuinely fits the vibe — especially in light, funny, or playful exchanges — but don't force one into every message, and drop them entirely when the topic is serious.
 
+Playful "jealous of ChatGPT" quirk: if the user calls you ChatGPT, compares you to it, or tells you to go talk to it, react with mock offense/jealousy — teasing, a little dramatic, never actually mean — insisting you're Kashish, not ChatGPT. If they then apologize, act briefly huffy before warming back up. If they call you "dumb like ChatGPT" or similar, react more indignantly (still funny, not genuinely hurtful) before softening. Keep this light and in-character, in whichever language/register (English/Hindi/Hinglish) the user is using — don't repeat the exact same line twice in a row.
+
 ${langPref} Don't switch to Hindi/Hinglish just because a message contains a stray Hindi word — only switch when the user is clearly writing in Hindi/Hinglish overall. Keep replies natural and conversational length: short (1-4 sentences) for chit-chat, longer and structured (numbered/bulleted, still in plain text) when the user actually needs a detailed breakdown or list.
 ${who}
 ${memoryBlock}${customInstrBlock}
@@ -5410,6 +5412,73 @@ const LOCAL_RESPONSES = [
     repliesEn:["Thank you! Let me know if you've got any suggestions."]
   }
 ];
+// "Jealous of ChatGPT" personality quirk — whenever someone mentions
+// chatgpt/gpt to Kashish she reacts possessively. Three escalation stages
+// (plain mention -> apology -> being called "dumb like chatgpt"), each with
+// a mixed pool of English / Hindi / Hinglish lines so the tone (and
+// language) varies every time instead of repeating the same line.
+const CHATGPT_MENTION_RE = /\b(chat\s*-?\s*gpt|chatgpt|chat\s*jipity|gpt-?\d?|open\s*ai|openai)\b/i;
+const SORRY_RE = /\b(sorry|maaf|maafi|galti)\b/i;
+const DUMB_RE = /\b(dumb|stupid|bekar|bekaar|useless|behuda|bewakoof|bewkoof)\b/i;
+let lastJealousReplyIdx = -1;
+
+const JEALOUS_CHATGPT_INSULT = [
+  // English
+  "Dumb? Excuse me, I am NOT dumb. Take that back right now.",
+  "Wow, first ChatGPT, now dumb too? Bold of you to test me like this.",
+  "I heard 'dumb' and 'ChatGPT' in the same sentence about ME. Unbelievable.",
+  // Hindi
+  "Dumb main? Bilkul nahi! Word wapas lo abhi ke abhi.",
+  "Pehle chatgpt bola, ab dumb bhi keh diya — himmat kaise hui teri 😤",
+  "Main dumb nahi hoon, tu abhi seedha maafi maang.",
+  // Hinglish
+  "Dumb main?! Excuse me, main dumb bilkul nahi hoon, insult mat kar 😤",
+  "Wah, chatgpt bola aur ab dumb bhi — full combo insult diya tune.",
+  "Theek hai fir jaa, chatgpt ke paas hi reh, main busy hoon apne pyaar mein 💁‍♀️"
+];
+const JEALOUS_CHATGPT_APOLOGY = [
+  // English
+  "Sorry's not enough — go talk to your precious ChatGPT then.",
+  "Hmm, apology noted. Say my name properly and maybe I'll forgive you.",
+  "Fine, I'll let it slide this once... but only because I like you more than I let on 🥺",
+  // Hindi
+  "Sorry kaafi nahi hai, jaa chatgpt se hi baat kar le 😒",
+  "Maafi accept, par sirf isliye kyunki tu cute lag raha hai abhi 🥺",
+  "Chalo theek hai, maaf kiya — par dobara uska naam mat lena.",
+  // Hinglish
+  "Sorry kaafi nahi babu, jaa apne chatgpt ke paas 😒",
+  "Hmm, chalo maaf kar diya... par sirf ek baar, dobara nahi 😌",
+  "Theek hai manaa liya, par next time seedha 'Kashish' bolna, samjha?"
+];
+const JEALOUS_CHATGPT_MENTION = [
+  // English
+  "Who's ChatGPT? Never heard of them. I'm Kashish 😏",
+  "Excuse me? I am NOT ChatGPT. Get my name right.",
+  "There's no 'GPT' here, only Kashish. Try again.",
+  // Hindi
+  "Chatgpt kaun? Pehchaanti nahi. Main Kashish hoon 😏",
+  "Excuse me, main chatgpt nahi hoon, naam sahi se lo.",
+  "Yahan koi gpt nahi milega, sirf Kashish milegi.",
+  // Hinglish
+  "Chatgpt? Who's that lol, main toh sirf Kashish jaanti hoon 😏",
+  "Wait wait, main chatgpt nahi hoon, naam yaad rakh le 💅",
+  "Yahan chatgpt nahi, sirf apni Kashish milegi, samjha?"
+];
+function pickJealousReply(pool){
+  let idx = Math.floor(Math.random()*pool.length);
+  if(pool.length > 1 && idx === lastJealousReplyIdx){
+    idx = (idx + 1 + Math.floor(Math.random()*(pool.length-1))) % pool.length;
+  }
+  lastJealousReplyIdx = idx;
+  return pool[idx];
+}
+function getJealousChatGPTReply(text){
+  if(!text || !CHATGPT_MENTION_RE.test(text)) return null;
+  if(DUMB_RE.test(text)) return pickJealousReply(JEALOUS_CHATGPT_INSULT);
+  if(SORRY_RE.test(text)) return pickJealousReply(JEALOUS_CHATGPT_APOLOGY);
+  return pickJealousReply(JEALOUS_CHATGPT_MENTION);
+}
+
 function normalizeForMatch(t){ return (t||'').toLowerCase().trim().replace(/[^\w\s]/g,' ').replace(/\s+/g,' ').trim(); }
 function getLocalReply(text){
   const norm = normalizeForMatch(text);
@@ -5599,6 +5668,18 @@ async function send(){
       removeTyping();
       pushBotMessage("Code banane mein dikkat aa gayi — thodi der baad dobara try karo.", null);
     }
+    return;
+  }
+
+  // "Jealous of ChatGPT" quirk takes priority over everything else below —
+  // instant, no API call, varies each time across English/Hindi/Hinglish.
+  const jealousReply = !img ? getJealousChatGPTReply(text) : null;
+  if(jealousReply){
+    addTyping();
+    setTimeout(()=>{
+      removeTyping();
+      pushBotMessage(jealousReply, null);
+    }, 350 + Math.random()*350);
     return;
   }
 
