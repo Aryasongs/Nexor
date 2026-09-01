@@ -4363,6 +4363,146 @@ function buildChartSvg(data){
   return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="200">${content}${labelsRow}</svg>`;
 }
 
+/* ---------------- free API add-ons: cricket / horoscope / jokes / quotes / dictionary / translate / trivia / holidays ---------------- */
+
+// --- Cricket scores (via Serper search snippet — no key needed, reuses
+// the same search infra as stocks/news fallback) ---
+const CRICKET_TRIGGER_RE = /\b(cricket\s*score|live\s*score|match\s*score|ipl\s*score|aaj\s*ka\s*match|cricket\s*match|score\s*kya\s*hai|kaun\s*jeeta|who\s*won)\b/i;
+function detectCricketRequest(text){ return !!text && CRICKET_TRIGGER_RE.test(text.trim()); }
+async function fetchCricketScore(query){
+  try{
+    const res = await fetchWithTimeout('https://google.serper.dev/search', {
+      method:'POST',
+      headers: {'X-API-KEY': SERPER_API_KEY, 'Content-Type':'application/json'},
+      body: JSON.stringify({ q: (query||'cricket score today') + ' live score' })
+    }, 8000);
+    const data = await res.json();
+    const snippet = data?.answerBox?.answer || data?.answerBox?.snippet || data?.organic?.[0]?.snippet || null;
+    return snippet;
+  }catch(e){ console.warn('[KASHISH] cricket score fetch failed:', e); return null; }
+}
+
+// --- Horoscope / Rashifal — horoscope-app-api.vercel.app, free, no key ---
+const ZODIAC_MAP = {
+  'aries':'aries','mesh':'aries','taurus':'taurus','vrishabh':'taurus','gemini':'gemini','mithun':'gemini',
+  'cancer':'cancer','kark':'cancer','leo':'leo','singh':'leo','virgo':'virgo','kanya':'virgo',
+  'libra':'libra','tula':'libra','scorpio':'scorpio','vrishchik':'scorpio','sagittarius':'sagittarius','dhanu':'sagittarius',
+  'capricorn':'capricorn','makar':'capricorn','aquarius':'aquarius','kumbh':'aquarius','pisces':'pisces','meen':'pisces'
+};
+const HOROSCOPE_TRIGGER_RE = /\b(rashifal|horoscope|rashi|aaj\s*ka\s*rashifal)\b/i;
+function detectHoroscopeRequest(text){
+  if(!text) return null;
+  const t = text.toLowerCase();
+  if(!HOROSCOPE_TRIGGER_RE.test(t)) return null;
+  for(const key in ZODIAC_MAP){ if(new RegExp(`\\b${key}\\b`,'i').test(t)) return ZODIAC_MAP[key]; }
+  return '';
+}
+async function fetchHoroscope(sign){
+  try{
+    const res = await fetchWithTimeout(`https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=${sign}&day=today`, null, 8000);
+    const data = await res.json();
+    return data?.data?.horoscope_data || null;
+  }catch(e){ console.warn('[KASHISH] horoscope fetch failed:', e); return null; }
+}
+
+// --- Jokes — v2.jokeapi.dev, free, no key ---
+const JOKE_API_TRIGGER_RE = /\b(joke\s*sunao|koi\s*joke|tell\s*me\s*a\s*joke|joke\s*bolo|joke\s*bhejo|funny\s*joke)\b/i;
+function detectJokeApiRequest(text){ return !!text && JOKE_API_TRIGGER_RE.test(text.trim()); }
+async function fetchJoke(){
+  try{
+    const res = await fetchWithTimeout('https://v2.jokeapi.dev/joke/Any?blacklistFlags=nsfw,racist,sexist,explicit&safe-mode', null, 8000);
+    const data = await res.json();
+    if(data.error) return null;
+    return data.type==='twopart' ? `${data.setup}\n\n${data.delivery}` : data.joke;
+  }catch(e){ console.warn('[KASHISH] joke fetch failed:', e); return null; }
+}
+
+// --- Quotes — zenquotes.io, free, no key ---
+const QUOTE_TRIGGER_RE = /\b(quote\s*sunao|motivational\s*quote|koi\s*quote|give\s*me\s*a\s*quote|quote\s*bhejo|inspire\s*me)\b/i;
+function detectQuoteRequest(text){ return !!text && QUOTE_TRIGGER_RE.test(text.trim()); }
+async function fetchQuote(){
+  try{
+    const res = await fetchWithTimeout('https://zenquotes.io/api/random', null, 8000);
+    const data = await res.json();
+    const q = data?.[0];
+    return q ? `"${q.q}" — ${q.a}` : null;
+  }catch(e){ console.warn('[KASHISH] quote fetch failed:', e); return null; }
+}
+
+// --- Dictionary / meaning — dictionaryapi.dev, free, no key ---
+const DICT_TRIGGER_RE = /\b(meaning\s*of\s+(\w+)|define\s+(\w+)|(\w+)\s*ka\s*matlab|(\w+)\s*ka\s*meaning)\b/i;
+function detectDictionaryRequest(text){
+  if(!text) return null;
+  const m = text.match(DICT_TRIGGER_RE);
+  if(!m) return null;
+  return (m[2]||m[3]||m[4]||m[5]||'').trim() || null;
+}
+async function fetchDictionary(word){
+  try{
+    const res = await fetchWithTimeout(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(word)}`, null, 8000);
+    if(!res.ok) return null;
+    const data = await res.json();
+    const entry = data?.[0];
+    if(!entry) return null;
+    const meanings = (entry.meanings||[]).slice(0,3).map(m=>{
+      const def = m.definitions?.[0]?.definition;
+      return def ? `• (${m.partOfSpeech}) ${def}` : null;
+    }).filter(Boolean);
+    return meanings.length ? { word: entry.word, phonetic: entry.phonetic||'', meanings } : null;
+  }catch(e){ console.warn('[KASHISH] dictionary fetch failed:', e); return null; }
+}
+
+// --- Translation — MyMemory API, free, no key ---
+const TRANSLATE_TRIGGER_RE = /^(?:translate|anuvad(?:\s*karo)?)\s+["']?(.+?)["']?\s*(?:(?:in|into|to)\s*(hindi|english)|(hindi|english)\s*(?:mein|me))?$/i;
+function detectTranslateRequest(text){
+  if(!text) return null;
+  const t = text.trim();
+  const m = t.match(TRANSLATE_TRIGGER_RE);
+  if(!m) return null;
+  const phrase = m[1]?.trim();
+  const targetRaw = (m[2]||m[3]||'').toLowerCase();
+  if(!phrase) return null;
+  const target = targetRaw==='hindi' ? 'hi' : targetRaw==='english' ? 'en' : (looksHindiOrHinglish(phrase) ? 'en' : 'hi');
+  return { phrase, target };
+}
+async function fetchTranslation(phrase, target){
+  try{
+    const source = target==='hi' ? 'en' : 'hi';
+    const res = await fetchWithTimeout(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(phrase)}&langpair=${source}|${target}`, null, 8000);
+    const data = await res.json();
+    return data?.responseData?.translatedText || null;
+  }catch(e){ console.warn('[KASHISH] translation fetch failed:', e); return null; }
+}
+
+// --- Trivia / GK quiz — opentdb.com, free, no key ---
+const TRIVIA_TRIGGER_RE = /\b(trivia|gk\s*question|quiz\s*karao|quiz\s*sunao|pooch\s*trivia|general\s*knowledge)\b/i;
+function detectTriviaRequest(text){ return !!text && TRIVIA_TRIGGER_RE.test(text.trim()); }
+function decodeHtmlEntities(str){
+  const el = document.createElement('textarea'); el.innerHTML = str; return el.value;
+}
+async function fetchTrivia(){
+  try{
+    const res = await fetchWithTimeout('https://opentdb.com/api.php?amount=1&type=multiple', null, 8000);
+    const data = await res.json();
+    const q = data?.results?.[0];
+    if(!q) return null;
+    const options = [...q.incorrect_answers, q.correct_answer].map(decodeHtmlEntities).sort(()=>Math.random()-0.5);
+    return { question: decodeHtmlEntities(q.question), options, answer: decodeHtmlEntities(q.correct_answer), category: q.category };
+  }catch(e){ console.warn('[KASHISH] trivia fetch failed:', e); return null; }
+}
+
+// --- Public holidays — date.nager.at, free, no key ---
+const HOLIDAY_TRIGGER_RE = /\b(next\s*holiday|holiday\s*kab\s*hai|chutti\s*kab\s*hai|public\s*holiday|agli\s*chutti|upcoming\s*holiday)\b/i;
+function detectHolidayRequest(text){ return !!text && HOLIDAY_TRIGGER_RE.test(text.trim()); }
+async function fetchNextHolidays(){
+  try{
+    const res = await fetchWithTimeout('https://date.nager.at/api/v3/NextPublicHolidays/IN', null, 8000);
+    if(!res.ok) return null;
+    const data = await res.json();
+    return (data||[]).slice(0,3);
+  }catch(e){ console.warn('[KASHISH] holiday fetch failed:', e); return null; }
+}
+
 function buildSparklineSvg(values, up){
   const w=200, h=48, pad=3;
   const min=Math.min.apply(null, values), max=Math.max.apply(null, values);
@@ -5767,6 +5907,89 @@ async function send(){
       pushBotMessage("Chart banane mein dikkat aa gayi — thodi der baad dobara try karo.", null);
     }
     return;
+  }
+
+  // --- Free API add-ons: cricket / horoscope / jokes / quotes / dictionary / translation / trivia / holidays ---
+  if(!img){
+    if(detectCricketRequest(text)){
+      addTyping();
+      const snippet = await fetchCricketScore(text);
+      removeTyping();
+      pushBotMessage(snippet ? snippet : "Abhi live score nahi mil paaya — thodi der baad try karo.", null);
+      return;
+    }
+    const horoscopeSign = detectHoroscopeRequest(text);
+    if(horoscopeSign !== null){
+      if(!horoscopeSign){
+        pushBotMessage("Kis rashi ka rashifal chahiye? Naam bhi likh do — jaise 'aaj ka rashifal Leo' ya 'rashifal Vrishabh'.", null);
+        return;
+      }
+      addTyping();
+      const h = await fetchHoroscope(horoscopeSign);
+      removeTyping();
+      if(h){
+        pushBotMessage(`${horoscopeSign.charAt(0).toUpperCase()+horoscopeSign.slice(1)} ka aaj ka rashifal:\n\n${h.date ? h.date+'\n\n' : ''}${h.horoscope_data || h}`, null);
+      } else {
+        pushBotMessage("Rashifal abhi nahi mil paaya — thodi der baad try karo.", null);
+      }
+      return;
+    }
+    if(detectJokeApiRequest(text)){
+      addTyping();
+      const joke = await fetchJoke();
+      removeTyping();
+      pushBotMessage(joke || getLocalReply('joke sunao') || "Abhi joke nahi mil paaya, phir try karo 😅", null);
+      return;
+    }
+    if(detectQuoteRequest(text)){
+      addTyping();
+      const quote = await fetchQuote();
+      removeTyping();
+      pushBotMessage(quote || "Abhi quote fetch nahi ho paaya — thodi der baad try karo.", null);
+      return;
+    }
+    const dictWord = detectDictionaryRequest(text);
+    if(dictWord){
+      addTyping();
+      const d = await fetchDictionary(dictWord);
+      removeTyping();
+      if(d){
+        pushBotMessage(`${d.word}${d.phonetic ? ' '+d.phonetic : ''}\n\n${d.meanings.join('\n')}`, null);
+      } else {
+        pushBotMessage(`"${dictWord}" ka meaning nahi mil paaya — spelling check kar lo.`, null);
+      }
+      return;
+    }
+    const translateReq = detectTranslateRequest(text);
+    if(translateReq){
+      addTyping();
+      const translated = await fetchTranslation(translateReq.phrase, translateReq.target);
+      removeTyping();
+      pushBotMessage(translated || "Translation abhi nahi ho paaya — thodi der baad try karo.", null);
+      return;
+    }
+    if(detectTriviaRequest(text)){
+      addTyping();
+      const trivia = await fetchTrivia();
+      removeTyping();
+      if(trivia){
+        pushBotMessage(`🧠 ${trivia.category}\n\n${trivia.question}\n\n${trivia.options.map((o,i)=>`${String.fromCharCode(65+i)}) ${o}`).join('\n')}\n\n✅ Answer: ${trivia.answer}`, null);
+      } else {
+        pushBotMessage("Trivia abhi nahi mil paaya — thodi der baad try karo.", null);
+      }
+      return;
+    }
+    if(detectHolidayRequest(text)){
+      addTyping();
+      const holidays = await fetchNextHolidays();
+      removeTyping();
+      if(holidays && holidays.length){
+        pushBotMessage(`Agli public holidays (India):\n\n${holidays.map(h=>`• ${h.date} — ${h.localName || h.name}`).join('\n')}`, null);
+      } else {
+        pushBotMessage("Holiday list abhi nahi mil paayi — thodi der baad try karo.", null);
+      }
+      return;
+    }
   }
 
   // "AI create" — image generation, triggered by #imagine / "image ..." / etc.
