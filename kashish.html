@@ -3184,6 +3184,11 @@ function renderChat(){
         if(p.kgDescription){ const d=document.createElement('div'); d.className='pc-kg-desc'; d.textContent=p.kgDescription; body.appendChild(d); }
         if(p.kgDetail){ const d=document.createElement('div'); d.className='pc-kg-detail'; d.textContent=p.kgDetail; body.appendChild(d); }
       }
+      if(p.extraFacts){
+        const lbl=document.createElement('div'); lbl.className='pc-section-label'; lbl.innerHTML='<i class="ph-fill ph-info"></i> About';
+        body.appendChild(lbl);
+        const d=document.createElement('div'); d.className='pc-kg-detail'; d.textContent=p.extraFacts; body.appendChild(d);
+      }
       if(p.images && p.images.length){
         const glbl=document.createElement('div'); glbl.className='pc-section-label'; glbl.innerHTML='<i class="ph-fill ph-images"></i> Photos';
         body.appendChild(glbl);
@@ -4790,7 +4795,13 @@ function extractProfileLookupHandle(text){
 // equally to every name, famous or not, not just a special few.
 const KNOWN_PERSON_HANDLES = [
   { pattern: /\b(gursharn\s*arya|gursharan\s*singh)\b/i, handle: 'gursharan', kgQuery: 'Gursharn Arya' },
-  { pattern: /\bkashish\s*tyagi\b/i, handle: 'kashishtyagi0999', kgQuery: 'Kashish Tyagi' }
+  // Fixed personal facts for Kashish Tyagi (the app's namesake) that live
+  // search/KG lookups won't reliably surface for a private individual.
+  // Deliberately limited to non-contact details (birthdate, country) —
+  // no social handles/links here, so this can't be used to locate or
+  // message her directly from the card.
+  { pattern: /\bkashish\s*tyagi\b/i, handle: 'kashishtyagi0999', kgQuery: 'Kashish Tyagi',
+    knownFacts: 'Birthdate: 24 October. Based in India. Gursharn Arya (Nexor\'s founder) ki girlfriend, jinse Kashish AI ka naam inspire hua.' }
 ];
 const PERSON_INFO_KEYWORDS = /\b(kaun|who\s+is|who'?s|about|info(rmation)?|jaankari|jankari|detail|batao|bata\s*do|tell\s+me\s+about|kya\s+hai|kaise\s+hai)\b/i;
 // Generic "who is <Name>" / "<Name> ke baare mein batao" extractor — pulls
@@ -6268,6 +6279,9 @@ async function send(){
     // knows) into a single natural-language reply, same as a normal
     // web-search answer, rather than just filling in a static template.
     const contextParts = [];
+    if(knownPerson.knownFacts){
+      contextParts.push(`Known facts (confirmed, use these): ${knownPerson.knownFacts}`);
+    }
     if(hasProfile){
       contextParts.push(`Nexor Sparks database profile: name "${profile.name}", handle @${profile.handle}${profile.verified?' (verified)':''}${profile.bio?(', bio: "'+profile.bio+'"'):''}, ${profile.posts||0} posts, ${profile.followers||0} followers.`);
     }
@@ -6310,6 +6324,7 @@ async function send(){
         kgDetail: kg ? (kg.detail||'') : '',
         kgImage: kg ? kg.image : null,
         kgUrl: kg ? kg.url : null,
+        extraFacts: knownPerson.knownFacts || null,
         images: images && images.length ? images : null
       };
       pushBotMessage(replyText, quickReplies, null, null, null, null, null, webSources, null, null, null, null, null, null, merged);
