@@ -1482,6 +1482,16 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
           <span style="width:44px;text-align:center;"><i class="ph-bold ph-check" style="color:var(--accent);"></i></span>
         </div>
         <div class="settings-row">
+          <div class="body"><div class="lbl">Unlimited questions</div><div class="sub" style="font-size:11px;color:var(--ink-soft);">Free: 12 every 5 hours</div></div>
+          <span style="width:44px;text-align:center;color:var(--ink-soft);">—</span>
+          <span style="width:44px;text-align:center;"><i class="ph-bold ph-check" style="color:var(--accent);"></i></span>
+        </div>
+        <div class="settings-row">
+          <div class="body"><div class="lbl">Unlimited AI image generation</div><div class="sub" style="font-size:11px;color:var(--ink-soft);">Free: 2 every 5 hours</div></div>
+          <span style="width:44px;text-align:center;color:var(--ink-soft);">—</span>
+          <span style="width:44px;text-align:center;"><i class="ph-bold ph-check" style="color:var(--accent);"></i></span>
+        </div>
+        <div class="settings-row">
           <div class="body"><div class="lbl">HTML &amp; website code generation</div></div>
           <span style="width:44px;text-align:center;color:var(--ink-soft);">—</span>
           <span style="width:44px;text-align:center;"><i class="ph-bold ph-check" style="color:var(--accent);"></i></span>
@@ -5213,7 +5223,17 @@ async function callProvider(endpoint, model, msgs, label, maxTokens){
   const json = await res.json();
   const raw = (json.choices && json.choices[0] && json.choices[0].message && json.choices[0].message.content) || '';
   const parsed = extractJson(raw);
-  if(!parsed || typeof parsed.reply !== 'string' || !parsed.reply.trim()) throw new Error('unexpected response shape from '+label);
+  if(!parsed) throw new Error('unexpected response shape from '+label);
+  if(typeof parsed.reply !== 'string' || !parsed.reply.trim()){
+    // Some rawContext prompts (chart data, etc.) deliberately ask the model
+    // for a plain JSON object with its own shape instead of the usual
+    // {"reply":...} envelope. In that case extractJson successfully parsed
+    // *something*, just not our envelope — re-stringify the whole object
+    // as the "reply" so callers that do their own downstream JSON.parse
+    // (e.g. parseChartFromReply) still get usable text instead of an error.
+    if(raw && raw.trim()) return { reply: JSON.stringify(parsed), quickReplies: null };
+    throw new Error('unexpected response shape from '+label);
+  }
   return parsed;
 }
 // Retries a provider once (with a short delay) before giving up on it —
