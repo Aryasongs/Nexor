@@ -1596,6 +1596,50 @@ let appSettings = {...SETTINGS_DEFAULTS};
 // free) and HTML/website code generation. This is a UI-level paywall only —
 // tapping "Upgrade" always shows an unavailable-on-this-profile error, it
 // never actually charges or flips anyone to Pro.
+// --- Free-plan usage limits: images and questions each get their own
+// rolling 5-hour window (not calendar-day). Once a free user hits the cap
+// for a window, that window has to fully expire (5h from its first use)
+// before the counter resets — Pro users are never limited.
+const FREE_LIMIT_WINDOW_MS = 5*60*60*1000; // 5 hours
+const FREE_IMAGE_LIMIT = 2;
+const FREE_QUESTION_LIMIT = 12;
+function getUsageWindow(key){
+  let raw = null;
+  try{ raw = JSON.parse(localStorage.getItem(key)||'null'); }catch(e){}
+  const now = Date.now();
+  if(!raw || typeof raw.windowStart !== 'number' || (now - raw.windowStart) >= FREE_LIMIT_WINDOW_MS){
+    return {count:0, windowStart: now};
+  }
+  return raw;
+}
+function saveUsageWindow(key, data){
+  try{ localStorage.setItem(key, JSON.stringify(data)); }catch(e){}
+}
+function msUntilWindowReset(windowStart){
+  return Math.max(0, FREE_LIMIT_WINDOW_MS - (Date.now() - windowStart));
+}
+function formatWaitTime(ms){
+  const totalMin = Math.max(1, Math.ceil(ms/60000));
+  const h = Math.floor(totalMin/60), m = totalMin%60;
+  if(h>0 && m>0) return `${h} ghante ${m} minute`;
+  if(h>0) return `${h} ghante`;
+  return `${m} minute`;
+}
+// Checks + (if allowed) consumes one unit from a free-plan quota.
+// Pro users always pass. Returns {allowed, waitMs}.
+function checkFreeQuota(storageKey, limit){
+  if(isProUser()) return {allowed:true};
+  const usage = getUsageWindow(storageKey);
+  if(usage.count >= limit){
+    return {allowed:false, waitMs: msUntilWindowReset(usage.windowStart)};
+  }
+  usage.count += 1;
+  saveUsageWindow(storageKey, usage);
+  return {allowed:true};
+}
+function checkImageQuota(){ return checkFreeQuota('kashishFreeImageUsage', FREE_IMAGE_LIMIT); }
+function checkQuestionQuota(){ return checkFreeQuota('kashishFreeQuestionUsage', FREE_QUESTION_LIMIT); }
+
 function isProUser(){ return appSettings.plan === 'pro'; }
 function canUseCustomAccent(){ return isProUser() || !!appSettings.grandfatheredAccent; }
 function updateUpgradePill(){
@@ -2888,6 +2932,34 @@ function renderChat(){
       live.innerHTML = s.approx ? '<span class="dot"></span> Approx price (via search)' : '<span class="dot"></span> Live price';
       sc.appendChild(live);
       scroll.appendChild(sc);
+    }
+    if(m.chartCard){
+      const cd = m.chartCard;
+      const chc = document.createElement('div'); chc.className='code-card';
+      const head=document.createElement('div'); head.className='cc-head';
+      const icon=document.createElement('div'); icon.className='cc-icon'; icon.style.background='linear-gradient(155deg,#e6e0ff,#c9baff)'; icon.style.color='#5B3FE0'; icon.innerHTML='<i class="ph-fill ph-chart-bar"></i>';
+      const info=document.createElement('div'); info.className='cc-info';
+      const name=document.createElement('div'); name.className='cc-name'; name.textContent=cd.title;
+      const meta=document.createElement('div'); meta.className='cc-meta'; meta.textContent=(cd.unit ? cd.unit+' · ' : '')+cd.type.toUpperCase()+' chart';
+      info.appendChild(name); info.appendChild(meta);
+      head.appendChild(icon); head.appendChild(info);
+      chc.appendChild(head);
+      const chartWrap=document.createElement('div'); chartWrap.style.padding='6px 4px';
+      chartWrap.innerHTML = buildChartSvg(cd);
+      chc.appendChild(chartWrap);
+      if(cd.type!=='pie'){
+        // no extra legend needed, labels are drawn on the axis
+      } else {
+        const legend=document.createElement('div'); legend.style.display='flex'; legend.style.flexWrap='wrap'; legend.style.gap='6px 12px'; legend.style.padding='0 8px 8px';
+        cd.labels.forEach((l,i)=>{
+          const item=document.createElement('div'); item.style.display='flex'; item.style.alignItems='center'; item.style.gap='5px'; item.style.fontSize='11px'; item.style.color='#666';
+          const dot=document.createElement('span'); dot.style.width='8px'; dot.style.height='8px'; dot.style.borderRadius='50%'; dot.style.background=CHART_PALETTE[i%CHART_PALETTE.length]; dot.style.display='inline-block';
+          item.appendChild(dot); item.appendChild(document.createTextNode(`${l}: ${cd.values[i]}${cd.unit||''}`));
+          legend.appendChild(item);
+        });
+        chc.appendChild(legend);
+      }
+      scroll.appendChild(chc);
     }
     if(m.mapCard){
       const mp = m.mapCard;
@@ -4215,6 +4287,82 @@ async function fetchStockQuote(symbol, displayQuery){
 }
 // Builds a tiny inline SVG line chart from an array of prices — the
 // "kitna upar/down gaya" visual on the stock card.
+/* ---------------- secret code: AI chart generation ---------------- */
+// Secret command that asks the model for structured data and renders it
+// as a real bar/line/pie SVG chart, instead of just describing numbers in
+// text. Triggered either by the explicit secret code "/chart <topic>" (or
+// "chart/ <topic>") or by natural Hindi/English phrasing like "chart banao
+// India GDP 2020-2024" / "graph bana do sales growth".
+const CHART_WORD_PATTERN = /\b(chart|graph)\b/i;
+const CHART_VERB_PATTERN = /\b(banao|banade|bana\s*do|bana\w*|banw\w*|banake|create|make|generate|plot|draw|show\s*me)\b/i;
+function detectChartRequest(text){
+  if(!text) return null;
+  const t = text.trim();
+  const explicit = t.match(/^\/chart\s+(.+)/i) || t.match(/^chart\s*\/\s*(.+)/i) || t.match(/^\/graph\s+(.+)/i);
+  if(explicit) return explicit[1].trim();
+  if(CHART_WORD_PATTERN.test(t) && CHART_VERB_PATTERN.test(t)){
+    const topic = t.replace(CHART_VERB_PATTERN,' ').replace(CHART_WORD_PATTERN,' ').replace(/\s+/g,' ').trim();
+    return topic || t;
+  }
+  return null;
+}
+function formatChartContext(topic){
+  return `The user wants a real data chart about: "${topic}". Respond with ONLY compact JSON, no markdown fences, no extra text, in this exact shape:
+{"type":"bar"|"line"|"pie","title":"short chart title","unit":"optional unit label like %, $, or empty string","labels":["label1","label2",...],"values":[number1,number2,...]}
+Rules: 3 to 8 data points. "values" must be plain numbers (no currency symbols/commas inside the numbers). Use your best real/reasonable knowledge for the numbers — if exact figures aren't certain, use well-informed approximate figures rather than refusing, since this is for a quick illustrative chart, not a cited research report. Pick chart "type": "line" for a trend over time, "bar" for comparing categories, "pie" for parts of a whole.`;
+}
+function parseChartFromReply(replyText){
+  if(!replyText) return null;
+  let raw = replyText.trim().replace(/^```(?:json)?\s*/i,'').replace(/```\s*$/,'').trim();
+  let data;
+  try{ data = JSON.parse(raw); }catch(e){ return null; }
+  if(!data || !Array.isArray(data.labels) || !Array.isArray(data.values)) return null;
+  if(data.labels.length < 2 || data.labels.length !== data.values.length) return null;
+  const values = data.values.map(v=>Number(v));
+  if(values.some(v=>Number.isNaN(v))) return null;
+  const type = ['bar','line','pie'].includes(data.type) ? data.type : 'bar';
+  return { type, title: String(data.title||'Chart'), unit: String(data.unit||''), labels: data.labels.map(String), values };
+}
+const CHART_PALETTE = ['#7C6CF6','#1FA855','#FF9F43','#E0433C','#3AB0FF','#F368E0','#00D2B4','#FFC93C'];
+function buildChartSvg(data){
+  const w=320, h=200, padL=8, padR=8, padT=16, padB=34;
+  const { type, labels, values } = data;
+  if(type==='pie'){
+    const total = values.reduce((a,b)=>a+Math.max(b,0),0) || 1;
+    const cx=w/2, cy=h/2-6, r=70;
+    let angle=-Math.PI/2, slices='';
+    values.forEach((v,i)=>{
+      const frac = Math.max(v,0)/total;
+      const next = angle + frac*Math.PI*2;
+      const x1=cx+r*Math.cos(angle), y1=cy+r*Math.sin(angle);
+      const x2=cx+r*Math.cos(next), y2=cy+r*Math.sin(next);
+      const large = (next-angle) > Math.PI ? 1 : 0;
+      slices += `<path d="M${cx},${cy} L${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${large} 1 ${x2.toFixed(1)},${y2.toFixed(1)} Z" fill="${CHART_PALETTE[i%CHART_PALETTE.length]}" stroke="#fff" stroke-width="1.5"/>`;
+      angle = next;
+    });
+    return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="200">${slices}</svg>`;
+  }
+  const max = Math.max(...values, 0), min = Math.min(...values, 0);
+  const range = (max-min) || 1;
+  const plotW = w-padL-padR, plotH = h-padT-padB;
+  const x = i => padL + (labels.length>1 ? i*(plotW/(labels.length-1)) : plotW/2);
+  const y = v => padT + plotH - ((v-min)/range)*plotH;
+  let content='';
+  if(type==='line'){
+    const pts = values.map((v,i)=>`${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
+    content = `<polyline points="${pts}" fill="none" stroke="${CHART_PALETTE[0]}" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>` +
+      values.map((v,i)=>`<circle cx="${x(i).toFixed(1)}" cy="${y(v).toFixed(1)}" r="3" fill="${CHART_PALETTE[0]}"/>`).join('');
+  } else {
+    const bw = Math.min(38, plotW/values.length*0.6);
+    content = values.map((v,i)=>{
+      const bx = x(i)-bw/2, by = y(Math.max(v,0)), bh = Math.abs(y(v)-y(0));
+      return `<rect x="${bx.toFixed(1)}" y="${(v>=0?by:y(0)).toFixed(1)}" width="${bw.toFixed(1)}" height="${Math.max(bh,1).toFixed(1)}" rx="3" fill="${CHART_PALETTE[i%CHART_PALETTE.length]}"/>`;
+    }).join('');
+  }
+  const labelsRow = labels.map((l,i)=>`<text x="${x(i).toFixed(1)}" y="${h-10}" font-size="9" fill="#8a8a95" text-anchor="middle">${truncate(l,10)}</text>`).join('');
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="200">${content}${labelsRow}</svg>`;
+}
+
 function buildSparklineSvg(values, up){
   const w=200, h=48, pad=3;
   const min=Math.min.apply(null, values), max=Math.max.apply(null, values);
@@ -4965,12 +5113,12 @@ function sendLocal(){
   }, 400);
 }
 
-function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults, webSources, kgCard, factCheckResults, postCard, conversionCard, stockCard, mapCard, personCard, movieResults, emailCard, pdfCard, codeCard, upgradeCard){
+function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults, webSources, kgCard, factCheckResults, postCard, conversionCard, stockCard, mapCard, personCard, movieResults, emailCard, pdfCard, codeCard, upgradeCard, chartCard){
   const sess = getSession(currentSessionId);
   if(!sess) return;
   const qr = appSettings.trendingSearches ? (quickReplies||null) : null;
   const ts = Date.now();
-  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, webSources: (webSources&&webSources.length)?webSources:null, kgCard: kgCard||null, factCheckResults: (factCheckResults&&factCheckResults.length)?factCheckResults:null, postCard: postCard||null, conversionCard: conversionCard||null, stockCard: stockCard||null, mapCard: mapCard||null, personCard: personCard||null, movieResults: (movieResults&&movieResults.length)?movieResults:null, emailCard: emailCard||null, pdfCard: pdfCard||null, codeCard: codeCard||null, upgradeCard: upgradeCard||null, ts});
+  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, webSources: (webSources&&webSources.length)?webSources:null, kgCard: kgCard||null, factCheckResults: (factCheckResults&&factCheckResults.length)?factCheckResults:null, postCard: postCard||null, conversionCard: conversionCard||null, stockCard: stockCard||null, mapCard: mapCard||null, personCard: personCard||null, movieResults: (movieResults&&movieResults.length)?movieResults:null, emailCard: emailCard||null, pdfCard: pdfCard||null, codeCard: codeCard||null, upgradeCard: upgradeCard||null, chartCard: chartCard||null, ts});
   sess.preview = truncate(text, 60);
   sess.updatedAt = Date.now();
   upsertSession(sess);
@@ -5298,6 +5446,11 @@ async function handleImageGenRequest(prompt){
     pushBotMessage("I can't generate that — nude, sexual, or exploitative images aren't something I'll create. Describe something else and I'm happy to draw it!", null);
     return;
   }
+  const imgQuota = checkImageQuota();
+  if(!imgQuota.allowed){
+    pushBotMessage(`Free plan mein sirf ${FREE_IMAGE_LIMIT} images har 5 ghante mein bana sakte ho, aur abhi ke liye limit khatam ho gayi hai. Agla image ${formatWaitTime(imgQuota.waitMs)} baad bana paoge — ya Kashish Pro lekar unlimited images banao.`, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { feature:'image-limit' });
+    return;
+  }
   const genMsg={role:'model', text:'', ts:Date.now(), genPending:true};
   sess.messages.push(genMsg);
   sess.updatedAt=Date.now(); upsertSession(sess); renderChat();
@@ -5536,6 +5689,20 @@ async function send(){
     }
   }
 
+  // Free-plan "12 questions / 5 hours" gate. Runs before every branch below
+  // except image generation, which has its own separate "2 images / 5
+  // hours" quota (checked inside handleImageGenRequest). Computing the
+  // image intent here (and reusing it further down) avoids detecting it
+  // twice and avoids double-charging a single message against both quotas.
+  const precomputedImagePrompt = !img ? detectImageRequest(text) : null;
+  if(precomputedImagePrompt === null){
+    const qQuota = checkQuestionQuota();
+    if(!qQuota.allowed){
+      pushBotMessage(`Free plan mein sirf ${FREE_QUESTION_LIMIT} questions har 5 ghante mein pooch sakte ho, aur abhi ke liye limit khatam ho gayi hai. Agla sawaal ${formatWaitTime(qQuota.waitMs)} baad pooch paoge — ya Kashish Pro lekar unlimited chat karo.`, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { feature:'question-limit' });
+      return;
+    }
+  }
+
   // "/search <query>" — force a live web search regardless of what the
   // heuristics would normally decide, so the user has a guaranteed way
   // to trigger a real-time lookup for anything.
@@ -5575,8 +5742,35 @@ async function send(){
     return;
   }
 
+  // Secret code "/chart <topic>" (or "chart/ <topic>", or natural language
+  // "chart banao X" / "graph bana do X") — asks the model for structured
+  // data and renders a real SVG bar/line/pie chart instead of just text.
+  const chartTopic = !img ? detectChartRequest(text) : null;
+  if(chartTopic !== null){
+    if(!chartTopic){
+      pushBotMessage("Kis cheez ka chart banau? '/chart' ke baad topic likho — jaise '/chart India population 2015-2024'.", null);
+      return;
+    }
+    addTyping();
+    const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
+    try{
+      const result = await kashishReply(historyForModel, null, formatChartContext(chartTopic), 900);
+      removeTyping();
+      const chartData = parseChartFromReply(result.reply);
+      if(chartData){
+        pushBotMessage(`Yeh raha "${chartData.title}" ka chart ✨`, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, chartData);
+      } else {
+        pushBotMessage("Chart ke liye clear data nahi bana paayi — thoda specific topic dedo, jaise 'chart banao India GDP 2019-2023'.", null);
+      }
+    }catch(e){
+      removeTyping();
+      pushBotMessage("Chart banane mein dikkat aa gayi — thodi der baad dobara try karo.", null);
+    }
+    return;
+  }
+
   // "AI create" — image generation, triggered by #imagine / "image ..." / etc.
-  const imagePrompt = !img ? detectImageRequest(text) : null;
+  const imagePrompt = precomputedImagePrompt;
   if(imagePrompt !== null){
     handleImageGenRequest(imagePrompt);
     return;
