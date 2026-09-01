@@ -1482,7 +1482,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
           <span style="width:44px;text-align:center;"><i class="ph-bold ph-check" style="color:var(--accent);"></i></span>
         </div>
         <div class="settings-row">
-          <div class="body"><div class="lbl">Unlimited questions</div><div class="sub" style="font-size:11px;color:var(--ink-soft);">Free: 12 every 5 hours</div></div>
+          <div class="body"><div class="lbl">Unlimited questions</div><div class="sub" style="font-size:11px;color:var(--ink-soft);">Free: 100 credits/day</div></div>
           <span style="width:44px;text-align:center;color:var(--ink-soft);">—</span>
           <span style="width:44px;text-align:center;"><i class="ph-bold ph-check" style="color:var(--accent);"></i></span>
         </div>
@@ -1610,9 +1610,8 @@ let appSettings = {...SETTINGS_DEFAULTS};
 // rolling 5-hour window (not calendar-day). Once a free user hits the cap
 // for a window, that window has to fully expire (5h from its first use)
 // before the counter resets — Pro users are never limited.
-const FREE_LIMIT_WINDOW_MS = 5*60*60*1000; // 5 hours
+const FREE_LIMIT_WINDOW_MS = 5*60*60*1000; // 5 hours (used for images)
 const FREE_IMAGE_LIMIT = 2;
-const FREE_QUESTION_LIMIT = 12;
 function getUsageWindow(key){
   let raw = null;
   try{ raw = JSON.parse(localStorage.getItem(key)||'null'); }catch(e){}
@@ -1625,8 +1624,8 @@ function getUsageWindow(key){
 function saveUsageWindow(key, data){
   try{ localStorage.setItem(key, JSON.stringify(data)); }catch(e){}
 }
-function msUntilWindowReset(windowStart){
-  return Math.max(0, FREE_LIMIT_WINDOW_MS - (Date.now() - windowStart));
+function msUntilWindowReset(windowStart, windowMs){
+  return Math.max(0, (windowMs||FREE_LIMIT_WINDOW_MS) - (Date.now() - windowStart));
 }
 function formatWaitTime(ms){
   const totalMin = Math.max(1, Math.ceil(ms/60000));
@@ -1648,7 +1647,49 @@ function checkFreeQuota(storageKey, limit){
   return {allowed:true};
 }
 function checkImageQuota(){ return checkFreeQuota('kashishFreeImageUsage', FREE_IMAGE_LIMIT); }
-function checkQuestionQuota(){ return checkFreeQuota('kashishFreeQuestionUsage', FREE_QUESTION_LIMIT); }
+
+// --- Free-plan CREDIT system for questions/queries: 100 credits per
+// rolling 24-hour window ("per day"), instead of a flat per-message count.
+// Short replies cost a small number of credits; longer, more detailed
+// answers cost more — roughly 1 credit per ~200 characters the backend
+// actually generates, mirroring how a real token-billed backend would
+// charge. A message is only blocked up front if the day's credits are
+// already fully used; otherwise it always goes through, and the exact
+// cost is deducted afterwards once the real reply length is known.
+const FREE_CREDIT_WINDOW_MS = 24*60*60*1000; // 24 hours ("per day")
+const FREE_DAILY_CREDITS = 100;
+const CREDIT_CHARS_PER_CREDIT = 200; // ~1 credit per 200 characters of reply
+function getCreditUsage(){
+  let raw = null;
+  try{ raw = JSON.parse(localStorage.getItem('kashishFreeCreditUsage')||'null'); }catch(e){}
+  const now = Date.now();
+  if(!raw || typeof raw.windowStart !== 'number' || typeof raw.creditsUsed !== 'number' || (now - raw.windowStart) >= FREE_CREDIT_WINDOW_MS){
+    return {creditsUsed:0, windowStart: now};
+  }
+  return raw;
+}
+function saveCreditUsage(usage){
+  try{ localStorage.setItem('kashishFreeCreditUsage', JSON.stringify(usage)); }catch(e){}
+}
+function creditsRemainingToday(){
+  if(isProUser()) return Infinity;
+  return Math.max(0, FREE_DAILY_CREDITS - getCreditUsage().creditsUsed);
+}
+function creditResetWaitMs(){
+  return msUntilWindowReset(getCreditUsage().windowStart, FREE_CREDIT_WINDOW_MS);
+}
+// Deducts credits for a reply that was just generated. Pass either the
+// reply text itself (cost is derived from its length) or a raw number of
+// credits for flows with no generated text (e.g. a fixed utility call).
+function chargeCredits(textOrAmount){
+  if(isProUser()) return;
+  const usage = getCreditUsage();
+  const cost = typeof textOrAmount === 'number'
+    ? Math.max(1, Math.round(textOrAmount))
+    : Math.max(1, Math.ceil((textOrAmount||'').length / CREDIT_CHARS_PER_CREDIT));
+  usage.creditsUsed += cost;
+  saveCreditUsage(usage);
+}
 
 function isProUser(){ return appSettings.plan === 'pro'; }
 function canUseCustomAccent(){ return isProUser() || !!appSettings.grandfatheredAccent; }
@@ -2613,6 +2654,7 @@ async function regenerateMessage(m){
     .map(mm=> mm.role==='user' ? {role:'user', text:mm.text} : {role:'model', text:mm.text});
   try{
     const result = await kashishReply(historyForModel, null);
+    chargeCredits(result.reply);
     removeTyping();
     pushBotMessage(result.reply, result.quickReplies);
   }catch(e){
@@ -5849,18 +5891,19 @@ async function send(){
     }
   }
 
-  // Free-plan "12 questions / 5 hours" gate. Runs before every branch below
+  // Free-plan credit gate: 100 credits/day, only blocks up front once the
+  // day's credits are fully used. The actual cost per message (bigger
+  // answer = more credits) is deducted after each reply is generated —
+  // see chargeCredits() calls further down. Runs before every branch below
   // except image generation, which has its own separate "2 images / 5
   // hours" quota (checked inside handleImageGenRequest). Computing the
   // image intent here (and reusing it further down) avoids detecting it
   // twice and avoids double-charging a single message against both quotas.
   const precomputedImagePrompt = !img ? detectImageRequest(text) : null;
-  if(precomputedImagePrompt === null){
-    const qQuota = checkQuestionQuota();
-    if(!qQuota.allowed){
-      pushBotMessage(`Free plan mein sirf ${FREE_QUESTION_LIMIT} questions har 5 ghante mein pooch sakte ho, aur abhi ke liye limit khatam ho gayi hai. Agla sawaal ${formatWaitTime(qQuota.waitMs)} baad pooch paoge — ya Kashish Pro lekar unlimited chat karo.`, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { feature:'question-limit' });
-      return;
-    }
+  if(precomputedImagePrompt === null && creditsRemainingToday() <= 0){
+    const waitMs = creditResetWaitMs();
+    pushBotMessage(`Free plan mein har din ${FREE_DAILY_CREDITS} credits milte hain — chhoti baaton mein kam lagte hain, lambi detailed answers mein zyada. Aaj ke credits khatam ho gaye. Naye credits ${formatWaitTime(waitMs)} baad milenge — ya Kashish Pro lekar unlimited chat karo.`, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { feature:'question-limit' });
+    return;
   }
 
   // "/search <query>" — force a live web search regardless of what the
@@ -5893,6 +5936,7 @@ async function send(){
     const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
     try{
       const result = await kashishReply(historyForModel, searchContext);
+      chargeCredits(result.reply);
       removeSearchIndicator();
       pushBotMessage(result.reply, result.quickReplies, null, null, null, null, null, webSources, kgCard);
     }catch(e){
@@ -5915,6 +5959,7 @@ async function send(){
     const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
     try{
       const result = await kashishReply(historyForModel, null, formatChartContext(chartTopic), 900);
+      chargeCredits(result.reply);
       removeTyping();
       const chartData = parseChartFromReply(result.reply);
       if(chartData){
@@ -6060,6 +6105,7 @@ async function send(){
     const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
     try{
       const result = await kashishReply(historyForModel, null, formatEmailComposeContext(text));
+      chargeCredits(result.reply);
       removeTyping();
       const draft = parseEmailDraftFromReply(result.reply);
       if(draft){
@@ -6093,6 +6139,7 @@ async function send(){
     const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
     try{
       const result = await kashishReply(historyForModel, null, formatCodeGenContext(text), 3800);
+      chargeCredits(result.reply);
       removeTyping();
       const code = parseCodeFromReply(result.reply);
       if(code){
@@ -6179,6 +6226,7 @@ async function send(){
     const crawlContext = crawled ? formatCrawlResultForModel(crawled, text) : null;
     try{
       const result = await kashishReply(historyForModel, null, crawlContext);
+      chargeCredits(result.reply);
       removeSearchIndicator();
       if(crawled){
         pushBotMessage(result.reply, result.quickReplies);
@@ -6237,6 +6285,7 @@ async function send(){
     try{
       const result = await kashishReply(historyForModel, combinedContext);
       replyText = result.reply; quickReplies = result.quickReplies;
+      chargeCredits(replyText);
     }catch(e){
       console.warn('[KASHISH] known-person merged reply failed:', e);
       replyText = hasProfile || kg ? `Yeh raha ${(hasProfile&&profile.name)||(kg&&kg.name)||knownPerson.kgQuery} ke baare mein jo mil paaya.` : `Mujhe "${knownPerson.kgQuery}" ke baare mein koi bharosemand jaankari nahi mil paayi — shayad yeh koi kam-jaana-pehchana naam hai. Main jhooth nahi bolungi, sach mein nahi pata.`;
@@ -6445,6 +6494,7 @@ async function send(){
 
   try{
     const result = await kashishReply(historyForModel, searchContext);
+    chargeCredits(result.reply);
     removeTyping(); removeSearchIndicator();
     pushBotMessage(result.reply, result.quickReplies, videoResults, null, null, null, newsResults, webSources, kgCard, factCheckResults, null, null, null, null, null, movieResults);
   }catch(e){
