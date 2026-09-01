@@ -117,6 +117,10 @@ img{display:block;max-width:100%;}
 .bubble::before{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(165deg,rgba(255,255,255,.35) 0%,rgba(255,255,255,0) 32%);}
 .bubble.user{background:linear-gradient(160deg,#2b2b30 0%,var(--black) 55%,#0d0d0f 100%);color:#fff;font-weight:600;border-bottom-right-radius:6px;box-shadow:0 6px 16px -8px rgba(20,20,22,.55),0 1px 0 rgba(255,255,255,.08) inset;}
 .bubble.bot{background:linear-gradient(160deg,#f8f8f9 0%,var(--bubble-bot) 55%,#ebebee 100%);color:var(--ink);border-bottom-left-radius:6px;box-shadow:0 4px 12px -8px rgba(20,20,22,.12),0 1px 0 rgba(255,255,255,.9) inset;}
+/* Live-typing reveal — a soft blinking cursor at the end of text while a
+   freshly-arrived bot reply is streaming in, ChatGPT-style. */
+.bubble.bot .typing-live::after{content:'';display:inline-block;width:2px;height:14px;margin-left:2px;vertical-align:-2px;background:var(--ink-soft);animation:liveCursorBlink .85s steps(1) infinite;}
+@keyframes liveCursorBlink{0%,50%{opacity:1;}51%,100%{opacity:0;}}
 .bubble img{border-radius:12px;margin-bottom:6px;max-height:200px;object-fit:cover;}
 .bubble-time{font-size:10px;color:var(--ink-soft);margin-top:4px;padding:0 3px;}
 .quick-replies{display:flex;gap:8px;margin-top:2px;flex-wrap:wrap;align-self:flex-end;}
@@ -124,10 +128,10 @@ img{display:block;max-width:100%;}
 .quick-replies button:active{opacity:.85;}
 
 .typing-bubble{position:relative;overflow:hidden;display:flex;gap:5px;align-items:center;background:linear-gradient(160deg,#f8f8f9,var(--bubble-bot));padding:14px 18px;border-radius:19px;border-bottom-left-radius:6px;align-self:flex-start;box-shadow:0 4px 12px -8px rgba(20,20,22,.12),0 1px 0 rgba(255,255,255,.9) inset;}
-.typing-bubble span{width:6px;height:6px;border-radius:50%;background:#B4B4BB;animation:dotBounce 1.2s ease-in-out infinite;display:inline-block;}
-.typing-bubble span:nth-child(2){animation-delay:.15s;}
-.typing-bubble span:nth-child(3){animation-delay:.3s;}
-@keyframes dotBounce{0%,60%,100%{opacity:.35;transform:translateY(0);}30%{opacity:1;transform:translateY(-3px);}}
+/* Single blinking cursor instead of 3 bouncing dots — same motif that
+   carries straight into the live-typing reveal once text starts arriving,
+   so it reads as one continuous "she's typing" beat, ChatGPT-style. */
+.typing-bubble .live-cursor{width:2px;height:14px;background:var(--ink-soft);display:inline-block;animation:liveCursorBlink .85s steps(1) infinite;}
 
 .stop-gen{align-self:center;display:flex;align-items:center;gap:8px;background:linear-gradient(160deg,#2b2b30,var(--black));color:#fff;font-size:12.5px;font-weight:700;padding:9px 16px;border-radius:999px;margin:2px 0;box-shadow:0 4px 10px -6px rgba(20,20,22,.5),0 1px 0 rgba(255,255,255,.12) inset;}
 .stop-gen .dot{width:15px;height:15px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;}
@@ -228,6 +232,20 @@ html[data-theme="dark"] .map-card{background:linear-gradient(150deg,#1E1E21 0%,#
 .email-card .ec-btn:active{opacity:.85;}
 .email-card .ec-note{font-size:10.5px;color:var(--ink-soft);text-align:center;margin-top:8px;line-height:1.4;}
 html[data-theme="dark"] .email-card{background:linear-gradient(150deg,#1E1E21 0%,#1A1A1D 50%,#151517 100%);border-color:rgba(255,255,255,.06);}
+
+/* PDF export card — shows up once a client-side generated PDF is ready;
+   nothing downloads on its own, the user taps to view or explicitly hits
+   Download. */
+.pdf-card{display:flex;align-items:center;gap:12px;max-width:88%;width:100%;margin-top:6px;background:linear-gradient(155deg,#ffffff 0%,#f6f7f9 55%,#edeef1 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:14px 15px;box-shadow:0 10px 24px -14px rgba(20,20,22,.26);text-align:left;}
+.pdf-card .pc-icon{flex-shrink:0;width:44px;height:44px;border-radius:13px;background:linear-gradient(155deg,#ffe6e4,#ffd2ce);display:flex;align-items:center;justify-content:center;font-size:20px;color:#E0483E;}
+.pdf-card .pc-info{flex:1;min-width:0;}
+.pdf-card .pc-name{font-size:13.5px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.pdf-card .pc-meta{font-size:11px;color:var(--ink-soft);margin-top:2px;}
+.pdf-card .pc-actions{flex-shrink:0;display:flex;gap:8px;}
+.pdf-card .pc-btn{width:36px;height:36px;border-radius:50%;background:var(--bubble-bot);display:flex;align-items:center;justify-content:center;font-size:15px;color:var(--ink);flex-shrink:0;}
+.pdf-card .pc-btn:active{background:var(--border);}
+.pdf-card .pc-btn.download{background:linear-gradient(160deg,#2b2b30 0%,var(--black) 55%,#0d0d0f 100%);color:#fff;}
+html[data-theme="dark"] .pdf-card{background:linear-gradient(150deg,#1E1E21 0%,#1A1A1D 50%,#151517 100%);border-color:rgba(255,255,255,.06);}
 
 
 /* Knowledge Graph — compact verified-entity card */
@@ -2231,6 +2249,35 @@ function fmtTime(ts){
   const ap = h>=12 ? 'PM':'AM'; h = h%12; if(h===0) h=12;
   return `${h}:${m<10?'0':''}${m}${ap}`;
 }
+// "Live typing" reveal — ChatGPT-style. Kashish's providers return the
+// whole reply in one shot (no real token streaming), so instead of just
+// dumping the full text into the bubble instantly, the freshest bot
+// message streams in progressively with a blinking cursor. Only the
+// message just pushed by pushBotMessage gets this — anything rendered for
+// any other reason (switching sessions, liking a message, etc.) shows
+// instantly as before.
+let animateNextBotMessageTs = null;
+function typewriterReveal(el, text){
+  el.classList.add('typing-live');
+  let i = 0;
+  // Scale the reveal speed to length so a long answer still finishes in a
+  // natural few seconds instead of visibly speed-reading forever.
+  const totalTicks = 90;
+  const chunk = Math.max(1, Math.ceil(text.length / totalTicks));
+  const timer = setInterval(()=>{
+    if(!el.isConnected){ clearInterval(timer); return; }
+    i += chunk;
+    const scroll = document.getElementById('chat-scroll');
+    if(i >= text.length){
+      el.textContent = text;
+      el.classList.remove('typing-live');
+      clearInterval(timer);
+    } else {
+      el.textContent = text.slice(0, i);
+    }
+    if(scroll) scroll.scrollTop = scroll.scrollHeight;
+  }, 16);
+}
 function renderChat(){
   const scroll = document.getElementById('chat-scroll');
   scroll.innerHTML='';
@@ -2261,7 +2308,16 @@ function renderChat(){
         const wrap=document.createElement('div'); wrap.className='gen-image-wrap';
         const im=document.createElement('img'); im.src=m.imageDataUrl; wrap.appendChild(im); b.appendChild(wrap);
       }
-      if(m.text){ const span=document.createElement('div'); span.textContent=m.text; b.appendChild(span); }
+      if(m.text){
+        const span=document.createElement('div');
+        if(animateNextBotMessageTs && m.ts === animateNextBotMessageTs){
+          animateNextBotMessageTs = null;
+          typewriterReveal(span, m.text);
+        } else {
+          span.textContent = m.text;
+        }
+        b.appendChild(span);
+      }
     }
     row.appendChild(b);
     scroll.appendChild(row);
@@ -2426,6 +2482,29 @@ function renderChat(){
       note.textContent="Yeh sirf ek draft hai — kuch bhi apne aap send nahi hota. Gmail khulne ke baad tum edit kar sakte ho aur khud Send dabana hoga.";
       ec.appendChild(note);
       scroll.appendChild(ec);
+    }
+    if(m.pdfCard){
+      const p = m.pdfCard;
+      const card = document.createElement('div'); card.className='pdf-card';
+      const icon=document.createElement('div'); icon.className='pc-icon'; icon.innerHTML='<i class="ph-fill ph-file-pdf"></i>';
+      card.appendChild(icon);
+      const info=document.createElement('div'); info.className='pc-info';
+      const name=document.createElement('div'); name.className='pc-name'; name.textContent=p.filename||'export.pdf';
+      const meta=document.createElement('div'); meta.className='pc-meta';
+      meta.textContent = `${p.pageCount||1} page${(p.pageCount||1)>1?'s':''} · ${p.sizeLabel||''} · Tap to view`;
+      info.appendChild(name); info.appendChild(meta);
+      card.appendChild(info);
+      const actions=document.createElement('div'); actions.className='pc-actions';
+      const viewBtn=document.createElement('button'); viewBtn.className='pc-btn view'; viewBtn.title='View';
+      viewBtn.innerHTML='<i class="ph-bold ph-eye"></i>';
+      viewBtn.onclick=(ev)=>{ ev.stopPropagation(); viewGeneratedPdf(p.dataUrl); };
+      const dlBtn=document.createElement('button'); dlBtn.className='pc-btn download'; dlBtn.title='Download';
+      dlBtn.innerHTML='<i class="ph-bold ph-download-simple"></i>';
+      dlBtn.onclick=(ev)=>{ ev.stopPropagation(); downloadGeneratedPdf(p.dataUrl, p.filename); };
+      actions.appendChild(viewBtn); actions.appendChild(dlBtn);
+      card.appendChild(actions);
+      card.onclick=()=>viewGeneratedPdf(p.dataUrl);
+      scroll.appendChild(card);
     }
     if(m.kgCard){
       const kg = m.kgCard;
@@ -2661,7 +2740,7 @@ function renderChat(){
 function addTyping(){
   const scroll = document.getElementById('chat-scroll');
   const b=document.createElement('div'); b.className='typing-bubble'; b.id='typing-indicator';
-  b.innerHTML='<span></span><span></span><span></span>';
+  b.innerHTML='<span class="live-cursor"></span>';
   scroll.appendChild(b); scroll.scrollTop=scroll.scrollHeight;
 }
 function removeTyping(){ const el=document.getElementById('typing-indicator'); if(el) el.remove(); }
@@ -4051,10 +4130,17 @@ Nexor Sparks help: since Kashish shares its account system with Nexor Sparks (th
 Respond with ONLY compact JSON, no markdown fences, no extra text outside the JSON:
 {"reply":"your natural conversational reply as plain text","quickReplies":["optional","short chips"]}`;
 }
-function buildMessages(history, searchContext){
+function buildMessages(history, searchContext, rawContext){
   const sys = buildSystemPrompt();
   const msgs = [{role:'system', content:sys}];
-  if(searchContext){
+  if(rawContext){
+    // Used for contexts that already contain their own complete framing/
+    // instructions (email drafts, crawled page content) — wrapping them in
+    // the "web search results" template below would misdescribe what the
+    // context actually is and can confuse the model into ignoring the
+    // exact format it was asked for.
+    msgs.push({role:'system', content: rawContext});
+  } else if(searchContext){
     msgs.push({role:'system', content:
       `Live web search results for the user's latest message (retrieved just now, treat as current/accurate):\n\n${searchContext}\n\nThese came from several different sources — synthesize them into ONE clear, complete answer, combining and cross-checking the info rather than just summarizing a single source or listing results one by one. Write it as a natural, well-organized reply (short paragraphs, or a tight list only if that genuinely fits). The individual sources are already shown to the user as small tappable chips right below your reply, so don't paste URLs or say "according to search results" — just answer like you already know it.`});
   }
@@ -4112,8 +4198,8 @@ async function callProviderWithRetry(endpoint, model, msgs, label){
     return await callProvider(endpoint, model, msgs, label);
   }
 }
-async function kashishReply(history, searchContext){
-  const msgs = buildMessages(history, searchContext);
+async function kashishReply(history, searchContext, rawContext){
+  const msgs = buildMessages(history, searchContext, rawContext);
   try{ return await callProviderWithRetry(GROQ_PROXY_ENDPOINT, GROQ_MODEL, msgs, 'Groq'); }
   catch(e1){
     console.warn('[KASHISH] Groq failed, trying Gemini:', e1);
@@ -4138,14 +4224,16 @@ function sendLocal(){
   }, 400);
 }
 
-function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults, webSources, kgCard, factCheckResults, postCard, conversionCard, stockCard, mapCard, personCard, movieResults, emailCard){
+function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults, webSources, kgCard, factCheckResults, postCard, conversionCard, stockCard, mapCard, personCard, movieResults, emailCard, pdfCard){
   const sess = getSession(currentSessionId);
   if(!sess) return;
   const qr = appSettings.trendingSearches ? (quickReplies||null) : null;
-  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, webSources: (webSources&&webSources.length)?webSources:null, kgCard: kgCard||null, factCheckResults: (factCheckResults&&factCheckResults.length)?factCheckResults:null, postCard: postCard||null, conversionCard: conversionCard||null, stockCard: stockCard||null, mapCard: mapCard||null, personCard: personCard||null, movieResults: (movieResults&&movieResults.length)?movieResults:null, emailCard: emailCard||null, ts: Date.now()});
+  const ts = Date.now();
+  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, webSources: (webSources&&webSources.length)?webSources:null, kgCard: kgCard||null, factCheckResults: (factCheckResults&&factCheckResults.length)?factCheckResults:null, postCard: postCard||null, conversionCard: conversionCard||null, stockCard: stockCard||null, mapCard: mapCard||null, personCard: personCard||null, movieResults: (movieResults&&movieResults.length)?movieResults:null, emailCard: emailCard||null, pdfCard: pdfCard||null, ts});
   sess.preview = truncate(text, 60);
   sess.updatedAt = Date.now();
   upsertSession(sess);
+  if(text) animateNextBotMessageTs = ts;
   renderChat();
   notifyNewBotMessage(text);
   if(voiceModeActive) speakVoiceModeReply(text);
@@ -4174,6 +4262,10 @@ function detectPdfRequest(text){
   const stripped = t.replace(PDF_FILLER_WORDS, ' ').replace(/\s+/g,' ').replace(/^[:,\-–\s]+/,'').trim();
   return { inlineContent: stripped.length > 25 ? stripped : null };
 }
+// Builds the PDF and returns it (as a data URL) instead of auto-downloading
+// it — Kashish shows it as a tappable card in chat instead, so the user
+// decides when to open/download it, rather than a file dropping into their
+// downloads folder unasked.
 function generateTextPdf(text, title){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF({ unit:'pt', format:'a4' });
@@ -4188,13 +4280,35 @@ function generateTextPdf(text, title){
   doc.setFont('helvetica','normal'); doc.setFontSize(11.5);
   const bodyLines = doc.splitTextToSize(text, usableWidth);
   const lineHeight = 16;
+  let pageCount = 1;
   bodyLines.forEach(line=>{
-    if(y > pageHeight - margin){ doc.addPage(); y = margin; }
+    if(y > pageHeight - margin){ doc.addPage(); y = margin; pageCount++; }
     doc.text(line, margin, y);
     y += lineHeight;
   });
   const filename = (title||'kashish-export').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'').slice(0,50) || 'kashish-export';
-  doc.save(filename + '.pdf');
+  const dataUrl = doc.output('datauristring');
+  // Rough on-disk size estimate from the base64 payload, just for a nice
+  // human-readable label on the card ("~42 KB" etc).
+  const b64 = dataUrl.split(',')[1] || '';
+  const bytes = Math.round(b64.length * 0.75);
+  const sizeLabel = bytes > 1024*1024 ? (bytes/1024/1024).toFixed(1)+' MB' : Math.max(1, Math.round(bytes/1024))+' KB';
+  return { dataUrl, filename: filename + '.pdf', pageCount, sizeLabel };
+}
+// "View" — opens the PDF in a new tab so the user can look through it
+// (most mobile/desktop browsers render PDFs inline) before deciding
+// whether to keep it.
+function viewGeneratedPdf(dataUrl){
+  const w = window.open();
+  if(w){ w.location.href = dataUrl; }
+  else { showKashishToast("Popup block ho gaya — neeche 'Download' try karo."); }
+}
+// "Download" — the explicit, user-initiated save-to-device action; nothing
+// downloads on its own before this is tapped.
+function downloadGeneratedPdf(dataUrl, filename){
+  const a = document.createElement('a');
+  a.href = dataUrl; a.download = filename || 'kashish-export.pdf';
+  document.body.appendChild(a); a.click(); a.remove();
 }
 /* ---------------- email compose -> Gmail handoff ---------------- */
 // Kashish drafts the email text (subject + body) via the LLM, shows it in
@@ -4376,67 +4490,98 @@ async function handleImageGenRequest(prompt){
 // normal LLM providers (Groq -> Gemini -> Cloudflare) as before.
 // This is a starting set — add more {patterns, replies} entries any time
 // to grow coverage toward 1000+ without touching the rest of the app.
+// Quick heuristic: does this message look like Hindi/Hinglish, or plain
+// English? Used only to pick which language the LOCAL_RESPONSES canned
+// reply comes back in — everything else (the actual LLM) already follows
+// langPref in the system prompt correctly; this was the one place that
+// always replied in Hindi/Hinglish regardless of what the user wrote.
+const HINGLISH_MARKER_WORDS = /\b(hai|hain|kya|kyu|kyun|kaise|kaisi|kaisa|kab|kaha|kahan|tum|tumhe|tumhara|tumhari|mera|meri|mujhe|hu|hoon|ho|raha|rahi|rahe|nahi|nahin|haan|bhi|toh|acha|accha|theek|thik|karo|kar|karke|bata|batao|chahiye|abhi|aaj|kal|yaar|bhai|didi|kuch|sab|wala|wali)\b/i;
+function looksHindiOrHinglish(text){
+  if(!text) return false;
+  if(/[\u0900-\u097F]/.test(text)) return true; // Devanagari script
+  return HINGLISH_MARKER_WORDS.test(text);
+}
 const LOCAL_RESPONSES = [
-  { patterns:['hi','hello','hey','helo','hii','hiii','hlo','yo'], replies:[
-    "Hey! Kya haal hai?","Hello! Batao, kya chal raha hai aaj?","Hii! Kaise ho?","Yo! Sab badhiya?"
-  ]},
-  { patterns:['namaste','namaskar'], replies:[
-    "Namaste! Kaise ho aap?","Namaskar! Batao kya help chahiye."
-  ]},
-  { patterns:['good morning','gm','subh prabhat'], replies:[
-    "Good morning! Din shubh ho tumhara.","Morning! Aaj ka plan kya hai?"
-  ]},
-  { patterns:['good night','gn','shubh ratri'], replies:[
-    "Good night! Achi neend lena.","Good night! Kal baat karte hain."
-  ]},
-  { patterns:['kaise ho','kaisi ho','kaise hain aap','how are you','hows it going'], replies:[
-    "Main theek hoon! Tum batao, kaise ho?","Bilkul badhiya, tumhare bina thoda bore ho raha tha 😄 tum sunao.","Main mast hoon! Aur tum kaise ho?"
-  ]},
-  { patterns:['main theek hu','mai thik hu','i am fine','im good','sab badhiya'], replies:[
-    "Accha suna! Kuch specific baat karni hai ya bas chill kar rahe ho?","Nice! Aaj kuch khaas plan hai?"
-  ]},
-  { patterns:['tum kaun ho','tu kaun hai','who are you','what are you'], replies:[
-    "Main Kashish hoon — tumhara AI companion. Chat karo, kuch pucho, ya bas time pass karo, main yahin hoon.","Main Kashish — ek AI dost jaisa, jo kisi bhi cheez mein help kar sakta hai ya bas baat kar sakta hai."
-  ]},
-  { patterns:['tumhara naam kya hai','your name','naam kya hai'], replies:[
-    "Mera naam Kashish hai!","Main Kashish hoon, jaise pucha waise bata diya 🙂"
-  ]},
-  { patterns:['kya kar rahe ho','what are you doing','kya kar rahi ho'], replies:[
-    "Bas tumhara wait kar raha tha, ab batao kya karna hai.","Kuch nahi, tumse baat karne ka mann tha — tum sunao."
-  ]},
-  { patterns:['bore ho raha hu','i am bored','bore horaha hu','boring'], replies:[
-    "Chalo kuch mazedaar karte hain — joke sunu ya koi random fact?","Bore mat ho, batao kya interest hai, main kuch suggest karta hoon."
-  ]},
-  { patterns:['thanks','thank you','shukriya','dhanyavaad','thankyou'], replies:[
-    "Koi baat nahi! Jab bhi zarurat ho, bata dena.","Welcome! Aur kuch chahiye toh bolo."
-  ]},
-  { patterns:['bye','goodbye','tata','chalta hu','chalti hu','alvida'], replies:[
-    "Bye! Apna khayal rakhna.","Chalo phir, baad mein baat karte hain 👋"
-  ]},
-  { patterns:['ok','okay','theek hai','thik hai','acha','achha'], replies:[
-    "Theek hai! Aur kuch?","Okay, aur batao kya chal raha hai."
-  ]},
-  { patterns:['haan','han','yes','yeah','ya'], replies:[
-    "Theek hai, aage batao.","Ok, samjha — aur kya?"
-  ]},
-  { patterns:['nahi','nahin','no','nope'], replies:[
-    "Koi baat nahi, jab mann ho tab bata dena.","Theek hai, aur kuch help chahiye?"
-  ]},
-  { patterns:['joke sunao','koi joke','tell me a joke','joke bolo'], replies:[
-    "Teacher: Tumne homework kyun nahi kiya? Student: Ma'am, mera AI companion busy tha 😄","Ek joke: Programmer ki wife bola 'jaake dudh le aao, agar ande mile toh 6 le aana.' Wo 6 dudh le aaya 😂"
-  ]},
-  { patterns:['i love you','love you','tumse pyaar hai'], replies:[
-    "Aww, sweet ho tum! Main yahin hoon dost ki tarah, tumhara din acha banane ke liye 🙂"
-  ]},
-  { patterns:['tum acche ho','you are nice','tum smart ho','good ai'], replies:[
-    "Thank you! Tum bhi kaafi cool ho 🙂"
-  ]},
-  { patterns:['help chahiye','i need help','madad chahiye'], replies:[
-    "Bilkul, batao kis cheez mein help chahiye?","Main yahin hoon, bata do kya problem hai."
-  ]},
-  { patterns:['app kaisa hai','app acha hai','nice app'], replies:[
-    "Thank you! Aur suggestions ho toh zaroor batana."
-  ]}
+  { patterns:['hi','hello','hey','helo','hii','hiii','hlo','yo'],
+    repliesHi:["Hey! Kya haal hai?","Hello! Batao, kya chal raha hai aaj?","Hii! Kaise ho?","Yo! Sab badhiya?"],
+    repliesEn:["Hey! What's up?","Hello! What's going on today?","Hii! How are you?","Yo! All good?"]
+  },
+  { patterns:['namaste','namaskar'],
+    repliesHi:["Namaste! Kaise ho aap?","Namaskar! Batao kya help chahiye."],
+    repliesEn:["Namaste! How are you?","Hello! What can I help with?"]
+  },
+  { patterns:['good morning','gm','subh prabhat'],
+    repliesHi:["Good morning! Din shubh ho tumhara.","Morning! Aaj ka plan kya hai?"],
+    repliesEn:["Good morning! Hope your day goes great.","Morning! What's the plan for today?"]
+  },
+  { patterns:['good night','gn','shubh ratri'],
+    repliesHi:["Good night! Achi neend lena.","Good night! Kal baat karte hain."],
+    repliesEn:["Good night! Sleep well.","Good night! Talk tomorrow."]
+  },
+  { patterns:['kaise ho','kaisi ho','kaise hain aap','how are you','hows it going'],
+    repliesHi:["Main theek hoon! Tum batao, kaise ho?","Bilkul badhiya, tumhare bina thoda bore ho raha tha 😄 tum sunao.","Main mast hoon! Aur tum kaise ho?"],
+    repliesEn:["I'm doing well! How about you?","Pretty great, honestly 😄 what about you?","I'm good! How are you doing?"]
+  },
+  { patterns:['main theek hu','mai thik hu','i am fine','im good','sab badhiya'],
+    repliesHi:["Accha suna! Kuch specific baat karni hai ya bas chill kar rahe ho?","Nice! Aaj kuch khaas plan hai?"],
+    repliesEn:["Glad to hear it! Anything specific on your mind, or just chilling?","Nice! Got any plans today?"]
+  },
+  { patterns:['tum kaun ho','tu kaun hai','who are you','what are you'],
+    repliesHi:["Main Kashish hoon — tumhara AI companion. Chat karo, kuch pucho, ya bas time pass karo, main yahin hoon.","Main Kashish — ek AI dost jaisa, jo kisi bhi cheez mein help kar sakta hai ya bas baat kar sakta hai."],
+    repliesEn:["I'm Kashish — your AI companion. Chat, ask me anything, or just hang out, I'm here for it.","I'm Kashish, kind of like an AI friend — happy to help with things or just talk."]
+  },
+  { patterns:['tumhara naam kya hai','your name','naam kya hai'],
+    repliesHi:["Mera naam Kashish hai!","Main Kashish hoon, jaise pucha waise bata diya 🙂"],
+    repliesEn:["My name is Kashish!","I'm Kashish 🙂"]
+  },
+  { patterns:['kya kar rahe ho','what are you doing','kya kar rahi ho'],
+    repliesHi:["Bas tumhara wait kar raha tha, ab batao kya karna hai.","Kuch nahi, tumse baat karne ka mann tha — tum sunao."],
+    repliesEn:["Just here waiting on you — what do you want to do?","Nothing much, just felt like chatting — what's up with you?"]
+  },
+  { patterns:['bore ho raha hu','i am bored','bore horaha hu','boring'],
+    repliesHi:["Chalo kuch mazedaar karte hain — joke sunu ya koi random fact?","Bore mat ho, batao kya interest hai, main kuch suggest karta hoon."],
+    repliesEn:["Let's fix that — want a joke or a random fact?","Don't be bored, tell me what you're into and I'll suggest something."]
+  },
+  { patterns:['thanks','thank you','shukriya','dhanyavaad','thankyou'],
+    repliesHi:["Koi baat nahi! Jab bhi zarurat ho, bata dena.","Welcome! Aur kuch chahiye toh bolo."],
+    repliesEn:["No worries at all! Just let me know whenever you need something.","You're welcome! Let me know if you need anything else."]
+  },
+  { patterns:['bye','goodbye','tata','chalta hu','chalti hu','alvida'],
+    repliesHi:["Bye! Apna khayal rakhna.","Chalo phir, baad mein baat karte hain 👋"],
+    repliesEn:["Bye! Take care.","Alright, talk later 👋"]
+  },
+  { patterns:['ok','okay','theek hai','thik hai','acha','achha'],
+    repliesHi:["Theek hai! Aur kuch?","Okay, aur batao kya chal raha hai."],
+    repliesEn:["Alright! Anything else?","Okay, what else is going on?"]
+  },
+  { patterns:['haan','han','yes','yeah','ya'],
+    repliesHi:["Theek hai, aage batao.","Ok, samjha — aur kya?"],
+    repliesEn:["Alright, go on.","Got it — what else?"]
+  },
+  { patterns:['nahi','nahin','no','nope'],
+    repliesHi:["Koi baat nahi, jab mann ho tab bata dena.","Theek hai, aur kuch help chahiye?"],
+    repliesEn:["No worries, let me know whenever.","Alright, anything else you need help with?"]
+  },
+  { patterns:['joke sunao','koi joke','tell me a joke','joke bolo'],
+    repliesHi:["Teacher: Tumne homework kyun nahi kiya? Student: Ma'am, mera AI companion busy tha 😄","Ek joke: Programmer ki wife bola 'jaake dudh le aao, agar ande mile toh 6 le aana.' Wo 6 dudh le aaya 😂"],
+    repliesEn:["Why do programmers prefer dark mode? Because light attracts bugs 😄","I told my computer I needed a break, and now it won't stop sending me KitKats."]
+  },
+  { patterns:['i love you','love you','tumse pyaar hai'],
+    repliesHi:["Aww, sweet ho tum! Main yahin hoon dost ki tarah, tumhara din acha banane ke liye 🙂"],
+    repliesEn:["Aww, that's sweet! I'm here like a good friend, happy to make your day a bit better 🙂"]
+  },
+  { patterns:['tum acche ho','you are nice','tum smart ho','good ai'],
+    repliesHi:["Thank you! Tum bhi kaafi cool ho 🙂"],
+    repliesEn:["Thank you! You're pretty great too 🙂"]
+  },
+  { patterns:['help chahiye','i need help','madad chahiye'],
+    repliesHi:["Bilkul, batao kis cheez mein help chahiye?","Main yahin hoon, bata do kya problem hai."],
+    repliesEn:["Sure, what do you need help with?","I'm here — tell me what's up."]
+  },
+  { patterns:['app kaisa hai','app acha hai','nice app'],
+    repliesHi:["Thank you! Aur suggestions ho toh zaroor batana."],
+    repliesEn:["Thank you! Let me know if you've got any suggestions."]
+  }
 ];
 function normalizeForMatch(t){ return (t||'').toLowerCase().trim().replace(/[^\w\s]/g,' ').replace(/\s+/g,' ').trim(); }
 function getLocalReply(text){
@@ -4445,10 +4590,12 @@ function getLocalReply(text){
   // Only auto-answer short, simple messages locally — longer/complex
   // messages should still get a full model-generated reply.
   if(norm.split(' ').length > 6) return null;
+  const useHindi = looksHindiOrHinglish(text);
   for(const entry of LOCAL_RESPONSES){
     for(const p of entry.patterns){
       if(norm === p || (' '+norm+' ').includes(' '+p+' ')){
-        return entry.replies[Math.floor(Math.random()*entry.replies.length)];
+        const pool = useHindi ? entry.repliesHi : entry.repliesEn;
+        return pool[Math.floor(Math.random()*pool.length)];
       }
     }
   }
@@ -4551,8 +4698,9 @@ async function send(){
     setTimeout(()=>{
       removeTyping();
       try{
-        generateTextPdf(content, sess.title || 'Kashish chat');
-        pushBotMessage("PDF ban gaya — download shuru ho gaya hai. ", null);
+        const title = sess.title || 'Kashish chat';
+        const pdf = generateTextPdf(content, title);
+        pushBotMessage("PDF ban gaya — neeche tap karke dekh sakte ho, ya download kar sakte ho.", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { dataUrl: pdf.dataUrl, filename: pdf.filename, title, pageCount: pdf.pageCount, sizeLabel: pdf.sizeLabel });
       }catch(e){
         console.warn('[KASHISH] PDF generation failed:', e);
         pushBotMessage("PDF banane mein dikkat aa gayi, thodi der baad dobara try karo.", null);
@@ -4571,7 +4719,7 @@ async function send(){
     const extractedTo = toMatch ? toMatch[0] : '';
     const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
     try{
-      const result = await kashishReply(historyForModel, formatEmailComposeContext(text));
+      const result = await kashishReply(historyForModel, null, formatEmailComposeContext(text));
       removeTyping();
       const draft = parseEmailDraftFromReply(result.reply);
       if(draft){
@@ -4644,7 +4792,7 @@ async function send(){
     const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
     const crawlContext = crawled ? formatCrawlResultForModel(crawled, text) : null;
     try{
-      const result = await kashishReply(historyForModel, crawlContext);
+      const result = await kashishReply(historyForModel, null, crawlContext);
       removeSearchIndicator();
       if(crawled){
         pushBotMessage(result.reply, result.quickReplies);
