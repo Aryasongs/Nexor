@@ -68,7 +68,7 @@ img{display:block;max-width:100%;}
 .avatar{position:relative;overflow:hidden;width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#3a3a40,var(--black));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:14px;flex-shrink:0;box-shadow:0 4px 10px -5px rgba(20,20,22,.5),0 1px 0 rgba(255,255,255,.15) inset;}
 .avatar::before{content:'';position:absolute;top:1px;left:4px;right:4px;height:40%;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.4),rgba(255,255,255,0));pointer-events:none;}
 
-.home-scroll{flex:1;overflow-y:auto;}
+.home-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;}
 .greeting{padding:20px 20px 2px;}
 .greeting .hi{font-size:26px;color:#9a9aa4;font-weight:700;line-height:1.18;}
 .greeting .q{font-size:26px;color:var(--ink);font-weight:800;line-height:1.22;}
@@ -108,7 +108,7 @@ img{display:block;max-width:100%;}
 #screen-chat{padding-top:env(safe-area-inset-top);background:linear-gradient(180deg,#F8F8F9 0%,var(--bg) 220px);}
 .chat-topbar{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;flex-shrink:0;background:rgba(255,255,255,.72);backdrop-filter:blur(14px) saturate(160%);-webkit-backdrop-filter:blur(14px) saturate(160%);border-bottom:1px solid rgba(235,235,238,.9);box-shadow:0 1px 0 rgba(255,255,255,.6) inset;position:relative;z-index:2;}
 .chat-title{font-weight:800;font-size:15.5px;color:var(--ink);}
-.chat-scroll{flex:1;overflow-y:auto;padding:8px 16px 4px;display:flex;flex-direction:column;gap:9px;}
+.chat-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 16px 4px;display:flex;flex-direction:column;gap:9px;}
 .day-pill{align-self:center;background:linear-gradient(180deg,#ffffff,#f6f6f8);border:1px solid var(--border);color:var(--ink-soft);font-size:11px;font-weight:700;padding:5px 14px;border-radius:999px;margin:4px 0 8px;box-shadow:0 1px 2px rgba(20,20,22,.05),0 1px 0 rgba(255,255,255,.8) inset;}
 .bubble-row{display:flex;flex-direction:column;max-width:82%;}
 .bubble-row.user{align-self:flex-end;align-items:flex-end;}
@@ -408,7 +408,7 @@ html[data-theme="dark"] .web-source-chip{background:linear-gradient(160deg,#1E1E
 
 /* ---------- PROFILE ---------- */
 #screen-profile{padding-top:env(safe-area-inset-top);}
-.profile-scroll{flex:1;overflow-y:auto;padding:28px 24px calc(30px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;}
+.profile-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:28px 24px calc(30px + env(safe-area-inset-bottom));display:flex;flex-direction:column;align-items:center;}
 .profile-avatar-wrap{position:relative;width:104px;height:104px;margin-bottom:16px;}
 .profile-avatar-big{position:relative;overflow:hidden;width:104px;height:104px;border-radius:50%;background:linear-gradient(135deg,#3a3a40,var(--black));background-size:cover;background-position:center;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:34px;box-shadow:0 10px 24px -10px rgba(20,20,22,.35),0 1px 0 rgba(255,255,255,.15) inset;}
 .profile-avatar-big::before{content:'';position:absolute;top:3px;left:10px;right:10px;height:38%;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.35),rgba(255,255,255,0));pointer-events:none;}
@@ -435,7 +435,7 @@ html[data-theme="dark"] .web-source-chip{background:linear-gradient(160deg,#1E1E
 .legal-item .go{font-size:15px;color:var(--ink-soft);flex-shrink:0;}
 .legal-brand-note{width:100%;text-align:center;font-size:11.5px;color:var(--ink-soft);line-height:1.5;margin-top:14px;padding:0 6px;}
 
-.legal-doc-scroll{flex:1;overflow-y:auto;padding:8px 22px calc(30px + env(safe-area-inset-bottom));}
+.legal-doc-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:8px 22px calc(30px + env(safe-area-inset-bottom));}
 .legal-doc-updated{font-size:12px;color:var(--ink-soft);font-weight:600;margin-bottom:18px;}
 .legal-doc-body h4{font-size:14.5px;font-weight:800;color:var(--ink);margin:18px 0 6px;}
 .legal-doc-body h4:first-child{margin-top:0;}
@@ -445,7 +445,7 @@ html[data-theme="dark"] .web-source-chip{background:linear-gradient(160deg,#1E1E
 .legal-doc-body li{font-size:13.5px;line-height:1.65;color:#4c4c53;margin-bottom:4px;}
 
 /* ---------- SETTINGS ---------- */
-.settings-scroll{flex:1;overflow-y:auto;padding:16px 20px calc(30px + env(safe-area-inset-bottom));}
+.settings-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:16px 20px calc(30px + env(safe-area-inset-bottom));}
 .settings-section{margin-bottom:22px;}
 .settings-section-title{font-size:12px;font-weight:700;color:var(--ink-soft);margin-bottom:8px;padding-left:4px;text-transform:uppercase;letter-spacing:.02em;}
 .settings-list{position:relative;overflow:hidden;width:100%;background:linear-gradient(150deg,#ffffff 0%,#f4f5f7 50%,#eaecef 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;box-shadow:0 16px 30px -18px rgba(20,20,22,.28),0 2px 0 rgba(255,255,255,1) inset;}
@@ -2260,9 +2260,13 @@ let animateNextBotMessageTs = null;
 function typewriterReveal(el, text){
   el.classList.add('typing-live');
   let i = 0;
-  // Scale the reveal speed to length so a long answer still finishes in a
-  // natural few seconds instead of visibly speed-reading forever.
-  const totalTicks = 90;
+  // Reveal at a natural reading pace (~1 tick per 32ms) instead of racing
+  // through the whole message in a second and a half. Long replies are
+  // still capped so they don't drag on forever — chunk size grows only
+  // once the message is long enough to need it.
+  const tickMs = 32;
+  const maxDurationMs = 5200;
+  const totalTicks = Math.max(1, Math.min(text.length, Math.floor(maxDurationMs / tickMs)));
   const chunk = Math.max(1, Math.ceil(text.length / totalTicks));
   const timer = setInterval(()=>{
     if(!el.isConnected){ clearInterval(timer); return; }
@@ -2276,7 +2280,7 @@ function typewriterReveal(el, text){
       el.textContent = text.slice(0, i);
     }
     if(scroll) scroll.scrollTop = scroll.scrollHeight;
-  }, 16);
+  }, tickMs);
 }
 function renderChat(){
   const scroll = document.getElementById('chat-scroll');
@@ -4315,11 +4319,18 @@ function downloadGeneratedPdf(dataUrl, filename){
 // a preview card for the user to review, and "Open in Gmail" just launches
 // a prefilled compose screen via mailto:/Gmail's own deep link — nothing
 // is ever sent automatically, and there's no Gmail API/OAuth involved.
-const EMAIL_COMPOSE_PATTERN = /\b(write|draft|compose|send)\s+(an?\s+)?(email|mail)\b|\b(email|mail)\s+(likh|likho|likh\s*do|likhdo|banao|bana\s*do|banado|bhejo|bhej\s*do|de\s*do)\b/i;
+// Broad, order-independent match: "email"/"mail" appearing anywhere in the
+// message, plus a verb that signals "write/create/send this for me" —
+// covers direct forms (likh, likho, likh do) and causative Hinglish forms
+// (likhwa, likhwado, banwa, bhijwa) that the older strict pattern missed.
+const EMAIL_WORD_PATTERN = /\b(e-?mail|mail)\b/i;
+const EMAIL_VERB_PATTERN = /\b(write|draft|compose|send|forward|likh\w*|banw?\w*|bhej\w*|bhijw?\w*|type\s*kar\w*|kar\s*do|de\s*do|daal\w*)\b/i;
+const EMAIL_COMPOSE_PATTERN = EMAIL_WORD_PATTERN; // kept for reference; real check is in detectEmailComposeRequest
 const EMAIL_ADDRESS_PATTERN = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
 function detectEmailComposeRequest(text){
   if(!text) return false;
-  return EMAIL_COMPOSE_PATTERN.test(text.trim());
+  const t = text.trim();
+  return EMAIL_WORD_PATTERN.test(t) && EMAIL_VERB_PATTERN.test(t);
 }
 function formatEmailComposeContext(text){
   return `The user wants you to draft an email based on this instruction: "${text}". Write a complete, professional, natural-sounding email a real person would actually send — a proper greeting, clear short paragraphs for the body, and an appropriate sign-off. If a sender name is known from earlier in this conversation use it in the sign-off, otherwise a generic closing like "Best," is fine — don't invent a fake name.
@@ -4335,13 +4346,27 @@ Subject: <the email subject line, one line>
 function parseEmailDraftFromReply(replyText){
   if(!replyText) return null;
   const idx = replyText.indexOf('---BODY---');
-  if(idx === -1) return null;
-  const subjectPart = replyText.slice(0, idx);
-  const subjMatch = subjectPart.match(/subject\s*:\s*(.+)/i);
-  const subject = subjMatch ? subjMatch[1].trim() : '';
-  const body = replyText.slice(idx + '---BODY---'.length).trim();
-  if(!body) return null;
-  return { subject, body };
+  if(idx !== -1){
+    const subjectPart = replyText.slice(0, idx);
+    const subjMatch = subjectPart.match(/subject\s*:\s*(.+)/i);
+    const subject = subjMatch ? subjMatch[1].trim() : '';
+    const body = replyText.slice(idx + '---BODY---'.length).trim();
+    if(body) return { subject, body };
+  }
+  // Fallback: the model sometimes skips the exact "---BODY---" separator.
+  // If it still labelled a "Subject:" line, treat everything after that
+  // line (past the first blank line, if any) as the body instead of
+  // giving up and showing the raw text as a normal chat reply.
+  const lines = replyText.split(/\r?\n/);
+  const subjLineIdx = lines.findIndex(l=>/^\s*subject\s*:/i.test(l));
+  if(subjLineIdx !== -1){
+    const subject = lines[subjLineIdx].replace(/^\s*subject\s*:\s*/i, '').trim();
+    let bodyStart = subjLineIdx + 1;
+    while(bodyStart < lines.length && lines[bodyStart].trim() === '') bodyStart++;
+    const body = lines.slice(bodyStart).join('\n').trim();
+    if(body) return { subject, body };
+  }
+  return null;
 }
 // RFC-6068-style mailto: builder — subject/body are percent-encoded so
 // line breaks (%0D%0A), punctuation, etc. all survive into the compose
