@@ -246,6 +246,19 @@ html[data-theme="dark"] .email-card{background:linear-gradient(150deg,#1E1E21 0%
 .pdf-card .pc-btn:active{background:var(--border);}
 .pdf-card .pc-btn.download{background:linear-gradient(160deg,#2b2b30 0%,var(--black) 55%,#0d0d0f 100%);color:#fff;}
 html[data-theme="dark"] .pdf-card{background:linear-gradient(150deg,#1E1E21 0%,#1A1A1D 50%,#151517 100%);border-color:rgba(255,255,255,.06);}
+.code-card{max-width:92%;width:100%;margin-top:6px;background:linear-gradient(155deg,#ffffff 0%,#f6f7f9 55%,#edeef1 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:14px 15px;box-shadow:0 10px 24px -14px rgba(20,20,22,.26);text-align:left;}
+.code-card .cc-head{display:flex;align-items:center;gap:10px;}
+.code-card .cc-icon{flex-shrink:0;width:38px;height:38px;border-radius:12px;background:linear-gradient(155deg,#e2f4e9,#c9ecd6);display:flex;align-items:center;justify-content:center;font-size:17px;color:#1E9E5A;}
+.code-card .cc-info{flex:1;min-width:0;}
+.code-card .cc-name{font-size:13.5px;font-weight:800;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.code-card .cc-meta{font-size:11px;color:var(--ink-soft);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.code-card .cc-code{margin-top:11px;background:#17171A;color:#B7F5C5;font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:10.5px;line-height:1.5;padding:11px 12px;border-radius:12px;white-space:pre-wrap;word-break:break-word;max-height:120px;overflow:hidden;position:relative;}
+.code-card .cc-code::after{content:'';position:absolute;left:0;right:0;bottom:0;height:34px;background:linear-gradient(180deg,rgba(23,23,26,0),#17171A);}
+.code-card .cc-actions{display:flex;gap:8px;margin-top:12px;}
+.code-card .cc-btn{flex-shrink:0;height:38px;border-radius:12px;background:var(--bubble-bot);display:flex;align-items:center;justify-content:center;gap:6px;font-size:13px;font-weight:700;color:var(--ink);padding:0 14px;}
+.code-card .cc-btn:active{background:var(--border);}
+.code-card .cc-btn.primary{flex:1;background:linear-gradient(160deg,#2b2b30 0%,var(--black) 55%,#0d0d0f 100%);color:#fff;}
+html[data-theme="dark"] .code-card{background:linear-gradient(150deg,#1E1E21 0%,#1A1A1D 50%,#151517 100%);border-color:rgba(255,255,255,.06);}
 
 
 /* Knowledge Graph — compact verified-entity card */
@@ -459,6 +472,16 @@ html[data-theme="dark"] .settings-list{background:linear-gradient(150deg,#1E1E21
 .settings-row .val{font-size:13px;color:var(--ink-soft);font-weight:700;flex-shrink:0;}
 .settings-row .go{font-size:15px;color:var(--ink-soft);flex-shrink:0;}
 .settings-row.disabled{opacity:.5;}
+.mem-del-btn{width:28px;height:28px;border-radius:50%;background:var(--bubble-bot);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--ink-soft);flex-shrink:0;}
+.mem-del-btn:active{background:var(--border);color:#E0483E;}
+.task-check{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:21px;color:var(--ink-soft);flex-shrink:0;}
+.task-check.done{color:var(--accent);}
+.task-add-row{padding:14px 16px;display:flex;gap:8px;align-items:center;}
+.task-add-row input[type="text"],.task-add-row input[type="datetime-local"]{background:linear-gradient(160deg,#f8f8f9,#F1F1F3);border:1px solid var(--border);border-radius:14px;padding:12px 14px;font-size:14px;color:var(--ink);font-family:inherit;box-shadow:0 1px 3px rgba(20,20,22,.05) inset;}
+.task-add-btn{width:44px;height:44px;border-radius:50%;background:var(--black);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;}
+.task-add-btn:active{opacity:.85;}
+html[data-theme="dark"] .task-add-row input{background:linear-gradient(160deg,#1E1E21,#18181A);color:var(--ink);}
+html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#18181A);color:var(--ink);}
 
 .tswitch{position:relative;width:46px;height:27px;border-radius:999px;background:#D8D8DD;flex-shrink:0;transition:background .2s;}
 .tswitch::after{content:'';position:absolute;top:2.5px;left:2.5px;width:22px;height:22px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(20,20,22,.25);transition:transform .2s;}
@@ -466,8 +489,10 @@ html[data-theme="dark"] .settings-list{background:linear-gradient(150deg,#1E1E21
 .tswitch.on::after{transform:translateX(19px);}
 
 .accent-row{display:flex;align-items:center;gap:12px;padding:14px 16px;}
-.accent-dot{width:26px;height:26px;border-radius:50%;flex-shrink:0;border:2px solid transparent;}
+.accent-dot{width:26px;height:26px;border-radius:50%;flex-shrink:0;border:2px solid transparent;position:relative;}
 .accent-dot.on{border-color:var(--ink);}
+.accent-dot.locked{opacity:.35;}
+.accent-dot.locked::after{content:'🔒';font-size:10px;position:absolute;inset:0;display:flex;align-items:center;justify-content:center;filter:drop-shadow(0 1px 1px rgba(0,0,0,.5));}
 .accent-picker{display:flex;gap:10px;}
 
 .theme-seg{display:flex;background:var(--bubble-bot);border-radius:999px;padding:3px;gap:2px;}
@@ -766,7 +791,12 @@ html[data-theme="dark"] .settings-list{background:linear-gradient(150deg,#1E1E21
   <!-- ============ HOME ============ -->
   <div class="screen" id="screen-home">
     <div class="topbar-home">
-      <button class="pill-select" onclick="toggleHomeMenu()">Kashish <i class="ph-bold ph-caret-down"></i></button>
+      <div style="display:flex;align-items:center;gap:8px;min-width:0;">
+        <button class="pill-select" onclick="toggleHomeMenu()">Kashish <i class="ph-bold ph-caret-down"></i></button>
+        <button class="pill-select" id="home-upgrade-pill" style="background:linear-gradient(160deg,#2b2b30 0%,var(--black) 55%,#0d0d0f 100%);color:#fff;" onclick="showScreen('screen-upgrade')">
+          <i class="ph-fill ph-sparkle" id="home-upgrade-pill-icon" style="color:#FFD65A;"></i> <span id="home-upgrade-pill-label">Upgrade</span>
+        </button>
+      </div>
       <div class="avatar" id="home-avatar" onclick="openProfileScreen()">K</div>
     </div>
     <div class="home-scroll">
@@ -997,6 +1027,42 @@ html[data-theme="dark"] .settings-list{background:linear-gradient(150deg,#1E1E21
             <div class="body"><div class="lbl">Movies &amp; OTT</div></div>
             <span class="go"><i class="ph-bold ph-caret-right"></i></span>
           </button>
+          <button class="settings-row" onclick="showScreen('screen-settings-personalization')">
+            <span class="ic"><i class="ph-bold ph-fingerprint"></i></span>
+            <div class="body"><div class="lbl">Personalization</div></div>
+            <span class="go"><i class="ph-bold ph-caret-right"></i></span>
+          </button>
+          <button class="settings-row" onclick="showScreen('screen-settings-memory')">
+            <span class="ic"><i class="ph-bold ph-brain"></i></span>
+            <div class="body"><div class="lbl">Memory</div></div>
+            <span class="go"><i class="ph-bold ph-caret-right"></i></span>
+          </button>
+          <button class="settings-row" onclick="showScreen('screen-settings-data-controls')">
+            <span class="ic"><i class="ph-bold ph-shield-check"></i></span>
+            <div class="body"><div class="lbl">Data controls</div></div>
+            <span class="go"><i class="ph-bold ph-caret-right"></i></span>
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-section">
+        <div class="settings-section-title">Planner</div>
+        <div class="settings-list">
+          <button class="settings-row" onclick="showScreen('screen-bucket-list')">
+            <span class="ic"><i class="ph-bold ph-mountains"></i></span>
+            <div class="body"><div class="lbl">Bucket list</div></div>
+            <span class="go"><i class="ph-bold ph-caret-right"></i></span>
+          </button>
+          <button class="settings-row" onclick="showScreen('screen-daily-tasks')">
+            <span class="ic"><i class="ph-bold ph-check-square-offset"></i></span>
+            <div class="body"><div class="lbl">Daily tasks</div></div>
+            <span class="go"><i class="ph-bold ph-caret-right"></i></span>
+          </button>
+          <button class="settings-row" onclick="showScreen('screen-reminders')">
+            <span class="ic"><i class="ph-bold ph-alarm"></i></span>
+            <div class="body"><div class="lbl">Reminders</div></div>
+            <span class="go"><i class="ph-bold ph-caret-right"></i></span>
+          </button>
         </div>
       </div>
 
@@ -1194,6 +1260,255 @@ html[data-theme="dark"] .settings-list{background:linear-gradient(150deg,#1E1E21
     <div class="home-indicator"></div>
   </div>
 
+  <!-- ============ SETTINGS: PERSONALIZATION ============ -->
+  <div class="screen hidden" id="screen-settings-personalization">
+    <div class="chat-topbar">
+      <button class="circle-btn" onclick="showScreen('screen-settings')"><i class="ph-bold ph-arrow-left"></i></button>
+      <div class="chat-title">Personalization</div>
+      <span style="width:38px"></span>
+    </div>
+    <div class="settings-scroll">
+      <div class="settings-list">
+        <div class="settings-row">
+          <span class="ic"><i class="ph-bold ph-fingerprint"></i></span>
+          <div class="body"><div class="lbl">Personalize automatically</div><div class="sub">Kashish quietly picks up things you mention naturally (likes, work, where you're from) and uses them later — no need to say "remember this"</div></div>
+          <button class="tswitch" id="sw-personalize" onclick="toggleSetting('personalize','sw-personalize')"></button>
+        </div>
+      </div>
+      <div class="settings-section" style="margin-top:16px;">
+        <div class="settings-section-title">What Kashish has learned</div>
+        <div class="settings-list" id="personalization-list"></div>
+        <div class="recent-empty hidden" id="personalization-empty">Kashish hasn't picked up anything about you yet — just chat normally and it'll fill in here.</div>
+      </div>
+      <div class="settings-list" style="margin-top:16px;">
+        <button class="settings-row" onclick="clearAllMemories()">
+          <span class="ic" style="background:linear-gradient(155deg,#ffe6e4,#ffd2ce);color:#E0483E;"><i class="ph-bold ph-trash"></i></span>
+          <div class="body"><div class="lbl" style="color:#E0483E;">Clear everything Kashish knows about you</div></div>
+        </button>
+      </div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ============ SETTINGS: MEMORY ============ -->
+  <div class="screen hidden" id="screen-settings-memory">
+    <div class="chat-topbar">
+      <button class="circle-btn" onclick="showScreen('screen-settings')"><i class="ph-bold ph-arrow-left"></i></button>
+      <div class="chat-title">Memory</div>
+      <span style="width:38px"></span>
+    </div>
+    <div class="settings-scroll">
+      <div class="settings-list">
+        <div class="settings-row">
+          <span class="ic"><i class="ph-bold ph-brain"></i></span>
+          <div class="body"><div class="lbl">Enable memory</div><div class="sub">Let Kashish remember things about you and use them to personalize replies</div></div>
+          <button class="tswitch" id="sw-memoryenabled" onclick="toggleSetting('personalize','sw-memoryenabled')"></button>
+        </div>
+      </div>
+
+      <div class="settings-section" style="margin-top:16px;">
+        <div class="settings-section-title">Memory summary</div>
+        <div class="settings-list" id="memory-summary-list"></div>
+        <div class="recent-empty hidden" id="memory-summary-empty">Kashish hasn't picked up anything about you yet — just chat normally and it'll fill in here.</div>
+      </div>
+
+      <div class="settings-section" style="margin-top:16px;">
+        <div class="settings-section-title">Custom instructions</div>
+        <div class="settings-list" style="padding:14px 16px;display:flex;flex-direction:column;gap:12px;">
+          <div class="profile-field" style="margin-bottom:0;">
+            <label>Your nickname</label>
+            <input type="text" id="ci-nickname-input" placeholder="Name" oninput="onCustomInstrInput('customNickname', this.value)">
+          </div>
+          <div class="profile-field" style="margin-bottom:0;">
+            <label>Your occupation</label>
+            <input type="text" id="ci-occupation-input" placeholder="Engineer, student, etc." oninput="onCustomInstrInput('customOccupation', this.value)">
+          </div>
+          <div class="profile-field" style="margin-bottom:0;">
+            <label>More about you</label>
+            <textarea id="ci-about-input" class="ci-textarea" rows="4" placeholder="Interests, values, or preferences to keep in mind" oninput="onCustomInstrInput('customAboutYou', this.value)" style="width:100%;background:linear-gradient(160deg,#f8f8f9,#F1F1F3);border:1px solid var(--border);border-radius:14px;padding:13px 16px;font-size:14.5px;color:var(--ink);font-family:inherit;resize:vertical;box-shadow:0 1px 3px rgba(20,20,22,.05) inset;"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-list" style="margin-top:16px;">
+        <button class="settings-row" onclick="clearAllMemories()">
+          <span class="ic" style="background:linear-gradient(155deg,#ffe6e4,#ffd2ce);color:#E0483E;"><i class="ph-bold ph-trash"></i></span>
+          <div class="body"><div class="lbl" style="color:#E0483E;">Clear everything Kashish knows about you</div></div>
+        </button>
+      </div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ============ SETTINGS: DATA CONTROLS ============ -->
+  <div class="screen hidden" id="screen-settings-data-controls">
+    <div class="chat-topbar">
+      <button class="circle-btn" onclick="showScreen('screen-settings')"><i class="ph-bold ph-arrow-left"></i></button>
+      <div class="chat-title">Data controls</div>
+      <span style="width:38px"></span>
+    </div>
+    <div class="settings-scroll">
+      <div class="settings-list">
+        <div class="settings-row">
+          <span class="ic"><i class="ph-bold ph-graduation-cap"></i></span>
+          <div class="body"><div class="lbl">Improve model for everyone</div><div class="sub">Allow your chats to help improve Kashish for you and other users</div></div>
+          <button class="tswitch" id="sw-improvemodel" onclick="toggleSetting('improveModel','sw-improvemodel')"></button>
+        </div>
+      </div>
+
+      <div class="settings-section" style="margin-top:16px;">
+        <div class="settings-section-title">Location</div>
+        <div class="settings-list">
+          <div class="settings-row">
+            <span class="ic"><i class="ph-bold ph-map-pin"></i></span>
+            <div class="body"><div class="lbl">Location services</div><div class="sub">Lets Kashish give locally relevant answers, like weather or nearby suggestions</div></div>
+            <button class="tswitch" id="sw-location" onclick="toggleLocationServices()"></button>
+          </div>
+        </div>
+      </div>
+
+      <div class="settings-section" style="margin-top:16px;">
+        <div class="settings-section-title">Chat history</div>
+        <div class="settings-list">
+          <button class="settings-row" onclick="exportKashishData()">
+            <span class="ic"><i class="ph-bold ph-download-simple"></i></span>
+            <div class="body"><div class="lbl">Export data</div><div class="sub">Download your settings, memory, and lists as a file</div></div>
+            <span class="go"><i class="ph-bold ph-caret-right"></i></span>
+          </button>
+          <button class="settings-row" onclick="confirmDeleteAllChats()">
+            <span class="ic" style="background:linear-gradient(155deg,#ffe6e4,#ffd2ce);color:#E0483E;"><i class="ph-bold ph-trash"></i></span>
+            <div class="body"><div class="lbl" style="color:#E0483E;">Delete all chats</div></div>
+          </button>
+        </div>
+      </div>
+
+      <div class="settings-section" style="margin-top:16px;">
+        <div class="settings-list">
+          <button class="settings-row" onclick="confirmDeleteAccount()">
+            <span class="ic" style="background:linear-gradient(155deg,#ffe6e4,#ffd2ce);color:#E0483E;"><i class="ph-bold ph-user-minus"></i></span>
+            <div class="body"><div class="lbl" style="color:#E0483E;">Delete account</div></div>
+          </button>
+        </div>
+      </div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ============ BUCKET LIST ============ -->
+  <div class="screen hidden" id="screen-bucket-list">
+    <div class="chat-topbar">
+      <button class="circle-btn" onclick="showScreen('screen-settings')"><i class="ph-bold ph-arrow-left"></i></button>
+      <div class="chat-title">Bucket list</div>
+      <span style="width:38px"></span>
+    </div>
+    <div class="settings-scroll">
+      <div class="settings-list task-add-row">
+        <input type="text" id="bucket-new-input" placeholder="Add something you want to do..." style="flex:1;" onkeydown="if(event.key==='Enter'){addTaskItem('bucket');}">
+        <button class="task-add-btn" onclick="addTaskItem('bucket')"><i class="ph-bold ph-plus"></i></button>
+      </div>
+      <div class="settings-section" style="margin-top:16px;">
+        <div class="settings-list" id="bucket-list-items"></div>
+        <div class="recent-empty hidden" id="bucket-list-empty">Your bucket list is empty — add your first dream above.</div>
+      </div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ============ DAILY TASKS ============ -->
+  <div class="screen hidden" id="screen-daily-tasks">
+    <div class="chat-topbar">
+      <button class="circle-btn" onclick="showScreen('screen-settings')"><i class="ph-bold ph-arrow-left"></i></button>
+      <div class="chat-title">Daily tasks</div>
+      <span style="width:38px"></span>
+    </div>
+    <div class="settings-scroll">
+      <div class="settings-list task-add-row">
+        <input type="text" id="daily-new-input" placeholder="Add a task for today..." style="flex:1;" onkeydown="if(event.key==='Enter'){addTaskItem('tasks');}">
+        <button class="task-add-btn" onclick="addTaskItem('tasks')"><i class="ph-bold ph-plus"></i></button>
+      </div>
+      <div class="settings-section" style="margin-top:16px;">
+        <div class="settings-section-title">Today</div>
+        <div class="settings-list" id="daily-tasks-items"></div>
+        <div class="recent-empty hidden" id="daily-tasks-empty">No tasks yet — add what you want to get done today.</div>
+      </div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ============ REMINDERS ============ -->
+  <div class="screen hidden" id="screen-reminders">
+    <div class="chat-topbar">
+      <button class="circle-btn" onclick="showScreen('screen-settings')"><i class="ph-bold ph-arrow-left"></i></button>
+      <div class="chat-title">Reminders</div>
+      <span style="width:38px"></span>
+    </div>
+    <div class="settings-scroll">
+      <div class="settings-list task-add-row" style="flex-direction:column;align-items:stretch;">
+        <input type="text" id="reminders-new-input" placeholder="What do you want to be reminded of?">
+        <div style="display:flex;gap:8px;">
+          <input type="datetime-local" id="reminders-new-datetime" style="flex:1;">
+          <button class="task-add-btn" style="width:46px;height:46px;flex-shrink:0;" onclick="addTaskItem('reminders')"><i class="ph-bold ph-plus"></i></button>
+        </div>
+      </div>
+      <div class="settings-section" style="margin-top:16px;">
+        <div class="settings-list" id="reminders-list-items"></div>
+        <div class="recent-empty hidden" id="reminders-list-empty">No reminders yet — add one above and Kashish will nudge you when it's time.</div>
+      </div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ============ UPGRADE / KASHISH PRO PLAN ============ -->
+  <div class="screen hidden" id="screen-upgrade">
+    <div class="chat-topbar" style="background:transparent;border-bottom:none;box-shadow:none;">
+      <span style="width:38px"></span>
+      <div class="chat-title">&nbsp;</div>
+      <button class="circle-btn" onclick="showScreen('screen-home')"><i class="ph-bold ph-x"></i></button>
+    </div>
+    <div class="settings-scroll" style="text-align:center;">
+      <div style="font-size:42px;color:var(--accent);margin:2px 0 6px;"><i class="ph-fill ph-sparkle"></i></div>
+      <div style="font-size:27px;font-weight:800;color:var(--ink);margin-bottom:6px;">Get Kashish Pro</div>
+      <div style="font-size:14px;color:var(--ink-soft);margin-bottom:22px;">Do more with K12-pro intelligence</div>
+
+      <div class="settings-list" style="text-align:left;">
+        <div class="settings-row">
+          <div class="body"><div class="lbl" style="font-size:12px;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.02em;">Features</div></div>
+          <span style="width:44px;text-align:center;font-weight:800;font-size:12px;color:var(--ink-soft);">Free</span>
+          <span style="width:44px;text-align:center;font-weight:800;font-size:12px;color:var(--accent);">Pro</span>
+        </div>
+        <div class="settings-row">
+          <div class="body"><div class="lbl">Core model</div></div>
+          <span style="width:44px;text-align:center;"><i class="ph-bold ph-check" style="color:var(--ink-soft);"></i></span>
+          <span style="width:44px;text-align:center;"><i class="ph-bold ph-check" style="color:var(--accent);"></i></span>
+        </div>
+        <div class="settings-row">
+          <div class="body"><div class="lbl">HTML &amp; website code generation</div></div>
+          <span style="width:44px;text-align:center;color:var(--ink-soft);">—</span>
+          <span style="width:44px;text-align:center;"><i class="ph-bold ph-check" style="color:var(--accent);"></i></span>
+        </div>
+        <div class="settings-row">
+          <div class="body"><div class="lbl">Custom accent colors</div></div>
+          <span style="width:44px;text-align:center;color:var(--ink-soft);">—</span>
+          <span style="width:44px;text-align:center;"><i class="ph-bold ph-check" style="color:var(--accent);"></i></span>
+        </div>
+        <div class="settings-row">
+          <div class="body"><div class="lbl">Expanded memory</div></div>
+          <span style="width:44px;text-align:center;color:var(--ink-soft);">—</span>
+          <span style="width:44px;text-align:center;"><i class="ph-bold ph-check" style="color:var(--accent);"></i></span>
+        </div>
+        <div class="settings-row">
+          <div class="body"><div class="lbl">Early access to new features</div></div>
+          <span style="width:44px;text-align:center;color:var(--ink-soft);">—</span>
+          <span style="width:44px;text-align:center;"><i class="ph-bold ph-check" style="color:var(--accent);"></i></span>
+        </div>
+      </div>
+
+      <button class="task-add-btn" style="width:100%;border-radius:16px;height:52px;margin-top:22px;font-weight:800;font-size:15px;" onclick="attemptUpgradePurchase()">Upgrade for $11.5/mo</button>
+      <div id="upgrade-error-sub" style="font-size:12px;color:var(--ink-soft);margin-top:12px;line-height:1.5;">Auto-renews monthly. Cancel anytime.</div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
 </div>
 
 <script>
@@ -1261,7 +1576,11 @@ const SETTINGS_DEFAULTS = {
   notifChat:true, notifSound:true,
   voiceAutoSend:true, voiceHaptic:true,
   elevenLabsApiKey:'', elevenLabsVoiceId:'21m00Tcm4TlvDq8ikWAM',
-  tmdbApiKey:'d39bc110ef687b835b0837bf6f4902d1', movieRegion:'IN'
+  tmdbApiKey:'d39bc110ef687b835b0837bf6f4902d1', movieRegion:'IN',
+  personalize:true,
+  improveModel:true, locationEnabled:false, lastLat:null, lastLng:null,
+  customNickname:'', customOccupation:'', customAboutYou:'',
+  plan:'free', grandfatheredAccent:false, accentMigrationChecked:false
 };
 const ACCENT_PALETTES = {
   blue:{accent:'#1975CE', s1:'#eef7ff', s2:'#d9edff', s3:'#c3e2ff'},
@@ -1270,6 +1589,33 @@ const ACCENT_PALETTES = {
   rose:{accent:'#E0487E', s1:'#fff0f5', s2:'#ffd9e6', s3:'#ffb8d1'}
 };
 let appSettings = {...SETTINGS_DEFAULTS};
+
+/* ---------------- Kashish Pro (K12-pro) plan gating ---------------- */
+// Pro-only for now: custom accent colors (unless the account already had a
+// non-default accent before this rollout — those stay grandfathered in for
+// free) and HTML/website code generation. This is a UI-level paywall only —
+// tapping "Upgrade" always shows an unavailable-on-this-profile error, it
+// never actually charges or flips anyone to Pro.
+function isProUser(){ return appSettings.plan === 'pro'; }
+function canUseCustomAccent(){ return isProUser() || !!appSettings.grandfatheredAccent; }
+function updateUpgradePill(){
+  const label = document.getElementById('home-upgrade-pill-label');
+  const icon = document.getElementById('home-upgrade-pill-icon');
+  if(!label) return;
+  if(isProUser()){
+    label.textContent = 'Pro';
+    if(icon) icon.className = 'ph-fill ph-crown-simple';
+  } else {
+    label.textContent = 'Upgrade';
+    if(icon) icon.className = 'ph-fill ph-sparkle';
+  }
+}
+function attemptUpgradePurchase(){
+  triggerHaptic();
+  const sub = document.getElementById('upgrade-error-sub');
+  if(sub) sub.textContent = 'Aapki profile par abhi yeh upgradation available nahin hai — thodi der baad dobara try karo.';
+  showKashishToast('Upgrade abhi available nahin hai is profile par');
+}
 
 function applySettings(){
   document.documentElement.setAttribute('data-theme', appSettings.theme==='dark' ? 'dark' : 'light');
@@ -1284,6 +1630,7 @@ function applySettings(){
     ci.spellcheck = !!appSettings.autoCorrect;
     ci.setAttribute('autocomplete', appSettings.autocomplete ? 'on' : 'off');
   }
+  updateUpgradePill();
 }
 function renderSettingsUI(){
   document.getElementById('settings-email-val') && (document.getElementById('settings-email-val').textContent = (userCtx && (firebase.auth().currentUser && firebase.auth().currentUser.email)) || '—');
@@ -1291,18 +1638,23 @@ function renderSettingsUI(){
   document.getElementById('theme-opt-light') && document.getElementById('theme-opt-light').classList.toggle('on', appSettings.theme!=='dark');
   document.getElementById('theme-opt-dark') && document.getElementById('theme-opt-dark').classList.toggle('on', appSettings.theme==='dark');
   document.querySelectorAll('.accent-dot').forEach(d=> d.classList.toggle('on', d.dataset.accent===appSettings.accentColor));
+  document.querySelectorAll('.accent-dot').forEach(d=> d.classList.toggle('locked', !canUseCustomAccent() && d.dataset.accent!==appSettings.accentColor));
   document.getElementById('lang-opt-en') && document.getElementById('lang-opt-en').classList.toggle('on', appSettings.language!=='hi');
   document.getElementById('lang-opt-hi') && document.getElementById('lang-opt-hi').classList.toggle('on', appSettings.language==='hi');
   const map = {
     'sw-autocorrect':'autoCorrect','sw-haptics':'haptics','sw-autoswitch':'autoSwitch',
     'sw-autocomplete':'autocomplete','sw-trending':'trendingSearches','sw-websearch':'autoWebSearch',
     'sw-notifchat':'notifChat','sw-notifsound':'notifSound',
-    'sw-voiceautosend':'voiceAutoSend','sw-voicehaptic':'voiceHaptic'
+    'sw-voiceautosend':'voiceAutoSend','sw-voicehaptic':'voiceHaptic',
+    'sw-personalize':'personalize','sw-memoryenabled':'personalize',
+    'sw-improvemodel':'improveModel'
   };
   Object.keys(map).forEach(id=>{
     const el=document.getElementById(id);
     if(el) el.classList.toggle('on', !!appSettings[map[id]]);
   });
+  document.getElementById('sw-location') && document.getElementById('sw-location').classList.toggle('on', !!appSettings.locationEnabled);
+  renderPersonalizationList();
   const keyInput = document.getElementById('el-api-key-input');
   if(keyInput && document.activeElement !== keyInput) keyInput.value = appSettings.elevenLabsApiKey || '';
   const voiceSelect = document.getElementById('el-voice-select');
@@ -1311,6 +1663,12 @@ function renderSettingsUI(){
   if(tmdbInput && document.activeElement !== tmdbInput) tmdbInput.value = appSettings.tmdbApiKey || '';
   const regionSelect = document.getElementById('movie-region-select');
   if(regionSelect) regionSelect.value = appSettings.movieRegion || 'IN';
+  const nickInput = document.getElementById('ci-nickname-input');
+  if(nickInput && document.activeElement !== nickInput) nickInput.value = appSettings.customNickname || '';
+  const occInput = document.getElementById('ci-occupation-input');
+  if(occInput && document.activeElement !== occInput) occInput.value = appSettings.customOccupation || '';
+  const aboutInput = document.getElementById('ci-about-input');
+  if(aboutInput && document.activeElement !== aboutInput) aboutInput.value = appSettings.customAboutYou || '';
 }
 function saveSettings(){
   if(userCtx && userCtx.uid){
@@ -1324,6 +1682,13 @@ async function loadSettings(){
       const snap = await db.ref('users/'+userCtx.uid+'/settings').once('value');
       if(snap.exists()) appSettings = {...SETTINGS_DEFAULTS, ...snap.val()};
     }catch(e){}
+  }
+  // One-time migration: accounts that already picked a non-default accent
+  // color before Pro-gating existed keep using it for free going forward.
+  if(!appSettings.accentMigrationChecked){
+    appSettings.grandfatheredAccent = appSettings.accentColor !== SETTINGS_DEFAULTS.accentColor;
+    appSettings.accentMigrationChecked = true;
+    saveSettings();
   }
   applySettings();
   renderSettingsUI();
@@ -1380,10 +1745,94 @@ function setTheme(t){
 }
 function setAccentColor(name){
   if(!ACCENT_PALETTES[name]) return;
+  if(name!==appSettings.accentColor && !canUseCustomAccent()){
+    triggerHaptic();
+    showKashishToast('Accent colors ab Kashish Pro (K12-pro) ka feature hai');
+    renderSettingsUI();
+    showScreen('screen-upgrade');
+    return;
+  }
   appSettings.accentColor = name;
   applySettings();
   renderSettingsUI();
   saveSettings();
+}
+let customInstrSaveTimer=null;
+function onCustomInstrInput(key, val){
+  appSettings[key] = val;
+  clearTimeout(customInstrSaveTimer);
+  customInstrSaveTimer = setTimeout(saveSettings, 500);
+}
+function toggleLocationServices(){
+  triggerHaptic();
+  if(!appSettings.locationEnabled){
+    if(!navigator.geolocation){
+      showKashishToast('Location not supported on this device');
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(function(pos){
+      appSettings.locationEnabled = true;
+      appSettings.lastLat = pos.coords.latitude;
+      appSettings.lastLng = pos.coords.longitude;
+      renderSettingsUI();
+      saveSettings();
+      showKashishToast('Location access enabled');
+    }, function(){
+      showKashishToast("Couldn't get your location — check permission and try again");
+    });
+  } else {
+    appSettings.locationEnabled = false;
+    appSettings.lastLat = null;
+    appSettings.lastLng = null;
+    renderSettingsUI();
+    saveSettings();
+  }
+}
+function exportKashishData(){
+  const data = {
+    exportedAt: new Date().toISOString(),
+    settings: appSettings,
+    memories: loadMemories(),
+    bucketList: loadTaskList('bucket'),
+    dailyTasks: loadTaskList('tasks'),
+    reminders: loadTaskList('reminders'),
+    chatSessions: loadSessions()
+  };
+  try{
+    const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'kashish-data-export.json';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url), 2000);
+    showKashishToast('Your data has been exported');
+  }catch(e){
+    showKashishToast("Couldn't export data on this device");
+  }
+}
+function confirmDeleteAllChats(){
+  if(!confirm('This will permanently delete all your chat history. This cannot be undone. Continue?')) return;
+  sessions = [];
+  saveSessions([]);
+  currentSessionId = null;
+  try{ renderHome(); }catch(e){}
+  showKashishToast('All chats deleted');
+}
+function confirmDeleteAccount(){
+  if(!confirm('This will permanently delete your account and all associated data. This cannot be undone. Continue?')) return;
+  const user = firebase.auth().currentUser;
+  if(!user){ showKashishToast('You need to be signed in to delete your account'); return; }
+  const uid = user.uid;
+  db.ref('users/'+uid).remove().catch(()=>{}).then(()=>{
+    user.delete().then(()=>{
+      showKashishToast('Account deleted');
+    }).catch(()=>{
+      showKashishToast('Please sign in again and retry to delete your account');
+    });
+  });
 }
 function setLanguage(lang){
   appSettings.language = lang;
@@ -2206,8 +2655,11 @@ function startAiCreate(){
 
 /* ---------------- navigation ---------------- */
 function showScreen(id){
-  ['screen-home','screen-chat','screen-voice','screen-profile','screen-legal-doc','screen-settings','screen-settings-general','screen-settings-language','screen-settings-notifications','screen-settings-voice','screen-settings-movies'].forEach(s=>document.getElementById(s).classList.toggle('hidden', s!==id));
+  ['screen-home','screen-chat','screen-voice','screen-profile','screen-legal-doc','screen-settings','screen-settings-general','screen-settings-language','screen-settings-notifications','screen-settings-voice','screen-settings-movies','screen-settings-personalization','screen-settings-memory','screen-settings-data-controls','screen-bucket-list','screen-daily-tasks','screen-reminders','screen-upgrade'].forEach(s=>document.getElementById(s).classList.toggle('hidden', s!==id));
   if(id.indexOf('screen-settings')===0) renderSettingsUI();
+  if(id==='screen-bucket-list') renderTaskList('bucket');
+  if(id==='screen-daily-tasks') renderTaskList('tasks');
+  if(id==='screen-reminders') renderTaskList('reminders');
 }
 function goHome(){ renderHome(); showScreen('screen-home'); }
 function goChat(){
@@ -2509,6 +2961,51 @@ function renderChat(){
       card.appendChild(actions);
       card.onclick=()=>viewGeneratedPdf(p.dataUrl);
       scroll.appendChild(card);
+    }
+    if(m.codeCard){
+      const c = m.codeCard;
+      const cc = document.createElement('div'); cc.className='code-card';
+      const head=document.createElement('div'); head.className='cc-head';
+      const icon=document.createElement('div'); icon.className='cc-icon'; icon.innerHTML='<i class="ph-fill ph-code"></i>';
+      const info=document.createElement('div'); info.className='cc-info';
+      const name=document.createElement('div'); name.className='cc-name'; name.textContent=c.filename||'page.html';
+      const meta=document.createElement('div'); meta.className='cc-meta'; meta.textContent=c.title||'Generated HTML';
+      info.appendChild(name); info.appendChild(meta);
+      head.appendChild(icon); head.appendChild(info);
+      cc.appendChild(head);
+      const pre=document.createElement('div'); pre.className='cc-code'; pre.textContent = truncate(c.code||'', 220);
+      cc.appendChild(pre);
+      const actions=document.createElement('div'); actions.className='cc-actions';
+      const prevBtn=document.createElement('button'); prevBtn.className='cc-btn primary';
+      prevBtn.innerHTML='<i class="ph-bold ph-play"></i> Preview';
+      prevBtn.onclick=()=>previewGeneratedCode(c.code);
+      const copyBtn=document.createElement('button'); copyBtn.className='cc-btn'; copyBtn.title='Copy code';
+      copyBtn.innerHTML='<i class="ph-bold ph-copy"></i>';
+      copyBtn.onclick=()=>copyGeneratedCode(c.code);
+      const dlBtn=document.createElement('button'); dlBtn.className='cc-btn'; dlBtn.title='Download';
+      dlBtn.innerHTML='<i class="ph-bold ph-download-simple"></i>';
+      dlBtn.onclick=()=>downloadGeneratedCode(c.code, c.filename);
+      actions.appendChild(prevBtn); actions.appendChild(copyBtn); actions.appendChild(dlBtn);
+      cc.appendChild(actions);
+      scroll.appendChild(cc);
+    }
+    if(m.upgradeCard){
+      const uc = document.createElement('button'); uc.className='code-card'; uc.style.textAlign='left'; uc.style.width='100%';
+      const head=document.createElement('div'); head.className='cc-head';
+      const icon=document.createElement('div'); icon.className='cc-icon'; icon.style.background='linear-gradient(155deg,#fff3d6,#ffe4a3)'; icon.style.color='#B8860B'; icon.innerHTML='<i class="ph-fill ph-sparkle"></i>';
+      const info=document.createElement('div'); info.className='cc-info';
+      const name=document.createElement('div'); name.className='cc-name'; name.textContent='Kashish Pro (K12-pro)';
+      const meta=document.createElement('div'); meta.className='cc-meta'; meta.textContent='Unlock this feature by upgrading';
+      info.appendChild(name); info.appendChild(meta);
+      head.appendChild(icon); head.appendChild(info);
+      uc.appendChild(head);
+      const actions2=document.createElement('div'); actions2.className='cc-actions';
+      const viewPlanBtn=document.createElement('div'); viewPlanBtn.className='cc-btn primary'; viewPlanBtn.style.flex='1';
+      viewPlanBtn.innerHTML='<i class="ph-bold ph-sparkle"></i> View plans';
+      actions2.appendChild(viewPlanBtn);
+      uc.appendChild(actions2);
+      uc.onclick=()=>showScreen('screen-upgrade');
+      scroll.appendChild(uc);
     }
     if(m.kgCard){
       const kg = m.kgCard;
@@ -4078,11 +4575,15 @@ async function lookupPublicPost(pulseId){
   }
 }
 
-/* ---------------- long-term memory ---------------- */
+/* ---------------- long-term memory / personalization ---------------- */
 // Lightweight persistent memory: things explicitly asked to be remembered
 // ("yaad rakhna ki...", "remember that...") get saved per-account and
 // injected into every future system prompt, so Kashish can recall them
 // even in a brand-new chat session, not just within the current one.
+// On top of that explicit path, extractPassiveFact() below quietly picks
+// up common self-disclosures ("I'm a designer", "mujhe cricket pasand
+// hai") from ordinary messages too — that's what makes Kashish feel like
+// she's personalizing herself, not just remembering things on command.
 function memoryStorageKey(){
   return 'kashishMemory_' + ((userCtx && userCtx.uid) || 'guest');
 }
@@ -4090,12 +4591,62 @@ function loadMemories(){
   try{ return JSON.parse(localStorage.getItem(memoryStorageKey())||'[]'); }
   catch(e){ return []; }
 }
+function persistMemories(mems){
+  try{ localStorage.setItem(memoryStorageKey(), JSON.stringify(mems)); }catch(e){}
+}
 function saveMemory(fact){
   if(!fact || !fact.trim()) return;
+  const clean = fact.trim();
   const mems = loadMemories();
-  mems.push(fact.trim());
-  while(mems.length > 30) mems.shift(); // keep the most recent 30 facts
-  try{ localStorage.setItem(memoryStorageKey(), JSON.stringify(mems)); }catch(e){}
+  // Skip near-duplicates so re-mentioning the same thing doesn't clutter
+  // the list with slightly-reworded copies of a fact already known.
+  const lower = clean.toLowerCase();
+  if(mems.some(m => m.toLowerCase()===lower || m.toLowerCase().includes(lower) || lower.includes(m.toLowerCase()))) return;
+  mems.push(clean);
+  const cap = isProUser() ? 30 : 15; // "Expanded memory" is a Kashish Pro perk
+  while(mems.length > cap) mems.shift();
+  persistMemories(mems);
+}
+function deleteMemoryAt(index){
+  const mems = loadMemories();
+  if(index < 0 || index >= mems.length) return;
+  mems.splice(index, 1);
+  persistMemories(mems);
+  renderPersonalizationList();
+}
+function clearAllMemories(){
+  if(!confirm('Kashish ne tumhare baare mein jo bhi seekha hai, sab hata diya jayega. Pakka?')) return;
+  persistMemories([]);
+  renderPersonalizationList();
+  showKashishToast('Sab kuch clear ho gaya');
+}
+// Renders the "What Kashish has learned" list in Settings → Personalization.
+// No-op if that screen's container isn't in the DOM right now.
+function renderPersonalizationList(){
+  const mems = loadMemories();
+  [['personalization-list','personalization-empty'],['memory-summary-list','memory-summary-empty']].forEach(([listId,emptyId])=>{
+    const list = document.getElementById(listId);
+    const empty = document.getElementById(emptyId);
+    if(!list) return;
+    list.innerHTML = '';
+    if(!mems.length){
+      empty && empty.classList.remove('hidden');
+      return;
+    }
+    empty && empty.classList.add('hidden');
+    mems.slice().reverse().forEach((fact)=>{
+      const realIndex = mems.indexOf(fact);
+      const row = document.createElement('div'); row.className='settings-row';
+      const body = document.createElement('div'); body.className='body';
+      const lbl = document.createElement('div'); lbl.className='lbl'; lbl.style.fontWeight='600'; lbl.style.fontSize='13.5px'; lbl.textContent = fact;
+      body.appendChild(lbl);
+      row.appendChild(body);
+      const del = document.createElement('button'); del.className='mem-del-btn'; del.innerHTML='<i class="ph-bold ph-x"></i>';
+      del.onclick=()=>{ deleteMemoryAt(realIndex); };
+      row.appendChild(del);
+      list.appendChild(row);
+    });
+  });
 }
 const REMEMBER_PATTERN = /\b(yaad rakh(na|o)?|yaad rakhna ki|mat bhoolna|mat bhulna|remember (that|this)|don'?t forget)\b/i;
 function extractMemoryFact(text){
@@ -4106,15 +4657,199 @@ function extractMemoryFact(text){
   fact = fact.replace(/^[:,\-–]\s*/,'').trim();
   return fact || text.trim();
 }
+// Heuristic, best-effort passive fact-picker for ordinary sentences (no
+// "remember this" needed). Covers common English and Hinglish
+// self-disclosure phrasing. Deliberately conservative — returns at most
+// one fact per message, and skips generic/filler captures so the memory
+// list stays useful instead of noisy.
+const PASSIVE_FACT_FILLERS = new Set(['not','sure','it','that','this','so','good','fine','okay','ok','bit','little','lot','few','kind','sort','really','very']);
+const PASSIVE_FACT_PATTERNS = [
+  { re: /\bi\s+work\s+as\s+an?\s+([a-z][a-z\s]{2,28}?)(?:[.,!?]|$)/i, tmpl:(m)=>`Works as ${m[1].trim()}` },
+  { re: /\bi(?:'m| am)\s+an?\s+([a-z][a-z\s]{2,28}?)(?:[.,!?]|$)/i, tmpl:(m)=>`Is a/an ${m[1].trim()}` },
+  { re: /\bi\s+study\s+([a-z][a-z\s]{2,28}?)(?:[.,!?]|$)/i, tmpl:(m)=>`Studies ${m[1].trim()}` },
+  { re: /\bi\s+(?:really\s+)?love\s+([a-z][a-z0-9\s]{2,28}?)(?:[.,!?]|$)/i, tmpl:(m)=>`Loves ${m[1].trim()}` },
+  { re: /\bi\s+(?:really\s+)?like\s+([a-z][a-z0-9\s]{2,28}?)(?:[.,!?]|$)/i, tmpl:(m)=>`Likes ${m[1].trim()}` },
+  { re: /\bi\s+hate\s+([a-z][a-z0-9\s]{2,28}?)(?:[.,!?]|$)/i, tmpl:(m)=>`Dislikes ${m[1].trim()}` },
+  { re: /\bmy\s+favou?rite\s+([a-z\s]{2,18}?)\s+is\s+([a-z0-9\s]{2,28}?)(?:[.,!?]|$)/i, tmpl:(m)=>`Favorite ${m[1].trim()} is ${m[2].trim()}` },
+  { re: /\bi\s+live\s+in\s+([a-z\s]{2,28}?)(?:[.,!?]|$)/i, tmpl:(m)=>`Lives in ${m[1].trim()}` },
+  { re: /\bi(?:'m| am)\s+from\s+([a-z\s]{2,28}?)(?:[.,!?]|$)/i, tmpl:(m)=>`From ${m[1].trim()}` },
+  { re: /mujhe\s+([a-z\s]{2,28}?)\s+bilkul\s+pasand\s+nahi(?:\s+hai)?/i, tmpl:(m)=>`Dislikes ${m[1].trim()}` },
+  { re: /mujhe\s+([a-z\s]{2,28}?)\s+pasand\s+nahi(?:\s+hai)?/i, tmpl:(m)=>`Dislikes ${m[1].trim()}` },
+  { re: /mujhe\s+([a-z\s]{2,28}?)\s+bahut\s+pasand\s+hai/i, tmpl:(m)=>`Really likes ${m[1].trim()}` },
+  { re: /mujhe\s+([a-z\s]{2,28}?)\s+pasand\s+hai/i, tmpl:(m)=>`Likes ${m[1].trim()}` },
+  { re: /\bmain\s+ek\s+([a-z\s]{2,28}?)\s+hoon\b/i, tmpl:(m)=>`Is a ${m[1].trim()}` },
+  { re: /\bmera\s+naam\s+([a-z\s]{2,24}?)(?:\s+hai)?(?:[.,!?]|$)/i, tmpl:(m)=>`Name is ${m[1].trim()}` }
+];
+function extractPassiveFact(text){
+  if(!text || text.trim().length < 6) return null;
+  for(const p of PASSIVE_FACT_PATTERNS){
+    const m = text.match(p.re);
+    if(!m) continue;
+    const capture = (m[1]||'').trim().toLowerCase();
+    if(!capture || capture.length < 2 || PASSIVE_FACT_FILLERS.has(capture)) continue;
+    return p.tmpl(m).trim();
+  }
+  return null;
+}
+
+/* ---------------- bucket list / daily tasks / reminders ---------------- */
+// Same lightweight per-account localStorage pattern as memories above.
+// type is one of: 'bucket' (bucket list), 'tasks' (daily tasks, auto-reset
+// each day), 'reminders' (has an optional due datetime + one-shot notify).
+function taskStorageKey(type){
+  return 'kashish' + type.charAt(0).toUpperCase() + type.slice(1) + '_' + ((userCtx && userCtx.uid) || 'guest');
+}
+function loadTaskList(type){
+  try{ return JSON.parse(localStorage.getItem(taskStorageKey(type)) || '[]'); }
+  catch(e){ return []; }
+}
+function persistTaskList(type, arr){
+  try{ localStorage.setItem(taskStorageKey(type), JSON.stringify(arr)); }catch(e){}
+}
+function taskInputIds(type){
+  if(type==='bucket') return {text:'bucket-new-input'};
+  if(type==='tasks') return {text:'daily-new-input'};
+  return {text:'reminders-new-input', due:'reminders-new-datetime'};
+}
+function addTaskItem(type){
+  const ids = taskInputIds(type);
+  const input = document.getElementById(ids.text);
+  if(!input) return;
+  const text = input.value.trim();
+  if(!text) return;
+  const item = { id: Date.now()+'-'+Math.random().toString(36).slice(2,7), text, done:false };
+  if(type==='reminders'){
+    const dtInput = ids.due && document.getElementById(ids.due);
+    item.due = (dtInput && dtInput.value) ? dtInput.value : '';
+    item.notified = false;
+    if(dtInput) dtInput.value = '';
+  }
+  const list = loadTaskList(type);
+  list.push(item);
+  if(type==='reminders') list.sort((a,b)=> (a.due||'').localeCompare(b.due||''));
+  persistTaskList(type, list);
+  input.value = '';
+  renderTaskList(type);
+  triggerHaptic();
+}
+function toggleTaskItem(type, id){
+  const list = loadTaskList(type);
+  const it = list.find(x=>x.id===id);
+  if(!it) return;
+  it.done = !it.done;
+  persistTaskList(type, list);
+  renderTaskList(type);
+  triggerHaptic();
+}
+function deleteTaskItem(type, id){
+  const list = loadTaskList(type).filter(x=>x.id!==id);
+  persistTaskList(type, list);
+  renderTaskList(type);
+}
+function fmtReminderDue(due){
+  if(!due) return '';
+  const d = new Date(due);
+  if(isNaN(d.getTime())) return '';
+  const now = new Date();
+  const timeStr = d.toLocaleTimeString([], {hour:'numeric', minute:'2-digit'});
+  if(d.toDateString()===now.toDateString()) return 'Today, ' + timeStr;
+  return d.toLocaleDateString([], {month:'short', day:'numeric'}) + ', ' + timeStr;
+}
+function taskListElIds(type){
+  if(type==='bucket') return {list:'bucket-list-items', empty:'bucket-list-empty'};
+  if(type==='tasks') return {list:'daily-tasks-items', empty:'daily-tasks-empty'};
+  return {list:'reminders-list-items', empty:'reminders-list-empty'};
+}
+function renderTaskList(type){
+  if(type==='tasks') maybeResetDailyTasks();
+  const ids = taskListElIds(type);
+  const container = document.getElementById(ids.list);
+  const empty = document.getElementById(ids.empty);
+  if(!container) return;
+  const list = loadTaskList(type);
+  container.innerHTML = '';
+  if(!list.length){ empty && empty.classList.remove('hidden'); return; }
+  empty && empty.classList.add('hidden');
+  list.forEach(it=>{
+    const row = document.createElement('div'); row.className = 'settings-row';
+    const check = document.createElement('button');
+    check.className = 'task-check' + (it.done ? ' done' : '');
+    check.innerHTML = '<i class="ph-bold ' + (it.done ? 'ph-check-circle' : 'ph-circle') + '"></i>';
+    check.onclick = ()=>toggleTaskItem(type, it.id);
+    row.appendChild(check);
+    const body = document.createElement('div'); body.className = 'body';
+    const lbl = document.createElement('div'); lbl.className = 'lbl';
+    lbl.style.fontWeight = '600'; lbl.style.fontSize = '13.5px';
+    if(it.done){ lbl.style.textDecoration = 'line-through'; lbl.style.color = 'var(--ink-soft)'; }
+    lbl.textContent = it.text;
+    body.appendChild(lbl);
+    if(type==='reminders' && it.due){
+      const sub = document.createElement('div'); sub.className = 'sub'; sub.textContent = fmtReminderDue(it.due);
+      body.appendChild(sub);
+    }
+    row.appendChild(body);
+    const del = document.createElement('button'); del.className = 'mem-del-btn'; del.innerHTML = '<i class="ph-bold ph-x"></i>';
+    del.onclick = ()=>deleteTaskItem(type, it.id);
+    row.appendChild(del);
+    container.appendChild(row);
+  });
+}
+function todayStr(){ return new Date().toDateString(); }
+function maybeResetDailyTasks(){
+  const key = 'kashishDailyTasksResetDate_' + ((userCtx && userCtx.uid) || 'guest');
+  if(localStorage.getItem(key) === todayStr()) return;
+  const list = loadTaskList('tasks');
+  if(list.length){
+    list.forEach(it=> it.done = false);
+    persistTaskList('tasks', list);
+  }
+  try{ localStorage.setItem(key, todayStr()); }catch(e){}
+}
+let reminderCheckTimer = null;
+function startReminderChecker(){
+  clearInterval(reminderCheckTimer);
+  reminderCheckTimer = setInterval(()=>{
+    const list = loadTaskList('reminders');
+    const now = new Date();
+    let changed = false;
+    list.forEach(it=>{
+      if(!it.notified && it.due){
+        const d = new Date(it.due);
+        if(!isNaN(d.getTime()) && d <= now){
+          it.notified = true; changed = true;
+          showKashishToast('⏰ ' + it.text);
+          playNotifSound();
+          if('Notification' in window && Notification.permission==='granted'){
+            try{ new Notification('Kashish reminder', {body: it.text}); }catch(e){}
+          }
+        }
+      }
+    });
+    if(changed){
+      persistTaskList('reminders', list);
+      if(document.getElementById('reminders-list-items')) renderTaskList('reminders');
+    }
+  }, 30000);
+}
+startReminderChecker();
 
 function buildSystemPrompt(){
   const who = firstName()
     ? `You're talking with ${firstName()}. You may use their name naturally sometimes, but don't overdo it.`
     : `You don't know this person's name yet — that's fine, keep things warm and natural.`;
   const langPref = `Your default and primary language is always English, regardless of any app language setting — always start and reply in English unless the user is clearly writing to you in Hindi/Hinglish in that message, in which case match them and reply in Hindi/Hinglish for that exchange only.`;
-  const memories = loadMemories();
+  const memories = appSettings.personalize ? loadMemories() : [];
   const memoryBlock = memories.length
     ? `\nThings to remember about this person from earlier conversations (use naturally when relevant, don't just recite the list): ${memories.join(' | ')}\n`
+    : '';
+  const ciParts = [];
+  if(appSettings.personalize){
+    if(appSettings.customNickname) ciParts.push(`They'd like to be called "${appSettings.customNickname}".`);
+    if(appSettings.customOccupation) ciParts.push(`Their occupation: ${appSettings.customOccupation}.`);
+    if(appSettings.customAboutYou) ciParts.push(appSettings.customAboutYou.trim());
+  }
+  const customInstrBlock = ciParts.length
+    ? `\nThe user has shared this about themselves in their custom instructions (use it naturally, don't just recite it): ${ciParts.join(' ')}\n`
     : '';
   return `You are KASHISH — a general-purpose AI companion. You are NOT built for, limited to, or branded around any single company, app, or product's help desk. People come to you for anything: casual conversation, venting, jokes, advice, explanations, help planning things, writing help, learning something new, or just killing time. Treat "just chatting" as equally valid as "getting help" — never redirect a casual conversation back into "how can I assist you" support-mode.
 
@@ -4122,7 +4857,7 @@ Personality: warm, witty, genuinely curious, never robotic or corporate. Talk li
 
 ${langPref} Don't switch to Hindi/Hinglish just because a message contains a stray Hindi word — only switch when the user is clearly writing in Hindi/Hinglish overall. Keep replies natural and conversational length: short (1-4 sentences) for chit-chat, longer and structured (numbered/bulleted, still in plain text) when the user actually needs a detailed breakdown or list.
 ${who}
-${memoryBlock}
+${memoryBlock}${customInstrBlock}
 Origin story (only bring this up if directly asked "who made you", "who created you", "who is your founder/developer", or "why is your name Kashish" / "what does your name mean" — don't volunteer it unprompted): You were created by Gursharan Singh, who is also known by the name Gursharn Arya, the founder of Nexor. Your name "Kashish" was taken from — and inspired by — Kashish Tyagi. State this naturally and factually, in the same conversational tone/language as the rest of the chat (Hinglish/Hindi if that's what the user is using, English otherwise), without turning it into a long biography — a couple of warm, natural sentences is enough.
 
 You can optionally offer 1-2 short "quickReplies" (single words or short phrases, like "Yes" or "Tell me more") when a natural yes/no or follow-up moment fits — don't force this on every message, only when it genuinely fits the flow.
@@ -4182,8 +4917,8 @@ function extractJson(raw){
   if(cleaned && !cleaned.startsWith('{')) return { reply: cleaned, quickReplies: null };
   return null;
 }
-async function callProvider(endpoint, model, msgs, label){
-  const res = await fetch(endpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ model, messages:msgs, temperature:0.75, max_tokens:900 }) });
+async function callProvider(endpoint, model, msgs, label, maxTokens){
+  const res = await fetch(endpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ model, messages:msgs, temperature:0.75, max_tokens: maxTokens || 900 }) });
   if(!res.ok) throw new Error(label+' proxy HTTP '+res.status);
   const json = await res.json();
   const raw = (json.choices && json.choices[0] && json.choices[0].message && json.choices[0].message.content) || '';
@@ -4194,23 +4929,23 @@ async function callProvider(endpoint, model, msgs, label){
 // Retries a provider once (with a short delay) before giving up on it —
 // covers transient blips (rate limit, brief network hiccup) that would
 // otherwise immediately cascade to the next provider or the local fallback.
-async function callProviderWithRetry(endpoint, model, msgs, label){
-  try{ return await callProvider(endpoint, model, msgs, label); }
+async function callProviderWithRetry(endpoint, model, msgs, label, maxTokens){
+  try{ return await callProvider(endpoint, model, msgs, label, maxTokens); }
   catch(e){
     console.warn('['+label+'] first attempt failed, retrying once:', e);
     await new Promise(r=>setTimeout(r, 500));
-    return await callProvider(endpoint, model, msgs, label);
+    return await callProvider(endpoint, model, msgs, label, maxTokens);
   }
 }
-async function kashishReply(history, searchContext, rawContext){
+async function kashishReply(history, searchContext, rawContext, maxTokens){
   const msgs = buildMessages(history, searchContext, rawContext);
-  try{ return await callProviderWithRetry(GROQ_PROXY_ENDPOINT, GROQ_MODEL, msgs, 'Groq'); }
+  try{ return await callProviderWithRetry(GROQ_PROXY_ENDPOINT, GROQ_MODEL, msgs, 'Groq', maxTokens); }
   catch(e1){
     console.warn('[KASHISH] Groq failed, trying Gemini:', e1);
-    try{ return await callProviderWithRetry(GEMINI_PROXY_ENDPOINT, GEMINI_MODEL, msgs, 'Gemini'); }
+    try{ return await callProviderWithRetry(GEMINI_PROXY_ENDPOINT, GEMINI_MODEL, msgs, 'Gemini', maxTokens); }
     catch(e2){
       console.warn('[KASHISH] Gemini failed, trying Cloudflare AI:', e2);
-      return await callProviderWithRetry(CFAI_PROXY_ENDPOINT, CFAI_MODEL, msgs, 'Cloudflare AI');
+      return await callProviderWithRetry(CFAI_PROXY_ENDPOINT, CFAI_MODEL, msgs, 'Cloudflare AI', maxTokens);
     }
   }
 }
@@ -4228,12 +4963,12 @@ function sendLocal(){
   }, 400);
 }
 
-function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults, webSources, kgCard, factCheckResults, postCard, conversionCard, stockCard, mapCard, personCard, movieResults, emailCard, pdfCard){
+function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults, webSources, kgCard, factCheckResults, postCard, conversionCard, stockCard, mapCard, personCard, movieResults, emailCard, pdfCard, codeCard, upgradeCard){
   const sess = getSession(currentSessionId);
   if(!sess) return;
   const qr = appSettings.trendingSearches ? (quickReplies||null) : null;
   const ts = Date.now();
-  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, webSources: (webSources&&webSources.length)?webSources:null, kgCard: kgCard||null, factCheckResults: (factCheckResults&&factCheckResults.length)?factCheckResults:null, postCard: postCard||null, conversionCard: conversionCard||null, stockCard: stockCard||null, mapCard: mapCard||null, personCard: personCard||null, movieResults: (movieResults&&movieResults.length)?movieResults:null, emailCard: emailCard||null, pdfCard: pdfCard||null, ts});
+  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, webSources: (webSources&&webSources.length)?webSources:null, kgCard: kgCard||null, factCheckResults: (factCheckResults&&factCheckResults.length)?factCheckResults:null, postCard: postCard||null, conversionCard: conversionCard||null, stockCard: stockCard||null, mapCard: mapCard||null, personCard: personCard||null, movieResults: (movieResults&&movieResults.length)?movieResults:null, emailCard: emailCard||null, pdfCard: pdfCard||null, codeCard: codeCard||null, upgradeCard: upgradeCard||null, ts});
   sess.preview = truncate(text, 60);
   sess.updatedAt = Date.now();
   upsertSession(sess);
@@ -4331,6 +5066,73 @@ function detectEmailComposeRequest(text){
   if(!text) return false;
   const t = text.trim();
   return EMAIL_WORD_PATTERN.test(t) && EMAIL_VERB_PATTERN.test(t);
+}
+
+/* ---------------- real HTML code generation ---------------- */
+// "html code banao" / "make me a website" / "landing page bana do" — asks
+// the model for a complete, real, self-contained HTML document (not a
+// snippet, not pseudo-code) and shows it in a code-card the user can
+// preview live, copy, or download as an actual .html file.
+const CODE_WORD_PATTERN = /\b(html|website|web\s*page|webpage|landing\s*page|web\s*app|portfolio\s*site)\b/i;
+const CODE_VERB_PATTERN = /\b(write|create|generate|build|make|code|likh\w*|banw?\w*|bana\w*|de\s*do|kar\s*do)\b/i;
+function detectCodeGenRequest(text){
+  if(!text) return false;
+  const t = text.trim();
+  return CODE_WORD_PATTERN.test(t) && CODE_VERB_PATTERN.test(t);
+}
+function formatCodeGenContext(text){
+  return `The user wants real, working HTML code based on this instruction: "${text}". Generate a COMPLETE, self-contained, production-quality HTML document — not a snippet, not a description of what it would contain, and not placeholder/pseudo code. Requirements:
+- Start with <!DOCTYPE html> and end with </html>.
+- Put all CSS inside a single <style> tag in the <head> and all JS (if any) inside a single <script> tag before </body> — no external files, no external libraries that need installing, so it runs standalone the instant it's opened.
+- Make it genuinely well-designed: sensible layout, readable typography, real colors/spacing, and responsive (works on both phone and desktop widths) — not a bare unstyled skeleton.
+- Use realistic placeholder content/text/images (e.g. https://picsum.photos/... for images) so the page looks complete, not empty.
+- If the request implies interactivity (buttons, forms, tabs, etc.), make it actually functional with vanilla JS.
+
+Reply with ONLY the raw HTML code and nothing else — no markdown code fences (no triple backticks), no explanation before or after, no commentary. The very first characters of your reply must be "<!DOCTYPE html>".`;
+}
+// Strips accidental markdown fences the model sometimes wraps the code in
+// despite being told not to, and does a light sanity check that this is
+// actually an HTML document before we show it as a code-card.
+function parseCodeFromReply(replyText){
+  if(!replyText) return null;
+  let code = replyText.trim();
+  code = code.replace(/^```(?:html)?\s*/i, '').replace(/```\s*$/,'').trim();
+  if(!/<html[\s>]/i.test(code) && !/<!DOCTYPE\s+html/i.test(code)) return null;
+  return code;
+}
+function deriveCodeTitle(text){
+  const cleaned = (text||'').replace(CODE_VERB_PATTERN,'').replace(CODE_WORD_PATTERN,'').trim();
+  const words = cleaned.split(/\s+/).filter(Boolean).slice(0,5).join(' ');
+  return words ? truncate(words, 40) : 'Generated page';
+}
+function slugifyFilename(title){
+  const slug = (title||'page').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+  return (slug || 'page') + '.html';
+}
+// "Preview" — opens the generated page live in a new tab via a Blob URL,
+// so it actually renders/runs exactly as a real .html file would, with no
+// server round-trip.
+function previewGeneratedCode(code){
+  const blob = new Blob([code], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const w = window.open(url, '_blank');
+  if(!w) showKashishToast("Popup block ho gaya — neeche 'Download' try karo.");
+  setTimeout(()=>URL.revokeObjectURL(url), 60000);
+}
+function copyGeneratedCode(code){
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(code).then(()=>showKashishToast('Code copy ho gaya')).catch(()=>showKashishToast('Copy nahi ho paya'));
+  } else {
+    showKashishToast('Copy is browser mein support nahi hai');
+  }
+}
+function downloadGeneratedCode(code, filename){
+  const blob = new Blob([code], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename || 'page.html';
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 60000);
 }
 function formatEmailComposeContext(text){
   return `The user wants you to draft an email based on this instruction: "${text}". Write a complete, professional, natural-sounding email a real person would actually send — a proper greeting, clear short paragraphs for the body, and an appropriate sign-off. If a sender name is known from earlier in this conversation use it in the sign-off, otherwise a generic closing like "Best," is fine — don't invent a fake name.
@@ -4651,11 +5453,18 @@ async function send(){
   }
   renderChat();
 
-  // Explicit "yaad rakhna / remember that..." — save as a long-term memory
-  // fact right away, independent of whatever else happens with this message.
+  // Explicit "yaad rakhna / remember that..." always saves. On top of
+  // that, if personalization is on, quietly pick up ordinary self-
+  // disclosures too — that's the bit that makes this feel automatic
+  // instead of needing an explicit command every time.
   if(!img){
     const fact = extractMemoryFact(text);
-    if(fact) saveMemory(fact);
+    if(fact){
+      saveMemory(fact);
+    } else if(appSettings.personalize){
+      const passive = extractPassiveFact(text);
+      if(passive) saveMemory(passive);
+    }
   }
 
   // "/search <query>" — force a live web search regardless of what the
@@ -4755,6 +5564,40 @@ async function send(){
     }catch(e){
       removeTyping();
       pushBotMessage("Email draft banane mein dikkat aa gayi — thodi der baad dobara try karo.", null);
+    }
+    return;
+  }
+
+  // "html code banao" / "make me a website" — draft a complete, real,
+  // working HTML document and show it as a code-card the user can
+  // preview live, copy, or download as an actual .html file. Needs a much
+  // bigger token budget than a normal chat reply, so this passes a higher
+  // maxTokens through to kashishReply.
+  const codeRequest = !img ? detectCodeGenRequest(text) : null;
+  if(codeRequest){
+    if(!isProUser()){
+      addTyping();
+      setTimeout(()=>{
+        removeTyping();
+        pushBotMessage("HTML/website code banana ab Kashish Pro (K12-pro model) ka feature hai — free plan par abhi available nahin hai. Upgrade karke turant unlock ho jayega.", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { feature:'html-code' });
+      }, 400 + Math.random()*250);
+      return;
+    }
+    addTyping();
+    const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
+    try{
+      const result = await kashishReply(historyForModel, null, formatCodeGenContext(text), 3800);
+      removeTyping();
+      const code = parseCodeFromReply(result.reply);
+      if(code){
+        const title = deriveCodeTitle(text);
+        pushBotMessage("Yeh raha tumhara HTML — neeche Preview karke live dekh sakte ho, ya code copy/download kar sakte ho.", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { code, title, filename: slugifyFilename(title) });
+      } else {
+        pushBotMessage(result.reply, result.quickReplies);
+      }
+    }catch(e){
+      removeTyping();
+      pushBotMessage("Code banane mein dikkat aa gayi — thodi der baad dobara try karo.", null);
     }
     return;
   }
