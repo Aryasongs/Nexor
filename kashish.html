@@ -211,6 +211,25 @@ html[data-theme="dark"] .search-indicator{background:linear-gradient(160deg,#232
 html[data-theme="dark"] .stock-card{background:linear-gradient(155deg,#2a2318 0%,#221d15 55%,#1c1810 100%);}
 html[data-theme="dark"] .map-card{background:linear-gradient(150deg,#1E1E21 0%,#1A1A1D 50%,#151517 100%);border-color:rgba(255,255,255,.06);}
 
+/* Email-compose preview card — shown after Kashish drafts an email; lets
+   the user review it, then hand off to Gmail (or the device's default
+   mail app) to actually send, via a mailto:/deep-link, never sent from
+   here directly. */
+.email-card{max-width:92%;width:100%;margin-top:6px;background:linear-gradient(155deg,#ffffff 0%,#f6f7f9 55%,#edeef1 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:16px 16px 14px;box-shadow:0 10px 24px -14px rgba(20,20,22,.26);text-align:left;}
+.email-card .ec-head{display:flex;align-items:center;gap:8px;margin-bottom:12px;}
+.email-card .ec-icon{width:30px;height:30px;border-radius:50%;background:linear-gradient(155deg,var(--accent-soft-1) 0%,var(--accent-soft-2) 55%,var(--accent-soft-3) 100%);display:flex;align-items:center;justify-content:center;font-size:14px;color:var(--accent);flex-shrink:0;}
+.email-card .ec-headtxt{font-size:12px;font-weight:800;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;}
+.email-card .ec-field{padding:9px 0;border-top:1px solid var(--border);}
+.email-card .ec-field:first-of-type{border-top:none;}
+.email-card .ec-label{font-size:10.5px;font-weight:800;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.03em;margin-bottom:3px;}
+.email-card .ec-to,.email-card .ec-subject{font-size:13.5px;font-weight:700;color:var(--ink);word-break:break-word;}
+.email-card .ec-body{font-size:13px;color:var(--ink);line-height:1.55;white-space:pre-wrap;word-break:break-word;max-height:260px;overflow-y:auto;}
+.email-card .ec-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;margin-top:14px;padding:12px;border-radius:13px;background:linear-gradient(160deg,#2b2b30 0%,var(--black) 55%,#0d0d0f 100%);color:#fff;font-weight:800;font-size:14px;box-shadow:0 8px 18px -8px rgba(20,20,22,.45),0 1px 0 rgba(255,255,255,.12) inset;}
+.email-card .ec-btn:active{opacity:.85;}
+.email-card .ec-note{font-size:10.5px;color:var(--ink-soft);text-align:center;margin-top:8px;line-height:1.4;}
+html[data-theme="dark"] .email-card{background:linear-gradient(150deg,#1E1E21 0%,#1A1A1D 50%,#151517 100%);border-color:rgba(255,255,255,.06);}
+
+
 /* Knowledge Graph — compact verified-entity card */
 .kg-card{position:relative;overflow:hidden;max-width:88%;margin-top:6px;background:linear-gradient(150deg,#ffffff 0%,#f4f5f7 50%,#eaecef 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 10px 22px -14px rgba(20,20,22,.25);text-align:left;width:100%;}
 .kg-card:active{background:var(--bubble-bot);}
@@ -2377,6 +2396,37 @@ function renderChat(){
       mc.appendChild(body);
       scroll.appendChild(mc);
     }
+    if(m.emailCard){
+      const ec = document.createElement('div'); ec.className='email-card';
+      const head=document.createElement('div'); head.className='ec-head';
+      const icon=document.createElement('div'); icon.className='ec-icon'; icon.innerHTML='<i class="ph-fill ph-envelope-simple"></i>';
+      const headtxt=document.createElement('div'); headtxt.className='ec-headtxt'; headtxt.textContent='Email draft';
+      head.appendChild(icon); head.appendChild(headtxt);
+      ec.appendChild(head);
+      const e = m.emailCard;
+      if(e.to){
+        const f=document.createElement('div'); f.className='ec-field';
+        const l=document.createElement('div'); l.className='ec-label'; l.textContent='To';
+        const v=document.createElement('div'); v.className='ec-to'; v.textContent=e.to;
+        f.appendChild(l); f.appendChild(v); ec.appendChild(f);
+      }
+      const sf=document.createElement('div'); sf.className='ec-field';
+      const sl=document.createElement('div'); sl.className='ec-label'; sl.textContent='Subject';
+      const sv=document.createElement('div'); sv.className='ec-subject'; sv.textContent=e.subject||'(no subject)';
+      sf.appendChild(sl); sf.appendChild(sv); ec.appendChild(sf);
+      const bf=document.createElement('div'); bf.className='ec-field';
+      const bl=document.createElement('div'); bl.className='ec-label'; bl.textContent='Body';
+      const bv=document.createElement('div'); bv.className='ec-body'; bv.textContent=e.body||'';
+      bf.appendChild(bl); bf.appendChild(bv); ec.appendChild(bf);
+      const btn=document.createElement('button'); btn.className='ec-btn';
+      btn.innerHTML='<i class="ph-bold ph-envelope-simple-open"></i> Open in Gmail';
+      btn.onclick=()=>openEmailInGmail(e.to||'', e.subject||'', e.body||'');
+      ec.appendChild(btn);
+      const note=document.createElement('div'); note.className='ec-note';
+      note.textContent="Yeh sirf ek draft hai — kuch bhi apne aap send nahi hota. Gmail khulne ke baad tum edit kar sakte ho aur khud Send dabana hoga.";
+      ec.appendChild(note);
+      scroll.appendChild(ec);
+    }
     if(m.kgCard){
       const kg = m.kgCard;
       const kc = document.createElement('button'); kc.className='kg-card';
@@ -4088,11 +4138,11 @@ function sendLocal(){
   }, 400);
 }
 
-function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults, webSources, kgCard, factCheckResults, postCard, conversionCard, stockCard, mapCard, personCard, movieResults){
+function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults, webSources, kgCard, factCheckResults, postCard, conversionCard, stockCard, mapCard, personCard, movieResults, emailCard){
   const sess = getSession(currentSessionId);
   if(!sess) return;
   const qr = appSettings.trendingSearches ? (quickReplies||null) : null;
-  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, webSources: (webSources&&webSources.length)?webSources:null, kgCard: kgCard||null, factCheckResults: (factCheckResults&&factCheckResults.length)?factCheckResults:null, postCard: postCard||null, conversionCard: conversionCard||null, stockCard: stockCard||null, mapCard: mapCard||null, personCard: personCard||null, movieResults: (movieResults&&movieResults.length)?movieResults:null, ts: Date.now()});
+  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, webSources: (webSources&&webSources.length)?webSources:null, kgCard: kgCard||null, factCheckResults: (factCheckResults&&factCheckResults.length)?factCheckResults:null, postCard: postCard||null, conversionCard: conversionCard||null, stockCard: stockCard||null, mapCard: mapCard||null, personCard: personCard||null, movieResults: (movieResults&&movieResults.length)?movieResults:null, emailCard: emailCard||null, ts: Date.now()});
   sess.preview = truncate(text, 60);
   sess.updatedAt = Date.now();
   upsertSession(sess);
@@ -4146,6 +4196,93 @@ function generateTextPdf(text, title){
   const filename = (title||'kashish-export').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'').slice(0,50) || 'kashish-export';
   doc.save(filename + '.pdf');
 }
+/* ---------------- email compose -> Gmail handoff ---------------- */
+// Kashish drafts the email text (subject + body) via the LLM, shows it in
+// a preview card for the user to review, and "Open in Gmail" just launches
+// a prefilled compose screen via mailto:/Gmail's own deep link — nothing
+// is ever sent automatically, and there's no Gmail API/OAuth involved.
+const EMAIL_COMPOSE_PATTERN = /\b(write|draft|compose|send)\s+(an?\s+)?(email|mail)\b|\b(email|mail)\s+(likh|likho|likh\s*do|likhdo|banao|bana\s*do|banado|bhejo|bhej\s*do|de\s*do)\b/i;
+const EMAIL_ADDRESS_PATTERN = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+function detectEmailComposeRequest(text){
+  if(!text) return false;
+  return EMAIL_COMPOSE_PATTERN.test(text.trim());
+}
+function formatEmailComposeContext(text){
+  return `The user wants you to draft an email based on this instruction: "${text}". Write a complete, professional, natural-sounding email a real person would actually send — a proper greeting, clear short paragraphs for the body, and an appropriate sign-off. If a sender name is known from earlier in this conversation use it in the sign-off, otherwise a generic closing like "Best," is fine — don't invent a fake name.
+
+Reply using EXACTLY this format and nothing else — no extra commentary, no markdown, no quotes around it:
+Subject: <the email subject line, one line>
+---BODY---
+<the full email body, with real paragraph breaks between lines>`;
+}
+// Splits the model's specially-formatted reply back into {subject, body}.
+// Returns null if the model didn't follow the format, so the caller can
+// fall back to just showing the raw reply as normal chat text.
+function parseEmailDraftFromReply(replyText){
+  if(!replyText) return null;
+  const idx = replyText.indexOf('---BODY---');
+  if(idx === -1) return null;
+  const subjectPart = replyText.slice(0, idx);
+  const subjMatch = subjectPart.match(/subject\s*:\s*(.+)/i);
+  const subject = subjMatch ? subjMatch[1].trim() : '';
+  const body = replyText.slice(idx + '---BODY---'.length).trim();
+  if(!body) return null;
+  return { subject, body };
+}
+// RFC-6068-style mailto: builder — subject/body are percent-encoded so
+// line breaks (%0D%0A), punctuation, etc. all survive into the compose
+// screen exactly as drafted; the address itself is left unencoded since
+// mail clients expect a plain addr-spec there.
+function buildMailtoUrl(to, subject, body){
+  const parts = [];
+  if(subject) parts.push('subject=' + encodeURIComponent(subject));
+  if(body) parts.push('body=' + encodeURIComponent(body));
+  const query = parts.length ? '?' + parts.join('&') : '';
+  return 'mailto:' + (to ? to.trim() : '') + query;
+}
+function detectMobilePlatform(){
+  const ua = navigator.userAgent || navigator.vendor || window.opera || '';
+  if(/iPad|iPhone|iPod/.test(ua) && !window.MSStream) return 'ios';
+  if(/android/i.test(ua)) return 'android';
+  return 'other';
+}
+// Tapping "Open in Gmail" never sends anything — it only launches a
+// prefilled compose screen and hands control back to the user, who reviews
+// (and can edit) the draft and presses Send themselves inside Gmail.
+function openEmailInGmail(to, subject, body){
+  const mailtoUrl = buildMailtoUrl(to, subject, body);
+  const platform = detectMobilePlatform();
+  let handled = false;
+  // If the page is still visible a moment after we try to launch an app,
+  // nothing opened — fall back a step further, and if even mailto: doesn't
+  // take the user anywhere, tell them plainly instead of failing silently.
+  const onHidden = ()=>{ handled = true; document.removeEventListener('visibilitychange', onHidden); };
+  document.addEventListener('visibilitychange', onHidden);
+  if(platform === 'ios'){
+    // Gmail's own compose deep link opens the Gmail app directly when it's
+    // installed; if it's not, this silently does nothing and we fall back.
+    const gmailAppUrl = 'googlegmail://co?to=' + encodeURIComponent(to||'') + '&subject=' + encodeURIComponent(subject||'') + '&body=' + encodeURIComponent(body||'');
+    window.location.href = gmailAppUrl;
+    setTimeout(()=>{
+      if(handled) return;
+      window.location.href = mailtoUrl;
+      setTimeout(()=>{
+        if(!handled) showKashishToast("Koi compatible email app nahi mili — draft copy karke apne mail app mein paste kar lo.");
+        document.removeEventListener('visibilitychange', onHidden);
+      }, 1200);
+    }, 900);
+  } else {
+    // Android and desktop: a plain mailto: is enough — Android routes it
+    // through the system "open with" chooser (Gmail shows up there if
+    // installed), and desktop opens whatever default mail handler is set.
+    window.location.href = mailtoUrl;
+    setTimeout(()=>{
+      if(!handled) showKashishToast("Koi compatible email app nahi mili — draft copy karke apne mail app mein paste kar lo.");
+      document.removeEventListener('visibilitychange', onHidden);
+    }, 1200);
+  }
+}
+
 function detectImageRequest(text){
   const t=(text||'').trim().toLowerCase();
   if(!t) return null;
@@ -4421,6 +4558,31 @@ async function send(){
         pushBotMessage("PDF banane mein dikkat aa gayi, thodi der baad dobara try karo.", null);
       }
     }, 300);
+    return;
+  }
+
+  // "write an email to X saying..." — draft a professional email and show
+  // it as a review card; "Open in Gmail" only ever prefills a compose
+  // screen via mailto:/deep-link, never sends anything on its own.
+  const emailRequest = !img ? detectEmailComposeRequest(text) : null;
+  if(emailRequest){
+    addTyping();
+    const toMatch = text.match(EMAIL_ADDRESS_PATTERN);
+    const extractedTo = toMatch ? toMatch[0] : '';
+    const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
+    try{
+      const result = await kashishReply(historyForModel, formatEmailComposeContext(text));
+      removeTyping();
+      const draft = parseEmailDraftFromReply(result.reply);
+      if(draft){
+        pushBotMessage("Yeh raha email ka draft — check kar lo, phir Gmail mein khol kar khud Send karo.", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { to: extractedTo, subject: draft.subject, body: draft.body });
+      } else {
+        pushBotMessage(result.reply, result.quickReplies);
+      }
+    }catch(e){
+      removeTyping();
+      pushBotMessage("Email draft banane mein dikkat aa gayi — thodi der baad dobara try karo.", null);
+    }
     return;
   }
 
