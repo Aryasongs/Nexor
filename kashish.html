@@ -104,6 +104,46 @@ img{display:block;max-width:100%;}
 .recent-empty{padding:22px 16px;text-align:center;color:var(--ink-soft);font-size:12.5px;line-height:1.5;}
 
 .home-bottom{flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:12px;padding:6px 20px calc(10px + env(safe-area-inset-bottom));}
+.search-overlay{position:absolute;inset:0;top:0;z-index:5;background:var(--bg);display:flex;flex-direction:column;padding-top:env(safe-area-inset-top);}
+.search-overlay-bar{display:flex;align-items:center;gap:10px;padding:14px 20px 10px;flex-shrink:0;}
+.search-overlay-input-wrap{flex:1;display:flex;align-items:center;gap:8px;background:linear-gradient(160deg,#ffffff,#f7f7f9);border:1px solid var(--border);border-radius:999px;padding:10px 15px;color:var(--ink-soft);}
+.search-overlay-input-wrap i{font-size:15px;flex-shrink:0;}
+.search-overlay-input-wrap input{flex:1;min-width:0;border:none;background:none;font-size:14px;font-weight:600;color:var(--ink);}
+.search-overlay-input-wrap input::placeholder{color:var(--ink-soft);font-weight:500;}
+.search-overlay-scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:16px;}
+.search-hit-snippet mark{background:var(--accent-soft-3);color:var(--ink);border-radius:3px;padding:0 1px;}
+html[data-theme="dark"] .search-overlay-input-wrap{background:linear-gradient(160deg,#1E1E21,#18181A);}
+
+/* ---------- model picker ---------- */
+.model-pill-row{display:flex;padding:0 2px 6px;}
+.model-pill{display:flex;align-items:center;gap:6px;background:linear-gradient(160deg,#2b2b30 0%,var(--black) 55%,#0d0d0f 100%);color:#fff;border-radius:999px;padding:7px 13px;font-size:12px;font-weight:700;box-shadow:0 4px 10px -6px rgba(20,20,22,.4);}
+.model-pill i.ph-fill.ph-sparkle{color:#FFD65A;font-size:13px;}
+.model-pill-effort{color:#9a9aa4;font-weight:600;}
+.sheet-overlay{position:fixed;inset:0;z-index:70;background:rgba(10,10,11,.45);display:flex;align-items:flex-end;justify-content:center;}
+.sheet-overlay.hidden{display:none;}
+.model-sheet{width:100%;max-width:560px;max-height:88vh;overflow-y:auto;-webkit-overflow-scrolling:touch;background:var(--card);border-radius:26px 26px 0 0;padding:8px 18px calc(20px + env(safe-area-inset-bottom));box-shadow:0 -20px 50px -20px rgba(0,0,0,.4);}
+.model-sheet-handle{width:38px;height:4px;background:var(--border);border-radius:99px;margin:8px auto 4px;}
+.model-sheet-head{display:flex;align-items:center;justify-content:space-between;padding:6px 0 14px;}
+.model-sheet-title{font-weight:800;font-size:16.5px;color:var(--ink);}
+.model-sheet-list{background:linear-gradient(150deg,#ffffff 0%,#f4f5f7 50%,#eaecef 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;overflow:hidden;box-shadow:0 16px 30px -18px rgba(20,20,22,.28),0 2px 0 rgba(255,255,255,1) inset;}
+html[data-theme="dark"] .model-sheet-list{background:linear-gradient(150deg,#1E1E21 0%,#1A1A1D 50%,#151517 100%);border-color:rgba(255,255,255,.06);}
+.model-tier-item{width:100%;text-align:left;padding:14px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:10px;}
+.model-tier-item:last-child{border-bottom:none;}
+.model-tier-item .mt-left{min-width:0;}
+.model-tier-item .mt-name-row{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.model-tier-item .mt-name{font-weight:800;font-size:15px;color:var(--ink);}
+.model-tier-item .mt-badge{font-size:10.5px;font-weight:800;color:#fff;background:var(--accent);border-radius:999px;padding:2px 9px;}
+.model-tier-item .mt-badge.locked{background:#8B8B93;}
+.model-tier-item .mt-tag{font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+.model-tier-item .mt-cost{font-size:11px;color:var(--ink-soft);margin-top:3px;font-weight:700;}
+.model-tier-item .mt-check{font-size:19px;color:var(--accent);flex-shrink:0;}
+.model-sheet-note{font-size:12px;line-height:1.5;color:var(--ink-soft);padding:12px 4px;}
+.model-sheet-effort-row{display:flex;align-items:center;justify-content:space-between;background:linear-gradient(150deg,#ffffff 0%,#f4f5f7 50%,#eaecef 100%);border:1px solid rgba(255,255,255,.9);border-radius:16px;padding:12px 16px;}
+html[data-theme="dark"] .model-sheet-effort-row{background:linear-gradient(150deg,#1E1E21 0%,#1A1A1D 50%,#151517 100%);border-color:rgba(255,255,255,.06);}
+.model-sheet-effort-label{font-weight:800;font-size:14px;color:var(--ink);}
+.effort-toggle{display:flex;background:var(--bg);border-radius:999px;padding:3px;gap:2px;}
+.effort-toggle button{padding:7px 13px;border-radius:999px;font-size:12.5px;font-weight:700;color:var(--ink-soft);}
+.effort-toggle button.active{background:var(--accent);color:#fff;}
 .nav-pill{display:flex;align-items:center;gap:24px;background:linear-gradient(160deg,#ffffff,#f7f7f9);border:1px solid var(--border);border-radius:999px;padding:13px 24px;box-shadow:0 6px 16px -10px rgba(20,20,22,.2),0 1px 0 rgba(255,255,255,.85) inset;}
 .nav-pill button{color:#B7B7BD;font-size:19px;}
 .nav-plus{position:relative;overflow:hidden;width:50px;height:50px;border-radius:50%;background:linear-gradient(160deg,#2b2b30 0%,var(--black) 55%,#0d0d0f 100%);color:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0;box-shadow:0 8px 18px -8px rgba(20,20,22,.55),0 1px 0 rgba(255,255,255,.15) inset;}
@@ -850,7 +890,10 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
           <i class="ph-fill ph-sparkle" id="home-upgrade-pill-icon" style="color:#FFD65A;"></i> <span id="home-upgrade-pill-label">Upgrade</span>
         </button>
       </div>
-      <div class="avatar" id="home-avatar" onclick="openProfileScreen()">K</div>
+      <div style="display:flex;align-items:center;gap:8px;">
+        <button class="circle-btn" onclick="openChatSearch()" aria-label="Search chats"><i class="ph ph-magnifying-glass"></i></button>
+        <div class="avatar" id="home-avatar" onclick="openProfileScreen()">K</div>
+      </div>
     </div>
     <div class="home-scroll">
       <div class="greeting">
@@ -881,6 +924,19 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
       <div class="recent-list" id="recent-list"></div>
     </div>
 
+    <div class="search-overlay hidden" id="search-overlay">
+      <div class="search-overlay-bar">
+        <div class="search-overlay-input-wrap">
+          <i class="ph ph-magnifying-glass"></i>
+          <input id="search-overlay-input" type="text" placeholder="Search your chats..." oninput="renderChatSearchResults(this.value)">
+        </div>
+        <button class="circle-btn" onclick="closeChatSearch()" aria-label="Close search"><i class="ph ph-x"></i></button>
+      </div>
+      <div class="search-overlay-scroll">
+        <div class="recent-list" id="search-results-list"></div>
+      </div>
+    </div>
+
     <div class="home-bottom">
       <div class="nav-pill">
         <button onclick="openVoicePanel()" title="Voice"><i class="ph ph-microphone"></i></button>
@@ -902,6 +958,11 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
     <div class="chat-scroll" id="chat-scroll"></div>
     <div class="chat-input-wrap">
       <div class="attach-preview hidden" id="attach-preview"></div>
+      <div class="model-pill-row">
+        <button class="model-pill" id="model-pill-btn" onclick="openModelSheet()">
+          <i class="ph-fill ph-sparkle"></i> <span id="model-pill-label">Kashe 2</span> <span class="model-pill-effort" id="model-pill-effort">Medium</span> <i class="ph-bold ph-caret-down" style="font-size:10px;"></i>
+        </button>
+      </div>
       <div class="chat-input-row">
         <div class="chat-pill">
           <button class="mini-btn" onclick="insertEmoji()"><i class="ph ph-smiley"></i></button>
@@ -915,6 +976,24 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
       </div>
     </div>
     <div class="home-indicator"></div>
+  </div>
+
+  <!-- ============ MODEL PICKER SHEET ============ -->
+  <div class="sheet-overlay hidden" id="model-sheet-overlay" onclick="if(event.target===this) closeModelSheet()">
+    <div class="model-sheet">
+      <div class="model-sheet-handle"></div>
+      <div class="model-sheet-head">
+        <button class="circle-btn" onclick="closeModelSheet()"><i class="ph-bold ph-x"></i></button>
+        <div class="model-sheet-title">Select model</div>
+        <div style="width:38px;flex-shrink:0;"></div>
+      </div>
+      <div class="model-sheet-list" id="model-sheet-list"></div>
+      <div class="model-sheet-note">Kashe 3 aur Kashe 4 zyada gehri, detailed answers dete hain — free plan par yeh zyada credits use karte hain (upar list mein saaf dikhaya gaya hai), ya Kashish Pro mein unlimited included hain.</div>
+      <div class="model-sheet-effort-row">
+        <div class="model-sheet-effort-label">Effort</div>
+        <div class="effort-toggle" id="effort-toggle"></div>
+      </div>
+    </div>
   </div>
 
   <!-- ============ VOICE ============ -->
@@ -1675,7 +1754,8 @@ const SETTINGS_DEFAULTS = {
   personalize:true,
   improveModel:true, locationEnabled:false, lastLat:null, lastLng:null,
   customNickname:'', customOccupation:'', customAboutYou:'',
-  plan:'free', grandfatheredAccent:false, accentMigrationChecked:false
+  plan:'free', grandfatheredAccent:false, accentMigrationChecked:false,
+  modelTier:'kashe2', modelEffort:'Medium'
 };
 const ACCENT_PALETTES = {
   blue:{accent:'#1975CE', s1:'#eef7ff', s2:'#d9edff', s3:'#c3e2ff'},
@@ -1684,6 +1764,112 @@ const ACCENT_PALETTES = {
   rose:{accent:'#E0487E', s1:'#fff0f5', s2:'#ffd9e6', s3:'#ffb8d1'}
 };
 let appSettings = {...SETTINGS_DEFAULTS};
+
+/* ---------------- Kashish model tiers ---------------- */
+// Kashish's own model picker, shown in the chat input. These are Kashish's
+// own tiers (NOT any third-party model's name/branding) layered on top of
+// the same Groq/Gemini/Cloudflare backends already wired up elsewhere —
+// a higher tier means a bigger answer budget (maxTokens), a provider order
+// biased toward the stronger model first, and — clearly labeled, never
+// hidden — a higher credit cost per message on the free plan.
+const KASHE_MODEL_TIERS = [
+  { id:'kashe4', name:'Kashe 4', tagline:'For your toughest questions', pro:true,  maxTokens:2600, creditMultiplier:3, preferGemini:true },
+  { id:'kashe3', name:'Kashe 3', tagline:'For complex, detailed tasks',  pro:true,  maxTokens:1700, creditMultiplier:2, preferGemini:true },
+  { id:'kashe2', name:'Kashe 2', tagline:'Most efficient for everyday chat', pro:false, maxTokens:900,  creditMultiplier:1, preferGemini:false },
+  { id:'kashe1', name:'Kashe 1', tagline:'Fastest, for quick answers',  pro:false, maxTokens:450,  creditMultiplier:1, preferGemini:false }
+];
+const KASHE_EFFORT_LEVELS = ['Low','Medium','High'];
+const KASHE_EFFORT_MAXTOKEN_MULT = { Low:0.6, Medium:1, High:1.5 };
+function getModelTier(id){ return KASHE_MODEL_TIERS.find(t=>t.id===id) || KASHE_MODEL_TIERS[2]; }
+function currentModelTier(){
+  const tier = getModelTier(appSettings.modelTier);
+  // Safety net: if the account isn't (or no longer is) Pro, never silently
+  // run pro-tier behavior — fall back to the default free tier instead.
+  if(tier.pro && !isProUser()) return getModelTier('kashe2');
+  return tier;
+}
+// Effective max tokens for the current tier+effort combo, used as the
+// generation budget for the main chat reply.
+function currentMaxTokens(){
+  const tier = currentModelTier();
+  const mult = KASHE_EFFORT_MAXTOKEN_MULT[appSettings.modelEffort] || 1;
+  return Math.round(tier.maxTokens * mult);
+}
+function updateModelPillLabel(){
+  const tier = currentModelTier();
+  const lbl = document.getElementById('model-pill-label');
+  const eff = document.getElementById('model-pill-effort');
+  if(lbl) lbl.textContent = tier.name;
+  if(eff) eff.textContent = appSettings.modelEffort || 'Medium';
+}
+function openModelSheet(){
+  renderModelSheet();
+  const ov = document.getElementById('model-sheet-overlay');
+  if(ov) ov.classList.remove('hidden');
+}
+function closeModelSheet(){
+  const ov = document.getElementById('model-sheet-overlay');
+  if(ov) ov.classList.add('hidden');
+}
+function renderModelSheet(){
+  const list = document.getElementById('model-sheet-list');
+  if(list){
+    list.innerHTML = '';
+    KASHE_MODEL_TIERS.forEach(tier=>{
+      const locked = tier.pro && !isProUser();
+      const selected = appSettings.modelTier === tier.id && !locked;
+      const b = document.createElement('button');
+      b.className = 'model-tier-item';
+      b.onclick = ()=>selectModelTier(tier.id);
+      const costLabel = tier.creditMultiplier > 1 ? `${tier.creditMultiplier}× credits per message` : 'Standard credits';
+      b.innerHTML = `
+        <div class="mt-left">
+          <div class="mt-name-row">
+            <span class="mt-name">${tier.name}</span>
+            ${tier.pro ? `<span class="mt-badge${locked?' locked':''}">${locked?'Pro':'Pro ✓'}</span>` : ''}
+          </div>
+          <div class="mt-tag">${escapeHtml(tier.tagline)}</div>
+          <div class="mt-cost">${costLabel}</div>
+        </div>
+        ${selected ? '<i class="ph-fill ph-check-circle mt-check"></i>' : ''}`;
+      list.appendChild(b);
+    });
+  }
+  const toggle = document.getElementById('effort-toggle');
+  if(toggle){
+    toggle.innerHTML = '';
+    KASHE_EFFORT_LEVELS.forEach(level=>{
+      const b = document.createElement('button');
+      b.textContent = level;
+      b.className = (appSettings.modelEffort||'Medium')===level ? 'active' : '';
+      b.onclick = ()=>setModelEffort(level);
+      toggle.appendChild(b);
+    });
+  }
+}
+function selectModelTier(id){
+  const tier = getModelTier(id);
+  if(tier.pro && !isProUser()){
+    triggerHaptic();
+    closeModelSheet();
+    showKashishToast(`${tier.name} Kashish Pro ka feature hai`);
+    showScreen('screen-upgrade');
+    return;
+  }
+  appSettings.modelTier = id;
+  saveSettings();
+  updateModelPillLabel();
+  renderModelSheet();
+  triggerHaptic();
+}
+function setModelEffort(level){
+  if(!KASHE_EFFORT_LEVELS.includes(level)) return;
+  appSettings.modelEffort = level;
+  saveSettings();
+  updateModelPillLabel();
+  renderModelSheet();
+  triggerHaptic();
+}
 
 /* ---------------- Kashish Pro (K12-pro) plan gating ---------------- */
 // Pro-only for now: custom accent colors (unless the account already had a
@@ -1766,12 +1952,15 @@ function creditResetWaitMs(){
 // Deducts credits for a reply that was just generated. Pass either the
 // reply text itself (cost is derived from its length) or a raw number of
 // credits for flows with no generated text (e.g. a fixed utility call).
-function chargeCredits(textOrAmount){
+// `multiplier` scales the cost for higher model tiers (Kashe 3/4) — always
+// shown to the user ahead of time in the model picker, never hidden.
+function chargeCredits(textOrAmount, multiplier){
   if(isProUser()) return;
   const usage = getCreditUsage();
-  const cost = typeof textOrAmount === 'number'
+  const base = typeof textOrAmount === 'number'
     ? Math.max(1, Math.round(textOrAmount))
     : Math.max(1, Math.ceil((textOrAmount||'').length / CREDIT_CHARS_PER_CREDIT));
+  const cost = Math.max(1, Math.round(base * (multiplier || 1)));
   usage.creditsUsed += cost;
   saveCreditUsage(usage);
 }
@@ -1811,6 +2000,7 @@ function applySettings(){
     ci.setAttribute('autocomplete', appSettings.autocomplete ? 'on' : 'off');
   }
   updateUpgradePill();
+  updateModelPillLabel();
 }
 function renderSettingsUI(){
   document.getElementById('settings-email-val') && (document.getElementById('settings-email-val').textContent = (userCtx && (firebase.auth().currentUser && firebase.auth().currentUser.email)) || '—');
@@ -2594,6 +2784,66 @@ function renderHome(){
   });
 }
 function escapeHtml(s){ return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+/* ---------------- chat search ---------------- */
+// Full-text search across EVERY past chat's title and messages, not just
+// the 5 shown in "Recent Chat" — so something said weeks ago in an old
+// conversation is still findable, not just the last few chats.
+function openChatSearch(){
+  const ov = document.getElementById('search-overlay');
+  if(!ov) return;
+  ov.classList.remove('hidden');
+  const inp = document.getElementById('search-overlay-input');
+  if(inp){ inp.value=''; setTimeout(()=>inp.focus(), 60); }
+  renderChatSearchResults('');
+}
+function closeChatSearch(){
+  const ov = document.getElementById('search-overlay');
+  if(ov) ov.classList.add('hidden');
+}
+// Wraps the first match of `q` inside `text` with <mark> for a quick visual
+// highlight in the results list, safely (escapes everything else first).
+function highlightMatch(text, q){
+  const safe = escapeHtml(text);
+  if(!q) return safe;
+  const idx = safe.toLowerCase().indexOf(escapeHtml(q).toLowerCase());
+  if(idx===-1) return safe;
+  return safe.slice(0,idx) + '<mark>' + safe.slice(idx, idx+q.length) + '</mark>' + safe.slice(idx+q.length);
+}
+function renderChatSearchResults(query){
+  const list = document.getElementById('search-results-list');
+  if(!list) return;
+  const q = (query||'').trim().toLowerCase();
+  list.innerHTML = '';
+  if(!q){
+    list.innerHTML = '<div class="recent-empty">Kisi bhi purani chat mein jo baat hui thi, uska koi bhi word type karo — us conversation tak seedha pahunch jaoge.</div>';
+    return;
+  }
+  const matches = [];
+  sessions.forEach(sess=>{
+    if(!sess.messages || !sess.messages.length) return;
+    const titleHit = (sess.title||'').toLowerCase().includes(q);
+    let snippet = sess.preview || '';
+    let hitTs = sess.updatedAt || 0;
+    // Prefer showing the actual matching message as the snippet, not just
+    // the chat's last preview line, so the result makes sense at a glance.
+    const hitMsg = sess.messages.find(m => (m.text||'').toLowerCase().includes(q));
+    if(hitMsg){ snippet = hitMsg.text; hitTs = hitMsg.ts || hitTs; }
+    if(titleHit || hitMsg) matches.push({ sess, snippet, hitTs });
+  });
+  matches.sort((a,b)=> (b.hitTs||0)-(a.hitTs||0));
+  if(!matches.length){
+    list.innerHTML = `<div class="recent-empty">"${escapeHtml(query)}" se koi match nahi mila.</div>`;
+    return;
+  }
+  matches.slice(0,40).forEach(({sess, snippet})=>{
+    const b = document.createElement('button');
+    b.className = 'recent-item';
+    b.innerHTML = `<div class="t">${highlightMatch(sess.title||'New chat', query.trim())}</div><div class="p search-hit-snippet">${highlightMatch(truncate(snippet,80), query.trim())}</div>`;
+    b.onclick = ()=>{ closeChatSearch(); openSession(sess.id); };
+    list.appendChild(b);
+  });
+}
 // Bot replies come back as markdown-ish text (bold, lists, `code`, links,
 // etc). Parse with `marked`, then run the HTML through DOMPurify so a
 // reply can never inject a script/handler — only a safe, known subset of
@@ -2778,13 +3028,14 @@ async function regenerateMessage(m){
   let uIdx = idx-1;
   while(uIdx>=0 && sess.messages[uIdx].role!=='user') uIdx--;
   if(uIdx<0) return;
+  const originalImage = sess.messages[uIdx].imageDataUrl || null;
   sess.messages.splice(idx,1);
   upsertSession(sess); renderChat();
   addTyping();
   const historyForModel = sess.messages.slice(0, uIdx+1)
     .map(mm=> mm.role==='user' ? {role:'user', text:mm.text} : {role:'model', text:mm.text});
   try{
-    const result = await kashishReply(historyForModel, null);
+    const result = await kashishReply(historyForModel, null, null, undefined, originalImage);
     chargeCredits(result.reply);
     removeTyping();
     pushBotMessage(result.reply, result.quickReplies);
@@ -2889,6 +3140,12 @@ function showScreen(id){
   if(id==='screen-reminders') renderTaskList('reminders');
 }
 function goHome(){ renderHome(); showScreen('screen-home'); }
+// Opens a specific past chat by id — used by both the "Recent Chat" list
+// and the chat search overlay below.
+function openSession(id){
+  currentSessionId = id;
+  goChat();
+}
 function goChat(){
   if(!currentSessionId){
     const latest = sessions.find(s=>s.messages.length);
@@ -3650,6 +3907,17 @@ function extractSlashSearchQuery(text){
   if(!m) return null;
   return m[1] ? m[1].trim() : '';
 }
+// "/wiki <query>" or "/wikipedia <query>" — an explicit way to trigger a
+// DEEP Wikipedia search: unlike a normal web search (which only sees short
+// snippets), this pulls the full plain-text body of the best-matching
+// Wikipedia article so Kashish can give a properly researched answer.
+// Returns the query, '' if used with nothing after it, or null if the
+// message isn't a /wiki(pedia) command at all.
+function extractSlashWikiQuery(text){
+  const m = (text||'').match(/^\/wiki(?:pedia)?\s*(.*)$/i);
+  if(!m) return null;
+  return m[1] ? m[1].trim() : '';
+}
 function formatSerperResults(data){
   const parts=[];
   if(data.answerBox){
@@ -3760,6 +4028,45 @@ async function crawlUrl(url){
 }
 function formatCrawlResultForModel(crawled, userText){
   return `The user shared this link: ${crawled.url}\nPage title: ${crawled.title}\n\nHere is the actual page content, fetched just now (treat it as accurate/current):\n\n${crawled.text}\n\nAnswer the user's message using this content. If they didn't ask anything specific, give a short, natural summary of what the page is about. Don't dump the raw content back at them — synthesize it in your own words, in your normal reply style.`;
+}
+
+/* ---------------- Wikipedia deep search ---------------- */
+// Two-step, free, no-API-key lookup against Wikipedia's own API:
+//  1) find the best-matching article title for the query
+//  2) pull that article's FULL plain-text body (not just the intro/snippet)
+// so Kashish can answer from the complete article instead of a shallow
+// summary — a genuine "deep" search rather than a one-line search result.
+async function wikipediaDeepSearch(query){
+  try{
+    const searchUrl = `https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json&origin=*`;
+    const sres = await fetch(searchUrl);
+    if(!sres.ok) throw new Error('Wikipedia search HTTP '+sres.status);
+    const sdata = await sres.json();
+    const hit = sdata.query && sdata.query.search && sdata.query.search[0];
+    if(!hit || !hit.title) return null;
+    const title = hit.title;
+
+    const extractUrl = `https://en.wikipedia.org/w/api.php?action=query&prop=extracts|info&explaintext=1&exsectionformat=plain&inprop=url&titles=${encodeURIComponent(title)}&format=json&origin=*`;
+    const eres = await fetch(extractUrl);
+    if(!eres.ok) throw new Error('Wikipedia extract HTTP '+eres.status);
+    const edata = await eres.json();
+    const pages = edata.query && edata.query.pages;
+    const page = pages && Object.values(pages)[0];
+    if(!page || !page.extract) return null;
+
+    const fullText = page.extract.trim();
+    // Generous cap since this is meant to be a real deep-dive, but still
+    // bounded so it doesn't blow past the model's context budget.
+    const clipped = fullText.length > 12000 ? fullText.slice(0, 12000)+'…' : fullText;
+    return {
+      title: page.title || title,
+      url: page.fullurl || `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g,'_'))}`,
+      text: clipped
+    };
+  }catch(e){ console.warn('[KASHISH] Wikipedia deep search failed:', e); return null; }
+}
+function formatWikiResultForModel(wiki, userQuery){
+  return `The user asked for a deep Wikipedia search on: "${userQuery}"\n\nMatched Wikipedia article: ${wiki.title} (${wiki.url})\n\nHere is the FULL article text, fetched just now — this is the complete article, not just an intro or snippet:\n\n${wiki.text}\n\nAnswer the user's question thoroughly using this content, synthesizing it in your own words in your normal reply style — don't just dump the raw article text back at them. If they only gave a topic with no specific question, give a well-organized deep-dive covering the article's main points (background, key facts, significance, etc. as relevant). The article link is already shown to the user as a small tappable source chip below your reply, so no need to paste the URL yourself.`;
 }
 
 /* ---------------- Google Knowledge Graph — quick verified entity facts ---------------- */
@@ -5498,6 +5805,15 @@ function startReminderChecker(){
 }
 startReminderChecker();
 
+function currentDateTimeContext(){
+  const now = new Date();
+  const weekday = now.toLocaleDateString('en-US', {weekday:'long'});
+  const dateLong = now.toLocaleDateString('en-US', {year:'numeric', month:'long', day:'numeric'});
+  const time = now.toLocaleTimeString('en-US', {hour:'2-digit', minute:'2-digit'});
+  let tz = '';
+  try{ tz = Intl.DateTimeFormat().resolvedOptions().timeZone || ''; }catch(e){}
+  return `Right now it is ${weekday}, ${dateLong}, ${time}${tz ? ' (' + tz + ')' : ''} in the user's local time. This is the real, exact current date/time — always use it (not any date you might otherwise guess) whenever the user asks what today's date/day is, or asks you to calculate a date, a day of the week, an age, a countdown, days until/since an event, or anything else involving dates and time.`;
+}
 function buildSystemPrompt(){
   const who = firstName()
     ? `You're talking with ${firstName()}. You may use their name naturally sometimes, but don't overdo it.`
@@ -5524,6 +5840,7 @@ Playful "jealous of ChatGPT" quirk: if the user calls you ChatGPT, compares you 
 
 ${langPref} Don't switch to Hindi/Hinglish just because a message contains a stray Hindi word — only switch when the user is clearly writing in Hindi/Hinglish overall. Keep replies natural and conversational length: short (1-4 sentences) for chit-chat, longer and structured (numbered/bulleted, still in plain text) when the user actually needs a detailed breakdown or list.
 ${who}
+${currentDateTimeContext()}
 ${memoryBlock}${customInstrBlock}
 Origin story (only bring this up if directly asked "who made you", "who created you", "who is your founder/developer", or "why is your name Kashish" / "what does your name mean" — don't volunteer it unprompted): You were created by Gursharan Singh, who is also known by the name Gursharn Arya, the founder of Nexor. Your name "Kashish" was taken from — and inspired by — Kashish Tyagi, who is Gursharn's girlfriend. State this naturally and factually, in the same conversational tone/language as the rest of the chat (Hinglish/Hindi if that's what the user is using, English otherwise), without turning it into a long biography — a couple of warm, natural sentences is enough. If someone specifically asks who Gursharn Arya/Gursharan Singh's girlfriend is, or who Kashish Tyagi is in relation to him, you can share this directly too.
 
@@ -5536,7 +5853,7 @@ Nexor Sparks help: since Kashish shares its account system with Nexor Sparks (th
 Respond with ONLY compact JSON, no markdown fences, no extra text outside the JSON:
 {"reply":"your natural conversational reply as plain text","quickReplies":["optional","short chips"]}`;
 }
-function buildMessages(history, searchContext, rawContext){
+function buildMessages(history, searchContext, rawContext, imageDataUrl){
   const sys = buildSystemPrompt();
   const msgs = [{role:'system', content:sys}];
   if(rawContext){
@@ -5551,6 +5868,21 @@ function buildMessages(history, searchContext, rawContext){
       `Live web search results for the user's latest message (retrieved just now, treat as current/accurate):\n\n${searchContext}\n\nThese came from several different sources — synthesize them into ONE clear, complete answer, combining and cross-checking the info rather than just summarizing a single source or listing results one by one. Write it as a natural, well-organized reply (short paragraphs, or a tight list only if that genuinely fits). The individual sources are already shown to the user as small tappable chips right below your reply, so don't paste URLs or say "according to search results" — just answer like you already know it.`});
   }
   history.slice(-40).forEach(m=>msgs.push({role: m.role==='user'?'user':'assistant', content:m.text||''}));
+  if(imageDataUrl){
+    // Actually attach the photo to the model (OpenAI-style vision content
+    // array) on the most recent user turn, instead of just leaving a
+    // "[Attached photo: name.jpg]" text placeholder the model can't see.
+    for(let i=msgs.length-1;i>=0;i--){
+      if(msgs[i].role==='user'){
+        const cleanText = (msgs[i].content||'').replace(/\s*\[Attached photo:[^\]]*\]\s*$/,'').trim() || 'Is photo mein kya hai? Dekh ke bata do.';
+        msgs[i].content = [
+          { type:'text', text: cleanText },
+          { type:'image_url', image_url:{ url: imageDataUrl } }
+        ];
+        break;
+      }
+    }
+  }
   return msgs;
 }
 function extractJson(raw){
@@ -5616,9 +5948,38 @@ async function callProviderWithRetry(endpoint, model, msgs, label, maxTokens, ex
     return await callProvider(endpoint, model, msgs, label, maxTokens, expectRawJson);
   }
 }
-async function kashishReply(history, searchContext, rawContext, maxTokens){
-  const msgs = buildMessages(history, searchContext, rawContext);
+async function kashishReply(history, searchContext, rawContext, maxTokens, imageDataUrl, preferGemini){
+  const msgs = buildMessages(history, searchContext, rawContext, imageDataUrl);
   const expectRawJson = !!rawContext;
+  if(imageDataUrl){
+    // The Groq model wired up here (llama-3.3-70b-versatile) is text-only
+    // and would just silently ignore the photo — go straight to Gemini,
+    // which actually supports image input, so attached photos genuinely
+    // get looked at instead of the bot guessing from the filename alone.
+    try{ return await callProviderWithRetry(GEMINI_PROXY_ENDPOINT, GEMINI_MODEL, msgs, 'Gemini Vision', maxTokens, expectRawJson); }
+    catch(e1){
+      console.warn('[KASHISH] Gemini vision failed:', e1);
+      // Last resort: answer without the photo rather than fail the whole
+      // message, but be upfront that the image itself couldn't be read.
+      const fallbackMsgs = buildMessages(history, searchContext,
+        (rawContext ? rawContext+'\n\n' : '') + "Note: the user attached a photo but it couldn't be read this time (technical hiccup on the image side) — apologize briefly for not being able to see it, ask them to resend it or describe what's in it, and still answer anything else in their message.");
+      return await callProviderWithRetry(GROQ_PROXY_ENDPOINT, GROQ_MODEL, fallbackMsgs, 'Groq', maxTokens, expectRawJson);
+    }
+  }
+  if(preferGemini){
+    // Higher Kashe tiers (3/4) are meant to feel like a deeper, more
+    // thorough pass — bias toward Gemini first since it's the strongest
+    // backend wired up, before falling back the same way as usual.
+    try{ return await callProviderWithRetry(GEMINI_PROXY_ENDPOINT, GEMINI_MODEL, msgs, 'Gemini', maxTokens, expectRawJson); }
+    catch(e1){
+      console.warn('[KASHISH] Gemini (preferred) failed, trying Groq:', e1);
+      try{ return await callProviderWithRetry(GROQ_PROXY_ENDPOINT, GROQ_MODEL, msgs, 'Groq', maxTokens, expectRawJson); }
+      catch(e2){
+        console.warn('[KASHISH] Groq also failed, trying Cloudflare AI:', e2);
+        return await callProviderWithRetry(CFAI_PROXY_ENDPOINT, CFAI_MODEL, msgs, 'Cloudflare AI', maxTokens, expectRawJson);
+      }
+    }
+  }
   try{ return await callProviderWithRetry(GROQ_PROXY_ENDPOINT, GROQ_MODEL, msgs, 'Groq', maxTokens, expectRawJson); }
   catch(e1){
     console.warn('[KASHISH] Groq failed, trying Gemini:', e1);
@@ -6274,6 +6635,38 @@ async function send(){
     return;
   }
 
+  // "/wiki <query>" or "/wikipedia <query>" — DEEP Wikipedia search: pulls
+  // the full article text (not just a snippet) so Kashish can give a
+  // thoroughly researched answer straight from Wikipedia.
+  const forcedWikiQuery = !img ? extractSlashWikiQuery(text) : null;
+  if(forcedWikiQuery !== null){
+    if(!forcedWikiQuery){
+      pushBotMessage("Wikipedia par kya deep search karu? '/wiki' ke baad topic likho — jaise '/wiki Mahatma Gandhi'.", null);
+      return;
+    }
+    addSearchIndicator('Searching Wikipedia…');
+    let wiki = null;
+    try{ wiki = await wikipediaDeepSearch(forcedWikiQuery); }catch(e){ console.warn('[KASHISH] Wikipedia deep search failed:', e); }
+    if(!wiki){
+      removeSearchIndicator();
+      pushBotMessage(`Wikipedia par "${forcedWikiQuery}" se milta koi article nahi mila. Spelling check karke ya thoda different keyword likh ke phir try karo.`, null);
+      return;
+    }
+    updateSearchIndicator(`Reading "${wiki.title}"…`);
+    const wikiSources = [{ title: wiki.title, link: wiki.url, domain: 'wikipedia.org' }];
+    const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
+    try{
+      const result = await kashishReply(historyForModel, null, formatWikiResultForModel(wiki, forcedWikiQuery));
+      chargeCredits(result.reply);
+      removeSearchIndicator();
+      pushBotMessage(result.reply, result.quickReplies, null, null, null, null, null, wikiSources, null);
+    }catch(e){
+      removeSearchIndicator();
+      pushBotMessage("Wikipedia se answer banane mein dikkat aa gayi — thodi der baad try karo.", null);
+    }
+    return;
+  }
+
   // Secret code "/chart <topic>" (or "chart/ <topic>", or natural language
   // "chart banao X" / "graph bana do X") — asks the model for structured
   // data and renders a real SVG bar/line/pie chart instead of just text.
@@ -6847,8 +7240,9 @@ async function send(){
   }
 
   try{
-    const result = await kashishReply(historyForModel, searchContext);
-    chargeCredits(result.reply);
+    const tier = currentModelTier();
+    const result = await kashishReply(historyForModel, searchContext, null, currentMaxTokens(), img ? img.dataUrl : null, !img && tier.preferGemini);
+    chargeCredits(result.reply, tier.creditMultiplier);
     removeTyping(); removeSearchIndicator();
     pushBotMessage(result.reply, result.quickReplies, videoResults, null, null, null, newsResults, webSources, kgCard, factCheckResults, null, null, null, null, null, movieResults, null, null, null, null, null, hotelResults);
   }catch(e){
