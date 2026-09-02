@@ -960,7 +960,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
       <div class="attach-preview hidden" id="attach-preview"></div>
       <div class="model-pill-row">
         <button class="model-pill" id="model-pill-btn" onclick="openModelSheet()">
-          <i class="ph-fill ph-sparkle"></i> <span id="model-pill-label">Kashe 2</span> <span class="model-pill-effort" id="model-pill-effort">Medium</span> <i class="ph-bold ph-caret-down" style="font-size:10px;"></i>
+          <i class="ph-fill ph-sparkle"></i> <span id="model-pill-label">Kashi 2</span> <span class="model-pill-effort" id="model-pill-effort">Medium</span> <i class="ph-bold ph-caret-down" style="font-size:10px;"></i>
         </button>
       </div>
       <div class="chat-input-row">
@@ -988,7 +988,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
         <div style="width:38px;flex-shrink:0;"></div>
       </div>
       <div class="model-sheet-list" id="model-sheet-list"></div>
-      <div class="model-sheet-note">Kashe 3 and Kashe 4 give deeper, more detailed answers — on the free plan they use more credits (clearly shown in the list above), or they're included unlimited in Kashi Pro.</div>
+      <div class="model-sheet-note">Kashi 3 and Kashi 4 give deeper, more detailed answers — on the free plan they use more credits (clearly shown in the list above), or they're included unlimited in Kashi Pro.</div>
       <div class="model-sheet-effort-row">
         <div class="model-sheet-effort-label">Effort</div>
         <div class="effort-toggle" id="effort-toggle"></div>
@@ -1755,7 +1755,7 @@ const SETTINGS_DEFAULTS = {
   improveModel:true, locationEnabled:false, lastLat:null, lastLng:null,
   customNickname:'', customOccupation:'', customAboutYou:'',
   plan:'free', grandfatheredAccent:false, accentMigrationChecked:false,
-  modelTier:'kashe2', modelEffort:'Medium'
+  modelTier:'kashi2', modelEffort:'Medium'
 };
 const ACCENT_PALETTES = {
   blue:{accent:'#1975CE', s1:'#eef7ff', s2:'#d9edff', s3:'#c3e2ff'},
@@ -1772,27 +1772,27 @@ let appSettings = {...SETTINGS_DEFAULTS};
 // a higher tier means a bigger answer budget (maxTokens), a provider order
 // biased toward the stronger model first, and — clearly labeled, never
 // hidden — a higher credit cost per message on the free plan.
-const KASHE_MODEL_TIERS = [
-  { id:'kashe4', name:'Kashe 4', tagline:'For your toughest questions', pro:true,  maxTokens:2600, creditMultiplier:3, preferGemini:true },
-  { id:'kashe3', name:'Kashe 3', tagline:'For complex, detailed tasks',  pro:true,  maxTokens:1700, creditMultiplier:2, preferGemini:true },
-  { id:'kashe2', name:'Kashe 2', tagline:'Most efficient for everyday chat', pro:false, maxTokens:900,  creditMultiplier:1, preferGemini:false },
-  { id:'kashe1', name:'Kashe 1', tagline:'Fastest, for quick answers',  pro:false, maxTokens:450,  creditMultiplier:1, preferGemini:false }
+const KASHI_MODEL_TIERS = [
+  { id:'kashi4', name:'Kashi 4', tagline:'For your toughest questions', pro:true,  maxTokens:2600, creditMultiplier:3, preferGemini:true },
+  { id:'kashi3', name:'Kashi 3', tagline:'For complex, detailed tasks',  pro:true,  maxTokens:1700, creditMultiplier:2, preferGemini:true },
+  { id:'kashi2', name:'Kashi 2', tagline:'Most efficient for everyday chat', pro:false, maxTokens:900,  creditMultiplier:1, preferGemini:false },
+  { id:'kashi1', name:'Kashi 1', tagline:'Fastest, for quick answers',  pro:false, maxTokens:450,  creditMultiplier:1, preferGemini:false }
 ];
-const KASHE_EFFORT_LEVELS = ['Low','Medium','High'];
-const KASHE_EFFORT_MAXTOKEN_MULT = { Low:0.6, Medium:1, High:1.5 };
-function getModelTier(id){ return KASHE_MODEL_TIERS.find(t=>t.id===id) || KASHE_MODEL_TIERS[2]; }
+const KASHI_EFFORT_LEVELS = ['Low','Medium','High'];
+const KASHI_EFFORT_MAXTOKEN_MULT = { Low:0.6, Medium:1, High:1.5 };
+function getModelTier(id){ return KASHI_MODEL_TIERS.find(t=>t.id===id) || KASHI_MODEL_TIERS[2]; }
 function currentModelTier(){
   const tier = getModelTier(appSettings.modelTier);
   // Safety net: if the account isn't (or no longer is) Pro, never silently
   // run pro-tier behavior — fall back to the default free tier instead.
-  if(tier.pro && !isProUser()) return getModelTier('kashe2');
+  if(tier.pro && !isProUser()) return getModelTier('kashi2');
   return tier;
 }
 // Effective max tokens for the current tier+effort combo, used as the
 // generation budget for the main chat reply.
 function currentMaxTokens(){
   const tier = currentModelTier();
-  const mult = KASHE_EFFORT_MAXTOKEN_MULT[appSettings.modelEffort] || 1;
+  const mult = KASHI_EFFORT_MAXTOKEN_MULT[appSettings.modelEffort] || 1;
   return Math.round(tier.maxTokens * mult);
 }
 function updateModelPillLabel(){
@@ -1815,7 +1815,7 @@ function renderModelSheet(){
   const list = document.getElementById('model-sheet-list');
   if(list){
     list.innerHTML = '';
-    KASHE_MODEL_TIERS.forEach(tier=>{
+    KASHI_MODEL_TIERS.forEach(tier=>{
       const locked = tier.pro && !isProUser();
       const selected = appSettings.modelTier === tier.id && !locked;
       const b = document.createElement('button');
@@ -1838,7 +1838,7 @@ function renderModelSheet(){
   const toggle = document.getElementById('effort-toggle');
   if(toggle){
     toggle.innerHTML = '';
-    KASHE_EFFORT_LEVELS.forEach(level=>{
+    KASHI_EFFORT_LEVELS.forEach(level=>{
       const b = document.createElement('button');
       b.textContent = level;
       b.className = (appSettings.modelEffort||'Medium')===level ? 'active' : '';
@@ -1863,7 +1863,7 @@ function selectModelTier(id){
   triggerHaptic();
 }
 function setModelEffort(level){
-  if(!KASHE_EFFORT_LEVELS.includes(level)) return;
+  if(!KASHI_EFFORT_LEVELS.includes(level)) return;
   appSettings.modelEffort = level;
   saveSettings();
   updateModelPillLabel();
@@ -1952,7 +1952,7 @@ function creditResetWaitMs(){
 // Deducts credits for a reply that was just generated. Pass either the
 // reply text itself (cost is derived from its length) or a raw number of
 // credits for flows with no generated text (e.g. a fixed utility call).
-// `multiplier` scales the cost for higher model tiers (Kashe 3/4) — always
+// `multiplier` scales the cost for higher model tiers (Kashi 3/4) — always
 // shown to the user ahead of time in the model picker, never hidden.
 function chargeCredits(textOrAmount, multiplier){
   if(isProUser()) return;
@@ -5967,7 +5967,7 @@ async function kashiReply(history, searchContext, rawContext, maxTokens, imageDa
     }
   }
   if(preferGemini){
-    // Higher Kashe tiers (3/4) are meant to feel like a deeper, more
+    // Higher Kashi tiers (3/4) are meant to feel like a deeper, more
     // thorough pass — bias toward Gemini first since it's the strongest
     // backend wired up, before falling back the same way as usual.
     try{ return await callProviderWithRetry(GEMINI_PROXY_ENDPOINT, GEMINI_MODEL, msgs, 'Gemini', maxTokens, expectRawJson); }
