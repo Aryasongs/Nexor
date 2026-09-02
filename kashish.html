@@ -352,6 +352,17 @@ html[data-theme="dark"] .web-source-chip{background:linear-gradient(160deg,#1E1E
 .movie-card .mv-title{font-size:12px;font-weight:700;color:var(--ink);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .movie-card .mv-year{font-size:10.5px;color:var(--ink-soft);margin-top:2px;}
 .movie-card .mv-provider{margin-top:6px;font-size:10.5px;font-weight:700;color:var(--accent);display:flex;align-items:center;gap:4px;}
+.hotel-results{display:flex;gap:10px;overflow-x:auto;margin-top:6px;max-width:92%;padding-bottom:2px;}
+.hotel-card{flex-shrink:0;width:168px;display:flex;flex-direction:column;text-align:left;background:var(--card);border:1px solid var(--border);border-radius:14px;overflow:hidden;box-shadow:0 6px 14px -10px rgba(20,20,22,.3);}
+.hotel-card:active{transform:scale(.97);}
+.hotel-card .ht-photo{position:relative;width:168px;height:110px;background:var(--bubble-bot);}
+.hotel-card .ht-photo img{width:100%;height:100%;object-fit:cover;}
+.hotel-card .ht-rating{position:absolute;top:6px;right:6px;background:rgba(0,0,0,.65);color:#fff;font-size:10.5px;font-weight:700;padding:2px 6px;border-radius:999px;display:flex;align-items:center;gap:3px;}
+.hotel-card .ht-rating i{color:#FFC64B;font-size:10px;}
+.hotel-card .ht-meta{padding:9px 10px 11px;}
+.hotel-card .ht-name{font-size:12.5px;font-weight:700;color:var(--ink);line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.hotel-card .ht-price{margin-top:5px;font-size:13.5px;font-weight:800;color:var(--accent);}
+.hotel-card .ht-price span{font-size:10.5px;font-weight:600;color:var(--ink-soft);}
 .pulse-profile-card{max-width:82%;margin-top:6px;background:linear-gradient(150deg,#ffffff 0%,#f4f5f7 50%,#eaecef 100%);border:1px solid rgba(255,255,255,.9);border-radius:16px;padding:14px 16px;box-shadow:0 10px 22px -14px rgba(20,20,22,.28);}
 .pulse-profile-card .pp-head{display:flex;align-items:center;gap:9px;}
 .pulse-profile-card .pp-name{font-weight:800;font-size:14.5px;color:var(--ink);display:flex;align-items:center;gap:4px;}
@@ -1068,6 +1079,11 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
             <div class="body"><div class="lbl">Movies &amp; OTT</div></div>
             <span class="go"><i class="ph-bold ph-caret-right"></i></span>
           </button>
+          <button class="settings-row" onclick="showScreen('screen-settings-hotels')">
+            <span class="ic"><i class="ph-bold ph-buildings"></i></span>
+            <div class="body"><div class="lbl">Hotels</div></div>
+            <span class="go"><i class="ph-bold ph-caret-right"></i></span>
+          </button>
           <button class="settings-row" onclick="showScreen('screen-settings-personalization')">
             <span class="ic"><i class="ph-bold ph-fingerprint"></i></span>
             <div class="body"><div class="lbl">Personalization</div></div>
@@ -1295,6 +1311,32 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
         <div class="settings-row" style="align-items:flex-start;">
           <span class="ic"><i class="ph-bold ph-info"></i></span>
           <div class="body"><div class="lbl">How it works</div><div class="sub">Ask Kashish for a movie suggestion in chat — she'll show poster cards. Tap a card and it opens the streaming app/site (Netflix, Prime Video, etc.) where that title is actually available in your region.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ============ SETTINGS: HOTELS ============ -->
+  <div class="screen hidden" id="screen-settings-hotels">
+    <div class="chat-topbar">
+      <button class="circle-btn" onclick="showScreen('screen-settings')"><i class="ph-bold ph-arrow-left"></i></button>
+      <div class="chat-title">Hotels</div>
+      <span style="width:38px"></span>
+    </div>
+    <div class="settings-scroll">
+      <div class="settings-list">
+        <div class="profile-field" style="padding:14px 16px 4px;">
+          <label>Amadeus API key (free at developers.amadeus.com)</label>
+          <input type="password" id="amadeus-key-input" placeholder="Client ID (Self-Service test API)" autocomplete="off" spellcheck="false" oninput="onAmadeusKeyInput(this.value)">
+        </div>
+        <div class="profile-field" style="padding:4px 16px 14px;">
+          <label>Amadeus API secret</label>
+          <input type="password" id="amadeus-secret-input" placeholder="Client Secret" autocomplete="off" spellcheck="false" oninput="onAmadeusSecretInput(this.value)">
+        </div>
+        <div class="settings-row" style="align-items:flex-start;">
+          <span class="ic"><i class="ph-bold ph-info"></i></span>
+          <div class="body"><div class="lbl">How it works</div><div class="sub">Ask Kashish for a hotel in chat — e.g. "Delhi mein 3000 budget mein hotel dikhao". She'll show tappable hotel cards with a photo, name, rating and price. Sign up free at developers.amadeus.com → Self-Service → create an app to get your Client ID &amp; Secret (no card needed, generous free test quota).</div></div>
         </div>
       </div>
     </div>
@@ -1628,6 +1670,7 @@ const SETTINGS_DEFAULTS = {
   voiceAutoSend:true, voiceHaptic:true,
   elevenLabsApiKey:'', elevenLabsVoiceId:'21m00Tcm4TlvDq8ikWAM',
   tmdbApiKey:'d39bc110ef687b835b0837bf6f4902d1', movieRegion:'IN',
+  amadeusClientId:'', amadeusClientSecret:'',
   personalize:true,
   improveModel:true, locationEnabled:false, lastLat:null, lastLng:null,
   customNickname:'', customOccupation:'', customAboutYou:'',
@@ -1799,6 +1842,10 @@ function renderSettingsUI(){
   if(tmdbInput && document.activeElement !== tmdbInput) tmdbInput.value = appSettings.tmdbApiKey || '';
   const regionSelect = document.getElementById('movie-region-select');
   if(regionSelect) regionSelect.value = appSettings.movieRegion || 'IN';
+  const amadeusInput = document.getElementById('amadeus-key-input');
+  if(amadeusInput && document.activeElement !== amadeusInput) amadeusInput.value = appSettings.amadeusClientId || '';
+  const amadeusSecretInput = document.getElementById('amadeus-secret-input');
+  if(amadeusSecretInput && document.activeElement !== amadeusSecretInput) amadeusSecretInput.value = appSettings.amadeusClientSecret || '';
   const nickInput = document.getElementById('ci-nickname-input');
   if(nickInput && document.activeElement !== nickInput) nickInput.value = appSettings.customNickname || '';
   const occInput = document.getElementById('ci-occupation-input');
@@ -1868,6 +1915,20 @@ function onTmdbKeyInput(val){
   appSettings.tmdbApiKey = (val||'').trim();
   clearTimeout(tmdbKeySaveTimer);
   tmdbKeySaveTimer = setTimeout(saveSettings, 500);
+}
+let amadeusKeySaveTimer=null;
+function onAmadeusKeyInput(val){
+  appSettings.amadeusClientId = (val||'').trim();
+  amadeusTokenCache = null; // key changed — force a fresh token next time
+  clearTimeout(amadeusKeySaveTimer);
+  amadeusKeySaveTimer = setTimeout(saveSettings, 500);
+}
+let amadeusSecretSaveTimer=null;
+function onAmadeusSecretInput(val){
+  appSettings.amadeusClientSecret = (val||'').trim();
+  amadeusTokenCache = null;
+  clearTimeout(amadeusSecretSaveTimer);
+  amadeusSecretSaveTimer = setTimeout(saveSettings, 500);
 }
 function onMovieRegionChange(val){
   appSettings.movieRegion = val;
@@ -2818,7 +2879,7 @@ function startAiCreate(){
 
 /* ---------------- navigation ---------------- */
 function showScreen(id){
-  ['screen-home','screen-chat','screen-voice','screen-profile','screen-legal-doc','screen-settings','screen-settings-general','screen-settings-language','screen-settings-notifications','screen-settings-voice','screen-settings-movies','screen-settings-personalization','screen-settings-memory','screen-settings-data-controls','screen-bucket-list','screen-daily-tasks','screen-reminders','screen-upgrade'].forEach(s=>document.getElementById(s).classList.toggle('hidden', s!==id));
+  ['screen-home','screen-chat','screen-voice','screen-profile','screen-legal-doc','screen-settings','screen-settings-general','screen-settings-language','screen-settings-notifications','screen-settings-voice','screen-settings-movies','screen-settings-hotels','screen-settings-personalization','screen-settings-memory','screen-settings-data-controls','screen-bucket-list','screen-daily-tasks','screen-reminders','screen-upgrade'].forEach(s=>document.getElementById(s).classList.toggle('hidden', s!==id));
   if(id.indexOf('screen-settings')===0) renderSettingsUI();
   if(id==='screen-bucket-list') renderTaskList('bucket');
   if(id==='screen-daily-tasks') renderTaskList('tasks');
@@ -3370,6 +3431,26 @@ function renderChat(){
         mwrap.appendChild(card);
       });
       scroll.appendChild(mwrap);
+    }
+    if(m.hotelResults && m.hotelResults.length){
+      const hwrap=document.createElement('div'); hwrap.className='hotel-results';
+      m.hotelResults.forEach(h=>{
+        const card=document.createElement('button'); card.className='hotel-card';
+        card.onclick=()=>window.open(h.bookingUrl,'_blank');
+        const photo=document.createElement('div'); photo.className='ht-photo';
+        if(h.image){ const im=document.createElement('img'); im.src=h.image; im.alt=h.name; photo.appendChild(im); }
+        if(h.rating){ const rt=document.createElement('div'); rt.className='ht-rating'; rt.innerHTML=`<i class="ph-fill ph-star"></i> ${h.rating}`; photo.appendChild(rt); }
+        card.appendChild(photo);
+        const meta=document.createElement('div'); meta.className='ht-meta';
+        const nm=document.createElement('div'); nm.className='ht-name'; nm.textContent=h.name;
+        meta.appendChild(nm);
+        const price=document.createElement('div'); price.className='ht-price';
+        price.innerHTML = `₹${h.price.toLocaleString('en-IN')} <span>/ night</span>`;
+        meta.appendChild(price);
+        card.appendChild(meta);
+        hwrap.appendChild(card);
+      });
+      scroll.appendChild(hwrap);
     }
     if(m.profileCard){
       const p = m.profileCard;
@@ -4127,6 +4208,125 @@ function formatMovieResultsForModel(results){
   if(!results || !results.length) return null;
   return 'Found these movie suggestions for the user (already shown to them as tappable poster cards below your reply, each opening the streaming app where it\'s available — do NOT repeat the list, just briefly react to the picks in a sentence or two):\n'
     + results.map((r,i)=>`${i+1}. ${r.title}${r.year?(' ('+r.year+')'):''} — on ${r.providerName}`).join('\n');
+}
+
+/* ---------------- hotel search (Amadeus Self-Service, free test API) ---------------- */
+// Requires the user's own free Amadeus Client ID + Secret (Settings -> Hotels).
+// Flow: detect a "hotel in <city> under <budget>" style message -> pull the
+// city name + budget out of the wording -> resolve the city to an Amadeus
+// city code -> list hotels in that city -> fetch live prices for them ->
+// filter to the user's budget -> show as tappable cards (photo/name/price),
+// each tap opening a search for that hotel so the user can actually book it.
+const HOTEL_NOUN_WORDS = /\b(hotel|hotels|resort|resorts|stay|guesthouse|guest\s*house|room|rooms)\b/i;
+const HOTEL_INTENT_WORDS = /\b(chahiye|chaiye|dikhao|dikha|dikhaye|batao|bata|suggest|recommend|book|find|dhundo|dhoondo|search|want|need)\b/i;
+const HOTEL_STOPWORDS = new Set(['hotel','hotels','resort','resorts','stay','guesthouse','guest','house','room','rooms','chahiye','chaiye','dikhao','dikha','dikhaye','batao','bata','budget','mein','me','ke','ka','ki','andar','tak','under','near','nearby','in','at','for','book','find','dhundo','dhoondo','search','mujhe','please','plz','is','city','se','kam','good','best','nice','achha','accha','acha','a','an','the','my','with','images','image','pics','pic','photo','photos','wale','wala','suggest','recommend','want','need','koi','ek','sa','sasta','cheap']);
+function needsHotelSuggestion(text){
+  const t=(text||'').trim();
+  if(!t) return false;
+  if(!HOTEL_NOUN_WORDS.test(t)) return false;
+  return HOTEL_INTENT_WORDS.test(t) || /\bbudget\b/i.test(t) || /₹|\brs\.?\b|\binr\b/i.test(t);
+}
+function extractHotelCity(text){
+  let m = text.match(/\bhotels?\s+(?:in|at|near)\s+([a-zA-Z][a-zA-Z\s]*?)(?=\s+(?:mein|me|ke|ka|ki|under|budget|for|near|the)\b|[,.]|$)/i);
+  if(m && m[1]) return m[1].trim();
+  m = text.match(/\b([A-Za-z]+(?:\s[A-Za-z]+)?)\s+(?:mein|me)\b/i);
+  if(m && m[1] && !HOTEL_STOPWORDS.has(m[1].toLowerCase())) return m[1].trim();
+  m = text.match(/\b([A-Za-z]+(?:\s[A-Za-z]+)?)\s+(?:ke|ka|ki)\b/i);
+  if(m && m[1] && !HOTEL_STOPWORDS.has(m[1].toLowerCase())) return m[1].trim();
+  // fallback: strip filler words/numbers, whatever alphabetic text remains
+  // is our best guess at the city name.
+  const cleaned = text.replace(/[₹,]/g,' ').replace(/\d+[a-z]*/gi,' ')
+    .split(/\s+/).filter(w=>w && !HOTEL_STOPWORDS.has(w.toLowerCase()));
+  if(cleaned.length) return cleaned.join(' ').trim();
+  return null;
+}
+function parseBudgetNum(numStr, kFlag){
+  let n = parseFloat((numStr||'').replace(/,/g,''));
+  if(kFlag && /^(k|thousand|hazar|hazaar)$/i.test(kFlag)) n = n*1000;
+  return isFinite(n) && n>0 ? Math.round(n) : null;
+}
+function extractHotelBudget(text){
+  let m = text.match(/(?:₹|rs\.?|inr)\s*([\d,]+)\s*(k)?/i);
+  if(m) return parseBudgetNum(m[1], m[2]);
+  m = text.match(/([\d,]+)\s*(k|hazar|hazaar|thousand)\b/i);
+  if(m) return parseBudgetNum(m[1], m[2]);
+  m = text.match(/\bbudget\s*(?:of|is|:)?\s*([\d,]+)\s*(k)?/i);
+  if(m) return parseBudgetNum(m[1], m[2]);
+  m = text.match(/([\d,]+)\s*(k)?\s*(?:budget|tak|ke\s*andar|under|se\s*kam|rupay|rupaye|rupees?)/i);
+  if(m) return parseBudgetNum(m[1], m[2]);
+  m = text.match(/\bunder\s*([\d,]+)\s*(k)?/i);
+  if(m) return parseBudgetNum(m[1], m[2]);
+  return null;
+}
+let amadeusTokenCache = null; // {token, exp} — cached in memory only, cleared on key change
+async function getAmadeusToken(){
+  const id = (appSettings.amadeusClientId||'').trim();
+  const secret = (appSettings.amadeusClientSecret||'').trim();
+  if(!id || !secret) return null;
+  if(amadeusTokenCache && amadeusTokenCache.exp > Date.now()+10000) return amadeusTokenCache.token;
+  const body = `grant_type=client_credentials&client_id=${encodeURIComponent(id)}&client_secret=${encodeURIComponent(secret)}`;
+  const res = await fetchWithTimeout('https://test.api.amadeus.com/v1/security/oauth2/token', {
+    method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body
+  }, 8000);
+  if(!res.ok) throw new Error('Amadeus auth HTTP '+res.status);
+  const data = await res.json();
+  amadeusTokenCache = { token:data.access_token, exp: Date.now() + (data.expires_in||1800)*1000 };
+  return amadeusTokenCache.token;
+}
+async function searchHotelsAmadeus(text){
+  const id=(appSettings.amadeusClientId||'').trim(), secret=(appSettings.amadeusClientSecret||'').trim();
+  if(!id||!secret) return { hotels:null, needsKey:true };
+  const city = extractHotelCity(text);
+  const budget = extractHotelBudget(text);
+  if(!city) return { hotels:[], needsKey:false, noCity:true };
+  try{
+    const token = await getAmadeusToken();
+    if(!token) return { hotels:null, needsKey:true };
+    const auth = { Authorization:'Bearer '+token };
+    // 1) resolve the city name to an Amadeus/IATA city code
+    const cityRes = await fetchWithTimeout(`https://test.api.amadeus.com/v1/reference-data/locations/cities?keyword=${encodeURIComponent(city)}&max=1`, {headers:auth}, 8000);
+    if(!cityRes.ok) throw new Error('Amadeus city search HTTP '+cityRes.status);
+    const cityData = await cityRes.json();
+    const cityCode = cityData.data && cityData.data[0] && cityData.data[0].iataCode;
+    if(!cityCode) return { hotels:[], needsKey:false, cityNotFound:true, city, budget };
+    // 2) list hotels in that city
+    const listRes = await fetchWithTimeout(`https://test.api.amadeus.com/v1/reference-data/locations/hotels/by-city?cityCode=${cityCode}`, {headers:auth}, 8000);
+    if(!listRes.ok) throw new Error('Amadeus hotel list HTTP '+listRes.status);
+    const listData = await listRes.json();
+    const hotelIds = (listData.data||[]).slice(0,20).map(h=>h.hotelId).filter(Boolean);
+    if(!hotelIds.length) return { hotels:[], needsKey:false, cityNotFound:true, city, budget };
+    // 3) fetch live prices for those hotels
+    const offersRes = await fetchWithTimeout(`https://test.api.amadeus.com/v3/shopping/hotel-offers?hotelIds=${hotelIds.join(',')}&adults=1&roomQuantity=1&currency=INR&bestRateOnly=true`, {headers:auth}, 10000);
+    if(!offersRes.ok) throw new Error('Amadeus hotel offers HTTP '+offersRes.status);
+    const offersData = await offersRes.json();
+    let hotels = (offersData.data||[]).map(o=>{
+      const offer = o.offers && o.offers[0];
+      const price = offer && offer.price ? Math.round(parseFloat(offer.price.total)) : null;
+      return {
+        id: o.hotel.hotelId,
+        name: o.hotel.name,
+        price,
+        rating: o.hotel.rating || null,
+        // Amadeus's test data doesn't reliably include real photos, so each
+        // card gets a stable placeholder image (seeded on the hotel's own
+        // id, so the same hotel always shows the same picture).
+        image: `https://picsum.photos/seed/${encodeURIComponent(o.hotel.hotelId||o.hotel.name)}/320/200`,
+        bookingUrl: `https://www.google.com/search?q=${encodeURIComponent(o.hotel.name+' '+city+' hotel booking')}`
+      };
+    }).filter(h=>h.price);
+    if(budget) hotels = hotels.filter(h=>h.price <= budget);
+    hotels.sort((a,b)=>a.price-b.price);
+    return { hotels: hotels.slice(0,6), needsKey:false, city, budget };
+  }catch(e){
+    console.warn('[KASHISH] Amadeus hotel search failed:', e);
+    const authError = /HTTP 401/.test(e.message||'');
+    return { hotels:[], needsKey:false, error:true, authError };
+  }
+}
+function formatHotelResultsForModel(results, city, budget){
+  if(!results || !results.length) return null;
+  return `Found these hotels in ${city||'the requested city'}${budget?(' under ₹'+budget):''} (already shown to the user as tappable cards with photo/name/price below your reply — do NOT repeat the list, just react briefly in a sentence or two, and mention the photos are placeholder images since this is a free test API):\n`
+    + results.map((r,i)=>`${i+1}. ${r.name} — ₹${r.price}${r.rating?(' ('+r.rating+'-star)'):''}`).join('\n');
 }
 // "Play [song/video]" — an explicit play request plays the top result
 // directly in an embedded, autoplaying player instead of just showing
@@ -5410,12 +5610,12 @@ function sendLocal(){
   }, 400);
 }
 
-function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults, webSources, kgCard, factCheckResults, postCard, conversionCard, stockCard, mapCard, personCard, movieResults, emailCard, pdfCard, codeCard, upgradeCard, chartCard){
+function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults, webSources, kgCard, factCheckResults, postCard, conversionCard, stockCard, mapCard, personCard, movieResults, emailCard, pdfCard, codeCard, upgradeCard, chartCard, hotelResults){
   const sess = getSession(currentSessionId);
   if(!sess) return;
   const qr = appSettings.trendingSearches ? (quickReplies||null) : null;
   const ts = Date.now();
-  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, webSources: (webSources&&webSources.length)?webSources:null, kgCard: kgCard||null, factCheckResults: (factCheckResults&&factCheckResults.length)?factCheckResults:null, postCard: postCard||null, conversionCard: conversionCard||null, stockCard: stockCard||null, mapCard: mapCard||null, personCard: personCard||null, movieResults: (movieResults&&movieResults.length)?movieResults:null, emailCard: emailCard||null, pdfCard: pdfCard||null, codeCard: codeCard||null, upgradeCard: upgradeCard||null, chartCard: chartCard||null, ts});
+  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, webSources: (webSources&&webSources.length)?webSources:null, kgCard: kgCard||null, factCheckResults: (factCheckResults&&factCheckResults.length)?factCheckResults:null, postCard: postCard||null, conversionCard: conversionCard||null, stockCard: stockCard||null, mapCard: mapCard||null, personCard: personCard||null, movieResults: (movieResults&&movieResults.length)?movieResults:null, emailCard: emailCard||null, pdfCard: pdfCard||null, codeCard: codeCard||null, upgradeCard: upgradeCard||null, chartCard: chartCard||null, hotelResults: (hotelResults&&hotelResults.length)?hotelResults:null, ts});
   sess.preview = truncate(text, 60);
   sess.updatedAt = Date.now();
   upsertSession(sess);
@@ -6547,6 +6747,7 @@ async function send(){
   let kgCard = null;
   let factCheckResults = null;
   let movieResults = null;
+  let hotelResults = null;
   if(!img && needsFactCheck(text)){
     addSearchIndicator('Checking fact-checkers…');
     factCheckResults = await factCheckSearch(text);
@@ -6570,6 +6771,26 @@ async function send(){
     } else {
       movieResults = movieResult.movies;
       searchContext = formatMovieResultsForModel(movieResults);
+    }
+    updateSearchIndicator('Putting together an answer…');
+  } else if(!img && needsHotelSuggestion(text)){
+    addSearchIndicator('Looking up hotels…');
+    const hotelResult = await searchHotelsAmadeus(text);
+    if(hotelResult.needsKey){
+      searchContext = 'The user asked to find hotels, but no Amadeus API key is set up yet. Tell them (in your normal reply style) that they need to add a free Amadeus Client ID + Secret in Settings -> Hotels (signup at developers.amadeus.com, no card needed) to unlock hotel search, and offer to suggest a couple of well-known hotel areas from general knowledge in the meantime.';
+    } else if(hotelResult.error){
+      searchContext = hotelResult.authError
+        ? 'The user asked to find hotels, but the Amadeus keys in Settings -> Hotels look invalid or rejected (401). Tell them (in your normal reply style) to double-check the Client ID/Secret were pasted correctly, and offer to help with general hotel-hunting tips in the meantime.'
+        : 'The user asked to find hotels, but the hotel lookup timed out or failed (network issue). Tell them (in your normal reply style) that the search didn\'t come through and to try again in a moment.';
+    } else if(hotelResult.noCity){
+      searchContext = 'The user asked for hotels but didn\'t mention a clear city name. Ask them (in your normal reply style) which city they want hotels in.';
+    } else if(hotelResult.cityNotFound){
+      searchContext = `The user asked for hotels in "${hotelResult.city}", but that city wasn't found in the hotel database. Tell them (in your normal reply style) you couldn't find that city and to try a bigger/nearby city name.`;
+    } else if(!hotelResult.hotels.length){
+      searchContext = `The user asked for hotels in "${hotelResult.city}"${hotelResult.budget?(' under ₹'+hotelResult.budget):''}, but none matched. Tell them (in your normal reply style) nothing fit that budget in that city right now, and suggest raising the budget or trying a nearby city.`;
+    } else {
+      hotelResults = hotelResult.hotels;
+      searchContext = formatHotelResultsForModel(hotelResults, hotelResult.city, hotelResult.budget);
     }
     updateSearchIndicator('Putting together an answer…');
   } else if(!img && needsWebSearch(text)){
@@ -6596,7 +6817,7 @@ async function send(){
     const result = await kashishReply(historyForModel, searchContext);
     chargeCredits(result.reply);
     removeTyping(); removeSearchIndicator();
-    pushBotMessage(result.reply, result.quickReplies, videoResults, null, null, null, newsResults, webSources, kgCard, factCheckResults, null, null, null, null, null, movieResults);
+    pushBotMessage(result.reply, result.quickReplies, videoResults, null, null, null, newsResults, webSources, kgCard, factCheckResults, null, null, null, null, null, movieResults, null, null, null, null, null, hotelResults);
   }catch(e){
     console.error('[KASHISH] all providers failed, falling back to local:', e);
     removeSearchIndicator();
