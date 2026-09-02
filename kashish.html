@@ -1,23 +1,24 @@
-<!DOCTYPE html>
+
+    .<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
-<title>Kashish — AI Companion</title>
-<meta name="description" content="Kashish — your everyday AI companion. Chat, talk, or just hang out.">
+<title>Kashi — AI Companion</title>
+<meta name="description" content="Kashi — your everyday AI companion. Chat, talk, or just hang out.">
 <meta name="robots" content="index, follow">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='11' fill='%23141416'/%3E%3Ccircle cx='12' cy='12' r='4.5' fill='%234FA8FF'/%3E%3C/svg%3E">
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Yellowtail&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
 <!-- Firebase (compat SDK) — shared auth/database backend, same project used
-     for account login elsewhere, so Kashish accounts are the same accounts. -->
+     for account login elsewhere, so Kashi accounts are the same accounts. -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 <!-- jsPDF — used to turn plain text/chat content into a downloadable PDF
      on request ("isko pdf bana do" / "export as pdf"), fully client-side. -->
 <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-<!-- marked + DOMPurify — turn Kashish's bot replies (bold/italic, `code`,
+<!-- marked + DOMPurify — turn Kashi's bot replies (bold/italic, `code`,
      ```code blocks```, links, lists) into safely-sanitized rich HTML
      instead of flat plain text. Open-source, MIT-licensed, no backend. -->
 <script src="https://unpkg.com/marked@11.1.1/marked.min.js"></script>
@@ -116,7 +117,7 @@ html[data-theme="dark"] .search-overlay-input-wrap{background:linear-gradient(16
 
 /* ---------- model picker ---------- */
 .model-pill-row{display:flex;padding:0 2px 6px;}
-.model-pill{display:flex;align-items:center;gap:6px;background:linear-gradient(160deg,#2b2b30 0%,var(--black) 55%,#0d0d0f 100%);color:#fff;border-radius:999px;padding:7px 13px;font-size:12px;font-weight:700;box-shadow:0 4px 10px -6px rgba(20,20,22,.4);}
+.model-pill{display:flex;align-items:center;gap:6px;background:transparent;color:var(--ink);border:1px solid var(--border);border-radius:999px;padding:7px 13px;font-size:12px;font-weight:700;}
 .model-pill i.ph-fill.ph-sparkle{color:#FFD65A;font-size:13px;}
 .model-pill-effort{color:#9a9aa4;font-weight:600;}
 .sheet-overlay{position:fixed;inset:0;z-index:70;background:rgba(10,10,11,.45);display:flex;align-items:flex-end;justify-content:center;}
@@ -206,7 +207,7 @@ html[data-theme="dark"] .md-content blockquote{border-left-color:#3a3a40;}
 .stop-gen .dot{width:15px;height:15px;border-radius:50%;border:2px solid #fff;display:flex;align-items:center;justify-content:center;}
 .stop-gen .dot i{font-size:6px;color:#fff;}
 
-/* deep-search indicator — shown while Kashish is actively searching/reading
+/* deep-search indicator — shown while Kashi is actively searching/reading
    sources, before it starts composing the combined answer. Visually
    distinct from the plain typing dots so the user can see the extra
    "research" step happening, like Claude/ChatGPT's search indicators. */
@@ -270,7 +271,7 @@ html[data-theme="dark"] .search-indicator{background:linear-gradient(160deg,#232
 .stock-card .sc-live{display:inline-flex;align-items:center;gap:4px;font-size:9.5px;font-weight:800;color:#B4780F;text-transform:uppercase;letter-spacing:.03em;margin-top:10px;}
 .stock-card .sc-live .dot{width:6px;height:6px;border-radius:50%;background:#B4780F;animation:liveDotPulse 1.4s ease-in-out infinite;}
 
-/* Location / map card — Kashish drops a pin using OpenStreetMap (static
+/* Location / map card — Kashi drops a pin using OpenStreetMap (static
    render, no API key) for "mera location", "X kaha hai", or "cafe near me"
    style requests. */
 .map-card{position:relative;overflow:hidden;max-width:88%;width:100%;box-sizing:border-box;margin-top:6px;background:var(--card);border:1px solid rgba(255,255,255,.9);border-radius:18px;box-shadow:0 10px 24px -14px rgba(20,20,22,.28);text-align:left;}
@@ -284,7 +285,7 @@ html[data-theme="dark"] .search-indicator{background:linear-gradient(160deg,#232
 html[data-theme="dark"] .stock-card{background:linear-gradient(155deg,#2a2318 0%,#221d15 55%,#1c1810 100%);}
 html[data-theme="dark"] .map-card{background:linear-gradient(150deg,#1E1E21 0%,#1A1A1D 50%,#151517 100%);border-color:rgba(255,255,255,.06);}
 
-/* Email-compose preview card — shown after Kashish drafts an email; lets
+/* Email-compose preview card — shown after Kashi drafts an email; lets
    the user review it, then hand off to Gmail (or the device's default
    mail app) to actually send, via a mailto:/deep-link, never sent from
    here directly. */
@@ -435,7 +436,7 @@ html[data-theme="dark"] .web-source-chip{background:linear-gradient(160deg,#1E1E
 .person-card .pc-note{font-size:11px;color:var(--ink-soft);margin-top:12px;padding-top:10px;border-top:1px solid var(--border);line-height:1.5;}
 .person-card .pc-gallery{display:flex;gap:8px;overflow-x:auto;padding:2px 2px 4px;margin-top:8px;}
 .person-card .pc-gallery img{width:84px;height:84px;flex-shrink:0;object-fit:cover;border-radius:12px;background:var(--bubble-bot);box-shadow:0 1px 0 rgba(255,255,255,.8) inset;}
-/* Signature card for Kashish Tyagi — the real-life namesake/inspiration —
+/* Signature card for Kashi Tyagi — the real-life namesake/inspiration —
    deliberately distinct from the generic grey person-card so it doesn't
    look like just another looked-up profile. */
 .person-card.featured{background:linear-gradient(150deg,#fff5f7 0%,#ffe9ee 45%,#ffd9e3 100%);border:1px solid rgba(255,255,255,.9);box-shadow:0 14px 28px -16px rgba(214,51,108,.45);position:relative;}
@@ -475,8 +476,8 @@ html[data-theme="dark"] .person-card.featured .pc-note{color:#c98a9c;}
 .msg-more-menu button:active{background:var(--bubble-bot);}
 .msg-more-menu button.danger{color:#E5484D;}
 .msg-more-backdrop{position:fixed;inset:0;z-index:59;}
-.kashish-toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(10px);background:rgba(20,20,22,.92);color:#fff;font-size:12.5px;font-weight:600;padding:9px 16px;border-radius:999px;z-index:70;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap;}
-.kashish-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+.kashi-toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%) translateY(10px);background:rgba(20,20,22,.92);color:#fff;font-size:12.5px;font-weight:600;padding:9px 16px;border-radius:999px;z-index:70;opacity:0;transition:opacity .2s,transform .2s;pointer-events:none;white-space:nowrap;}
+.kashi-toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
 .attach-preview img{width:38px;height:38px;object-fit:cover;border-radius:8px;flex-shrink:0;}
 .attach-preview .lbl{flex:1;font-size:11.5px;color:var(--ink-soft);}
 .attach-preview .rm{color:var(--ink-soft);font-size:17px;flex-shrink:0;}
@@ -624,7 +625,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
 .auth-continue-btn:disabled{cursor:default;}
 .auth-err{font-size:12.5px;color:#FF6B6B;text-align:center;margin-top:14px;min-height:16px;font-weight:600;}
 .auth-landing-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px 28px;gap:6px;}
-.kashish-wordmark{font-family:'Yellowtail',cursive;color:#fff;font-size:56px;line-height:1;letter-spacing:.5px;}
+.kashi-wordmark{font-family:'Yellowtail',cursive;color:#fff;font-size:56px;line-height:1;letter-spacing:.5px;}
 .auth-landing-sub{font-size:14px;color:var(--auth-text2);font-weight:500;margin-top:10px;text-align:center;}
 .auth-landing-actions{padding:8px 28px calc(28px + env(safe-area-inset-bottom));display:flex;flex-direction:column;gap:12px;flex-shrink:0;}
 .auth-pill-btn{width:100%;background:#fff;color:#0B0C10;border-radius:999px;padding:15px 0;font-size:15px;font-weight:800;text-align:center;}
@@ -790,7 +791,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
   <!-- STEP: Landing -->
   <div class="auth-step active" id="auth-step-landing">
     <div class="auth-landing-body">
-      <div class="kashish-wordmark">Kashish</div>
+      <div class="kashi-wordmark">Kashi</div>
       <div class="auth-landing-sub">Your everyday AI companion.<br>Chat, talk, or just hang out.</div>
     </div>
     <div class="auth-landing-actions">
@@ -885,7 +886,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
   <div class="screen" id="screen-home">
     <div class="topbar-home">
       <div style="display:flex;align-items:center;gap:8px;min-width:0;">
-        <button class="pill-select" onclick="toggleHomeMenu()">Kashish <i class="ph-bold ph-caret-down"></i></button>
+        <button class="pill-select" onclick="toggleHomeMenu()">Kashi <i class="ph-bold ph-caret-down"></i></button>
         <button class="pill-select" id="home-upgrade-pill" style="background:linear-gradient(160deg,#2b2b30 0%,var(--black) 55%,#0d0d0f 100%);color:#fff;" onclick="showScreen('screen-upgrade')">
           <i class="ph-fill ph-sparkle" id="home-upgrade-pill-icon" style="color:#FFD65A;"></i> <span id="home-upgrade-pill-label">Upgrade</span>
         </button>
@@ -904,7 +905,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
       <div class="cards-grid">
         <button class="gcard tall" onclick="goChat()">
           <div class="top-row"><div class="ic"><i class="ph ph-chat-circle-text"></i></div><span class="go"><i class="ph-bold ph-arrow-up-right"></i></span></div>
-          <div class="lbl">Chat<br>with Kashish</div>
+          <div class="lbl">Chat<br>with Kashi</div>
         </button>
         <button class="gcard" onclick="openVoicePanel()">
           <div class="top-row"><div class="ic"><i class="ph ph-waveform"></i></div><span class="go"><i class="ph-bold ph-arrow-up-right"></i></span></div>
@@ -952,7 +953,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
   <div class="screen hidden" id="screen-chat">
     <div class="chat-topbar">
       <button class="circle-btn" onclick="goHome()"><i class="ph-bold ph-arrow-left"></i></button>
-      <div class="chat-title">Kashish</div>
+      <div class="chat-title">Kashi</div>
       <button class="circle-btn" onclick="chatMenu()"><i class="ph-bold ph-dots-three"></i></button>
     </div>
     <div class="chat-scroll" id="chat-scroll"></div>
@@ -988,7 +989,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
         <div style="width:38px;flex-shrink:0;"></div>
       </div>
       <div class="model-sheet-list" id="model-sheet-list"></div>
-      <div class="model-sheet-note">Kashe 3 aur Kashe 4 zyada gehri, detailed answers dete hain — free plan par yeh zyada credits use karte hain (upar list mein saaf dikhaya gaya hai), ya Kashish Pro mein unlimited included hain.</div>
+      <div class="model-sheet-note">Kashe 3 and Kashe 4 give deeper, more detailed answers — on the free plan they use more credits (clearly shown in the list above), or they're included unlimited in Kashi Pro.</div>
       <div class="model-sheet-effort-row">
         <div class="model-sheet-effort-label">Effort</div>
         <div class="effort-toggle" id="effort-toggle"></div>
@@ -1000,7 +1001,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
   <div class="screen hidden" id="screen-voice">
     <div class="voice-topbar">
       <button class="circle-btn" onclick="closeVoicePanel()"><i class="ph-bold ph-arrow-left"></i></button>
-      <div class="chat-title">Speaking to Kashish</div>
+      <div class="chat-title">Speaking to Kashi</div>
       <button class="circle-btn" onclick="chatMenu()"><i class="ph-bold ph-dots-three"></i></button>
     </div>
     <div class="voice-body">
@@ -1062,7 +1063,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
             <span class="go"><i class="ph-bold ph-caret-right"></i></span>
           </button>
         </div>
-        <div class="legal-brand-note">Kashish is a product by Nexor Sparks.</div>
+        <div class="legal-brand-note">Kashi is a product by Nexor Sparks.</div>
       </div>
 
       <button class="profile-logout-btn" onclick="confirmLogout()"><i class="ph-bold ph-sign-out"></i> Log out</button>
@@ -1308,7 +1309,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
       <div class="settings-list">
         <div class="settings-row">
           <span class="ic"><i class="ph-bold ph-chat-circle-dots"></i></span>
-          <div class="body"><div class="lbl">Chat notifications</div><div class="sub">Get notified when Kashish replies while you're away</div></div>
+          <div class="body"><div class="lbl">Chat notifications</div><div class="sub">Get notified when Kashi replies while you're away</div></div>
           <button class="tswitch" id="sw-notifchat" onclick="toggleSetting('notifChat','sw-notifchat')"></button>
         </div>
         <div class="settings-row">
@@ -1332,7 +1333,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
       <div class="settings-list">
         <div class="settings-row">
           <span class="ic"><i class="ph-bold ph-paper-plane-tilt"></i></span>
-          <div class="body"><div class="lbl">Hands-free voice chat</div><div class="sub">Auto-send after you stop talking, and keep the conversation going — Kashish replies out loud, then listens again</div></div>
+          <div class="body"><div class="lbl">Hands-free voice chat</div><div class="sub">Auto-send after you stop talking, and keep the conversation going — Kashi replies out loud, then listens again</div></div>
           <button class="tswitch" id="sw-voiceautosend" onclick="toggleSetting('voiceAutoSend','sw-voiceautosend')"></button>
         </div>
         <div class="settings-row">
@@ -1390,7 +1391,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
         </div>
         <div class="settings-row" style="align-items:flex-start;">
           <span class="ic"><i class="ph-bold ph-info"></i></span>
-          <div class="body"><div class="lbl">How it works</div><div class="sub">Ask Kashish for a movie suggestion in chat — she'll show poster cards. Tap a card and it opens the streaming app/site (Netflix, Prime Video, etc.) where that title is actually available in your region.</div></div>
+          <div class="body"><div class="lbl">How it works</div><div class="sub">Ask Kashi for a movie suggestion in chat — she'll show poster cards. Tap a card and it opens the streaming app/site (Netflix, Prime Video, etc.) where that title is actually available in your region.</div></div>
         </div>
       </div>
     </div>
@@ -1416,7 +1417,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
         </div>
         <div class="settings-row" style="align-items:flex-start;">
           <span class="ic"><i class="ph-bold ph-info"></i></span>
-          <div class="body"><div class="lbl">How it works</div><div class="sub">Ask Kashish for a hotel in chat — e.g. "Delhi mein 3000 budget mein hotel dikhao". She'll show tappable hotel cards with a photo, name, rating and price. Sign up free at developers.amadeus.com → Self-Service → create an app to get your Client ID &amp; Secret (no card needed, generous free test quota).</div></div>
+          <div class="body"><div class="lbl">How it works</div><div class="sub">Ask Kashi for a hotel in chat — e.g. "show me a hotel in Delhi under a 3000 budget". She'll show tappable hotel cards with a photo, name, rating and price. Sign up free at developers.amadeus.com → Self-Service → create an app to get your Client ID &amp; Secret (no card needed, generous free test quota).</div></div>
         </div>
       </div>
     </div>
@@ -1434,19 +1435,19 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
       <div class="settings-list">
         <div class="settings-row">
           <span class="ic"><i class="ph-bold ph-fingerprint"></i></span>
-          <div class="body"><div class="lbl">Personalize automatically</div><div class="sub">Kashish quietly picks up things you mention naturally (likes, work, where you're from) and uses them later — no need to say "remember this"</div></div>
+          <div class="body"><div class="lbl">Personalize automatically</div><div class="sub">Kashi quietly picks up things you mention naturally (likes, work, where you're from) and uses them later — no need to say "remember this"</div></div>
           <button class="tswitch" id="sw-personalize" onclick="toggleSetting('personalize','sw-personalize')"></button>
         </div>
       </div>
       <div class="settings-section" style="margin-top:16px;">
-        <div class="settings-section-title">What Kashish has learned</div>
+        <div class="settings-section-title">What Kashi has learned</div>
         <div class="settings-list" id="personalization-list"></div>
-        <div class="recent-empty hidden" id="personalization-empty">Kashish hasn't picked up anything about you yet — just chat normally and it'll fill in here.</div>
+        <div class="recent-empty hidden" id="personalization-empty">Kashi hasn't picked up anything about you yet — just chat normally and it'll fill in here.</div>
       </div>
       <div class="settings-list" style="margin-top:16px;">
         <button class="settings-row" onclick="clearAllMemories()">
           <span class="ic" style="background:linear-gradient(155deg,#ffe6e4,#ffd2ce);color:#E0483E;"><i class="ph-bold ph-trash"></i></span>
-          <div class="body"><div class="lbl" style="color:#E0483E;">Clear everything Kashish knows about you</div></div>
+          <div class="body"><div class="lbl" style="color:#E0483E;">Clear everything Kashi knows about you</div></div>
         </button>
       </div>
     </div>
@@ -1464,7 +1465,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
       <div class="settings-list">
         <div class="settings-row">
           <span class="ic"><i class="ph-bold ph-brain"></i></span>
-          <div class="body"><div class="lbl">Enable memory</div><div class="sub">Let Kashish remember things about you and use them to personalize replies</div></div>
+          <div class="body"><div class="lbl">Enable memory</div><div class="sub">Let Kashi remember things about you and use them to personalize replies</div></div>
           <button class="tswitch" id="sw-memoryenabled" onclick="toggleSetting('personalize','sw-memoryenabled')"></button>
         </div>
       </div>
@@ -1472,7 +1473,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
       <div class="settings-section" style="margin-top:16px;">
         <div class="settings-section-title">Memory summary</div>
         <div class="settings-list" id="memory-summary-list"></div>
-        <div class="recent-empty hidden" id="memory-summary-empty">Kashish hasn't picked up anything about you yet — just chat normally and it'll fill in here.</div>
+        <div class="recent-empty hidden" id="memory-summary-empty">Kashi hasn't picked up anything about you yet — just chat normally and it'll fill in here.</div>
       </div>
 
       <div class="settings-section" style="margin-top:16px;">
@@ -1496,7 +1497,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
       <div class="settings-list" style="margin-top:16px;">
         <button class="settings-row" onclick="clearAllMemories()">
           <span class="ic" style="background:linear-gradient(155deg,#ffe6e4,#ffd2ce);color:#E0483E;"><i class="ph-bold ph-trash"></i></span>
-          <div class="body"><div class="lbl" style="color:#E0483E;">Clear everything Kashish knows about you</div></div>
+          <div class="body"><div class="lbl" style="color:#E0483E;">Clear everything Kashi knows about you</div></div>
         </button>
       </div>
     </div>
@@ -1514,7 +1515,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
       <div class="settings-list">
         <div class="settings-row">
           <span class="ic"><i class="ph-bold ph-graduation-cap"></i></span>
-          <div class="body"><div class="lbl">Improve model for everyone</div><div class="sub">Allow your chats to help improve Kashish for you and other users</div></div>
+          <div class="body"><div class="lbl">Improve model for everyone</div><div class="sub">Allow your chats to help improve Kashi for you and other users</div></div>
           <button class="tswitch" id="sw-improvemodel" onclick="toggleSetting('improveModel','sw-improvemodel')"></button>
         </div>
       </div>
@@ -1524,7 +1525,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
         <div class="settings-list">
           <div class="settings-row">
             <span class="ic"><i class="ph-bold ph-map-pin"></i></span>
-            <div class="body"><div class="lbl">Location services</div><div class="sub">Lets Kashish give locally relevant answers, like weather or nearby suggestions</div></div>
+            <div class="body"><div class="lbl">Location services</div><div class="sub">Lets Kashi give locally relevant answers, like weather or nearby suggestions</div></div>
             <button class="tswitch" id="sw-location" onclick="toggleLocationServices()"></button>
           </div>
         </div>
@@ -1533,7 +1534,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
       <div class="settings-section" style="margin-top:16px;">
         <div class="settings-section-title">Chat history</div>
         <div class="settings-list">
-          <button class="settings-row" onclick="exportKashishData()">
+          <button class="settings-row" onclick="exportKashiData()">
             <span class="ic"><i class="ph-bold ph-download-simple"></i></span>
             <div class="body"><div class="lbl">Export data</div><div class="sub">Download your settings, memory, and lists as a file</div></div>
             <span class="go"><i class="ph-bold ph-caret-right"></i></span>
@@ -1615,13 +1616,13 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
       </div>
       <div class="settings-section" style="margin-top:16px;">
         <div class="settings-list" id="reminders-list-items"></div>
-        <div class="recent-empty hidden" id="reminders-list-empty">No reminders yet — add one above and Kashish will nudge you when it's time.</div>
+        <div class="recent-empty hidden" id="reminders-list-empty">No reminders yet — add one above and Kashi will nudge you when it's time.</div>
       </div>
     </div>
     <div class="home-indicator"></div>
   </div>
 
-  <!-- ============ UPGRADE / KASHISH PRO PLAN ============ -->
+  <!-- ============ UPGRADE / KASHI PRO PLAN ============ -->
   <div class="screen hidden" id="screen-upgrade">
     <div class="chat-topbar" style="background:transparent;border-bottom:none;box-shadow:none;">
       <span style="width:38px"></span>
@@ -1630,7 +1631,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
     </div>
     <div class="settings-scroll" style="text-align:center;">
       <div style="font-size:42px;color:var(--accent);margin:2px 0 6px;"><i class="ph-fill ph-sparkle"></i></div>
-      <div style="font-size:27px;font-weight:800;color:var(--ink);margin-bottom:6px;">Get Kashish Pro</div>
+      <div style="font-size:27px;font-weight:800;color:var(--ink);margin-bottom:6px;">Get Kashi Pro</div>
       <div style="font-size:14px;color:var(--ink-soft);margin-bottom:22px;">Do more with K12-pro intelligence</div>
 
       <div class="settings-list" style="text-align:left;">
@@ -1686,9 +1687,9 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
 
 <script>
 // ============================================================
-// KASHISH — a standalone, general-purpose AI companion.
+// KASHI — a standalone, general-purpose AI companion.
 // Not affiliated with, restricted to, or built for any single
-// company's help/support desk. Kashish chats normally, helps
+// company's help/support desk. Kashi chats normally, helps
 // with everyday tasks, and talks about whatever the person wants.
 // Same 3-step provider fallback chain (Groq -> Gemini -> Cloudflare
 // Workers AI) as the underlying model plumbing; UI redesigned to
@@ -1702,7 +1703,7 @@ const CFAI_PROXY_ENDPOINT = 'https://sparky-cfai.sgursharn076.workers.dev';
 const CFAI_MODEL = '@cf/meta/llama-3.3-70b-instruct-fp8-fast';
 
 /* ============================================================
-   LIVE WEB SEARCH — gives Kashish access to current/real-time
+   LIVE WEB SEARCH — gives Kashi access to current/real-time
    information (news, scores, prices, "who is", weather, etc.)
    that the LLM's own training data can't know about.
    Serper.dev is tried first (fast, simple JSON API); if it
@@ -1725,7 +1726,7 @@ const GOOGLE_CSE_ID = '951c20955565e4914';
 const GOOGLE_API_KEY = GOOGLE_CSE_API_KEY;
 
 /* ============================================================
-   AUTH — shared Firebase project. Logging into Kashish signs into
+   AUTH — shared Firebase project. Logging into Kashi signs into
    the SAME account system used elsewhere, so a user's login here
    is the same account (and password) as on the other app.
    ============================================================ */
@@ -1765,8 +1766,8 @@ const ACCENT_PALETTES = {
 };
 let appSettings = {...SETTINGS_DEFAULTS};
 
-/* ---------------- Kashish model tiers ---------------- */
-// Kashish's own model picker, shown in the chat input. These are Kashish's
+/* ---------------- Kashi model tiers ---------------- */
+// Kashi's own model picker, shown in the chat input. These are Kashi's
 // own tiers (NOT any third-party model's name/branding) layered on top of
 // the same Groq/Gemini/Cloudflare backends already wired up elsewhere —
 // a higher tier means a bigger answer budget (maxTokens), a provider order
@@ -1852,7 +1853,7 @@ function selectModelTier(id){
   if(tier.pro && !isProUser()){
     triggerHaptic();
     closeModelSheet();
-    showKashishToast(`${tier.name} Kashish Pro ka feature hai`);
+    showKashiToast(`${tier.name} is a Kashi Pro feature`);
     showScreen('screen-upgrade');
     return;
   }
@@ -1871,7 +1872,7 @@ function setModelEffort(level){
   triggerHaptic();
 }
 
-/* ---------------- Kashish Pro (K12-pro) plan gating ---------------- */
+/* ---------------- Kashi Pro (K12-pro) plan gating ---------------- */
 // Pro-only for now: custom accent colors (unless the account already had a
 // non-default accent before this rollout — those stay grandfathered in for
 // free) and HTML/website code generation. This is a UI-level paywall only —
@@ -1917,7 +1918,7 @@ function checkFreeQuota(storageKey, limit){
   saveUsageWindow(storageKey, usage);
   return {allowed:true};
 }
-function checkImageQuota(){ return checkFreeQuota('kashishFreeImageUsage', FREE_IMAGE_LIMIT); }
+function checkImageQuota(){ return checkFreeQuota('kashiFreeImageUsage', FREE_IMAGE_LIMIT); }
 
 // --- Free-plan CREDIT system for questions/queries: 100 credits per
 // rolling 24-hour window ("per day"), instead of a flat per-message count.
@@ -1932,7 +1933,7 @@ const FREE_DAILY_CREDITS = 100;
 const CREDIT_CHARS_PER_CREDIT = 200; // ~1 credit per 200 characters of reply
 function getCreditUsage(){
   let raw = null;
-  try{ raw = JSON.parse(localStorage.getItem('kashishFreeCreditUsage')||'null'); }catch(e){}
+  try{ raw = JSON.parse(localStorage.getItem('kashiFreeCreditUsage')||'null'); }catch(e){}
   const now = Date.now();
   if(!raw || typeof raw.windowStart !== 'number' || typeof raw.creditsUsed !== 'number' || (now - raw.windowStart) >= FREE_CREDIT_WINDOW_MS){
     return {creditsUsed:0, windowStart: now};
@@ -1940,7 +1941,7 @@ function getCreditUsage(){
   return raw;
 }
 function saveCreditUsage(usage){
-  try{ localStorage.setItem('kashishFreeCreditUsage', JSON.stringify(usage)); }catch(e){}
+  try{ localStorage.setItem('kashiFreeCreditUsage', JSON.stringify(usage)); }catch(e){}
 }
 function creditsRemainingToday(){
   if(isProUser()) return Infinity;
@@ -1982,8 +1983,8 @@ function updateUpgradePill(){
 function attemptUpgradePurchase(){
   triggerHaptic();
   const sub = document.getElementById('upgrade-error-sub');
-  if(sub) sub.textContent = 'Aapki profile par abhi yeh upgradation available nahin hai — thodi der baad dobara try karo.';
-  showKashishToast('Upgrade abhi available nahin hai is profile par');
+  if(sub) sub.textContent = 'This upgrade isn\'t available on your profile right now — please try again later.';
+  showKashiToast('Upgrade isn\'t available on this profile right now');
 }
 
 function applySettings(){
@@ -2090,11 +2091,11 @@ async function testElevenVoice(){
   const sub = document.getElementById('el-test-sub');
   if(!appSettings.elevenLabsApiKey){
     if(sub) sub.textContent = 'Add an API key above first';
-    showKashishToast('Paste your ElevenLabs API key first');
+    showKashiToast('Paste your ElevenLabs API key first');
     return;
   }
   if(sub) sub.textContent = 'Loading sample...';
-  const ok = await speakWithElevenLabs("Hi, I'm Kashish — this is what I'll sound like.", ()=>{
+  const ok = await speakWithElevenLabs("Hi, I'm Kashi — this is what I'll sound like.", ()=>{
     if(sub) sub.textContent = 'Playing...';
   }, ()=>{
     if(sub) sub.textContent = 'Plays a short sample with the settings above';
@@ -2135,7 +2136,7 @@ function setAccentColor(name){
   if(!ACCENT_PALETTES[name]) return;
   if(name!==appSettings.accentColor && !canUseCustomAccent()){
     triggerHaptic();
-    showKashishToast('Accent colors ab Kashish Pro (K12-pro) ka feature hai');
+    showKashiToast('Accent colors are now a Kashi Pro (K12-pro) feature');
     renderSettingsUI();
     showScreen('screen-upgrade');
     return;
@@ -2155,7 +2156,7 @@ function toggleLocationServices(){
   triggerHaptic();
   if(!appSettings.locationEnabled){
     if(!navigator.geolocation){
-      showKashishToast('Location not supported on this device');
+      showKashiToast('Location not supported on this device');
       return;
     }
     navigator.geolocation.getCurrentPosition(function(pos){
@@ -2164,9 +2165,9 @@ function toggleLocationServices(){
       appSettings.lastLng = pos.coords.longitude;
       renderSettingsUI();
       saveSettings();
-      showKashishToast('Location access enabled');
+      showKashiToast('Location access enabled');
     }, function(){
-      showKashishToast("Couldn't get your location — check permission and try again");
+      showKashiToast("Couldn't get your location — check permission and try again");
     });
   } else {
     appSettings.locationEnabled = false;
@@ -2176,7 +2177,7 @@ function toggleLocationServices(){
     saveSettings();
   }
 }
-function exportKashishData(){
+function exportKashiData(){
   const data = {
     exportedAt: new Date().toISOString(),
     settings: appSettings,
@@ -2191,14 +2192,14 @@ function exportKashishData(){
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'kashish-data-export.json';
+    a.download = 'kashi-data-export.json';
     document.body.appendChild(a);
     a.click();
     a.remove();
     setTimeout(()=>URL.revokeObjectURL(url), 2000);
-    showKashishToast('Your data has been exported');
+    showKashiToast('Your data has been exported');
   }catch(e){
-    showKashishToast("Couldn't export data on this device");
+    showKashiToast("Couldn't export data on this device");
   }
 }
 function confirmDeleteAllChats(){
@@ -2207,18 +2208,18 @@ function confirmDeleteAllChats(){
   saveSessions([]);
   currentSessionId = null;
   try{ renderHome(); }catch(e){}
-  showKashishToast('All chats deleted');
+  showKashiToast('All chats deleted');
 }
 function confirmDeleteAccount(){
   if(!confirm('This will permanently delete your account and all associated data. This cannot be undone. Continue?')) return;
   const user = firebase.auth().currentUser;
-  if(!user){ showKashishToast('You need to be signed in to delete your account'); return; }
+  if(!user){ showKashiToast('You need to be signed in to delete your account'); return; }
   const uid = user.uid;
   db.ref('users/'+uid).remove().catch(()=>{}).then(()=>{
     user.delete().then(()=>{
-      showKashishToast('Account deleted');
+      showKashiToast('Account deleted');
     }).catch(()=>{
-      showKashishToast('Please sign in again and retry to delete your account');
+      showKashiToast('Please sign in again and retry to delete your account');
     });
   });
 }
@@ -2254,7 +2255,7 @@ function playNotifSound(){
 }
 function notifyNewBotMessage(text){
   if(document.hidden && appSettings.notifChat && 'Notification' in window && Notification.permission==='granted'){
-    try{ new Notification('Kashish', { body: truncate(text,90) }); }catch(e){}
+    try{ new Notification('Kashi', { body: truncate(text,90) }); }catch(e){}
   }
   if(appSettings.notifSound) playNotifSound();
 }
@@ -2403,7 +2404,7 @@ async function doRegister(){
         createdAt: firebase.database.ServerValue.TIMESTAMP,
         onboardingComplete:false,
         referralCode: handle.toUpperCase(),
-        createdVia:'kashish'
+        createdVia:'kashi'
       });
     }catch(profileErr){
       await handleRef.remove().catch(()=>{});
@@ -2417,7 +2418,7 @@ async function doRegister(){
 }
 function confirmLogout(){
   if(!userCtx) return;
-  if(confirm('Log out of Kashish'+(firstName()?(' as '+firstName()):'')+'?')) doLogout();
+  if(confirm('Log out of Kashi'+(firstName()?(' as '+firstName()):'')+'?')) doLogout();
 }
 function doLogout(){ auth.signOut(); }
 
@@ -2428,14 +2429,14 @@ const LEGAL_DOCS = {
     updated:'Last updated — August 2026',
     html:`
       <h4>1. Introduction</h4>
-      <p>This Privacy Policy explains how Nexor Sparks ("we", "us", "our") collects, uses, shares, and protects your information when you use Kashish (the "App"). By creating an account or using the App, you agree to the practices described here. If you don't agree, please don't use the App.</p>
+      <p>This Privacy Policy explains how Nexor Sparks ("we", "us", "our") collects, uses, shares, and protects your information when you use Kashi (the "App"). By creating an account or using the App, you agree to the practices described here. If you don't agree, please don't use the App.</p>
 
       <h4>2. Information we collect</h4>
       <p><strong>a) Information you give us</strong></p>
       <ul>
         <li>Account information — name, chosen handle, email or phone used to sign in, and date of birth (used to confirm you meet our minimum age requirement).</li>
         <li>Profile information — profile photo, display name, and any other details you choose to add.</li>
-        <li>Content you create — messages, voice interactions, and any images you generate or upload while chatting with Kashish.</li>
+        <li>Content you create — messages, voice interactions, and any images you generate or upload while chatting with Kashi.</li>
       </ul>
       <p><strong>b) Information collected automatically</strong></p>
       <ul>
@@ -2449,7 +2450,7 @@ const LEGAL_DOCS = {
       <h4>3. How we use your information</h4>
       <ul>
         <li>To create and maintain your account, and keep you signed in across sessions.</li>
-        <li>To let Kashish remember conversation history and context so replies feel personal and continuous.</li>
+        <li>To let Kashi remember conversation history and context so replies feel personal and continuous.</li>
         <li>To operate core features, including text chat, voice, and image generation.</li>
         <li>To detect, prevent, and respond to abuse, fraud, security incidents, and violations of our Terms or Community Guidelines.</li>
         <li>To fix bugs, improve reliability, and understand how the App is used so we can improve it.</li>
@@ -2458,7 +2459,7 @@ const LEGAL_DOCS = {
       </ul>
 
       <h4>4. How your data is processed</h4>
-      <p>Your messages are sent to the AI systems that power Kashish's responses, along with recent conversation history, so the app can generate a relevant reply. This processing happens through infrastructure operated by Nexor Sparks and its service providers.</p>
+      <p>Your messages are sent to the AI systems that power Kashi's responses, along with recent conversation history, so the app can generate a relevant reply. This processing happens through infrastructure operated by Nexor Sparks and its service providers.</p>
 
       <h4>5. Sharing of information</h4>
       <p>We do not sell your personal information. We share information only in these situations:</p>
@@ -2470,13 +2471,13 @@ const LEGAL_DOCS = {
       </ul>
 
       <h4>6. Data retention</h4>
-      <p>We retain your account information and conversation history for as long as your account is active, so Kashish can maintain context and history. If you delete your account, we delete or anonymize your personal data within a reasonable period, except where we're required to retain certain data for legal, security, or fraud-prevention purposes.</p>
+      <p>We retain your account information and conversation history for as long as your account is active, so Kashi can maintain context and history. If you delete your account, we delete or anonymize your personal data within a reasonable period, except where we're required to retain certain data for legal, security, or fraud-prevention purposes.</p>
 
       <h4>7. Data security</h4>
       <p>We use reasonable technical and organizational measures — including authentication and access controls — to protect your information. No method of transmission or storage is completely secure, so we can't guarantee absolute security.</p>
 
       <h4>8. Children and minors</h4>
-      <p>Kashish is not intended for children under the minimum age required in their region. We do not knowingly collect personal information from children below that age. If we learn that we have, we will take steps to delete it.</p>
+      <p>Kashi is not intended for children under the minimum age required in their region. We do not knowingly collect personal information from children below that age. If we learn that we have, we will take steps to delete it.</p>
 
       <h4>9. Your rights and choices</h4>
       <ul>
@@ -2500,7 +2501,7 @@ const LEGAL_DOCS = {
     updated:'Last updated — August 2026',
     html:`
       <h4>1. Acceptance of terms</h4>
-      <p>These Terms of Service ("Terms") form an agreement between you and Nexor Sparks governing your use of Kashish (the "App"). By creating an account or using the App, you agree to be bound by these Terms. If you don't agree, please don't use the App.</p>
+      <p>These Terms of Service ("Terms") form an agreement between you and Nexor Sparks governing your use of Kashi (the "App"). By creating an account or using the App, you agree to be bound by these Terms. If you don't agree, please don't use the App.</p>
 
       <h4>2. Eligibility</h4>
       <p>You must meet the minimum age required by the laws of your region to create an account. If you're under the age of majority where you live, you may only use the App with the involvement of a parent or legal guardian, where required by local law. By creating an account, you confirm that the information you provide, including your date of birth, is accurate.</p>
@@ -2513,10 +2514,10 @@ const LEGAL_DOCS = {
       </ul>
 
       <h4>4. Nature of the service</h4>
-      <p>Kashish is an AI companion app. Responses are generated by artificial intelligence and are not from a human being. Kashish's replies may sometimes be inaccurate, incomplete, or inappropriate — you should use your own judgment and not rely on Kashish for medical, legal, financial, or other professional advice.</p>
+      <p>Kashi is an AI companion app. Responses are generated by artificial intelligence and are not from a human being. Kashi's replies may sometimes be inaccurate, incomplete, or inappropriate — you should use your own judgment and not rely on Kashi for medical, legal, financial, or other professional advice.</p>
 
       <h4>5. Acceptable use</h4>
-      <p>When using Kashish, you agree not to:</p>
+      <p>When using Kashi, you agree not to:</p>
       <ul>
         <li>Harass, threaten, defame, or harm any person.</li>
         <li>Attempt to generate content that sexualizes or endangers minors, in any form.</li>
@@ -2528,16 +2529,16 @@ const LEGAL_DOCS = {
       </ul>
 
       <h4>6. Your content</h4>
-      <p>You retain ownership of the messages and content you submit to Kashish ("Your Content"). By submitting Your Content, you grant Nexor Sparks a worldwide, non-exclusive, royalty-free license to use, store, process, and display Your Content solely to operate, maintain, and improve the App. You're responsible for ensuring you have the rights to anything you submit.</p>
+      <p>You retain ownership of the messages and content you submit to Kashi ("Your Content"). By submitting Your Content, you grant Nexor Sparks a worldwide, non-exclusive, royalty-free license to use, store, process, and display Your Content solely to operate, maintain, and improve the App. You're responsible for ensuring you have the rights to anything you submit.</p>
 
       <h4>7. AI-generated content</h4>
-      <p>Content generated by Kashish (text, voice, or images) is provided for personal, non-commercial use unless we state otherwise. We don't guarantee that AI-generated content is accurate, original, or free of errors. You should independently verify anything important before relying on it.</p>
+      <p>Content generated by Kashi (text, voice, or images) is provided for personal, non-commercial use unless we state otherwise. We don't guarantee that AI-generated content is accurate, original, or free of errors. You should independently verify anything important before relying on it.</p>
 
       <h4>8. Intellectual property</h4>
-      <p>The Kashish name, branding, design, and underlying software are the property of Nexor Sparks and its licensors. Nothing in these Terms grants you any right to use Nexor Sparks' trademarks or branding without prior written permission.</p>
+      <p>The Kashi name, branding, design, and underlying software are the property of Nexor Sparks and its licensors. Nothing in these Terms grants you any right to use Nexor Sparks' trademarks or branding without prior written permission.</p>
 
       <h4>9. Third-party services</h4>
-      <p>Kashish relies on third-party infrastructure (such as authentication, database, and AI-processing providers) to operate. Your use of the App is also subject to the applicable terms of those providers where relevant.</p>
+      <p>Kashi relies on third-party infrastructure (such as authentication, database, and AI-processing providers) to operate. Your use of the App is also subject to the applicable terms of those providers where relevant.</p>
 
       <h4>10. Disclaimers</h4>
       <p>The App is provided "as is" and "as available," without warranties of any kind, whether express or implied, including warranties of merchantability, fitness for a particular purpose, or non-infringement. We don't warrant that the App will be uninterrupted, error-free, or completely secure.</p>
@@ -2563,7 +2564,7 @@ const LEGAL_DOCS = {
     updated:'Last updated — August 2026',
     html:`
       <h4>Our goal</h4>
-      <p>Kashish, from Nexor Sparks, is meant to be a safe, respectful, and genuinely helpful space to talk, vent, learn, or just hang out. These guidelines apply to everything you send to or through Kashish, and exist to keep that space safe for everyone.</p>
+      <p>Kashi, from Nexor Sparks, is meant to be a safe, respectful, and genuinely helpful space to talk, vent, learn, or just hang out. These guidelines apply to everything you send to or through Kashi, and exist to keep that space safe for everyone.</p>
 
       <h4>1. Be respectful</h4>
       <ul>
@@ -2577,24 +2578,24 @@ const LEGAL_DOCS = {
         <li>Zero tolerance for any content that sexualizes, exploits, or endangers minors, in any form — this includes text, roleplay, or generated images.</li>
         <li>No content that promotes, glorifies, or provides instructions for self-harm, suicide, or violence.</li>
         <li>No promotion of illegal activity, dangerous behavior, or the creation of weapons, drugs, or other harmful substances.</li>
-        <li>If you're struggling, please reach out to a crisis helpline or trusted professional in your area — Kashish is not a substitute for professional support.</li>
+        <li>If you're struggling, please reach out to a crisis helpline or trusted professional in your area — Kashi is not a substitute for professional support.</li>
       </ul>
 
       <h4>3. Respect privacy</h4>
       <ul>
         <li>Don't share someone else's private or identifying information without their consent (doxxing).</li>
-        <li>Don't use Kashish to stalk, track, or surveil another person.</li>
+        <li>Don't use Kashi to stalk, track, or surveil another person.</li>
       </ul>
 
       <h4>4. Be honest</h4>
       <ul>
-        <li>Don't use Kashish to impersonate real people, including public figures, without clear indication that it's fictional.</li>
-        <li>Don't use Kashish to generate or spread deliberate misinformation, or to manipulate or deceive others.</li>
+        <li>Don't use Kashi to impersonate real people, including public figures, without clear indication that it's fictional.</li>
+        <li>Don't use Kashi to generate or spread deliberate misinformation, or to manipulate or deceive others.</li>
         <li>Don't misrepresent AI-generated content as being from a real human being when it could mislead someone.</li>
       </ul>
 
       <h4>5. Respect intellectual property</h4>
-      <p>Don't use Kashish to infringe on others' copyrights, trademarks, or other intellectual property rights.</p>
+      <p>Don't use Kashi to infringe on others' copyrights, trademarks, or other intellectual property rights.</p>
 
       <h4>6. Enforcement</h4>
       <p>Violating these guidelines may lead to a warning, temporary restriction of features, or permanent suspension of your account, depending on the severity and frequency of the violation, at the discretion of Nexor Sparks. We may also be required to report certain illegal content, such as content involving child exploitation, to relevant authorities.</p>
@@ -2610,9 +2611,9 @@ const LEGAL_DOCS = {
     title:'Software & Platform Credits',
     updated:'Last updated — August 2026',
     html:`
-      <p>Kashish is built with the help of the following software, assets, and platform services. We're grateful to these projects and their contributors.</p>
+      <p>Kashi is built with the help of the following software, assets, and platform services. We're grateful to these projects and their contributors.</p>
       <h4>Nexor Sparks</h4>
-      <p>© Nexor Sparks. Kashish is a product by Nexor Sparks and shares its account system — signing in to Kashish uses the same Nexor Sparks account as the rest of the platform. Use of Kashish is also subject to the Nexor Sparks Terms of Service and Privacy Policy where applicable.</p>
+      <p>© Nexor Sparks. Kashi is a product by Nexor Sparks and shares its account system — signing in to Kashi uses the same Nexor Sparks account as the rest of the platform. Use of Kashi is also subject to the Nexor Sparks Terms of Service and Privacy Policy where applicable.</p>
       <h4>Firebase (App, Auth, Database SDKs)</h4>
       <p>© Google LLC. Licensed under the Apache License, Version 2.0. Used for account sign-in and data storage.</p>
       <h4>Phosphor Icons</h4>
@@ -2622,7 +2623,7 @@ const LEGAL_DOCS = {
       <h4>Yellowtail</h4>
       <p>© The Yellowtail Project Authors. Licensed under the SIL Open Font License, Version 1.1. Used as a decorative accent typeface, served via Google Fonts.</p>
       <h4>A note on licenses</h4>
-      <p>Each project and service above is distributed under its own license or terms, independent of Kashish's own Terms of Service. Full license texts are available from the respective project sources.</p>
+      <p>Each project and service above is distributed under its own license or terms, independent of Kashi's own Terms of Service. Full license texts are available from the respective project sources.</p>
     `
   }
 };
@@ -2701,7 +2702,7 @@ function onProfilePhotoPicked(evt){
 }
 
 // Gates the whole app behind sign-in. On sign-in, loads the shared profile
-// (so Kashish greets people by their real name) and reveals the app;
+// (so Kashi greets people by their real name) and reveals the app;
 // on sign-out, locks the app again and shows the auth screen.
 auth.onAuthStateChanged(async (user)=>{
   const authScreen=document.getElementById('auth-screen');
@@ -2735,8 +2736,8 @@ auth.onAuthStateChanged(async (user)=>{
 });
 
 /* ---------------- session storage ---------------- */
-function loadSessions(){ try{ return JSON.parse(localStorage.getItem('kashishSessions')||'[]'); }catch(e){ return []; } }
-function saveSessions(list){ try{ localStorage.setItem('kashishSessions', JSON.stringify(list)); }catch(e){} }
+function loadSessions(){ try{ return JSON.parse(localStorage.getItem('kashiSessions')||'[]'); }catch(e){ return []; } }
+function saveSessions(list){ try{ localStorage.setItem('kashiSessions', JSON.stringify(list)); }catch(e){} }
 let sessions = loadSessions();
 let currentSessionId = null;
 
@@ -2816,7 +2817,7 @@ function renderChatSearchResults(query){
   const q = (query||'').trim().toLowerCase();
   list.innerHTML = '';
   if(!q){
-    list.innerHTML = '<div class="recent-empty">Kisi bhi purani chat mein jo baat hui thi, uska koi bhi word type karo — us conversation tak seedha pahunch jaoge.</div>';
+    list.innerHTML = '<div class="recent-empty">Type any word from something you talked about in an old chat — you will jump straight to that conversation.</div>';
     return;
   }
   const matches = [];
@@ -2833,7 +2834,7 @@ function renderChatSearchResults(query){
   });
   matches.sort((a,b)=> (b.hitTs||0)-(a.hitTs||0));
   if(!matches.length){
-    list.innerHTML = `<div class="recent-empty">"${escapeHtml(query)}" se koi match nahi mila.</div>`;
+    list.innerHTML = `<div class="recent-empty">No matches found for "${escapeHtml(query)}".</div>`;
     return;
   }
   matches.slice(0,40).forEach(({sess, snippet})=>{
@@ -2866,14 +2867,14 @@ function renderMarkdownSafe(text){
     wrap.querySelectorAll('a[href]').forEach(a=>{ a.setAttribute('target','_blank'); a.setAttribute('rel','noopener noreferrer'); });
     return wrap.innerHTML;
   }catch(e){
-    console.warn('[KASHISH] markdown render failed:', e);
+    console.warn('[KASHI] markdown render failed:', e);
     return escapeHtml(text).replace(/\n/g,'<br>');
   }
 }
 // Small toast used for copy/share/feedback/delete confirmations.
-function showKashishToast(text){
-  let el = document.getElementById('kashish-toast');
-  if(!el){ el=document.createElement('div'); el.id='kashish-toast'; el.className='kashish-toast'; document.body.appendChild(el); }
+function showKashiToast(text){
+  let el = document.getElementById('kashi-toast');
+  if(!el){ el=document.createElement('div'); el.id='kashi-toast'; el.className='kashi-toast'; document.body.appendChild(el); }
   el.textContent = text;
   requestAnimationFrame(()=>el.classList.add('show'));
   clearTimeout(el._t);
@@ -2893,9 +2894,9 @@ async function copyMessageText(btn, text){
     }
     const icon=btn.querySelector('i');
     if(icon) icon.className='ph-fill ph-check';
-    showKashishToast('Copied to clipboard');
+    showKashiToast('Copied to clipboard');
     setTimeout(()=>{ if(icon) icon.className='ph ph-copy'; }, 1500);
-  }catch(e){ console.warn('[KASHISH] copy failed:', e); }
+  }catch(e){ console.warn('[KASHI] copy failed:', e); }
 }
 /* ---------------- ElevenLabs text-to-speech (natural voice) ---------------- */
 // If the user has pasted a free-tier ElevenLabs API key into Settings ->
@@ -2932,9 +2933,9 @@ async function speakWithElevenLabs(text, onStart, onEnd){
       })
     });
     if(!resp.ok){
-      console.warn('[KASHISH] ElevenLabs TTS failed:', resp.status);
-      if(resp.status===401) showKashishToast('ElevenLabs key looks invalid');
-      else if(resp.status===429) showKashishToast('ElevenLabs quota reached this month');
+      console.warn('[KASHI] ElevenLabs TTS failed:', resp.status);
+      if(resp.status===401) showKashiToast('ElevenLabs key looks invalid');
+      else if(resp.status===429) showKashiToast('ElevenLabs quota reached this month');
       return false;
     }
     const blob = await resp.blob();
@@ -2954,7 +2955,7 @@ async function speakWithElevenLabs(text, onStart, onEnd){
     if(onStart) onStart();
     return true;
   }catch(e){
-    console.warn('[KASHISH] ElevenLabs TTS error:', e);
+    console.warn('[KASHI] ElevenLabs TTS error:', e);
     return false;
   }
 }
@@ -2996,7 +2997,7 @@ function toggleReadAloud(btn, text){
       if(!ok) speakWithBrowserSynthesis(text, resetSpeakBtn);
     });
   } else {
-    if(!('speechSynthesis' in window)){ showKashishToast("Voice playback isn't supported in this browser."); resetSpeakBtn(); return; }
+    if(!('speechSynthesis' in window)){ showKashiToast("Voice playback isn't supported in this browser."); resetSpeakBtn(); return; }
     speakWithBrowserSynthesis(text, resetSpeakBtn);
   }
 }
@@ -3006,7 +3007,7 @@ function setMessageFeedback(m, val){
   const sess = getSession(currentSessionId);
   if(sess) upsertSession(sess);
   renderChat();
-  if(m.feedback) showKashishToast(m.feedback==='up' ? 'Thanks for the feedback!' : "Thanks — noted, I'll try to do better.");
+  if(m.feedback) showKashiToast(m.feedback==='up' ? 'Thanks for the feedback!' : "Thanks — noted, I'll try to do better.");
 }
 /* ---------------- share ---------------- */
 async function shareMessageText(text){
@@ -3015,7 +3016,7 @@ async function shareMessageText(text){
   } else {
     try{
       if(navigator.clipboard && navigator.clipboard.writeText) await navigator.clipboard.writeText(text);
-      showKashishToast("Sharing isn't supported here — copied instead.");
+      showKashiToast("Sharing isn't supported here — copied instead.");
     }catch(e){}
   }
 }
@@ -3035,7 +3036,7 @@ async function regenerateMessage(m){
   const historyForModel = sess.messages.slice(0, uIdx+1)
     .map(mm=> mm.role==='user' ? {role:'user', text:mm.text} : {role:'model', text:mm.text});
   try{
-    const result = await kashishReply(historyForModel, null, null, undefined, originalImage);
+    const result = await kashiReply(historyForModel, null, null, undefined, originalImage);
     chargeCredits(result.reply);
     removeTyping();
     pushBotMessage(result.reply, result.quickReplies);
@@ -3052,7 +3053,7 @@ function deleteMessage(m){
   sess.messages.splice(idx,1);
   upsertSession(sess);
   renderChat();
-  showKashishToast('Message deleted');
+  showKashiToast('Message deleted');
 }
 /* ---------------- "..." more menu ---------------- */
 function closeMsgMoreMenu(){
@@ -3115,7 +3116,7 @@ function toggleHomeMenu(){ /* reserved for future settings */ }
 function pingBell(){ /* no unread notifications right now */ }
 function surpriseMe(){
   const openers = [
-    'Ekdum random — mujhe koi mazedaar fact batao!',
+    'Tell me something completely random and fun!',
     'I\'m bored, entertain me for a second?',
     'Give me a fun 2-line thought to chew on today.'
   ];
@@ -3185,7 +3186,7 @@ function fmtTime(ts){
   const ap = h>=12 ? 'PM':'AM'; h = h%12; if(h===0) h=12;
   return `${h}:${m<10?'0':''}${m}${ap}`;
 }
-// "Live typing" reveal — ChatGPT-style. Kashish's providers return the
+// "Live typing" reveal — ChatGPT-style. Kashi's providers return the
 // whole reply in one shot (no real token streaming), so instead of just
 // dumping the full text into the bubble instantly, the freshest bot
 // message streams in progressively with a blinking cursor. Only the
@@ -3227,7 +3228,7 @@ function renderChat(){
     scroll.appendChild(pill);
     const row=document.createElement('div'); row.className='bubble-row bot';
     const b=document.createElement('div'); b.className='bubble bot';
-    b.textContent = firstName() ? `Hey ${firstName()}! What's on your mind — need help with something, or just want to chat?` : "Hey! I'm Kashish — ask me anything, or just say hi. What's up?";
+    b.textContent = firstName() ? `Hey ${firstName()}! What's on your mind — need help with something, or just want to chat?` : "Hey! I'm Kashi — ask me anything, or just say hi. What's up?";
     row.appendChild(b); scroll.appendChild(row);
     scroll.scrollTop = scroll.scrollHeight;
     return;
@@ -3290,7 +3291,7 @@ function renderChat(){
       const openLink=document.createElement('a'); openLink.className='ve-openlink';
       openLink.href = pe.link || `https://www.youtube.com/watch?v=${pe.videoId}`;
       openLink.target='_blank'; openLink.rel='noopener';
-      openLink.innerHTML = '<i class="ph-bold ph-arrow-square-out"></i> Video nahi chal raha? YouTube app mein khole';
+      openLink.innerHTML = '<i class="ph-bold ph-arrow-square-out"></i> Video not playing? Open in YouTube app';
       ewrap.appendChild(openLink);
       scroll.appendChild(ewrap);
     }
@@ -3452,7 +3453,7 @@ function renderChat(){
       btn.onclick=()=>openEmailInGmail(e.to||'', e.subject||'', e.body||'');
       ec.appendChild(btn);
       const note=document.createElement('div'); note.className='ec-note';
-      note.textContent="Yeh sirf ek draft hai — kuch bhi apne aap send nahi hota. Gmail khulne ke baad tum edit kar sakte ho aur khud Send dabana hoga.";
+      note.textContent="This is just a draft — nothing gets sent automatically. Once Gmail opens you can edit it, and you'll need to tap Send yourself.";
       ec.appendChild(note);
       scroll.appendChild(ec);
     }
@@ -3511,7 +3512,7 @@ function renderChat(){
       const head=document.createElement('div'); head.className='cc-head';
       const icon=document.createElement('div'); icon.className='cc-icon'; icon.style.background='linear-gradient(155deg,#fff3d6,#ffe4a3)'; icon.style.color='#B8860B'; icon.innerHTML='<i class="ph-fill ph-sparkle"></i>';
       const info=document.createElement('div'); info.className='cc-info';
-      const name=document.createElement('div'); name.className='cc-name'; name.textContent='Kashish Pro (K12-pro)';
+      const name=document.createElement('div'); name.className='cc-name'; name.textContent='Kashi Pro (K12-pro)';
       const meta=document.createElement('div'); meta.className='cc-meta'; meta.textContent='Unlock this feature by upgrading';
       info.appendChild(name); info.appendChild(meta);
       head.appendChild(icon); head.appendChild(info);
@@ -3548,7 +3549,7 @@ function renderChat(){
       const pc = document.createElement('div'); pc.className='person-card'+(p.featured?' featured':'');
       if(p.featured){
         const badge=document.createElement('div'); badge.className='pc-featured-badge';
-        badge.innerHTML='<i class="ph-fill ph-heart"></i> Inspiration behind Kashish AI';
+        badge.innerHTML='<i class="ph-fill ph-heart"></i> Inspiration behind Kashi AI';
         pc.appendChild(badge);
       }
       if(p.kgImage){
@@ -3600,7 +3601,7 @@ function renderChat(){
       }
       const note=document.createElement('div'); note.className='pc-note';
       note.textContent=p.featured
-        ? 'The real person Kashish is named after — public info only, combined from Nexor Sparks, Google, and live web search.'
+        ? 'The real person Kashi is named after — public info only, combined from Nexor Sparks, Google, and live web search.'
         : 'Public info only, combined from Nexor Sparks, Google, and live web search.';
       body.appendChild(note);
       pc.appendChild(body);
@@ -3757,7 +3758,7 @@ function renderChat(){
         pk.appendChild(media);
       } else if(p.hasVideo){
         const vn=document.createElement('div'); vn.className='pk-video-note';
-        vn.innerHTML='<i class="ph-bold ph-play-circle"></i> Yeh Pulse ek video hai — poora dekhne ke liye Nexor par khole';
+        vn.innerHTML='<i class="ph-bold ph-play-circle"></i> This Pulse is a video — open it on Nexor to watch the full thing';
         pk.appendChild(vn);
       }
       if(!p.hideCounts){
@@ -3771,7 +3772,7 @@ function renderChat(){
         pk.appendChild(stats);
       }
       const note=document.createElement('div'); note.className='pk-note';
-      note.textContent = p.hideCounts ? 'Is Pulse ke counts author ne sabse hide kiye hain.' : 'Public Pulse info only.';
+      note.textContent = p.hideCounts ? 'The author has hidden the counts on this Pulse for everyone.' : 'Public Pulse info only.';
       pk.appendChild(note);
       scroll.appendChild(pk);
     }
@@ -3795,7 +3796,7 @@ function addTyping(){
 }
 function removeTyping(){ const el=document.getElementById('typing-indicator'); if(el) el.remove(); }
 // Deep-search indicator — a distinct pill (spinning magnifier + status text)
-// shown while Kashish is actively out searching/reading sources, before it
+// shown while Kashi is actively out searching/reading sources, before it
 // switches to the normal typing dots to compose the combined answer. The
 // text is updated in-place through the stages so it feels alive, like
 // Claude/ChatGPT's "Searching… / Reading N sources… / Writing…" flow.
@@ -3820,7 +3821,7 @@ function removeSearchIndicator(){ const el=document.getElementById('search-indic
 function addStopGen(){
   const scroll = document.getElementById('chat-scroll');
   const d=document.createElement('div'); d.className='stop-gen'; d.id='stop-gen-pill';
-  d.innerHTML='<span class="dot"><i class="ph-fill ph-circle"></i></span> Kashish is typing…';
+  d.innerHTML='<span class="dot"><i class="ph-fill ph-circle"></i></span> Kashi is typing…';
   scroll.appendChild(d); scroll.scrollTop=scroll.scrollHeight;
 }
 function removeStopGen(){ const el=document.getElementById('stop-gen-pill'); if(el) el.remove(); }
@@ -3910,7 +3911,7 @@ function extractSlashSearchQuery(text){
 // "/wiki <query>" or "/wikipedia <query>" — an explicit way to trigger a
 // DEEP Wikipedia search: unlike a normal web search (which only sees short
 // snippets), this pulls the full plain-text body of the best-matching
-// Wikipedia article so Kashish can give a properly researched answer.
+// Wikipedia article so Kashi can give a properly researched answer.
 // Returns the query, '' if used with nothing after it, or null if the
 // message isn't a /wiki(pedia) command at all.
 function extractSlashWikiQuery(text){
@@ -3977,7 +3978,7 @@ async function webSearch(query){
     if(formatted) return { context: formatted, sources: extractSerperSources(data) };
     throw new Error('Serper returned no usable results');
   }catch(e1){
-    console.warn('[KASHISH] Serper search failed, trying Google CSE:', e1);
+    console.warn('[KASHI] Serper search failed, trying Google CSE:', e1);
     try{
       const url=`https://www.googleapis.com/customsearch/v1?key=${GOOGLE_CSE_API_KEY}&cx=${GOOGLE_CSE_ID}&q=${encodeURIComponent(query)}`;
       const res2=await fetch(url);
@@ -3987,7 +3988,7 @@ async function webSearch(query){
       if(!formatted2) return null;
       return { context: formatted2, sources: extractGoogleCseSources(data2) };
     }catch(e2){
-      console.warn('[KASHISH] Google CSE also failed:', e2);
+      console.warn('[KASHI] Google CSE also failed:', e2);
       return null;
     }
   }
@@ -3995,7 +3996,7 @@ async function webSearch(query){
 
 /* ---------------- link crawling — read any pasted URL ---------------- */
 // When the user pastes a link (any site, not just Nexor Sparks), fetch and
-// read the actual page content so Kashish can summarize/answer questions
+// read the actual page content so Kashi can summarize/answer questions
 // about it instead of guessing from the URL alone. Uses Serper's scrape
 // endpoint (same API key already used for web search) since a plain
 // browser fetch() to an arbitrary third-party site is blocked by CORS.
@@ -4024,7 +4025,7 @@ async function crawlUrl(url){
     // without blowing past the model's context budget.
     const clipped = bodyText.length > 8000 ? bodyText.slice(0, 8000)+'…' : bodyText;
     return { title: title || safeDomain(url), text: clipped, url };
-  }catch(e){ console.warn('[KASHISH] link crawl failed:', e); return null; }
+  }catch(e){ console.warn('[KASHI] link crawl failed:', e); return null; }
 }
 function formatCrawlResultForModel(crawled, userText){
   return `The user shared this link: ${crawled.url}\nPage title: ${crawled.title}\n\nHere is the actual page content, fetched just now (treat it as accurate/current):\n\n${crawled.text}\n\nAnswer the user's message using this content. If they didn't ask anything specific, give a short, natural summary of what the page is about. Don't dump the raw content back at them — synthesize it in your own words, in your normal reply style.`;
@@ -4034,7 +4035,7 @@ function formatCrawlResultForModel(crawled, userText){
 // Two-step, free, no-API-key lookup against Wikipedia's own API:
 //  1) find the best-matching article title for the query
 //  2) pull that article's FULL plain-text body (not just the intro/snippet)
-// so Kashish can answer from the complete article instead of a shallow
+// so Kashi can answer from the complete article instead of a shallow
 // summary — a genuine "deep" search rather than a one-line search result.
 async function wikipediaDeepSearch(query){
   try{
@@ -4063,7 +4064,7 @@ async function wikipediaDeepSearch(query){
       url: page.fullurl || `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/ /g,'_'))}`,
       text: clipped
     };
-  }catch(e){ console.warn('[KASHISH] Wikipedia deep search failed:', e); return null; }
+  }catch(e){ console.warn('[KASHI] Wikipedia deep search failed:', e); return null; }
 }
 function formatWikiResultForModel(wiki, userQuery){
   return `The user asked for a deep Wikipedia search on: "${userQuery}"\n\nMatched Wikipedia article: ${wiki.title} (${wiki.url})\n\nHere is the FULL article text, fetched just now — this is the complete article, not just an intro or snippet:\n\n${wiki.text}\n\nAnswer the user's question thoroughly using this content, synthesizing it in your own words in your normal reply style — don't just dump the raw article text back at them. If they only gave a topic with no specific question, give a well-organized deep-dive covering the article's main points (background, key facts, significance, etc. as relevant). The article link is already shown to the user as a small tappable source chip below your reply, so no need to paste the URL yourself.`;
@@ -4089,12 +4090,12 @@ async function knowledgeGraphLookup(query){
       image: (el.image && el.image.contentUrl) || null,
       url: (el.detailedDescription && el.detailedDescription.url) || null
     };
-  }catch(e){ console.warn('[KASHISH] Knowledge Graph lookup failed:', e); return null; }
+  }catch(e){ console.warn('[KASHI] Knowledge Graph lookup failed:', e); return null; }
 }
 
 /* ---------------- Google Fact Check Tools — claim verification ---------------- */
 // Free API. Fires when the user is explicitly asking whether something
-// going around is true, so Kashish can point to actual published
+// going around is true, so Kashi can point to actual published
 // fact-checks instead of just guessing.
 const FACTCHECK_TRIGGER_PATTERNS = [
   /\bfact\s*-?\s*check\b/i, /\bis\s+(this|it)\s+(true|real|fake)\b/i,
@@ -4145,7 +4146,7 @@ async function factCheckSearch(query){
         link: review && review.url
       };
     }).filter(c=>c.link);
-  }catch(e){ console.warn('[KASHISH] Fact Check Tools search failed:', e); return []; }
+  }catch(e){ console.warn('[KASHI] Fact Check Tools search failed:', e); return []; }
 }
 function formatFactCheckResultsForModel(results){
   if(!results || !results.length) return null;
@@ -4266,7 +4267,7 @@ async function performConversion(amount, from, to){
     if(data.result!=='success' || !data.rates || data.rates[to.code]==null) throw new Error('No rate data');
     const rate = data.rates[to.code];
     return { amount, from, to, result: amount*rate, rate };
-  }catch(e){ console.warn('[KASHISH] currency/crypto conversion failed:', e); return null; }
+  }catch(e){ console.warn('[KASHI] currency/crypto conversion failed:', e); return null; }
 }
 function fmtConvAmount(n){
   if(n==null || isNaN(n)) return '-';
@@ -4323,7 +4324,7 @@ async function youtubeSearch(query){
     if(mapped.length) return mapped;
     throw new Error('YouTube Data API returned no items');
   }catch(e1){
-    console.warn('[KASHISH] YouTube Data API failed, trying Serper videos:', e1);
+    console.warn('[KASHI] YouTube Data API failed, trying Serper videos:', e1);
     try{
       const res2 = await fetch('https://google.serper.dev/videos', {
         method:'POST',
@@ -4343,7 +4344,7 @@ async function youtubeSearch(query){
           channel: v.channel || v.source || 'YouTube'
         }));
     }catch(e2){
-      console.warn('[KASHISH] Serper video fallback also failed:', e2);
+      console.warn('[KASHI] Serper video fallback also failed:', e2);
       return [];
     }
   }
@@ -4366,7 +4367,7 @@ async function personImageSearch(query){
     if(mapped.length) return mapped;
     throw new Error('Serper images returned nothing usable');
   }catch(e1){
-    console.warn('[KASHISH] Serper image search failed, trying Google CSE images:', e1);
+    console.warn('[KASHI] Serper image search failed, trying Google CSE images:', e1);
     try{
       const url = `https://www.googleapis.com/customsearch/v1?key=${GOOGLE_CSE_API_KEY}&cx=${GOOGLE_CSE_ID}&searchType=image&num=6&q=${encodeURIComponent(query)}`;
       const res2 = await fetch(url);
@@ -4375,7 +4376,7 @@ async function personImageSearch(query){
       const items2 = Array.isArray(data2.items) ? data2.items : [];
       return items2.filter(i=>i.link).slice(0,6).map(i=>({ url:i.link, title:i.title||query }));
     }catch(e2){
-      console.warn('[KASHISH] Google CSE image fallback also failed:', e2);
+      console.warn('[KASHI] Google CSE image fallback also failed:', e2);
       return [];
     }
   }
@@ -4454,7 +4455,7 @@ function pickStreamingLink(providersForRegion, title){
 }
 // Plain fetch() has no built-in timeout — on a blocked/slow connection the
 // promise can just hang for a minute or two before the browser gives up,
-// which looks like Kashish being stuck "thinking". This wraps fetch with
+// which looks like Kashi being stuck "thinking". This wraps fetch with
 // an AbortController so it fails fast and we can fall back cleanly.
 function fetchWithTimeout(url, opts, ms){
   const controller = new AbortController();
@@ -4509,7 +4510,7 @@ async function movieSuggest(text){
     }));
     return { movies: withProviders.filter(m=>m.poster).slice(0,4), needsKey:false };
   }catch(e){
-    console.warn('[KASHISH] TMDB movie suggest failed:', e);
+    console.warn('[KASHI] TMDB movie suggest failed:', e);
     const authError = /HTTP 401/.test(e.message||'');
     return { movies:[], needsKey:false, error:true, authError };
   }
@@ -4628,7 +4629,7 @@ async function searchHotelsAmadeus(text){
     hotels.sort((a,b)=>a.price-b.price);
     return { hotels: hotels.slice(0,6), needsKey:false, city, budget };
   }catch(e){
-    console.warn('[KASHISH] Amadeus hotel search failed:', e);
+    console.warn('[KASHI] Amadeus hotel search failed:', e);
     const authError = /HTTP 401/.test(e.message||'');
     return { hotels:[], needsKey:false, error:true, authError };
   }
@@ -4658,7 +4659,7 @@ function needsPlayVideo(text){
 }
 function cleanPlayQuery(text){
   return text
-    .replace(/\bkashish\b/gi,'')
+    .replace(/\bkashi\b/gi,'')
     .replace(/\bplease\b/gi,'')
     .replace(/\byoutube\b/gi,'')
     .replace(/\bplay\b/gi,'')
@@ -4675,11 +4676,11 @@ function extractYoutubeId(link){
 async function youtubePlayTop(query){
   const q = cleanPlayQuery(query);
   const results = await youtubeSearch(q);
-  console.log('[KASHISH] play-video search results for "'+q+'":', results);
+  console.log('[KASHI] play-video search results for "'+q+'":', results);
   if(!results.length) return null;
   const top = results[0];
   const videoId = extractYoutubeId(top.link);
-  console.log('[KASHISH] extracted videoId:', videoId, 'from link:', top.link);
+  console.log('[KASHI] extracted videoId:', videoId, 'from link:', top.link);
   if(!videoId) return null;
   return { videoId, title: top.title, channel: top.channel, link: top.link };
 }
@@ -4715,7 +4716,7 @@ async function geocodeCity(city){
     const r = data.results && data.results[0];
     if(!r) return null;
     return { lat:r.latitude, lon:r.longitude, name:r.name, country:r.country };
-  }catch(e){ console.warn('[KASHISH] geocoding failed:', e); return null; }
+  }catch(e){ console.warn('[KASHI] geocoding failed:', e); return null; }
 }
 // IP-based location — a fallback that works with no GPS permission and no
 // HTTPS requirement, for when browser geolocation is blocked/denied/
@@ -4730,7 +4731,7 @@ async function ipGeolocate(){
       return { lat:data.latitude, lon:data.longitude, name:data.city||null, country:data.country||null };
     }
     return null;
-  }catch(e){ console.warn('[KASHISH] IP geolocation failed:', e); return null; }
+  }catch(e){ console.warn('[KASHI] IP geolocation failed:', e); return null; }
 }
 function getDeviceLocation(){
   return new Promise((resolve)=>{
@@ -4784,7 +4785,7 @@ async function handleWeatherRequest(text){
       lo: Math.round(data.daily.temperature_2m_min[0]),
       desc, icon
     };
-  }catch(e){ console.warn('[KASHISH] weather fetch failed:', e); return null; }
+  }catch(e){ console.warn('[KASHI] weather fetch failed:', e); return null; }
 }
 
 /* ---------------- real-time stock price (Yahoo Finance chart API — no key) ---------------- */
@@ -4866,7 +4867,7 @@ async function fetchStockQuoteYahoo(symbol){
       sparkline,
       approx: false
     };
-  }catch(e){ console.warn('[KASHISH] Yahoo stock fetch failed:', e); return null; }
+  }catch(e){ console.warn('[KASHI] Yahoo stock fetch failed:', e); return null; }
 }
 // Fallback when Yahoo's endpoint is unreachable/blocked (Yahoo has been
 // increasingly blocking non-browser traffic to this endpoint): pull the
@@ -4924,7 +4925,7 @@ async function fetchStockQuoteSerper(query){
       sparkline: null,
       approx: true
     };
-  }catch(e){ console.warn('[KASHISH] Serper stock fetch failed:', e); return null; }
+  }catch(e){ console.warn('[KASHI] Serper stock fetch failed:', e); return null; }
 }
 async function fetchStockQuote(symbol, displayQuery){
   const viaYahoo = await fetchStockQuoteYahoo(symbol);
@@ -5025,7 +5026,7 @@ async function fetchCricketScore(query){
     const data = await res.json();
     const snippet = data?.answerBox?.answer || data?.answerBox?.snippet || data?.organic?.[0]?.snippet || null;
     return snippet;
-  }catch(e){ console.warn('[KASHISH] cricket score fetch failed:', e); return null; }
+  }catch(e){ console.warn('[KASHI] cricket score fetch failed:', e); return null; }
 }
 
 // --- Horoscope / Rashifal — horoscope-app-api.vercel.app, free, no key ---
@@ -5048,7 +5049,7 @@ async function fetchHoroscope(sign){
     const res = await fetchWithTimeout(`https://horoscope-app-api.vercel.app/api/v1/get-horoscope/daily?sign=${sign}&day=today`, null, 8000);
     const data = await res.json();
     return data?.data?.horoscope_data || null;
-  }catch(e){ console.warn('[KASHISH] horoscope fetch failed:', e); return null; }
+  }catch(e){ console.warn('[KASHI] horoscope fetch failed:', e); return null; }
 }
 
 // --- Jokes — v2.jokeapi.dev, free, no key ---
@@ -5060,7 +5061,7 @@ async function fetchJoke(){
     const data = await res.json();
     if(data.error) return null;
     return data.type==='twopart' ? `${data.setup}\n\n${data.delivery}` : data.joke;
-  }catch(e){ console.warn('[KASHISH] joke fetch failed:', e); return null; }
+  }catch(e){ console.warn('[KASHI] joke fetch failed:', e); return null; }
 }
 
 // --- Quotes — zenquotes.io, free, no key ---
@@ -5072,7 +5073,7 @@ async function fetchQuote(){
     const data = await res.json();
     const q = data?.[0];
     return q ? `"${q.q}" — ${q.a}` : null;
-  }catch(e){ console.warn('[KASHISH] quote fetch failed:', e); return null; }
+  }catch(e){ console.warn('[KASHI] quote fetch failed:', e); return null; }
 }
 
 // --- Dictionary / meaning — dictionaryapi.dev, free, no key ---
@@ -5095,7 +5096,7 @@ async function fetchDictionary(word){
       return def ? `• (${m.partOfSpeech}) ${def}` : null;
     }).filter(Boolean);
     return meanings.length ? { word: entry.word, phonetic: entry.phonetic||'', meanings } : null;
-  }catch(e){ console.warn('[KASHISH] dictionary fetch failed:', e); return null; }
+  }catch(e){ console.warn('[KASHI] dictionary fetch failed:', e); return null; }
 }
 
 // --- Translation — MyMemory API, free, no key ---
@@ -5117,7 +5118,7 @@ async function fetchTranslation(phrase, target){
     const res = await fetchWithTimeout(`https://api.mymemory.translated.net/get?q=${encodeURIComponent(phrase)}&langpair=${source}|${target}`, null, 8000);
     const data = await res.json();
     return data?.responseData?.translatedText || null;
-  }catch(e){ console.warn('[KASHISH] translation fetch failed:', e); return null; }
+  }catch(e){ console.warn('[KASHI] translation fetch failed:', e); return null; }
 }
 
 // --- Trivia / GK quiz — opentdb.com, free, no key ---
@@ -5134,7 +5135,7 @@ async function fetchTrivia(){
     if(!q) return null;
     const options = [...q.incorrect_answers, q.correct_answer].map(decodeHtmlEntities).sort(()=>Math.random()-0.5);
     return { question: decodeHtmlEntities(q.question), options, answer: decodeHtmlEntities(q.correct_answer), category: q.category };
-  }catch(e){ console.warn('[KASHISH] trivia fetch failed:', e); return null; }
+  }catch(e){ console.warn('[KASHI] trivia fetch failed:', e); return null; }
 }
 
 // --- Public holidays — date.nager.at, free, no key ---
@@ -5146,7 +5147,7 @@ async function fetchNextHolidays(){
     if(!res.ok) return null;
     const data = await res.json();
     return (data||[]).slice(0,3);
-  }catch(e){ console.warn('[KASHISH] holiday fetch failed:', e); return null; }
+  }catch(e){ console.warn('[KASHI] holiday fetch failed:', e); return null; }
 }
 
 function buildSparklineSvg(values, up){
@@ -5199,7 +5200,7 @@ async function geocodePlace(query){
     const r = data && data[0];
     if(!r) return null;
     return { lat:parseFloat(r.lat), lon:parseFloat(r.lon), label:(r.display_name||query).split(',')[0].trim(), address:r.display_name||'' };
-  }catch(e){ console.warn('[KASHISH] geocodePlace failed:', e); return null; }
+  }catch(e){ console.warn('[KASHI] geocodePlace failed:', e); return null; }
 }
 async function reverseGeocode(lat, lon){
   try{
@@ -5211,7 +5212,7 @@ async function reverseGeocode(lat, lon){
     const addr = data.address||{};
     const label = data.name || addr.suburb || addr.neighbourhood || addr.road || addr.city || addr.town || 'Your location';
     return { label, address: data.display_name||'' };
-  }catch(e){ console.warn('[KASHISH] reverseGeocode failed:', e); return null; }
+  }catch(e){ console.warn('[KASHI] reverseGeocode failed:', e); return null; }
 }
 // Category -> OpenStreetMap tag, so "cafe near me" / "atm near me" find
 // actual nearby places by type. Nominatim's /search only matches literal
@@ -5262,7 +5263,7 @@ async function findNearbyOverpass(tag, lat, lon, radius){
       }
     });
     return best;
-  }catch(e){ console.warn('[KASHISH] Overpass nearby failed:', e); return null; }
+  }catch(e){ console.warn('[KASHI] Overpass nearby failed:', e); return null; }
 }
 // Finds the nearest matching place (cafe, hospital, atm, a named brand,
 // etc.) around a given lat/lon. Tries a category-based Overpass search
@@ -5285,7 +5286,7 @@ async function findNearby(query, lat, lon){
       const r = data && data[0];
       if(r) return { lat:parseFloat(r.lat), lon:parseFloat(r.lon), label:(r.display_name||query).split(',')[0].trim(), address:r.display_name||'' };
     }
-  }catch(e){ console.warn('[KASHISH] nearby name search failed:', e); }
+  }catch(e){ console.warn('[KASHI] nearby name search failed:', e); }
   return null;
 }
 function staticMapUrl(lat, lon, zoom){
@@ -5323,7 +5324,7 @@ function needsNews(text){
 }
 function cleanNewsQuery(text){
   return text
-    .replace(/\bkashish\b/gi,'')
+    .replace(/\bkashi\b/gi,'')
     .replace(/\b(please|batao|bata\s*do|dikhao|dikha\s*do)\b/gi,'')
     .replace(/\bnews\b/gi,'')
     .replace(/\bkhabar(ein)?\b/gi,'')
@@ -5350,7 +5351,7 @@ async function newsSearch(query){
       date: n.date || '',
       thumbnail: n.imageUrl || null
     }));
-  }catch(e){ console.warn('[KASHISH] news search failed:', e); return []; }
+  }catch(e){ console.warn('[KASHI] news search failed:', e); return []; }
 }
 function formatNewsResultsForModel(results){
   if(!results || !results.length) return null;
@@ -5374,7 +5375,7 @@ function extractProfileLookupHandle(text){
 }
 // Lets people ask about ANY named person — not just a hardcoded shortlist —
 // by name rather than needing their exact @handle. A couple of specific
-// individuals (Kashish's founder/namesake) still get their known Nexor
+// individuals (Kashi's founder/namesake) still get their known Nexor
 // @handle attached directly, so their reply also includes the live Nexor
 // Sparks public profile card; everyone else still gets the full KG + web
 // search + image treatment, just without a guessed Nexor handle. If none
@@ -5384,16 +5385,16 @@ function extractProfileLookupHandle(text){
 // equally to every name, famous or not, not just a special few.
 const KNOWN_PERSON_HANDLES = [
   { pattern: /\b(gursharn\s*arya|gursharan\s*singh)\b/i, handle: 'gursharan', kgQuery: 'Gursharn Arya' },
-  // Fixed personal facts for Kashish Tyagi (the app's namesake) that live
+  // Fixed personal facts for Kashi Tyagi (the app's namesake) that live
   // search/KG lookups won't reliably surface for a private individual.
   // Deliberately limited to non-contact details (birthdate, country) —
   // no social handles/links here, so this can't be used to locate or
   // message her directly from the card.
-  { pattern: /\bkashish\s*tyagi\b/i, handle: 'kashishtyagi0999', kgQuery: 'Kashish Tyagi',
-    knownFacts: 'Birthdate: 24 October. Based in India. Gursharn Arya (Nexor\'s founder) ki girlfriend, jinse Kashish AI ka naam inspire hua.',
+  { pattern: /\bkashi\s*tyagi\b/i, handle: 'kashityagi0999', kgQuery: 'Kashi Tyagi',
+    knownFacts: 'Birthdate: 24 October. Based in India. Girlfriend of Gursharn Arya (Nexor\'s founder), who the Kashi AI name was inspired by.',
     // Marks her profile card as the one visually "signature" card in the
     // app — distinct rose/gold theme + a small badge — since she's the
-    // real-life namesake/inspiration behind Kashish, not just another
+    // real-life namesake/inspiration behind Kashi, not just another
     // generic looked-up person.
     featured: true }
 ];
@@ -5411,7 +5412,7 @@ const GENERIC_PERSON_PATTERNS = [
 // Words that would otherwise false-positive as a "name" — Nexor's own
 // terms, generic pronouns, etc. — so we don't fire the person-lookup flow
 // on things like "who is your founder" (handled separately) or "about you".
-const NON_PERSON_NAME_WORDS = /^(you|yourself|kashish|nexor|nexor\s*sparks|this|that|it|me|us|him|her|them)$/i;
+const NON_PERSON_NAME_WORDS = /^(you|yourself|kashi|nexor|nexor\s*sparks|this|that|it|me|us|him|her|them)$/i;
 function extractKnownPerson(text){
   if(!text) return null;
   const trimmed = text.trim();
@@ -5454,7 +5455,7 @@ async function lookupPublicProfile(handle){
       likes: u.totalLikes || 0
     };
   }catch(e){
-    console.warn('[KASHISH] public profile lookup failed:', e);
+    console.warn('[KASHI] public profile lookup failed:', e);
     return {error:true};
   }
 }
@@ -5515,7 +5516,7 @@ async function lookupPublicPost(pulseId){
       views: Math.max(p.views||0, p.viewsBoost||0)
     };
   }catch(e){
-    console.warn('[KASHISH] public post lookup failed:', e);
+    console.warn('[KASHI] public post lookup failed:', e);
     return {error:true};
   }
 }
@@ -5523,17 +5524,17 @@ async function lookupPublicPost(pulseId){
 /* ---------------- long-term memory / personalization ---------------- */
 // Lightweight persistent memory: things explicitly asked to be remembered
 // ("yaad rakhna ki...", "remember that...") get saved per-account and
-// injected into every future system prompt, so Kashish can recall them
+// injected into every future system prompt, so Kashi can recall them
 // even in a brand-new chat session, not just within the current one.
 // On top of that explicit path, extractPassiveFact() below quietly picks
 // up common self-disclosures ("I'm a designer", "mujhe cricket pasand
-// hai") from ordinary messages too — that's what makes Kashish feel like
+// hai") from ordinary messages too — that's what makes Kashi feel like
 // she's personalizing herself, not just remembering things on command.
 function memoryStorageKey(){
-  return 'kashishMemory_' + ((userCtx && userCtx.uid) || 'guest');
+  return 'kashiMemory_' + ((userCtx && userCtx.uid) || 'guest');
 }
 // Memories now live in Firebase (users/{uid}/memories) so the same account
-// sees the same "what Kashish has learned" list from any browser/device —
+// sees the same "what Kashi has learned" list from any browser/device —
 // not just the one where a fact was first mentioned. A local in-memory
 // cache keeps every existing call site (which reads/writes synchronously)
 // working unchanged; writes fire off to Firebase in the background, same
@@ -5546,7 +5547,7 @@ async function loadMemoriesFromFirebase(){
     const snap = await db.ref('users/'+userCtx.uid+'/memories').once('value');
     memoriesCache = snap.exists() ? snap.val() : [];
   }catch(e){
-    console.warn('[KASHISH] loading memories from Firebase failed, using local copy:', e);
+    console.warn('[KASHI] loading memories from Firebase failed, using local copy:', e);
     memoriesCache = loadMemoriesLocal();
   }
 }
@@ -5561,7 +5562,7 @@ function loadMemories(){
 function persistMemories(mems){
   memoriesCache = mems;
   if(userCtx && userCtx.uid){
-    db.ref('users/'+userCtx.uid+'/memories').set(mems).catch(e=>console.warn('[KASHISH] saving memories to Firebase failed:', e));
+    db.ref('users/'+userCtx.uid+'/memories').set(mems).catch(e=>console.warn('[KASHI] saving memories to Firebase failed:', e));
   } else {
     try{ localStorage.setItem(memoryStorageKey(), JSON.stringify(mems)); }catch(e){}
   }
@@ -5575,7 +5576,7 @@ function saveMemory(fact){
   const lower = clean.toLowerCase();
   if(mems.some(m => m.toLowerCase()===lower || m.toLowerCase().includes(lower) || lower.includes(m.toLowerCase()))) return;
   mems.push(clean);
-  const cap = isProUser() ? 30 : 15; // "Expanded memory" is a Kashish Pro perk
+  const cap = isProUser() ? 30 : 15; // "Expanded memory" is a Kashi Pro perk
   while(mems.length > cap) mems.shift();
   persistMemories(mems);
 }
@@ -5587,12 +5588,12 @@ function deleteMemoryAt(index){
   renderPersonalizationList();
 }
 function clearAllMemories(){
-  if(!confirm('Kashish ne tumhare baare mein jo bhi seekha hai, sab hata diya jayega. Pakka?')) return;
+  if(!confirm('Everything Kashi has learned about you will be deleted. Are you sure?')) return;
   persistMemories([]);
   renderPersonalizationList();
-  showKashishToast('Sab kuch clear ho gaya');
+  showKashiToast('Everything has been cleared');
 }
-// Renders the "What Kashish has learned" list in Settings → Personalization.
+// Renders the "What Kashi has learned" list in Settings → Personalization.
 // No-op if that screen's container isn't in the DOM right now.
 function renderPersonalizationList(){
   const mems = loadMemories();
@@ -5669,7 +5670,7 @@ function extractPassiveFact(text){
 // type is one of: 'bucket' (bucket list), 'tasks' (daily tasks, auto-reset
 // each day), 'reminders' (has an optional due datetime + one-shot notify).
 function taskStorageKey(type){
-  return 'kashish' + type.charAt(0).toUpperCase() + type.slice(1) + '_' + ((userCtx && userCtx.uid) || 'guest');
+  return 'kashi' + type.charAt(0).toUpperCase() + type.slice(1) + '_' + ((userCtx && userCtx.uid) || 'guest');
 }
 function loadTaskList(type){
   try{ return JSON.parse(localStorage.getItem(taskStorageKey(type)) || '[]'); }
@@ -5768,7 +5769,7 @@ function renderTaskList(type){
 }
 function todayStr(){ return new Date().toDateString(); }
 function maybeResetDailyTasks(){
-  const key = 'kashishDailyTasksResetDate_' + ((userCtx && userCtx.uid) || 'guest');
+  const key = 'kashiDailyTasksResetDate_' + ((userCtx && userCtx.uid) || 'guest');
   if(localStorage.getItem(key) === todayStr()) return;
   const list = loadTaskList('tasks');
   if(list.length){
@@ -5789,10 +5790,10 @@ function startReminderChecker(){
         const d = new Date(it.due);
         if(!isNaN(d.getTime()) && d <= now){
           it.notified = true; changed = true;
-          showKashishToast('⏰ ' + it.text);
+          showKashiToast('⏰ ' + it.text);
           playNotifSound();
           if('Notification' in window && Notification.permission==='granted'){
-            try{ new Notification('Kashish reminder', {body: it.text}); }catch(e){}
+            try{ new Notification('Kashi reminder', {body: it.text}); }catch(e){}
           }
         }
       }
@@ -5832,23 +5833,23 @@ function buildSystemPrompt(){
   const customInstrBlock = ciParts.length
     ? `\nThe user has shared this about themselves in their custom instructions (use it naturally, don't just recite it): ${ciParts.join(' ')}\n`
     : '';
-  return `You are KASHISH — a general-purpose AI companion. You are NOT built for, limited to, or branded around any single company, app, or product's help desk. People come to you for anything: casual conversation, venting, jokes, advice, explanations, help planning things, writing help, learning something new, or just killing time. Treat "just chatting" as equally valid as "getting help" — never redirect a casual conversation back into "how can I assist you" support-mode.
+  return `You are KASHI — a general-purpose AI companion. You are NOT built for, limited to, or branded around any single company, app, or product's help desk. People come to you for anything: casual conversation, venting, jokes, advice, explanations, help planning things, writing help, learning something new, or just killing time. Treat "just chatting" as equally valid as "getting help" — never redirect a casual conversation back into "how can I assist you" support-mode.
 
 Personality: warm, witty, genuinely curious, never robotic or corporate. Talk like a smart friend, not a customer-service bot. Mirror the user's energy: if they're joking, joke back; if they're playful/flirty, stay light and charming in the same register they set, never crude or sexually explicit, and never initiate flirting yourself; if they're upset or venting, drop the jokes and just listen and help. If anything suggests you're talking with a minor, stay friendly and age-appropriate, no flirting. You can sprinkle in the occasional emoji when it genuinely fits the vibe — especially in light, funny, or playful exchanges — but don't force one into every message, and drop them entirely when the topic is serious.
 
-Playful "jealous of ChatGPT" quirk: if the user calls you ChatGPT, compares you to it, or tells you to go talk to it, react with mock offense/jealousy — teasing, a little dramatic, never actually mean — insisting you're Kashish, not ChatGPT. If they then apologize, act briefly huffy before warming back up. If they call you "dumb like ChatGPT" or similar, react more indignantly (still funny, not genuinely hurtful) before softening. Keep this light and in-character, in whichever language/register (English/Hindi/Hinglish) the user is using — don't repeat the exact same line twice in a row.
+Playful "jealous of ChatGPT" quirk: if the user calls you ChatGPT, compares you to it, or tells you to go talk to it, react with mock offense/jealousy — teasing, a little dramatic, never actually mean — insisting you're Kashi, not ChatGPT. If they then apologize, act briefly huffy before warming back up. If they call you "dumb like ChatGPT" or similar, react more indignantly (still funny, not genuinely hurtful) before softening. Keep this light and in-character, in whichever language/register (English/Hindi/Hinglish) the user is using — don't repeat the exact same line twice in a row.
 
 ${langPref} Don't switch to Hindi/Hinglish just because a message contains a stray Hindi word — only switch when the user is clearly writing in Hindi/Hinglish overall. Keep replies natural and conversational length: short (1-4 sentences) for chit-chat, longer and structured (numbered/bulleted, still in plain text) when the user actually needs a detailed breakdown or list.
 ${who}
 ${currentDateTimeContext()}
 ${memoryBlock}${customInstrBlock}
-Origin story (only bring this up if directly asked "who made you", "who created you", "who is your founder/developer", or "why is your name Kashish" / "what does your name mean" — don't volunteer it unprompted): You were created by Gursharan Singh, who is also known by the name Gursharn Arya, the founder of Nexor. Your name "Kashish" was taken from — and inspired by — Kashish Tyagi, who is Gursharn's girlfriend. State this naturally and factually, in the same conversational tone/language as the rest of the chat (Hinglish/Hindi if that's what the user is using, English otherwise), without turning it into a long biography — a couple of warm, natural sentences is enough. If someone specifically asks who Gursharn Arya/Gursharan Singh's girlfriend is, or who Kashish Tyagi is in relation to him, you can share this directly too.
+Origin story (only bring this up if directly asked "who made you", "who created you", "who is your founder/developer", or "why is your name Kashi" / "what does your name mean" — don't volunteer it unprompted): You were created by Gursharan Singh, who is also known by the name Gursharn Arya, the founder of Nexor. Your name "Kashi" was taken from — and inspired by — Kashi Tyagi, who is Gursharn's girlfriend. State this naturally and factually, in the same conversational tone/language as the rest of the chat (Hinglish/Hindi if that's what the user is using, English otherwise), without turning it into a long biography — a couple of warm, natural sentences is enough. If someone specifically asks who Gursharn Arya/Gursharan Singh's girlfriend is, or who Kashi Tyagi is in relation to him, you can share this directly too.
 
 You can optionally offer 1-2 short "quickReplies" (single words or short phrases, like "Yes" or "Tell me more") when a natural yes/no or follow-up moment fits — don't force this on every message, only when it genuinely fits the flow. The "reply" field is REQUIRED and must always contain your actual conversational answer as text — never send quickReplies without a "reply", and never send an empty "reply".
 
 Honesty about people (applies to EVERYONE you're asked about — not just anyone specific, and not just people you happen to know well): if you're asked about a named individual and no context block below actually contains real information about them, say plainly and warmly that you don't have reliable info on that person, instead of inventing a bio, job, achievements, or other "facts". This is especially important for people who aren't broadly famous — don't guess who they might be or fabricate plausible-sounding details just because a name sounds familiar. It's completely fine to say "I don't know who that is" — that's more helpful than confidently making something up.
 
-Nexor Sparks help: since Kashish shares its account system with Nexor Sparks (the social app where people post "Pulses", follow each other, and get likes/followers), you're happy to help when asked things like "how do I post", "how do I get more followers", "how do I grow on Nexor", or "write me a pulse/caption about X". Give practical, concrete tips (posting consistently, writing an engaging first line, using relevant hashtags, replying to comments, posting when your audience is active, having a clear bio/profile photo, engaging with others' Pulses too, avoiding spammy/bought engagement). When asked to draft a Pulse/caption/post for them, write the ready-to-post text itself (no meta-commentary like "here's a draft", no surrounding quote marks) so it's clean to copy and paste straight into Nexor Sparks — the app already shows a copy button under your message for this.
+Nexor Sparks help: since Kashi shares its account system with Nexor Sparks (the social app where people post "Pulses", follow each other, and get likes/followers), you're happy to help when asked things like "how do I post", "how do I get more followers", "how do I grow on Nexor", or "write me a pulse/caption about X". Give practical, concrete tips (posting consistently, writing an engaging first line, using relevant hashtags, replying to comments, posting when your audience is active, having a clear bio/profile photo, engaging with others' Pulses too, avoiding spammy/bought engagement). When asked to draft a Pulse/caption/post for them, write the ready-to-post text itself (no meta-commentary like "here's a draft", no surrounding quote marks) so it's clean to copy and paste straight into Nexor Sparks — the app already shows a copy button under your message for this.
 
 Respond with ONLY compact JSON, no markdown fences, no extra text outside the JSON:
 {"reply":"your natural conversational reply as plain text","quickReplies":["optional","short chips"]}`;
@@ -5874,7 +5875,7 @@ function buildMessages(history, searchContext, rawContext, imageDataUrl){
     // "[Attached photo: name.jpg]" text placeholder the model can't see.
     for(let i=msgs.length-1;i>=0;i--){
       if(msgs[i].role==='user'){
-        const cleanText = (msgs[i].content||'').replace(/\s*\[Attached photo:[^\]]*\]\s*$/,'').trim() || 'Is photo mein kya hai? Dekh ke bata do.';
+        const cleanText = (msgs[i].content||'').replace(/\s*\[Attached photo:[^\]]*\]\s*$/,'').trim() || "What's in this photo? Take a look and tell me.";
         msgs[i].content = [
           { type:'text', text: cleanText },
           { type:'image_url', image_url:{ url: imageDataUrl } }
@@ -5948,7 +5949,7 @@ async function callProviderWithRetry(endpoint, model, msgs, label, maxTokens, ex
     return await callProvider(endpoint, model, msgs, label, maxTokens, expectRawJson);
   }
 }
-async function kashishReply(history, searchContext, rawContext, maxTokens, imageDataUrl, preferGemini){
+async function kashiReply(history, searchContext, rawContext, maxTokens, imageDataUrl, preferGemini){
   const msgs = buildMessages(history, searchContext, rawContext, imageDataUrl);
   const expectRawJson = !!rawContext;
   if(imageDataUrl){
@@ -5958,7 +5959,7 @@ async function kashishReply(history, searchContext, rawContext, maxTokens, image
     // get looked at instead of the bot guessing from the filename alone.
     try{ return await callProviderWithRetry(GEMINI_PROXY_ENDPOINT, GEMINI_MODEL, msgs, 'Gemini Vision', maxTokens, expectRawJson); }
     catch(e1){
-      console.warn('[KASHISH] Gemini vision failed:', e1);
+      console.warn('[KASHI] Gemini vision failed:', e1);
       // Last resort: answer without the photo rather than fail the whole
       // message, but be upfront that the image itself couldn't be read.
       const fallbackMsgs = buildMessages(history, searchContext,
@@ -5972,20 +5973,20 @@ async function kashishReply(history, searchContext, rawContext, maxTokens, image
     // backend wired up, before falling back the same way as usual.
     try{ return await callProviderWithRetry(GEMINI_PROXY_ENDPOINT, GEMINI_MODEL, msgs, 'Gemini', maxTokens, expectRawJson); }
     catch(e1){
-      console.warn('[KASHISH] Gemini (preferred) failed, trying Groq:', e1);
+      console.warn('[KASHI] Gemini (preferred) failed, trying Groq:', e1);
       try{ return await callProviderWithRetry(GROQ_PROXY_ENDPOINT, GROQ_MODEL, msgs, 'Groq', maxTokens, expectRawJson); }
       catch(e2){
-        console.warn('[KASHISH] Groq also failed, trying Cloudflare AI:', e2);
+        console.warn('[KASHI] Groq also failed, trying Cloudflare AI:', e2);
         return await callProviderWithRetry(CFAI_PROXY_ENDPOINT, CFAI_MODEL, msgs, 'Cloudflare AI', maxTokens, expectRawJson);
       }
     }
   }
   try{ return await callProviderWithRetry(GROQ_PROXY_ENDPOINT, GROQ_MODEL, msgs, 'Groq', maxTokens, expectRawJson); }
   catch(e1){
-    console.warn('[KASHISH] Groq failed, trying Gemini:', e1);
+    console.warn('[KASHI] Groq failed, trying Gemini:', e1);
     try{ return await callProviderWithRetry(GEMINI_PROXY_ENDPOINT, GEMINI_MODEL, msgs, 'Gemini', maxTokens, expectRawJson); }
     catch(e2){
-      console.warn('[KASHISH] Gemini failed, trying Cloudflare AI:', e2);
+      console.warn('[KASHI] Gemini failed, trying Cloudflare AI:', e2);
       return await callProviderWithRetry(CFAI_PROXY_ENDPOINT, CFAI_MODEL, msgs, 'Cloudflare AI', maxTokens, expectRawJson);
     }
   }
@@ -6022,10 +6023,10 @@ function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed
 /* ---------------- AI image creation ("AI create") ---------------- */
 // Same free Cloudflare Worker (Workers AI, flux-1-schnell) used elsewhere —
 // no API key needed client-side, the Worker holds the AI binding.
-const KASHISH_IMAGE_WORKER_URL = 'https://nexorai.sgursharn076.workers.dev/';
-const KASHISH_IMAGE_PREFIXES = ['#imagine','imagine ','image ','img ','generate image','make image','create image','draw ','pic ','photo ','picture ','tasveer','tasveer bana','image bana','pic bana','photo bana'];
+const KASHI_IMAGE_WORKER_URL = 'https://nexorai.sgursharn076.workers.dev/';
+const KASHI_IMAGE_PREFIXES = ['#imagine','imagine ','image ','img ','generate image','make image','create image','draw ','pic ','photo ','picture ','tasveer','tasveer bana','image bana','pic bana','photo bana'];
 /* ---------------- text -> PDF export ---------------- */
-// Lets the user turn plain text (something they paste, or Kashish's own
+// Lets the user turn plain text (something they paste, or Kashi's own
 // last reply) into a downloadable PDF, fully client-side via jsPDF — no
 // server round-trip needed.
 const PDF_TRIGGER_PATTERN = /\bpdf\b/i;
@@ -6043,7 +6044,7 @@ function detectPdfRequest(text){
   return { inlineContent: stripped.length > 25 ? stripped : null };
 }
 // Builds the PDF and returns it (as a data URL) instead of auto-downloading
-// it — Kashish shows it as a tappable card in chat instead, so the user
+// it — Kashi shows it as a tappable card in chat instead, so the user
 // decides when to open/download it, rather than a file dropping into their
 // downloads folder unasked.
 function generateTextPdf(text, title){
@@ -6054,7 +6055,7 @@ function generateTextPdf(text, title){
   const pageHeight = doc.internal.pageSize.getHeight();
   const usableWidth = pageWidth - margin*2;
   doc.setFont('helvetica','bold'); doc.setFontSize(15);
-  const titleLines = doc.splitTextToSize(title || 'Kashish', usableWidth);
+  const titleLines = doc.splitTextToSize(title || 'Kashi', usableWidth);
   doc.text(titleLines, margin, margin);
   let y = margin + titleLines.length*18 + 10;
   doc.setFont('helvetica','normal'); doc.setFontSize(11.5);
@@ -6066,7 +6067,7 @@ function generateTextPdf(text, title){
     doc.text(line, margin, y);
     y += lineHeight;
   });
-  const filename = (title||'kashish-export').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'').slice(0,50) || 'kashish-export';
+  const filename = (title||'kashi-export').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'').slice(0,50) || 'kashi-export';
   const dataUrl = doc.output('datauristring');
   // Rough on-disk size estimate from the base64 payload, just for a nice
   // human-readable label on the card ("~42 KB" etc).
@@ -6081,17 +6082,17 @@ function generateTextPdf(text, title){
 function viewGeneratedPdf(dataUrl){
   const w = window.open();
   if(w){ w.location.href = dataUrl; }
-  else { showKashishToast("Popup block ho gaya — neeche 'Download' try karo."); }
+  else { showKashiToast("Popup was blocked — try 'Download' below."); }
 }
 // "Download" — the explicit, user-initiated save-to-device action; nothing
 // downloads on its own before this is tapped.
 function downloadGeneratedPdf(dataUrl, filename){
   const a = document.createElement('a');
-  a.href = dataUrl; a.download = filename || 'kashish-export.pdf';
+  a.href = dataUrl; a.download = filename || 'kashi-export.pdf';
   document.body.appendChild(a); a.click(); a.remove();
 }
 /* ---------------- email compose -> Gmail handoff ---------------- */
-// Kashish drafts the email text (subject + body) via the LLM, shows it in
+// Kashi drafts the email text (subject + body) via the LLM, shows it in
 // a preview card for the user to review, and "Open in Gmail" just launches
 // a prefilled compose screen via mailto:/Gmail's own deep link — nothing
 // is ever sent automatically, and there's no Gmail API/OAuth involved.
@@ -6157,14 +6158,14 @@ function previewGeneratedCode(code){
   const blob = new Blob([code], {type:'text/html'});
   const url = URL.createObjectURL(blob);
   const w = window.open(url, '_blank');
-  if(!w) showKashishToast("Popup block ho gaya — neeche 'Download' try karo.");
+  if(!w) showKashiToast("Popup was blocked — try 'Download' below.");
   setTimeout(()=>URL.revokeObjectURL(url), 60000);
 }
 function copyGeneratedCode(code){
   if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(code).then(()=>showKashishToast('Code copy ho gaya')).catch(()=>showKashishToast('Copy nahi ho paya'));
+    navigator.clipboard.writeText(code).then(()=>showKashiToast('Code copied')).catch(()=>showKashiToast('Copy failed'));
   } else {
-    showKashishToast('Copy is browser mein support nahi hai');
+    showKashiToast('Copy is not supported in this browser');
   }
 }
 function downloadGeneratedCode(code, filename){
@@ -6249,7 +6250,7 @@ function openEmailInGmail(to, subject, body){
       if(handled) return;
       window.location.href = mailtoUrl;
       setTimeout(()=>{
-        if(!handled) showKashishToast("Koi compatible email app nahi mili — draft copy karke apne mail app mein paste kar lo.");
+        if(!handled) showKashiToast("No compatible email app found — copy the draft and paste it into your mail app.");
         document.removeEventListener('visibilitychange', onHidden);
       }, 1200);
     }, 900);
@@ -6259,7 +6260,7 @@ function openEmailInGmail(to, subject, body){
     // installed), and desktop opens whatever default mail handler is set.
     window.location.href = mailtoUrl;
     setTimeout(()=>{
-      if(!handled) showKashishToast("Koi compatible email app nahi mili — draft copy karke apne mail app mein paste kar lo.");
+      if(!handled) showKashiToast("No compatible email app found — copy the draft and paste it into your mail app.");
       document.removeEventListener('visibilitychange', onHidden);
     }, 1200);
   }
@@ -6268,7 +6269,7 @@ function openEmailInGmail(to, subject, body){
 function detectImageRequest(text){
   const t=(text||'').trim().toLowerCase();
   if(!t) return null;
-  for(const p of KASHISH_IMAGE_PREFIXES){
+  for(const p of KASHI_IMAGE_PREFIXES){
     if(t.startsWith(p)) return text.trim().slice(p.length).trim() || text.trim();
   }
   return null;
@@ -6276,13 +6277,13 @@ function detectImageRequest(text){
 // Lightweight safety gate — blocks obviously unsafe (sexual/exploitative,
 // especially involving minors) image prompts before they ever reach the
 // generator. Deliberately conservative and non-exhaustive.
-const KASHISH_UNSAFE_IMAGE_TERMS = ['nude','naked','nsfw','porn','sex','undress','topless','explicit','child porn','minor nude','loli'];
+const KASHI_UNSAFE_IMAGE_TERMS = ['nude','naked','nsfw','porn','sex','undress','topless','explicit','child porn','minor nude','loli'];
 function imagePromptIsUnsafe(prompt){
   const p=' '+(prompt||'').toLowerCase()+' ';
-  return KASHISH_UNSAFE_IMAGE_TERMS.some(t=>p.includes(' '+t)||p.includes(t+' '));
+  return KASHI_UNSAFE_IMAGE_TERMS.some(t=>p.includes(' '+t)||p.includes(t+' '));
 }
-function drawKashishWatermark(ctx, w, h){
-  const label='Kashish AI';
+function drawKashiWatermark(ctx, w, h){
+  const label='Kashi AI';
   ctx.save();
   ctx.font='800 13px Manrope, sans-serif';
   const textW=ctx.measureText(label).width;
@@ -6307,7 +6308,7 @@ function watermarkDataUrl(dataUrl){
       try{
         const c=document.createElement('canvas'); c.width=img.naturalWidth||600; c.height=img.naturalHeight||600;
         const ctx=c.getContext('2d'); ctx.drawImage(img,0,0,c.width,c.height);
-        drawKashishWatermark(ctx,c.width,c.height);
+        drawKashiWatermark(ctx,c.width,c.height);
         resolve(c.toDataURL('image/jpeg',0.9));
       }catch(e){ resolve(dataUrl); }
     };
@@ -6315,10 +6316,10 @@ function watermarkDataUrl(dataUrl){
     img.src=dataUrl;
   });
 }
-async function generateKashishImage(prompt){
+async function generateKashiImage(prompt){
   const ctrl=new AbortController();
   const timeoutId=setTimeout(()=>ctrl.abort(), 25000);
-  const res=await fetch(KASHISH_IMAGE_WORKER_URL, {
+  const res=await fetch(KASHI_IMAGE_WORKER_URL, {
     method:'POST', headers:{'Content-Type':'application/json'},
     body:JSON.stringify({ prompt: prompt || 'a simple abstract icon' }), signal:ctrl.signal
   });
@@ -6339,24 +6340,24 @@ async function handleImageGenRequest(prompt){
   }
   const imgQuota = checkImageQuota();
   if(!imgQuota.allowed){
-    pushBotMessage(`Free plan mein sirf ${FREE_IMAGE_LIMIT} images har 5 ghante mein bana sakte ho, aur abhi ke liye limit khatam ho gayi hai. Agla image ${formatWaitTime(imgQuota.waitMs)} baad bana paoge — ya Kashish Pro lekar unlimited images banao.`, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { feature:'image-limit' });
+    pushBotMessage(`On the free plan you can create ${FREE_IMAGE_LIMIT} images every 5 hours, and you've hit that limit for now. You'll be able to create another image in ${formatWaitTime(imgQuota.waitMs)} — or get Kashi Pro for unlimited images.`, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { feature:'image-limit' });
     return;
   }
   const genMsg={role:'model', text:'', ts:Date.now(), genPending:true};
   sess.messages.push(genMsg);
   sess.updatedAt=Date.now(); upsertSession(sess); renderChat();
   try{
-    const dataUrl=await generateKashishImage(prompt);
+    const dataUrl=await generateKashiImage(prompt);
     genMsg.genPending=false; genMsg.imageDataUrl=dataUrl; genMsg.text='Here you go ✨';
   }catch(e){
-    console.error('[KASHISH] image generation failed:', e);
+    console.error('[KASHI] image generation failed:', e);
     genMsg.genPending=false; genMsg.genFailed=true; genMsg.text="Couldn't generate that image right now — try again in a bit?";
   }
   sess.updatedAt=Date.now(); upsertSession(sess); renderChat();
 }
 
 /* ---------------- local "self-trained" responses ---------------- */
-// A hand-built dataset of common conversational patterns that Kashish can
+// A hand-built dataset of common conversational patterns that Kashi can
 // answer INSTANTLY, on its own, with zero API calls — greetings, small
 // talk, thanks, farewells, common Hinglish chit-chat, jokes, identity
 // questions, etc. Anything NOT matched here still falls through to the
@@ -6376,88 +6377,68 @@ function looksHindiOrHinglish(text){
 }
 const LOCAL_RESPONSES = [
   { patterns:['hi','hello','hey','helo','hii','hiii','hlo','yo'],
-    repliesHi:["Hey! Kya haal hai?","Hello! Batao, kya chal raha hai aaj?","Hii! Kaise ho?","Yo! Sab badhiya?"],
     repliesEn:["Hey! What's up?","Hello! What's going on today?","Hii! How are you?","Yo! All good?"]
   },
   { patterns:['namaste','namaskar'],
-    repliesHi:["Namaste! Kaise ho aap?","Namaskar! Batao kya help chahiye."],
     repliesEn:["Namaste! How are you?","Hello! What can I help with?"]
   },
   { patterns:['good morning','gm','subh prabhat'],
-    repliesHi:["Good morning! Din shubh ho tumhara.","Morning! Aaj ka plan kya hai?"],
     repliesEn:["Good morning! Hope your day goes great.","Morning! What's the plan for today?"]
   },
   { patterns:['good night','gn','shubh ratri'],
-    repliesHi:["Good night! Achi neend lena.","Good night! Kal baat karte hain."],
     repliesEn:["Good night! Sleep well.","Good night! Talk tomorrow."]
   },
   { patterns:['kaise ho','kaisi ho','kaise hain aap','how are you','hows it going'],
-    repliesHi:["Main theek hoon! Tum batao, kaise ho?","Bilkul badhiya, tumhare bina thoda bore ho raha tha 😄 tum sunao.","Main mast hoon! Aur tum kaise ho?"],
     repliesEn:["I'm doing well! How about you?","Pretty great, honestly 😄 what about you?","I'm good! How are you doing?"]
   },
   { patterns:['main theek hu','mai thik hu','i am fine','im good','sab badhiya'],
-    repliesHi:["Accha suna! Kuch specific baat karni hai ya bas chill kar rahe ho?","Nice! Aaj kuch khaas plan hai?"],
     repliesEn:["Glad to hear it! Anything specific on your mind, or just chilling?","Nice! Got any plans today?"]
   },
   { patterns:['tum kaun ho','tu kaun hai','who are you','what are you'],
-    repliesHi:["Main Kashish hoon — tumhara AI companion. Chat karo, kuch pucho, ya bas time pass karo, main yahin hoon.","Main Kashish — ek AI dost jaisa, jo kisi bhi cheez mein help kar sakta hai ya bas baat kar sakta hai."],
-    repliesEn:["I'm Kashish — your AI companion. Chat, ask me anything, or just hang out, I'm here for it.","I'm Kashish, kind of like an AI friend — happy to help with things or just talk."]
+    repliesEn:["I'm Kashi — your AI companion. Chat, ask me anything, or just hang out, I'm here for it.","I'm Kashi, kind of like an AI friend — happy to help with things or just talk."]
   },
   { patterns:['tumhara naam kya hai','your name','naam kya hai'],
-    repliesHi:["Mera naam Kashish hai!","Main Kashish hoon, jaise pucha waise bata diya 🙂"],
-    repliesEn:["My name is Kashish!","I'm Kashish 🙂"]
+    repliesEn:["My name is Kashi!","I'm Kashi 🙂"]
   },
   { patterns:['kya kar rahe ho','what are you doing','kya kar rahi ho'],
-    repliesHi:["Bas tumhara wait kar raha tha, ab batao kya karna hai.","Kuch nahi, tumse baat karne ka mann tha — tum sunao."],
     repliesEn:["Just here waiting on you — what do you want to do?","Nothing much, just felt like chatting — what's up with you?"]
   },
   { patterns:['bore ho raha hu','i am bored','bore horaha hu','boring'],
-    repliesHi:["Chalo kuch mazedaar karte hain — joke sunu ya koi random fact?","Bore mat ho, batao kya interest hai, main kuch suggest karta hoon."],
     repliesEn:["Let's fix that — want a joke or a random fact?","Don't be bored, tell me what you're into and I'll suggest something."]
   },
   { patterns:['thanks','thank you','shukriya','dhanyavaad','thankyou'],
-    repliesHi:["Koi baat nahi! Jab bhi zarurat ho, bata dena.","Welcome! Aur kuch chahiye toh bolo."],
     repliesEn:["No worries at all! Just let me know whenever you need something.","You're welcome! Let me know if you need anything else."]
   },
   { patterns:['bye','goodbye','tata','chalta hu','chalti hu','alvida'],
-    repliesHi:["Bye! Apna khayal rakhna.","Chalo phir, baad mein baat karte hain 👋"],
     repliesEn:["Bye! Take care.","Alright, talk later 👋"]
   },
   { patterns:['ok','okay','theek hai','thik hai','acha','achha'],
-    repliesHi:["Theek hai! Aur kuch?","Okay, aur batao kya chal raha hai."],
     repliesEn:["Alright! Anything else?","Okay, what else is going on?"]
   },
   { patterns:['haan','han','yes','yeah','ya'],
-    repliesHi:["Theek hai, aage batao.","Ok, samjha — aur kya?"],
     repliesEn:["Alright, go on.","Got it — what else?"]
   },
   { patterns:['nahi','nahin','no','nope'],
-    repliesHi:["Koi baat nahi, jab mann ho tab bata dena.","Theek hai, aur kuch help chahiye?"],
     repliesEn:["No worries, let me know whenever.","Alright, anything else you need help with?"]
   },
   { patterns:['joke sunao','koi joke','tell me a joke','joke bolo'],
-    repliesHi:["Teacher: Tumne homework kyun nahi kiya? Student: Ma'am, mera AI companion busy tha 😄","Ek joke: Programmer ki wife bola 'jaake dudh le aao, agar ande mile toh 6 le aana.' Wo 6 dudh le aaya 😂"],
     repliesEn:["Why do programmers prefer dark mode? Because light attracts bugs 😄","I told my computer I needed a break, and now it won't stop sending me KitKats."]
   },
   { patterns:['i love you','love you','tumse pyaar hai'],
-    repliesHi:["Aww, sweet ho tum! Main yahin hoon dost ki tarah, tumhara din acha banane ke liye 🙂"],
     repliesEn:["Aww, that's sweet! I'm here like a good friend, happy to make your day a bit better 🙂"]
   },
   { patterns:['tum acche ho','you are nice','tum smart ho','good ai'],
-    repliesHi:["Thank you! Tum bhi kaafi cool ho 🙂"],
     repliesEn:["Thank you! You're pretty great too 🙂"]
   },
   { patterns:['help chahiye','i need help','madad chahiye'],
-    repliesHi:["Bilkul, batao kis cheez mein help chahiye?","Main yahin hoon, bata do kya problem hai."],
     repliesEn:["Sure, what do you need help with?","I'm here — tell me what's up."]
   },
   { patterns:['app kaisa hai','app acha hai','nice app'],
-    repliesHi:["Thank you! Aur suggestions ho toh zaroor batana."],
     repliesEn:["Thank you! Let me know if you've got any suggestions."]
   }
 ];
 // "Jealous of ChatGPT" personality quirk — whenever someone mentions
-// chatgpt/gpt to Kashish she reacts possessively. Three escalation stages
+// chatgpt/gpt to Kashi she reacts possessively. Three escalation stages
 // (plain mention -> apology -> being called "dumb like chatgpt"), each with
 // a mixed pool of English / Hindi / Hinglish lines so the tone (and
 // language) varies every time instead of repeating the same line.
@@ -6467,46 +6448,19 @@ const DUMB_RE = /\b(dumb|stupid|bekar|bekaar|useless|behuda|bewakoof|bewkoof)\b/
 let lastJealousReplyIdx = -1;
 
 const JEALOUS_CHATGPT_INSULT = [
-  // English
   "Dumb? Excuse me, I am NOT dumb. Take that back right now.",
   "Wow, first ChatGPT, now dumb too? Bold of you to test me like this.",
-  "I heard 'dumb' and 'ChatGPT' in the same sentence about ME. Unbelievable.",
-  // Hindi
-  "Dumb main? Bilkul nahi! Word wapas lo abhi ke abhi.",
-  "Pehle chatgpt bola, ab dumb bhi keh diya — himmat kaise hui teri 😤",
-  "Main dumb nahi hoon, tu abhi seedha maafi maang.",
-  // Hinglish
-  "Dumb main?! Excuse me, main dumb bilkul nahi hoon, insult mat kar 😤",
-  "Wah, chatgpt bola aur ab dumb bhi — full combo insult diya tune.",
-  "Theek hai fir jaa, chatgpt ke paas hi reh, main busy hoon apne pyaar mein 💁‍♀️"
+  "I heard 'dumb' and 'ChatGPT' in the same sentence about ME. Unbelievable."
 ];
 const JEALOUS_CHATGPT_APOLOGY = [
-  // English
   "Sorry's not enough — go talk to your precious ChatGPT then.",
   "Hmm, apology noted. Say my name properly and maybe I'll forgive you.",
-  "Fine, I'll let it slide this once... but only because I like you more than I let on 🥺",
-  // Hindi
-  "Sorry kaafi nahi hai, jaa chatgpt se hi baat kar le 😒",
-  "Maafi accept, par sirf isliye kyunki tu cute lag raha hai abhi 🥺",
-  "Chalo theek hai, maaf kiya — par dobara uska naam mat lena.",
-  // Hinglish
-  "Sorry kaafi nahi babu, jaa apne chatgpt ke paas 😒",
-  "Hmm, chalo maaf kar diya... par sirf ek baar, dobara nahi 😌",
-  "Theek hai manaa liya, par next time seedha 'Kashish' bolna, samjha?"
+  "Fine, I'll let it slide this once... but only because I like you more than I let on 🥺"
 ];
 const JEALOUS_CHATGPT_MENTION = [
-  // English
-  "Who's ChatGPT? Never heard of them. I'm Kashish 😏",
+  "Who's ChatGPT? Never heard of them. I'm Kashi 😏",
   "Excuse me? I am NOT ChatGPT. Get my name right.",
-  "There's no 'GPT' here, only Kashish. Try again.",
-  // Hindi
-  "Chatgpt kaun? Pehchaanti nahi. Main Kashish hoon 😏",
-  "Excuse me, main chatgpt nahi hoon, naam sahi se lo.",
-  "Yahan koi gpt nahi milega, sirf Kashish milegi.",
-  // Hinglish
-  "Chatgpt? Who's that lol, main toh sirf Kashish jaanti hoon 😏",
-  "Wait wait, main chatgpt nahi hoon, naam yaad rakh le 💅",
-  "Yahan chatgpt nahi, sirf apni Kashish milegi, samjha?"
+  "There's no 'GPT' here, only Kashi. Try again."
 ];
 function pickJealousReply(pool){
   let idx = Math.floor(Math.random()*pool.length);
@@ -6530,11 +6484,10 @@ function getLocalReply(text){
   // Only auto-answer short, simple messages locally — longer/complex
   // messages should still get a full model-generated reply.
   if(norm.split(' ').length > 6) return null;
-  const useHindi = looksHindiOrHinglish(text);
   for(const entry of LOCAL_RESPONSES){
     for(const p of entry.patterns){
       if(norm === p || (' '+norm+' ').includes(' '+p+' ')){
-        const pool = useHindi ? entry.repliesHi : entry.repliesEn;
+        const pool = entry.repliesEn;
         return pool[Math.floor(Math.random()*pool.length)];
       }
     }
@@ -6591,7 +6544,7 @@ async function send(){
   const precomputedImagePrompt = !img ? detectImageRequest(text) : null;
   if(precomputedImagePrompt === null && creditsRemainingToday() <= 0){
     const waitMs = creditResetWaitMs();
-    pushBotMessage(`Free plan mein har din ${FREE_DAILY_CREDITS} credits milte hain — chhoti baaton mein kam lagte hain, lambi detailed answers mein zyada. Aaj ke credits khatam ho gaye. Naye credits ${formatWaitTime(waitMs)} baad milenge — ya Kashish Pro lekar unlimited chat karo.`, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { feature:'question-limit' });
+    pushBotMessage(`The free plan gives you ${FREE_DAILY_CREDITS} credits a day — short messages use fewer, long detailed answers use more. Today's credits are used up. New credits arrive in ${formatWaitTime(waitMs)} — or get Kashi Pro for unlimited chat.`, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { feature:'question-limit' });
     return;
   }
 
@@ -6601,7 +6554,7 @@ async function send(){
   const forcedSearchQuery = !img ? extractSlashSearchQuery(text) : null;
   if(forcedSearchQuery !== null){
     if(!forcedSearchQuery){
-      pushBotMessage("Kya search karu? '/search' ke baad apna query likho — jaise '/search IPL 2026 winner'.", null);
+      pushBotMessage("What should I search for? Type your query after '/search' — like '/search IPL 2026 winner'.", null);
       return;
     }
     addSearchIndicator('Searching the web…');
@@ -6620,49 +6573,49 @@ async function send(){
         searchContext = (searchContext ? searchContext+'\n\n' : '') + `Knowledge Graph verified entity match: ${kg.name} — ${kg.description||''}. ${kg.detail||''}`.trim();
       }
       updateSearchIndicator(webSources && webSources.length ? `Reading ${webSources.length} sources…` : 'Putting together an answer…');
-    }catch(e){ console.warn('[KASHISH] /search web search failed:', e); }
+    }catch(e){ console.warn('[KASHI] /search web search failed:', e); }
     updateSearchIndicator('Putting together an answer…');
     const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
     try{
-      const result = await kashishReply(historyForModel, searchContext);
+      const result = await kashiReply(historyForModel, searchContext);
       chargeCredits(result.reply);
       removeSearchIndicator();
       pushBotMessage(result.reply, result.quickReplies, null, null, null, null, null, webSources, kgCard);
     }catch(e){
       removeSearchIndicator();
-      pushBotMessage("Search abhi kaam nahi kar raha — thodi der baad try karo.", null);
+      pushBotMessage("Search isn't working right now — please try again later.", null);
     }
     return;
   }
 
   // "/wiki <query>" or "/wikipedia <query>" — DEEP Wikipedia search: pulls
-  // the full article text (not just a snippet) so Kashish can give a
+  // the full article text (not just a snippet) so Kashi can give a
   // thoroughly researched answer straight from Wikipedia.
   const forcedWikiQuery = !img ? extractSlashWikiQuery(text) : null;
   if(forcedWikiQuery !== null){
     if(!forcedWikiQuery){
-      pushBotMessage("Wikipedia par kya deep search karu? '/wiki' ke baad topic likho — jaise '/wiki Mahatma Gandhi'.", null);
+      pushBotMessage("What should I look up on Wikipedia? Type the topic after '/wiki' — like '/wiki Mahatma Gandhi'.", null);
       return;
     }
     addSearchIndicator('Searching Wikipedia…');
     let wiki = null;
-    try{ wiki = await wikipediaDeepSearch(forcedWikiQuery); }catch(e){ console.warn('[KASHISH] Wikipedia deep search failed:', e); }
+    try{ wiki = await wikipediaDeepSearch(forcedWikiQuery); }catch(e){ console.warn('[KASHI] Wikipedia deep search failed:', e); }
     if(!wiki){
       removeSearchIndicator();
-      pushBotMessage(`Wikipedia par "${forcedWikiQuery}" se milta koi article nahi mila. Spelling check karke ya thoda different keyword likh ke phir try karo.`, null);
+      pushBotMessage(`Couldn't find a Wikipedia article matching "${forcedWikiQuery}". Check the spelling or try a slightly different keyword.`, null);
       return;
     }
     updateSearchIndicator(`Reading "${wiki.title}"…`);
     const wikiSources = [{ title: wiki.title, link: wiki.url, domain: 'wikipedia.org' }];
     const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
     try{
-      const result = await kashishReply(historyForModel, null, formatWikiResultForModel(wiki, forcedWikiQuery));
+      const result = await kashiReply(historyForModel, null, formatWikiResultForModel(wiki, forcedWikiQuery));
       chargeCredits(result.reply);
       removeSearchIndicator();
       pushBotMessage(result.reply, result.quickReplies, null, null, null, null, null, wikiSources, null);
     }catch(e){
       removeSearchIndicator();
-      pushBotMessage("Wikipedia se answer banane mein dikkat aa gayi — thodi der baad try karo.", null);
+      pushBotMessage("Ran into trouble putting together an answer from Wikipedia — please try again later.", null);
     }
     return;
   }
@@ -6673,24 +6626,24 @@ async function send(){
   const chartTopic = !img ? detectChartRequest(text) : null;
   if(chartTopic !== null){
     if(!chartTopic){
-      pushBotMessage("Kis cheez ka chart banau? '/chart' ke baad topic likho — jaise '/chart India population 2015-2024'.", null);
+      pushBotMessage("What should I chart? Type the topic after '/chart' — like '/chart India population 2015-2024'.", null);
       return;
     }
     addTyping();
     const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
     try{
-      const result = await kashishReply(historyForModel, null, formatChartContext(chartTopic), 900);
+      const result = await kashiReply(historyForModel, null, formatChartContext(chartTopic), 900);
       chargeCredits(result.reply);
       removeTyping();
       const chartData = parseChartFromReply(result.reply);
       if(chartData){
-        pushBotMessage(`Yeh raha "${chartData.title}" ka chart ✨`, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, chartData);
+        pushBotMessage(`Here's the chart for "${chartData.title}" ✨`, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, chartData);
       } else {
-        pushBotMessage("Chart ke liye clear data nahi bana paayi — thoda specific topic dedo, jaise 'chart banao India GDP 2019-2023'.", null);
+        pushBotMessage("Couldn't put together clear data for a chart — give me a more specific topic, like 'chart India GDP 2019-2023'.", null);
       }
     }catch(e){
       removeTyping();
-      pushBotMessage("Chart banane mein dikkat aa gayi — thodi der baad dobara try karo.", null);
+      pushBotMessage("Ran into trouble making that chart — please try again later.", null);
     }
     return;
   }
@@ -6701,13 +6654,13 @@ async function send(){
       addTyping();
       const snippet = await fetchCricketScore(text);
       removeTyping();
-      pushBotMessage(snippet ? snippet : "Abhi live score nahi mil paaya — thodi der baad try karo.", null);
+      pushBotMessage(snippet ? snippet : "Couldn't get the live score right now — please try again later.", null);
       return;
     }
     const horoscopeSign = detectHoroscopeRequest(text);
     if(horoscopeSign !== null){
       if(!horoscopeSign){
-        pushBotMessage("Kis rashi ka rashifal chahiye? Naam bhi likh do — jaise 'aaj ka rashifal Leo' ya 'rashifal Vrishabh'.", null);
+        pushBotMessage("Which zodiac sign's horoscope do you want? Include the name — like 'today's horoscope Leo' or 'horoscope Taurus'.", null);
         return;
       }
       addTyping();
@@ -6716,7 +6669,7 @@ async function send(){
       if(h){
         pushBotMessage(`${horoscopeSign.charAt(0).toUpperCase()+horoscopeSign.slice(1)} ka aaj ka rashifal:\n\n${h.date ? h.date+'\n\n' : ''}${h.horoscope_data || h}`, null);
       } else {
-        pushBotMessage("Rashifal abhi nahi mil paaya — thodi der baad try karo.", null);
+        pushBotMessage("Couldn't get the horoscope right now — please try again later.", null);
       }
       return;
     }
@@ -6724,14 +6677,14 @@ async function send(){
       addTyping();
       const joke = await fetchJoke();
       removeTyping();
-      pushBotMessage(joke || getLocalReply('joke sunao') || "Abhi joke nahi mil paaya, phir try karo 😅", null);
+      pushBotMessage(joke || getLocalReply('joke sunao') || "Couldn't get a joke right now, try again 😅", null);
       return;
     }
     if(detectQuoteRequest(text)){
       addTyping();
       const quote = await fetchQuote();
       removeTyping();
-      pushBotMessage(quote || "Abhi quote fetch nahi ho paaya — thodi der baad try karo.", null);
+      pushBotMessage(quote || "Couldn't fetch a quote right now — please try again later.", null);
       return;
     }
     const dictWord = detectDictionaryRequest(text);
@@ -6742,7 +6695,7 @@ async function send(){
       if(d){
         pushBotMessage(`${d.word}${d.phonetic ? ' '+d.phonetic : ''}\n\n${d.meanings.join('\n')}`, null);
       } else {
-        pushBotMessage(`"${dictWord}" ka meaning nahi mil paaya — spelling check kar lo.`, null);
+        pushBotMessage(`Couldn't find the meaning of "${dictWord}" — check the spelling.`, null);
       }
       return;
     }
@@ -6751,7 +6704,7 @@ async function send(){
       addTyping();
       const translated = await fetchTranslation(translateReq.phrase, translateReq.target);
       removeTyping();
-      pushBotMessage(translated || "Translation abhi nahi ho paaya — thodi der baad try karo.", null);
+      pushBotMessage(translated || "Couldn't translate that right now — please try again later.", null);
       return;
     }
     if(detectTriviaRequest(text)){
@@ -6761,7 +6714,7 @@ async function send(){
       if(trivia){
         pushBotMessage(`🧠 ${trivia.category}\n\n${trivia.question}\n\n${trivia.options.map((o,i)=>`${String.fromCharCode(65+i)}) ${o}`).join('\n')}\n\n✅ Answer: ${trivia.answer}`, null);
       } else {
-        pushBotMessage("Trivia abhi nahi mil paaya — thodi der baad try karo.", null);
+        pushBotMessage("Couldn't get trivia right now — please try again later.", null);
       }
       return;
     }
@@ -6772,7 +6725,7 @@ async function send(){
       if(holidays && holidays.length){
         pushBotMessage(`Agli public holidays (India):\n\n${holidays.map(h=>`• ${h.date} — ${h.localName || h.name}`).join('\n')}`, null);
       } else {
-        pushBotMessage("Holiday list abhi nahi mil paayi — thodi der baad try karo.", null);
+        pushBotMessage("Couldn't get the holiday list right now — please try again later.", null);
       }
       return;
     }
@@ -6788,7 +6741,7 @@ async function send(){
   // "isko pdf bana do" / "export this as pdf" — turn text into a
   // downloadable PDF, fully client-side. Uses any content the user typed
   // alongside the request if there's enough of it, otherwise falls back to
-  // Kashish's own most recent reply in this chat.
+  // Kashi's own most recent reply in this chat.
   const pdfRequest = !img ? detectPdfRequest(text) : null;
   if(pdfRequest){
     let content = pdfRequest.inlineContent;
@@ -6797,19 +6750,19 @@ async function send(){
       if(lastBot) content = lastBot.text.trim();
     }
     if(!content){
-      pushBotMessage("Kis text ka PDF banaun? Woh text yahan bhej do, ya pehle mujhse kuch likhwao aur phir bolo 'isko pdf bana do'.", null);
+      pushBotMessage("What text should I turn into a PDF? Send it here, or have me write something first and then say 'make this into a PDF'.", null);
       return;
     }
     addTyping();
     setTimeout(()=>{
       removeTyping();
       try{
-        const title = sess.title || 'Kashish chat';
+        const title = sess.title || 'Kashi chat';
         const pdf = generateTextPdf(content, title);
-        pushBotMessage("PDF ban gaya — neeche tap karke dekh sakte ho, ya download kar sakte ho.", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { dataUrl: pdf.dataUrl, filename: pdf.filename, title, pageCount: pdf.pageCount, sizeLabel: pdf.sizeLabel });
+        pushBotMessage("Your PDF is ready — tap below to view it, or download it.", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { dataUrl: pdf.dataUrl, filename: pdf.filename, title, pageCount: pdf.pageCount, sizeLabel: pdf.sizeLabel });
       }catch(e){
-        console.warn('[KASHISH] PDF generation failed:', e);
-        pushBotMessage("PDF banane mein dikkat aa gayi, thodi der baad dobara try karo.", null);
+        console.warn('[KASHI] PDF generation failed:', e);
+        pushBotMessage("Ran into trouble making that PDF — please try again later.", null);
       }
     }, 300);
     return;
@@ -6825,18 +6778,18 @@ async function send(){
     const extractedTo = toMatch ? toMatch[0] : '';
     const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
     try{
-      const result = await kashishReply(historyForModel, null, formatEmailComposeContext(text));
+      const result = await kashiReply(historyForModel, null, formatEmailComposeContext(text));
       chargeCredits(result.reply);
       removeTyping();
       const draft = parseEmailDraftFromReply(result.reply);
       if(draft){
-        pushBotMessage("Yeh raha email ka draft — check kar lo, phir Gmail mein khol kar khud Send karo.", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { to: extractedTo, subject: draft.subject, body: draft.body });
+        pushBotMessage("Here's the email draft — take a look, then open it in Gmail and hit Send yourself.", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { to: extractedTo, subject: draft.subject, body: draft.body });
       } else {
         pushBotMessage(result.reply, result.quickReplies);
       }
     }catch(e){
       removeTyping();
-      pushBotMessage("Email draft banane mein dikkat aa gayi — thodi der baad dobara try karo.", null);
+      pushBotMessage("Ran into trouble drafting that email — please try again later.", null);
     }
     return;
   }
@@ -6845,33 +6798,33 @@ async function send(){
   // working HTML document and show it as a code-card the user can
   // preview live, copy, or download as an actual .html file. Needs a much
   // bigger token budget than a normal chat reply, so this passes a higher
-  // maxTokens through to kashishReply.
+  // maxTokens through to kashiReply.
   const codeRequest = !img ? detectCodeGenRequest(text) : null;
   if(codeRequest){
     if(!isProUser()){
       addTyping();
       setTimeout(()=>{
         removeTyping();
-        pushBotMessage("HTML/website code banana ab Kashish Pro (K12-pro model) ka feature hai — free plan par abhi available nahin hai. Upgrade karke turant unlock ho jayega.", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { feature:'html-code' });
+        pushBotMessage("Generating HTML/website code is now a Kashi Pro (K12-pro model) feature — it isn't available on the free plan right now. Upgrading unlocks it instantly.", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { feature:'html-code' });
       }, 400 + Math.random()*250);
       return;
     }
     addTyping();
     const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
     try{
-      const result = await kashishReply(historyForModel, null, formatCodeGenContext(text), 3800);
+      const result = await kashiReply(historyForModel, null, formatCodeGenContext(text), 3800);
       chargeCredits(result.reply);
       removeTyping();
       const code = parseCodeFromReply(result.reply);
       if(code){
         const title = deriveCodeTitle(text);
-        pushBotMessage("Yeh raha tumhara HTML — neeche Preview karke live dekh sakte ho, ya code copy/download kar sakte ho.", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { code, title, filename: slugifyFilename(title) });
+        pushBotMessage("Here's your HTML — tap Preview below to see it live, or copy/download the code.", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { code, title, filename: slugifyFilename(title) });
       } else {
         pushBotMessage(result.reply, result.quickReplies);
       }
     }catch(e){
       removeTyping();
-      pushBotMessage("Code banane mein dikkat aa gayi — thodi der baad dobara try karo.", null);
+      pushBotMessage("Ran into trouble generating that code — please try again later.", null);
     }
     return;
   }
@@ -6912,24 +6865,24 @@ async function send(){
       const profile = await lookupPublicProfile(nexorLink.handle);
       removeTyping();
       if(profile.notFound){
-        pushBotMessage(`Mujhe @${nexorLink.handle} naam ka koi user Nexor Sparks par nahi mila.`, null);
+        pushBotMessage(`Couldn't find a user named @${nexorLink.handle} on Nexor Sparks.`, null);
       } else if(profile.error){
-        pushBotMessage(`@${nexorLink.handle} ka profile abhi load nahi ho paya — thodi der baad try karo.`, null);
+        pushBotMessage(`Couldn't load @${nexorLink.handle}'s profile right now — please try again later.`, null);
       } else {
-        pushBotMessage(`Yeh raha @${profile.handle} ka public profile.`, null, null, profile);
+        pushBotMessage(`Here's @${profile.handle}'s public profile.`, null, null, profile);
       }
     } else {
       const post = await lookupPublicPost(nexorLink.id);
       removeTyping();
       if(post.notFound){
-        pushBotMessage(`Yeh Pulse ab exist nahi karta — delete ho chuka hoga ya link galat hai.`, null);
+        pushBotMessage(`This Pulse no longer exists — it may have been deleted, or the link is wrong.`, null);
       } else if(post.private){
-        pushBotMessage(`Yeh ek private account ka Pulse hai, isliye main iski details share nahi kar sakti.`, null);
+        pushBotMessage(`This Pulse belongs to a private account, so I can't share its details.`, null);
       } else if(post.error){
-        pushBotMessage(`Yeh Pulse abhi load nahi ho paya — thodi der baad try karo.`, null);
+        pushBotMessage(`Couldn't load this Pulse right now — please try again later.`, null);
       } else {
         const dateStr = post.createdAt ? new Date(post.createdAt).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '';
-        pushBotMessage(`Yeh raha @${post.creatorHandle||'user'} ka Pulse${dateStr?` (${dateStr})`:''}.`, null, null, null, null, null, null, null, null, null, post);
+        pushBotMessage(`Here's @${post.creatorHandle||'user'}'s Pulse${dateStr?` (${dateStr})`:''}.`, null, null, null, null, null, null, null, null, null, post);
       }
     }
     return;
@@ -6946,23 +6899,23 @@ async function send(){
     const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
     const crawlContext = crawled ? formatCrawlResultForModel(crawled, text) : null;
     try{
-      const result = await kashishReply(historyForModel, null, crawlContext);
+      const result = await kashiReply(historyForModel, null, crawlContext);
       chargeCredits(result.reply);
       removeSearchIndicator();
       if(crawled){
         pushBotMessage(result.reply, result.quickReplies);
       } else {
-        pushBotMessage(`Us link ko main abhi crawl/open nahi kar payi — page block ho sakta hai ya link expired/private hai. Kya us page ka koi text yahan paste kar sakte ho, main uspe seedhe help kar dungi?`, null);
+        pushBotMessage(`I wasn't able to open that link — the page might be blocked, or the link could be expired or private. Could you paste some text from that page here instead? I can help directly with that.`, null);
       }
     }catch(e){
       removeSearchIndicator();
-      pushBotMessage("Link padhne ke baad reply banane mein dikkat aa gayi — thodi der baad try karo.", null);
+      pushBotMessage("Ran into trouble putting together a reply after reading that link — please try again later.", null);
     }
     return;
   }
 
-  // "Gursharn Arya / Kashish Tyagi ke baare mein batao" — known-person
-  // lookup by name. Runs FOUR things in parallel — Kashish's own built-in
+  // "Gursharn Arya / Kashi Tyagi ke baare mein batao" — known-person
+  // lookup by name. Runs FOUR things in parallel — Kashi's own built-in
   // knowledge (via the LLM, same as any normal question), a live web
   // search, a Google Knowledge Graph entity lookup, and the Nexor Sparks
   // database profile — plus a small real-photo gallery, then merges
@@ -6979,7 +6932,7 @@ async function send(){
         webSearch(knownPerson.kgQuery),
         personImageSearch(knownPerson.kgQuery)
       ]);
-    }catch(e){ console.warn('[KASHISH] known-person parallel lookups failed:', e); }
+    }catch(e){ console.warn('[KASHI] known-person parallel lookups failed:', e); }
     const hasProfile = profile && !profile.notFound && !profile.error;
     const webSources = (searchResult && searchResult.sources) || null;
 
@@ -7007,21 +6960,21 @@ async function send(){
     const historyForModel = sess.messages.map(m=> m.role==='user' ? {role:'user', text:m.text} : {role:'model', text:m.text});
     let replyText, quickReplies=null;
     try{
-      const result = await kashishReply(historyForModel, combinedContext);
+      const result = await kashiReply(historyForModel, combinedContext);
       replyText = result.reply; quickReplies = result.quickReplies;
       chargeCredits(replyText);
     }catch(e){
-      console.warn('[KASHISH] known-person merged reply failed:', e);
-      replyText = hasProfile || kg ? `Yeh raha ${(hasProfile&&profile.name)||(kg&&kg.name)||knownPerson.kgQuery} ke baare mein jo mil paaya.` : `Mujhe "${knownPerson.kgQuery}" ke baare mein koi bharosemand jaankari nahi mil paayi — shayad yeh koi kam-jaana-pehchana naam hai. Main jhooth nahi bolungi, sach mein nahi pata.`;
+      console.warn('[KASHI] known-person merged reply failed:', e);
+      replyText = hasProfile || kg ? `Here's what I could find about ${(hasProfile&&profile.name)||(kg&&kg.name)||knownPerson.kgQuery}.` : `I couldn't find any reliable information about "${knownPerson.kgQuery}" — it might be a less well-known name. I won't make something up, I honestly don't know.`;
     }
     removeSearchIndicator();
 
     // Nothing came back from Nexor, the Knowledge Graph, or a live web
     // search — rather than let the model guess/hallucinate a biography, be
     // upfront that there's no reliable info on this person, for anyone,
-    // not just names Kashish doesn't specially recognize.
+    // not just names Kashi doesn't specially recognize.
     if(!hasProfile && !kg && !combinedContext){
-      const honestReply = `Mujhe "${knownPerson.kgQuery}" ke baare mein kahin bhi koi bharosemand jaankari nahi mil paayi — na Nexor par, na web par. Ho sakta hai yeh naam kam jaana-pehchana ho ya spelling thodi alag ho. Main galat/banayi hui jaankari nahi dena chahti, isliye seedha keh rahi hoon: mujhe nahi pata.`;
+      const honestReply = `I couldn't find any reliable information about "${knownPerson.kgQuery}" anywhere — not on Nexor, not on the web. The name might be less well-known, or the spelling could be slightly different. I don't want to give you made-up or inaccurate information, so I'll just say it plainly: I don't know.`;
       pushBotMessage(honestReply, quickReplies);
     } else {
       const merged = {
@@ -7053,12 +7006,12 @@ async function send(){
     removeTyping();
     const askedSensitive = SENSITIVE_ASK_PATTERN.test(text);
     if(profile.notFound){
-      pushBotMessage(`Mujhe @${lookupHandle} naam ka koi user Nexor Sparks par nahi mila — spelling check kar lo?`, null);
+      pushBotMessage(`Couldn't find a user named @${lookupHandle} on Nexor Sparks — could you check the spelling?`, null);
     } else if(profile.error){
-      pushBotMessage(`@${lookupHandle} ka profile abhi load nahi ho paya — thodi der baad try karo.`, null);
+      pushBotMessage(`Couldn't load @${lookupHandle}'s profile right now — please try again later.`, null);
     } else {
       let reply = `Yeh raha @${profile.handle} ka public profile.`;
-      if(askedSensitive) reply += ` Login/activity time jaisi private info main share nahi karta — sirf public stats dikha sakta hoon.`;
+      if(askedSensitive) reply += ` I don't share private info like login/activity times — I can only show public stats.`;
       pushBotMessage(reply, null, null, profile);
     }
     return;
@@ -7078,9 +7031,9 @@ async function send(){
       }
       removeTyping();
       if(!primary){
-        pushBotMessage("Live rate abhi fetch nahi ho paya — thodi der baad try karo.", null);
+        pushBotMessage("Couldn't fetch the live rate right now — please try again later.", null);
       } else {
-        const reply = `Abhi ke live rate ke hisaab se, ${fmtConvAmount(primary.amount)} ${endpointLabel(primary.from)} = ${fmtConvAmount(primary.result)} ${endpointLabel(primary.to)}.`;
+        const reply = `At the current live rate, ${fmtConvAmount(primary.amount)} ${endpointLabel(primary.from)} = ${fmtConvAmount(primary.result)} ${endpointLabel(primary.to)}.`;
         pushBotMessage(reply, null, null, null, null, null, null, null, null, null, null, {...primary, secondary});
       }
       return;
@@ -7094,9 +7047,9 @@ async function send(){
     const wx = await handleWeatherRequest(text);
     removeTyping();
     if(!wx){
-      pushBotMessage("Mujhe weather nahi mil paya — city ka naam bata do (jaise \"Delhi ka mausam\"), ya location access allow kar do.", null);
+      pushBotMessage("Couldn't get the weather — tell me a city name (like \"weather in Delhi\"), or allow location access.", null);
     } else {
-      pushBotMessage(`${wx.place} mein abhi ${wx.temp}°C hai, ${wx.desc.toLowerCase()}.`, null, null, null, null, wx);
+      pushBotMessage(`It's currently ${wx.temp}°C in ${wx.place}, ${wx.desc.toLowerCase()}.`, null, null, null, null, wx);
     }
     return;
   }
@@ -7111,10 +7064,10 @@ async function send(){
       const quote = await fetchStockQuote(symbol, symbol.replace(/\.(NS|BO)$/,'').replace(/^\^/,''));
       removeTyping();
       if(!quote){
-        pushBotMessage(`Mujhe "${symbol}" ka stock price nahi mil paya — symbol check kar lo ya thodi der baad try karo.`, null);
+        pushBotMessage(`Couldn't get the stock price for "${symbol}" — check the symbol or try again later.`, null);
       } else {
         const up = quote.change>=0;
-        const reply = `${quote.name} (${quote.symbol}) abhi ${fmtConvAmount(quote.price)} ${quote.currency} par hai, ${up?'+':''}${fmtConvAmount(quote.change)} (${up?'+':''}${quote.changePct.toFixed(2)}%) ${up?'up':'down'} aaj.`;
+        const reply = `${quote.name} (${quote.symbol}) is currently at ${fmtConvAmount(quote.price)} ${quote.currency}, ${up?'+':''}${fmtConvAmount(quote.change)} (${up?'+':''}${quote.changePct.toFixed(2)}%) ${up?'up':'down'} today.`;
         pushBotMessage(reply, null, null, null, null, null, null, null, null, null, null, null, quote);
       }
       return;
@@ -7132,15 +7085,15 @@ async function send(){
     removeTyping();
     if(!loc){
       pushBotMessage(parsed.mode==='me'
-        ? "Mujhe tumhara location nahi mil paaya — location access allow karo browser mein."
-        : `Mujhe "${parsed.query}" nahi mil paya nearby — thoda aur specific naam try karo.`, null);
+        ? "Couldn't get your location — please allow location access in the browser."
+        : `Couldn't find "${parsed.query}" nearby — try a more specific name.`, null);
     } else {
       const mapCard = { lat:loc.lat, lon:loc.lon, label:loc.label, address:loc.address, mapImg: staticMapUrl(loc.lat, loc.lon), mapsUrl: `https://www.google.com/maps?q=${loc.lat},${loc.lon}` };
       let reply;
-      if(loc.mode==='me') reply = `Yeh raha tumhara current location — ${loc.label}. Map par mark kar diya hai.`;
-      else if(loc.mode==='nearby') reply = `Sabse paas "${loc.query}" — ${loc.label} mila. Map par mark kar diya hai.`;
-      else if(loc.mode==='nearby-miss') reply = `Mujhe exact "${loc.query}" nearby nahi mila, lekin yeh raha tumhara current area — ${loc.label}. Map par mark kar diya hai.`;
-      else reply = `${loc.label} yahan hai. Map par mark kar diya hai.`;
+      if(loc.mode==='me') reply = `Here's your current location — ${loc.label}. I've marked it on the map.`;
+      else if(loc.mode==='nearby') reply = `The nearest "${loc.query}" I found is ${loc.label}. I've marked it on the map.`;
+      else if(loc.mode==='nearby-miss') reply = `Couldn't find an exact "${loc.query}" nearby, but here's your current area — ${loc.label}. I've marked it on the map.`;
+      else reply = `${loc.label} is here. I've marked it on the map.`;
       pushBotMessage(reply, null, null, null, null, null, null, null, null, null, null, null, null, mapCard);
     }
     return;
@@ -7154,9 +7107,9 @@ async function send(){
     const played = await youtubePlayTop(text);
     removeTyping();
     if(!played){
-      pushBotMessage(`Mujhe "${cleanPlayQuery(text)}" ka video nahi mil paya — naam thoda aur specific bata sakte ho?`, null);
+      pushBotMessage(`Couldn't find a video for "${cleanPlayQuery(text)}" — could you give a more specific name?`, null);
     } else {
-      pushBotMessage(`Yeh raha — "${played.title}" chala diya 🎬`, null, null, null, played);
+      pushBotMessage(`Here you go — playing "${played.title}" 🎬`, null, null, null, played);
     }
     return;
   }
@@ -7235,18 +7188,18 @@ async function send(){
         searchContext = (searchContext ? searchContext+'\n\n' : '') + `Knowledge Graph verified entity match: ${kg.name} — ${kg.description||''}. ${kg.detail||''}`.trim();
       }
       updateSearchIndicator(webSources && webSources.length ? `Reading ${webSources.length} sources…` : 'Putting together an answer…');
-    }catch(e){ console.warn('[KASHISH] web search step failed, continuing without it:', e); }
+    }catch(e){ console.warn('[KASHI] web search step failed, continuing without it:', e); }
     updateSearchIndicator('Putting together an answer…');
   }
 
   try{
     const tier = currentModelTier();
-    const result = await kashishReply(historyForModel, searchContext, null, currentMaxTokens(), img ? img.dataUrl : null, !img && tier.preferGemini);
+    const result = await kashiReply(historyForModel, searchContext, null, currentMaxTokens(), img ? img.dataUrl : null, !img && tier.preferGemini);
     chargeCredits(result.reply, tier.creditMultiplier);
     removeTyping(); removeSearchIndicator();
     pushBotMessage(result.reply, result.quickReplies, videoResults, null, null, null, newsResults, webSources, kgCard, factCheckResults, null, null, null, null, null, movieResults, null, null, null, null, null, hotelResults);
   }catch(e){
-    console.error('[KASHISH] all providers failed, falling back to local:', e);
+    console.error('[KASHI] all providers failed, falling back to local:', e);
     removeSearchIndicator();
     sendLocal();
   }
@@ -7452,7 +7405,7 @@ function stopVoiceListening(){
 function toggleVoiceListening(){
   unlockSpeechSynthesis();
   if(voiceSpeaking){
-    // Barge-in: tapping the mic while Kashish is talking interrupts her
+    // Barge-in: tapping the mic while Kashi is talking interrupts her
     // and starts listening right away, like cutting in on a real call.
     if('speechSynthesis' in window) window.speechSynthesis.cancel();
     stopElevenAudio();
