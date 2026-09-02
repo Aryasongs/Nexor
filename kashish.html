@@ -17,6 +17,7 @@
 <!-- jsPDF — used to turn plain text/chat content into a downloadable PDF
      on request ("isko pdf bana do" / "export as pdf"), fully client-side. -->
 <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+<script src="https://unpkg.com/qrcode@1.5.3/build/qrcode.min.js"></script>
 <!-- marked + DOMPurify — turn Kashish's bot replies (bold/italic, `code`,
      ```code blocks```, links, lists) into safely-sanitized rich HTML
      instead of flat plain text. Open-source, MIT-licensed, no backend. -->
@@ -315,6 +316,16 @@ html[data-theme="dark"] .email-card{background:linear-gradient(150deg,#1E1E21 0%
 .pdf-card .pc-btn:active{background:var(--border);}
 .pdf-card .pc-btn.download{background:linear-gradient(160deg,#2b2b30 0%,var(--black) 55%,#0d0d0f 100%);color:#fff;}
 html[data-theme="dark"] .pdf-card{background:linear-gradient(150deg,#1E1E21 0%,#1A1A1D 50%,#151517 100%);border-color:rgba(255,255,255,.06);}
+.qr-card{display:flex;flex-direction:column;gap:10px;max-width:88%;width:220px;margin-top:6px;background:linear-gradient(155deg,#ffffff 0%,#f6f7f9 55%,#edeef1 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:14px 14px 12px;box-shadow:0 10px 24px -14px rgba(20,20,22,.26);text-align:center;}
+.qr-card .qc-img{width:100%;aspect-ratio:1/1;border-radius:12px;background:#fff;padding:8px;box-sizing:border-box;}
+.qr-card .qc-img img{width:100%;height:100%;display:block;border-radius:6px;}
+.qr-card .qc-text{font-size:11.5px;color:var(--ink-soft);word-break:break-all;line-height:1.4;padding:0 2px;}
+.qr-card .qc-actions{display:flex;gap:8px;}
+.qr-card .qc-btn{flex:1;height:36px;border-radius:12px;background:var(--bubble-bot);display:flex;align-items:center;justify-content:center;gap:6px;font-size:12.5px;font-weight:700;color:var(--ink);}
+.qr-card .qc-btn:active{background:var(--border);}
+.qr-card .qc-btn.download{background:linear-gradient(160deg,#2b2b30 0%,var(--black) 55%,#0d0d0f 100%);color:#fff;}
+html[data-theme="dark"] .qr-card{background:linear-gradient(150deg,#1E1E21 0%,#1A1A1D 50%,#151517 100%);border-color:rgba(255,255,255,.06);}
+html[data-theme="dark"] .qr-card .qc-img{background:#fff;}
 .code-card{max-width:92%;width:100%;margin-top:6px;background:linear-gradient(155deg,#ffffff 0%,#f6f7f9 55%,#edeef1 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:14px 15px;box-shadow:0 10px 24px -14px rgba(20,20,22,.26);text-align:left;}
 .code-card .cc-head{display:flex;align-items:center;gap:10px;}
 .code-card .cc-icon{flex-shrink:0;width:38px;height:38px;border-radius:12px;background:linear-gradient(155deg,#e2f4e9,#c9ecd6);display:flex;align-items:center;justify-content:center;font-size:17px;color:#1E9E5A;}
@@ -3479,6 +3490,25 @@ function renderChat(){
       card.onclick=()=>viewGeneratedPdf(p.dataUrl);
       scroll.appendChild(card);
     }
+    if(m.qrCard){
+      const q = m.qrCard;
+      const card = document.createElement('div'); card.className='qr-card';
+      const imgWrap=document.createElement('div'); imgWrap.className='qc-img';
+      const img=document.createElement('img'); img.src=q.dataUrl; img.alt='QR code';
+      imgWrap.appendChild(img); card.appendChild(imgWrap);
+      const txt=document.createElement('div'); txt.className='qc-text'; txt.textContent=q.text||'';
+      card.appendChild(txt);
+      const actions=document.createElement('div'); actions.className='qc-actions';
+      const viewBtn=document.createElement('button'); viewBtn.className='qc-btn';
+      viewBtn.innerHTML='<i class="ph-bold ph-eye"></i> View';
+      viewBtn.onclick=(ev)=>{ ev.stopPropagation(); viewGeneratedQr(q.dataUrl); };
+      const dlBtn=document.createElement('button'); dlBtn.className='qc-btn download';
+      dlBtn.innerHTML='<i class="ph-bold ph-download-simple"></i> Save';
+      dlBtn.onclick=(ev)=>{ ev.stopPropagation(); downloadGeneratedQr(q.dataUrl, q.text); };
+      actions.appendChild(viewBtn); actions.appendChild(dlBtn);
+      card.appendChild(actions);
+      scroll.appendChild(card);
+    }
     if(m.codeCard){
       const c = m.codeCard;
       const cc = document.createElement('div'); cc.className='code-card';
@@ -6004,12 +6034,12 @@ function sendLocal(){
   }, 400);
 }
 
-function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults, webSources, kgCard, factCheckResults, postCard, conversionCard, stockCard, mapCard, personCard, movieResults, emailCard, pdfCard, codeCard, upgradeCard, chartCard, hotelResults){
+function pushBotMessage(text, quickReplies, videoResults, profileCard, playEmbed, weatherCard, newsResults, webSources, kgCard, factCheckResults, postCard, conversionCard, stockCard, mapCard, personCard, movieResults, emailCard, pdfCard, codeCard, upgradeCard, chartCard, hotelResults, qrCard){
   const sess = getSession(currentSessionId);
   if(!sess) return;
   const qr = appSettings.trendingSearches ? (quickReplies||null) : null;
   const ts = Date.now();
-  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, webSources: (webSources&&webSources.length)?webSources:null, kgCard: kgCard||null, factCheckResults: (factCheckResults&&factCheckResults.length)?factCheckResults:null, postCard: postCard||null, conversionCard: conversionCard||null, stockCard: stockCard||null, mapCard: mapCard||null, personCard: personCard||null, movieResults: (movieResults&&movieResults.length)?movieResults:null, emailCard: emailCard||null, pdfCard: pdfCard||null, codeCard: codeCard||null, upgradeCard: upgradeCard||null, chartCard: chartCard||null, hotelResults: (hotelResults&&hotelResults.length)?hotelResults:null, ts});
+  sess.messages.push({role:'model', text, quickReplies: qr, videoResults: (videoResults&&videoResults.length)?videoResults:null, profileCard: profileCard||null, playEmbed: playEmbed||null, weatherCard: weatherCard||null, newsResults: (newsResults&&newsResults.length)?newsResults:null, webSources: (webSources&&webSources.length)?webSources:null, kgCard: kgCard||null, factCheckResults: (factCheckResults&&factCheckResults.length)?factCheckResults:null, postCard: postCard||null, conversionCard: conversionCard||null, stockCard: stockCard||null, mapCard: mapCard||null, personCard: personCard||null, movieResults: (movieResults&&movieResults.length)?movieResults:null, emailCard: emailCard||null, pdfCard: pdfCard||null, codeCard: codeCard||null, upgradeCard: upgradeCard||null, chartCard: chartCard||null, hotelResults: (hotelResults&&hotelResults.length)?hotelResults:null, qrCard: qrCard||null, ts});
   sess.preview = truncate(text, 60);
   sess.updatedAt = Date.now();
   upsertSession(sess);
@@ -6089,6 +6119,41 @@ function downloadGeneratedPdf(dataUrl, filename){
   const a = document.createElement('a');
   a.href = dataUrl; a.download = filename || 'kashish-export.pdf';
   document.body.appendChild(a); a.click(); a.remove();
+}
+/* ---------------- text -> QR code ---------------- */
+// Lets the user turn any link, wifi password, phone number, or short bit of
+// text into a scannable QR code, fully client-side via the qrcode.js lib —
+// no server round-trip, no API key, works even with a flaky connection.
+const QR_TRIGGER_PATTERN = /\bqr\b|\bqr\s*code\b|\bkyu?u?\s*aar\b/i;
+const QR_ACTION_PATTERN = /\b(bana|banado|banao|banaun|generate|make|create|convert|de\s*do|karo|kar\s*do|chahiye|for)\b/i;
+const QR_FILLER_WORDS = /\b(qr|code|bana\s*do|banado|banao|banaun|generate|make|create|convert(ed)?|de\s*do|de\s*de|karo|kar\s*do|isko|iss|this|into|as|a|an|please|plz|for|of|ka|ki)\b/gi;
+function detectQrRequest(text){
+  if(!text) return null;
+  const t = text.trim();
+  if(!QR_TRIGGER_PATTERN.test(t)) return null;
+  if(!QR_ACTION_PATTERN.test(t)) return null;
+  // Strip the request-phrasing words to isolate the actual payload (a URL,
+  // phone number, wifi name, or short message) the user wants encoded.
+  const stripped = t.replace(QR_FILLER_WORDS, ' ').replace(/\s+/g,' ').replace(/^[:,\-–\s]+/,'').trim();
+  return { inlineContent: stripped.length > 1 ? stripped : null };
+}
+// Builds the QR code and returns it as a data URL — shown as a tappable
+// card in chat so the user can view it full-size or download the PNG,
+// rather than anything happening automatically.
+async function generateQrCode(text){
+  const dataUrl = await QRCode.toDataURL(text, { width: 512, margin: 1, color: { dark:'#141416', light:'#ffffff' } });
+  return { dataUrl, text };
+}
+function downloadGeneratedQr(dataUrl, label){
+  const a = document.createElement('a');
+  const filename = (label||'kashish-qr').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,'').slice(0,40) || 'kashish-qr';
+  a.href = dataUrl; a.download = filename + '.png';
+  document.body.appendChild(a); a.click(); a.remove();
+}
+function viewGeneratedQr(dataUrl){
+  const w = window.open();
+  if(w){ w.document.write(`<title>QR code</title><body style="margin:0;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#111"><img src="${dataUrl}" style="max-width:90vw;max-height:90vh;border-radius:12px;"></body>`); }
+  else { showKashishToast("Popup was blocked — try 'Download' below."); }
 }
 /* ---------------- email compose -> Gmail handoff ---------------- */
 // Kashish drafts the email text (subject + body) via the LLM, shows it in
@@ -6764,6 +6829,35 @@ async function send(){
         pushBotMessage("Ran into trouble making that PDF — please try again later.", null);
       }
     }, 300);
+    return;
+  }
+
+  // "qr code for X" / "make a qr for this link" — turn a link, wifi
+  // password, phone number, or short message into a scannable QR code,
+  // fully client-side. Falls back to Kashish's own last reply if the user
+  // didn't include the content inline (e.g. "qr code banado" right after
+  // Kashish shared a link).
+  const qrRequest = !img ? detectQrRequest(text) : null;
+  if(qrRequest){
+    let payload = qrRequest.inlineContent;
+    if(!payload){
+      const lastBot = [...sess.messages].reverse().find(m => m.role !== 'user' && m.text && m.text.trim());
+      if(lastBot) payload = lastBot.text.trim();
+    }
+    if(!payload){
+      pushBotMessage("What should I put in the QR code? Send a link, phone number, or short text, or say something like 'qr code for https://example.com'.", null);
+      return;
+    }
+    addTyping();
+    try{
+      const qr = await generateQrCode(payload);
+      removeTyping();
+      pushBotMessage("Here's your QR code — scan it, view it full-size, or save it as a PNG.", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { dataUrl: qr.dataUrl, text: qr.text });
+    }catch(e){
+      removeTyping();
+      console.warn('[KASHISH] QR generation failed:', e);
+      pushBotMessage("Ran into trouble making that QR code — please try again later.", null);
+    }
     return;
   }
 
