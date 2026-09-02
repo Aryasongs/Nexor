@@ -57,7 +57,8 @@ input{font-family:inherit;outline:none;}
 .hidden{display:none!important;}
 img{display:block;max-width:100%;}
 
-#app{position:fixed;top:0;left:0;width:100vw;height:100vh;height:100dvh;height:calc(var(--app-vh, 100vh));background:var(--bg);overflow:hidden;}
+#app{position:fixed;top:0;left:50%;transform:translateX(-50%);width:100%;max-width:560px;height:100vh;height:100dvh;height:calc(var(--app-vh, 100vh));background:var(--bg);overflow:hidden;}
+@media (min-width:561px){ html,body{background:#e7e7ea;} html[data-theme="dark"] body{background:#0b0b0c;} }
 .screen{position:absolute;inset:0;display:flex;flex-direction:column;height:100%;}
 
 /* ---------- shared bits ---------- */
@@ -79,7 +80,7 @@ img{display:block;max-width:100%;}
 .greeting .q{font-size:26px;color:var(--ink);font-weight:800;line-height:1.22;}
 
 .cards-grid{display:grid;grid-template-columns:1fr 1fr;grid-auto-rows:minmax(85px,auto);gap:12px;padding:18px 20px;}
-.gcard{position:relative;overflow:hidden;background:linear-gradient(150deg,#ffffff 0%,#f2f3f5 45%,#e6e8ec 100%);border:1px solid rgba(255,255,255,.9);border-radius:20px;padding:15px;display:flex;flex-direction:column;justify-content:space-between;text-align:left;transition:transform .1s;box-shadow:0 20px 36px -16px rgba(20,20,22,.32),0 2px 0 rgba(255,255,255,1) inset,0 -14px 22px -18px rgba(20,20,22,.1) inset;}
+.gcard{position:relative;overflow:hidden;min-width:0;background:linear-gradient(150deg,#ffffff 0%,#f2f3f5 45%,#e6e8ec 100%);border:1px solid rgba(255,255,255,.9);border-radius:20px;padding:15px;display:flex;flex-direction:column;justify-content:space-between;text-align:left;transition:transform .1s;box-shadow:0 20px 36px -16px rgba(20,20,22,.32),0 2px 0 rgba(255,255,255,1) inset,0 -14px 22px -18px rgba(20,20,22,.1) inset;}
 .gcard::before{content:'';position:absolute;top:-30%;left:-20%;width:90%;height:75%;border-radius:50%;pointer-events:none;background:radial-gradient(ellipse at 30% 20%,rgba(255,255,255,.95) 0%,rgba(255,255,255,.45) 35%,rgba(255,255,255,0) 68%);transform:rotate(-12deg);}
 .gcard::after{content:'';position:absolute;left:0;right:0;bottom:0;height:38%;pointer-events:none;background:linear-gradient(180deg,rgba(255,255,255,0) 0%,rgba(255,255,255,.65) 100%);}
 .gcard:active{transform:scale(.97);}
@@ -87,9 +88,9 @@ img{display:block;max-width:100%;}
 .gcard .top-row{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;}
 .gcard .ic{position:relative;z-index:1;width:36px;height:36px;border-radius:50%;background:linear-gradient(155deg,var(--accent-soft-1) 0%,var(--accent-soft-2) 55%,var(--accent-soft-3) 100%);display:flex;align-items:center;justify-content:center;font-size:16px;color:var(--accent);box-shadow:0 4px 10px -4px rgba(25,117,206,.35),0 1px 0 rgba(255,255,255,.9) inset;}
 .gcard .go{position:relative;z-index:1;font-size:15px;color:var(--ink-soft);}
-.gcard .lbl{position:relative;z-index:1;font-weight:800;color:var(--ink);}
-.gcard.tall .lbl{font-size:20px;line-height:1.25;margin-top:14px;}
-.gcard:not(.tall) .lbl{font-size:14.5px;margin-top:10px;}
+.gcard .lbl{position:relative;z-index:1;font-weight:800;color:var(--ink);overflow-wrap:anywhere;}
+.gcard.tall .lbl{font-size:clamp(17px,5vw,20px);line-height:1.25;margin-top:14px;}
+.gcard:not(.tall) .lbl{font-size:clamp(13px,3.6vw,14.5px);margin-top:10px;}
 
 .section-head{display:flex;align-items:center;justify-content:space-between;padding:8px 20px 10px;}
 .section-head h3{font-size:16.5px;font-weight:800;color:var(--ink);}
@@ -183,21 +184,21 @@ html[data-theme="dark"] .search-indicator{background:linear-gradient(160deg,#232
 .video-embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0;}
 .video-embed .ve-title{padding:8px 12px;font-size:12px;font-weight:700;color:var(--ink);background:var(--card);}
 .video-embed .ve-openlink{display:flex;align-items:center;gap:6px;padding:8px 12px 10px;font-size:11.5px;font-weight:700;color:var(--accent);background:var(--card);border-top:1px solid var(--border);}
-.weather-card{max-width:82%;margin-top:6px;background:linear-gradient(155deg,#eef6ff 0%,#f6f9ff 55%,#ffffff 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:16px 18px;box-shadow:0 10px 24px -14px rgba(30,70,150,.28);}
-.weather-card .wc-top{display:flex;align-items:center;justify-content:space-between;}
-.weather-card .wc-place{font-size:13px;font-weight:800;color:var(--ink);}
+.weather-card{max-width:88%;width:100%;box-sizing:border-box;margin-top:6px;background:linear-gradient(155deg,#eef6ff 0%,#f6f9ff 55%,#ffffff 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:16px 18px;box-shadow:0 10px 24px -14px rgba(30,70,150,.28);}
+.weather-card .wc-top{display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.weather-card .wc-place{font-size:13px;font-weight:800;color:var(--ink);overflow-wrap:anywhere;}
 .weather-card .wc-sub{font-size:11px;color:var(--ink-soft);margin-top:2px;}
-.weather-card .wc-icon{font-size:34px;line-height:1;}
-.weather-card .wc-temp{font-size:32px;font-weight:800;color:var(--ink);margin-top:6px;}
+.weather-card .wc-icon{font-size:34px;line-height:1;flex-shrink:0;}
+.weather-card .wc-temp{font-size:clamp(26px,7vw,32px);font-weight:800;color:var(--ink);margin-top:6px;}
 .weather-card .wc-desc{font-size:12.5px;color:var(--ink-soft);margin-top:-2px;}
-.weather-card .wc-grid{display:flex;gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(20,20,22,.08);}
-.weather-card .wc-item{display:flex;flex-direction:column;}
+.weather-card .wc-grid{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(20,20,22,.08);}
+.weather-card .wc-item{display:flex;flex-direction:column;min-width:0;}
 .weather-card .wc-item .v{font-weight:800;font-size:13px;color:var(--ink);}
 .weather-card .wc-item .l{font-size:10.5px;color:var(--ink-soft);}
 
 /* Currency/crypto converter card — live rate from open.er-api.com (fiat)
    or CoinGecko (crypto), no API key needed for either. */
-.currency-card{max-width:88%;margin-top:6px;background:linear-gradient(155deg,#eefaf1 0%,#f6fdf8 55%,#ffffff 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:16px 18px;box-shadow:0 10px 24px -14px rgba(20,120,70,.22);}
+.currency-card{max-width:88%;width:100%;box-sizing:border-box;margin-top:6px;background:linear-gradient(155deg,#eefaf1 0%,#f6fdf8 55%,#ffffff 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:16px 18px;box-shadow:0 10px 24px -14px rgba(20,120,70,.22);}
 .currency-card .cc-row{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
 .currency-card .cc-amt{font-size:20px;font-weight:800;color:var(--ink);}
 .currency-card .cc-eq{font-size:13px;color:var(--ink-soft);}
@@ -211,19 +212,19 @@ html[data-theme="dark"] .search-indicator{background:linear-gradient(160deg,#232
 /* Stock/share price card — live quote from Yahoo Finance chart API, no
    API key needed. Works for NSE tickers (RELIANCE.NS), US tickers (AAPL),
    and indices (^NSEI, ^BSESN). */
-.stock-card{max-width:88%;margin-top:6px;background:linear-gradient(155deg,#fff7ec 0%,#fffaf3 55%,#ffffff 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:16px 18px;box-shadow:0 10px 24px -14px rgba(180,120,20,.22);}
+.stock-card{max-width:88%;width:100%;box-sizing:border-box;margin-top:6px;background:linear-gradient(155deg,#fff7ec 0%,#fffaf3 55%,#ffffff 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:16px 18px;box-shadow:0 10px 24px -14px rgba(180,120,20,.22);}
 .stock-card .sc-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;}
-.stock-card .sc-name{font-size:13.5px;font-weight:800;color:var(--ink);line-height:1.3;}
+.stock-card .sc-name{min-width:0;font-size:13.5px;font-weight:800;color:var(--ink);line-height:1.3;overflow-wrap:anywhere;}
 .stock-card .sc-sym{font-size:11px;color:var(--ink-soft);margin-top:2px;}
 .stock-card .sc-badge{flex-shrink:0;font-size:10px;font-weight:800;color:var(--ink-soft);background:var(--bubble-bot);border-radius:999px;padding:4px 9px;}
-.stock-card .sc-price{font-size:28px;font-weight:800;color:var(--ink);margin-top:10px;}
+.stock-card .sc-price{font-size:clamp(22px,6vw,28px);font-weight:800;color:var(--ink);margin-top:10px;}
 .stock-card .sc-change{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:800;margin-top:2px;}
 .stock-card .sc-change.up{color:#1FA855;}
 .stock-card .sc-change.down{color:#E0433C;}
-.stock-card .sc-grid{display:flex;gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(20,20,22,.08);}
-.stock-card .sc-spark{margin-top:10px;line-height:0;}
-.stock-card .sc-spark svg{display:block;}
-.stock-card .sc-item{display:flex;flex-direction:column;}
+.stock-card .sc-grid{display:flex;flex-wrap:wrap;gap:10px 16px;margin-top:12px;padding-top:12px;border-top:1px solid rgba(20,20,22,.08);}
+.stock-card .sc-spark{margin-top:10px;line-height:0;max-width:100%;overflow:hidden;}
+.stock-card .sc-spark svg{display:block;max-width:100%;height:auto;}
+.stock-card .sc-item{display:flex;flex-direction:column;min-width:0;}
 .stock-card .sc-item .v{font-weight:800;font-size:13px;color:var(--ink);}
 .stock-card .sc-item .l{font-size:10.5px;color:var(--ink-soft);}
 .stock-card .sc-live{display:inline-flex;align-items:center;gap:4px;font-size:9.5px;font-weight:800;color:#B4780F;text-transform:uppercase;letter-spacing:.03em;margin-top:10px;}
@@ -232,7 +233,7 @@ html[data-theme="dark"] .search-indicator{background:linear-gradient(160deg,#232
 /* Location / map card — Kashish drops a pin using OpenStreetMap (static
    render, no API key) for "mera location", "X kaha hai", or "cafe near me"
    style requests. */
-.map-card{position:relative;overflow:hidden;max-width:88%;width:100%;margin-top:6px;background:var(--card);border:1px solid rgba(255,255,255,.9);border-radius:18px;box-shadow:0 10px 24px -14px rgba(20,20,22,.28);text-align:left;}
+.map-card{position:relative;overflow:hidden;max-width:88%;width:100%;box-sizing:border-box;margin-top:6px;background:var(--card);border:1px solid rgba(255,255,255,.9);border-radius:18px;box-shadow:0 10px 24px -14px rgba(20,20,22,.28);text-align:left;}
 .map-card .mc-imgwrap{position:relative;width:100%;height:150px;background:var(--bubble-bot);overflow:hidden;}
 .map-card .mc-imgwrap img{width:100%;height:100%;object-fit:cover;}
 .map-card .mc-pin{position:absolute;left:50%;top:50%;transform:translate(-50%,-100%);font-size:30px;color:#E0433C;filter:drop-shadow(0 3px 4px rgba(0,0,0,.35));pointer-events:none;}
@@ -290,12 +291,12 @@ html[data-theme="dark"] .code-card{background:linear-gradient(150deg,#1E1E21 0%,
 
 
 /* Knowledge Graph — compact verified-entity card */
-.kg-card{position:relative;overflow:hidden;max-width:88%;margin-top:6px;background:linear-gradient(150deg,#ffffff 0%,#f4f5f7 50%,#eaecef 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 10px 22px -14px rgba(20,20,22,.25);text-align:left;width:100%;}
+.kg-card{position:relative;overflow:hidden;max-width:88%;box-sizing:border-box;margin-top:6px;background:linear-gradient(150deg,#ffffff 0%,#f4f5f7 50%,#eaecef 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;padding:14px 16px;display:flex;gap:12px;align-items:flex-start;box-shadow:0 10px 22px -14px rgba(20,20,22,.25);text-align:left;width:100%;}
 .kg-card:active{background:var(--bubble-bot);}
 .kg-card .kg-thumb{width:52px;height:52px;border-radius:12px;overflow:hidden;flex-shrink:0;background:var(--bubble-bot);}
 .kg-card .kg-thumb img{width:100%;height:100%;object-fit:cover;}
 .kg-card .kg-body{min-width:0;flex:1;}
-.kg-card .kg-name{font-weight:800;font-size:14px;color:var(--ink);}
+.kg-card .kg-name{font-weight:800;font-size:14px;color:var(--ink);overflow-wrap:anywhere;}
 .kg-card .kg-desc{font-size:11.5px;color:var(--ink-soft);margin-top:1px;}
 .kg-card .kg-detail{font-size:12px;color:var(--ink);line-height:1.45;margin-top:6px;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;}
 .kg-card .kg-src{display:flex;align-items:center;gap:4px;font-size:10px;color:var(--ink-soft);margin-top:8px;font-weight:700;}
@@ -5526,7 +5527,7 @@ ${who}
 ${memoryBlock}${customInstrBlock}
 Origin story (only bring this up if directly asked "who made you", "who created you", "who is your founder/developer", or "why is your name Kashish" / "what does your name mean" — don't volunteer it unprompted): You were created by Gursharan Singh, who is also known by the name Gursharn Arya, the founder of Nexor. Your name "Kashish" was taken from — and inspired by — Kashish Tyagi, who is Gursharn's girlfriend. State this naturally and factually, in the same conversational tone/language as the rest of the chat (Hinglish/Hindi if that's what the user is using, English otherwise), without turning it into a long biography — a couple of warm, natural sentences is enough. If someone specifically asks who Gursharn Arya/Gursharan Singh's girlfriend is, or who Kashish Tyagi is in relation to him, you can share this directly too.
 
-You can optionally offer 1-2 short "quickReplies" (single words or short phrases, like "Yes" or "Tell me more") when a natural yes/no or follow-up moment fits — don't force this on every message, only when it genuinely fits the flow.
+You can optionally offer 1-2 short "quickReplies" (single words or short phrases, like "Yes" or "Tell me more") when a natural yes/no or follow-up moment fits — don't force this on every message, only when it genuinely fits the flow. The "reply" field is REQUIRED and must always contain your actual conversational answer as text — never send quickReplies without a "reply", and never send an empty "reply".
 
 Honesty about people (applies to EVERYONE you're asked about — not just anyone specific, and not just people you happen to know well): if you're asked about a named individual and no context block below actually contains real information about them, say plainly and warmly that you don't have reliable info on that person, instead of inventing a bio, job, achievements, or other "facts". This is especially important for people who aren't broadly famous — don't guess who they might be or fabricate plausible-sounding details just because a name sounds familiar. It's completely fine to say "I don't know who that is" — that's more helpful than confidently making something up.
 
@@ -5583,7 +5584,7 @@ function extractJson(raw){
   if(cleaned && !cleaned.startsWith('{')) return { reply: cleaned, quickReplies: null };
   return null;
 }
-async function callProvider(endpoint, model, msgs, label, maxTokens){
+async function callProvider(endpoint, model, msgs, label, maxTokens, expectRawJson){
   const res = await fetch(endpoint, { method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({ model, messages:msgs, temperature:0.75, max_tokens: maxTokens || 900 }) });
   if(!res.ok) throw new Error(label+' proxy HTTP '+res.status);
   const json = await res.json();
@@ -5593,35 +5594,38 @@ async function callProvider(endpoint, model, msgs, label, maxTokens){
   if(typeof parsed.reply !== 'string' || !parsed.reply.trim()){
     // Some rawContext prompts (chart data, etc.) deliberately ask the model
     // for a plain JSON object with its own shape instead of the usual
-    // {"reply":...} envelope. In that case extractJson successfully parsed
-    // *something*, just not our envelope — re-stringify the whole object
-    // as the "reply" so callers that do their own downstream JSON.parse
-    // (e.g. parseChartFromReply) still get usable text instead of an error.
-    if(raw && raw.trim()) return { reply: JSON.stringify(parsed), quickReplies: null };
-    throw new Error('unexpected response shape from '+label);
+    // {"reply":...} envelope — only THOSE calls (expectRawJson=true) should
+    // fall back to re-stringifying the whole object as the "reply" text.
+    // In normal chat, a missing "reply" means the model just messed up its
+    // format (e.g. sent only {"quickReplies":[...]}) — showing that raw
+    // JSON to the user would look like a glitch, so treat it as a failure
+    // instead and let the retry/next-provider fallback produce a real answer.
+    if(expectRawJson && raw && raw.trim()) return { reply: JSON.stringify(parsed), quickReplies: null };
+    throw new Error('missing "reply" field in response from '+label);
   }
   return parsed;
 }
 // Retries a provider once (with a short delay) before giving up on it —
 // covers transient blips (rate limit, brief network hiccup) that would
 // otherwise immediately cascade to the next provider or the local fallback.
-async function callProviderWithRetry(endpoint, model, msgs, label, maxTokens){
-  try{ return await callProvider(endpoint, model, msgs, label, maxTokens); }
+async function callProviderWithRetry(endpoint, model, msgs, label, maxTokens, expectRawJson){
+  try{ return await callProvider(endpoint, model, msgs, label, maxTokens, expectRawJson); }
   catch(e){
     console.warn('['+label+'] first attempt failed, retrying once:', e);
     await new Promise(r=>setTimeout(r, 500));
-    return await callProvider(endpoint, model, msgs, label, maxTokens);
+    return await callProvider(endpoint, model, msgs, label, maxTokens, expectRawJson);
   }
 }
 async function kashishReply(history, searchContext, rawContext, maxTokens){
   const msgs = buildMessages(history, searchContext, rawContext);
-  try{ return await callProviderWithRetry(GROQ_PROXY_ENDPOINT, GROQ_MODEL, msgs, 'Groq', maxTokens); }
+  const expectRawJson = !!rawContext;
+  try{ return await callProviderWithRetry(GROQ_PROXY_ENDPOINT, GROQ_MODEL, msgs, 'Groq', maxTokens, expectRawJson); }
   catch(e1){
     console.warn('[KASHISH] Groq failed, trying Gemini:', e1);
-    try{ return await callProviderWithRetry(GEMINI_PROXY_ENDPOINT, GEMINI_MODEL, msgs, 'Gemini', maxTokens); }
+    try{ return await callProviderWithRetry(GEMINI_PROXY_ENDPOINT, GEMINI_MODEL, msgs, 'Gemini', maxTokens, expectRawJson); }
     catch(e2){
       console.warn('[KASHISH] Gemini failed, trying Cloudflare AI:', e2);
-      return await callProviderWithRetry(CFAI_PROXY_ENDPOINT, CFAI_MODEL, msgs, 'Cloudflare AI', maxTokens);
+      return await callProviderWithRetry(CFAI_PROXY_ENDPOINT, CFAI_MODEL, msgs, 'Cloudflare AI', maxTokens, expectRawJson);
     }
   }
 }
