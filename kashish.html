@@ -22,10 +22,6 @@
      instead of flat plain text. Open-source, MIT-licensed, no backend. -->
 <script src="https://unpkg.com/marked@11.1.1/marked.min.js"></script>
 <script src="https://unpkg.com/dompurify@3.0.8/dist/purify.min.js"></script>
-<!-- Google Identity Services — client-side OAuth so Kashish can request a
-     short-lived, read-only Gmail access token directly from Google, with no
-     backend/server ever seeing the user's Gmail password or refresh token. -->
-<script src="https://accounts.google.com/gsi/client" async defer></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
@@ -1128,17 +1124,6 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
         </div>
       </div>
 
-      <div class="settings-section">
-        <div class="settings-section-title">Connected apps</div>
-        <div class="settings-list">
-          <button class="settings-row" onclick="showScreen('screen-gmail')">
-            <span class="ic"><i class="ph-bold ph-envelope-simple"></i></span>
-            <div class="body"><div class="lbl">Gmail</div><div class="sub" id="gmail-settings-sub">Not connected</div></div>
-            <span class="go"><i class="ph-bold ph-caret-right"></i></span>
-          </button>
-        </div>
-      </div>
-
     </div>
     <div class="home-indicator"></div>
   </div>
@@ -1534,40 +1519,6 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
     <div class="home-indicator"></div>
   </div>
 
-  <!-- ============ GMAIL ============ -->
-  <div class="screen hidden" id="screen-gmail">
-    <div class="chat-topbar">
-      <button class="circle-btn" onclick="showScreen('screen-settings')"><i class="ph-bold ph-arrow-left"></i></button>
-      <div class="chat-title">Gmail</div>
-      <span style="width:38px"></span>
-    </div>
-    <div class="settings-scroll">
-      <div id="gmail-disconnected-state">
-        <div class="recent-empty" style="padding:28px 16px;">
-          Connect Gmail so Kashish can read your inbox and draft replies for you to review — nothing is ever read or sent without you opening this screen and tapping.
-        </div>
-        <div class="settings-list" style="padding:0 16px;">
-          <button class="task-add-btn" style="width:100%;border-radius:14px;height:48px;" onclick="connectGmail()">
-            <i class="ph-bold ph-envelope-simple"></i>&nbsp; Connect Gmail
-          </button>
-        </div>
-      </div>
-      <div id="gmail-connected-state" class="hidden">
-        <div class="settings-list" style="padding:0 16px 10px;flex-direction:row;justify-content:space-between;">
-          <div class="sub" style="align-self:center;">Connected as <b id="gmail-account-email"></b></div>
-          <button class="view-all" onclick="disconnectGmail()">Disconnect</button>
-        </div>
-        <div class="settings-section">
-          <div class="settings-section-title">Inbox</div>
-          <div class="settings-list" id="gmail-inbox-items"></div>
-          <div class="recent-empty hidden" id="gmail-inbox-empty">No recent emails found.</div>
-          <div class="recent-empty hidden" id="gmail-inbox-loading">Loading inbox…</div>
-        </div>
-      </div>
-    </div>
-    <div class="home-indicator"></div>
-  </div>
-
   <!-- ============ REMINDERS ============ -->
   <div class="screen hidden" id="screen-reminders">
     <div class="chat-topbar">
@@ -1582,14 +1533,6 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
           <input type="datetime-local" id="reminders-new-datetime" style="flex:1;">
           <button class="task-add-btn" style="width:46px;height:46px;flex-shrink:0;" onclick="addTaskItem('reminders')"><i class="ph-bold ph-plus"></i></button>
         </div>
-      </div>
-      <div class="settings-section" style="margin-top:14px;">
-        <button class="settings-row" style="width:100%;" onclick="document.getElementById('vcf-import-input').click()">
-          <div class="ic"><i class="ph-bold ph-address-book"></i></div>
-          <div class="body"><div class="lbl">Import birthdays from contacts</div><div class="sub">Upload a .vcf file exported from your phone's Contacts app — Kashish adds a yearly birthday reminder for each contact that has one</div></div>
-        </button>
-        <input type="file" id="vcf-import-input" accept=".vcf,text/vcard,text/x-vcard" class="hidden" onchange="handleVcfImport(this)">
-        <div class="recent-empty hidden" id="vcf-import-status" style="text-align:left;padding:8px 16px 0;"></div>
       </div>
       <div class="settings-section" style="margin-top:16px;">
         <div class="settings-list" id="reminders-list-items"></div>
@@ -2939,12 +2882,11 @@ function startAiCreate(){
 
 /* ---------------- navigation ---------------- */
 function showScreen(id){
-  ['screen-home','screen-chat','screen-voice','screen-profile','screen-legal-doc','screen-settings','screen-settings-general','screen-settings-language','screen-settings-notifications','screen-settings-voice','screen-settings-movies','screen-settings-hotels','screen-settings-personalization','screen-settings-memory','screen-settings-data-controls','screen-bucket-list','screen-daily-tasks','screen-reminders','screen-gmail','screen-upgrade'].forEach(s=>document.getElementById(s).classList.toggle('hidden', s!==id));
+  ['screen-home','screen-chat','screen-voice','screen-profile','screen-legal-doc','screen-settings','screen-settings-general','screen-settings-language','screen-settings-notifications','screen-settings-voice','screen-settings-movies','screen-settings-hotels','screen-settings-personalization','screen-settings-memory','screen-settings-data-controls','screen-bucket-list','screen-daily-tasks','screen-reminders','screen-upgrade'].forEach(s=>document.getElementById(s).classList.toggle('hidden', s!==id));
   if(id.indexOf('screen-settings')===0) renderSettingsUI();
   if(id==='screen-bucket-list') renderTaskList('bucket');
   if(id==='screen-daily-tasks') renderTaskList('tasks');
   if(id==='screen-reminders') renderTaskList('reminders');
-  if(id==='screen-gmail') refreshGmailScreen();
 }
 function goHome(){ renderHome(); showScreen('screen-home'); }
 function goChat(){
@@ -5528,195 +5470,7 @@ function maybeResetDailyTasks(){
   }
   try{ localStorage.setItem(key, todayStr()); }catch(e){}
 }
-/* ---------------- Gmail read + AI reply drafts ----------------
-   Uses Google Identity Services (client-side OAuth, no backend, no
-   client secret) to request a short-lived gmail.readonly access token.
-   Kashish only ever READS the inbox and shows an AI-written DRAFT in the
-   same review card the compose feature already uses — "Open in Gmail"
-   just launches Gmail with the reply prefilled; nothing sends itself.
-
-   Setup required before this works:
-   1. Create an OAuth Client ID (type "Web application") in Google Cloud
-      Console -> APIs & Services -> Credentials.
-   2. Add this app's exact URL as an Authorized JavaScript origin.
-   3. Enable the Gmail API for that project.
-   4. Paste the client ID below. While the OAuth consent screen is in
-      "Testing" mode this works instantly for up to 100 added test users
-      with no Google review; going public with gmail.readonly to anyone
-      eventually requires Google's OAuth verification for restricted
-      scopes. */
-const GMAIL_CLIENT_ID = '276235725177-sn0ca53m0oi4q9cku48i6ktu4f9ul7kp.apps.googleusercontent.com';
-const GMAIL_SCOPE = 'https://www.googleapis.com/auth/gmail.readonly';
-let gmailTokenClient = null;
-let gmailAccessToken = null;
-let gmailAccessTokenExpiry = 0;
-
-function gmailClientReady(){ return typeof google !== 'undefined' && google.accounts && google.accounts.oauth2; }
-
-function ensureGmailTokenClient(){
-  if(gmailTokenClient || !gmailClientReady()) return gmailTokenClient;
-  gmailTokenClient = google.accounts.oauth2.initTokenClient({
-    client_id: GMAIL_CLIENT_ID,
-    scope: GMAIL_SCOPE,
-    callback: (resp)=>{
-      if(resp && resp.access_token){
-        gmailAccessToken = resp.access_token;
-        gmailAccessTokenExpiry = Date.now() + ((resp.expires_in||3300)*1000);
-        try{ localStorage.setItem('kashishGmailConnected_'+((userCtx&&userCtx.uid)||'guest'), '1'); }catch(e){}
-        refreshGmailScreen();
-      }
-    }
-  });
-  return gmailTokenClient;
-}
-function connectGmail(){
-  if(GMAIL_CLIENT_ID.indexOf('PASTE_YOUR') === 0){
-    showKashishToast('Gmail abhi setup nahi hua — Google Cloud se OAuth Client ID lekar code mein daalna hoga.');
-    return;
-  }
-  const tc = ensureGmailTokenClient();
-  if(!tc){ showKashishToast('Google sign-in load nahi ho paya, thodi der baad try karo.'); return; }
-  tc.requestAccessToken({ prompt: gmailAccessToken ? '' : 'consent' });
-}
-function disconnectGmail(){
-  if(gmailAccessToken && google.accounts && google.accounts.oauth2){
-    try{ google.accounts.oauth2.revoke(gmailAccessToken, ()=>{}); }catch(e){}
-  }
-  gmailAccessToken = null; gmailAccessTokenExpiry = 0;
-  try{ localStorage.removeItem('kashishGmailConnected_'+((userCtx&&userCtx.uid)||'guest')); }catch(e){}
-  refreshGmailScreen();
-}
-function gmailIsConnected(){ return !!gmailAccessToken && Date.now() < gmailAccessTokenExpiry; }
-async function gmailApi(path){
-  const res = await fetch('https://gmail.googleapis.com/gmail/v1/users/me/' + path, {
-    headers: { Authorization: 'Bearer ' + gmailAccessToken }
-  });
-  if(!res.ok) throw new Error('Gmail API ' + res.status);
-  return res.json();
-}
-function decodeGmailBase64(data){
-  if(!data) return '';
-  try{
-    const b64 = data.replace(/-/g,'+').replace(/_/g,'/');
-    return decodeURIComponent(atob(b64).split('').map(c=>'%'+('00'+c.charCodeAt(0).toString(16)).slice(-2)).join(''));
-  }catch(e){ return ''; }
-}
-function extractPlainTextFromPayload(payload){
-  if(!payload) return '';
-  if(payload.mimeType === 'text/plain' && payload.body && payload.body.data) return decodeGmailBase64(payload.body.data);
-  if(payload.parts){
-    for(const p of payload.parts){
-      const found = extractPlainTextFromPayload(p);
-      if(found) return found;
-    }
-  }
-  if(payload.mimeType === 'text/html' && payload.body && payload.body.data){
-    return decodeGmailBase64(payload.body.data).replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
-  }
-  return '';
-}
-function gmailHeader(headers, name){
-  const h = (headers||[]).find(x=>x.name && x.name.toLowerCase()===name.toLowerCase());
-  return h ? h.value : '';
-}
-async function refreshGmailScreen(){
-  const sub = document.getElementById('gmail-settings-sub');
-  const disc = document.getElementById('gmail-disconnected-state');
-  const conn = document.getElementById('gmail-connected-state');
-  if(!disc || !conn) return;
-  if(!gmailIsConnected()){
-    disc.classList.remove('hidden'); conn.classList.add('hidden');
-    if(sub) sub.textContent = 'Not connected';
-    return;
-  }
-  disc.classList.add('hidden'); conn.classList.remove('hidden');
-  if(sub) sub.textContent = 'Connected';
-  const loading = document.getElementById('gmail-inbox-loading');
-  const empty = document.getElementById('gmail-inbox-empty');
-  const list = document.getElementById('gmail-inbox-items');
-  if(!list) return;
-  list.innerHTML = ''; empty.classList.add('hidden'); loading.classList.remove('hidden');
-  try{
-    const profile = await gmailApi('profile');
-    const emailEl = document.getElementById('gmail-account-email');
-    if(emailEl) emailEl.textContent = profile.emailAddress || '';
-    const listResp = await gmailApi('messages?maxResults=12&labelIds=INBOX');
-    const ids = (listResp.messages||[]).map(m=>m.id);
-    loading.classList.add('hidden');
-    if(!ids.length){ empty.classList.remove('hidden'); return; }
-    for(const id of ids){
-      const msg = await gmailApi('messages/' + id + '?format=metadata&metadataHeaders=From&metadataHeaders=Subject');
-      const from = gmailHeader(msg.payload.headers, 'From');
-      const subject = gmailHeader(msg.payload.headers, 'Subject') || '(no subject)';
-      const row = document.createElement('button');
-      row.className = 'settings-row';
-      row.style.width = '100%';
-      row.innerHTML = `<div class="body" style="text-align:left;"><div class="lbl" style="font-weight:700;font-size:13.5px;">${escapeHtml(subject)}</div><div class="sub">${escapeHtml(from)}${msg.snippet? ' — ' + escapeHtml(truncate(msg.snippet, 60)) : ''}</div></div><span class="go"><i class="ph-bold ph-caret-right"></i></span>`;
-      row.onclick = ()=>draftGmailReply(id);
-      list.appendChild(row);
-    }
-  }catch(e){
-    console.warn('[KASHISH] Gmail inbox fetch failed:', e);
-    loading.classList.add('hidden');
-    empty.classList.remove('hidden');
-    empty.textContent = 'Inbox load nahi ho paya — Reconnect try karo.';
-  }
-}
-function escapeHtml(s){
-  return String(s||'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-function formatGmailReplyContext(fromHeader, subject, bodyText){
-  return `The user received this email:
-From: ${fromHeader}
-Subject: ${subject}
-Body: ${truncate(bodyText, 1500)}
-
-Draft a short, natural, appropriate reply the user could send back — read the email's tone and content and respond sensibly to it. Don't invent commitments, prices, or facts not present in the original email.
-
-Reply using EXACTLY this format and nothing else — no extra commentary, no markdown, no quotes around it:
-Subject: <reply subject line, one line, usually "Re: ..." >
----BODY---
-<the full reply body, with real paragraph breaks between lines>`;
-}
-async function draftGmailReply(messageId){
-  showKashishToast('Reply draft ban rahi hai…');
-  try{
-    const msg = await gmailApi('messages/' + messageId + '?format=full');
-    const headers = msg.payload.headers;
-    const from = gmailHeader(headers, 'From');
-    const subject = gmailHeader(headers, 'Subject') || '(no subject)';
-    const bodyText = extractPlainTextFromPayload(msg.payload) || msg.snippet || '';
-    const toMatch = from.match(EMAIL_ADDRESS_PATTERN);
-    const replyTo = toMatch ? toMatch[0] : '';
-    const result = await kashishReply([], null, formatGmailReplyContext(from, subject, bodyText));
-    const draft = parseEmailDraftFromReply(result.reply);
-    showScreen('screen-chat');
-    if(!currentSessionId) startSessionSilently();
-    if(draft){
-      pushBotMessage("Is email ka reply draft ban gaya — check kar lo, phir Gmail mein khol kar khud Send karna.", null, null, null, null, null, null, null, null, null, null, null, null, null, null, null, { to: replyTo, subject: draft.subject, body: draft.body });
-    } else {
-      pushBotMessage(result.reply, null);
-    }
-    renderChat();
-  }catch(e){
-    console.warn('[KASHISH] Gmail reply draft failed:', e);
-    showKashishToast('Reply draft nahi ban paya, dobara try karo.');
-  }
-}
-// Silently re-request a token (no consent popup) on load if the user
-// connected before, so they don't have to reconnect every single visit.
-(function tryGmailSilentReauth(){
-  const wasConnected = (()=>{ try{ return localStorage.getItem('kashishGmailConnected_'+((userCtx&&userCtx.uid)||'guest'))==='1'; }catch(e){ return false; } })();
-  if(!wasConnected || GMAIL_CLIENT_ID.indexOf('PASTE_YOUR')===0) return;
-  const tryInit = ()=>{
-    if(!gmailClientReady()){ setTimeout(tryInit, 400); return; }
-    const tc = ensureGmailTokenClient();
-    if(tc) tc.requestAccessToken({ prompt: '' });
-  };
-  setTimeout(tryInit, 800);
-})();
-
-
+let reminderCheckTimer = null;
 function startReminderChecker(){
   clearInterval(reminderCheckTimer);
   reminderCheckTimer = setInterval(()=>{
@@ -5727,21 +5481,11 @@ function startReminderChecker(){
       if(!it.notified && it.due){
         const d = new Date(it.due);
         if(!isNaN(d.getTime()) && d <= now){
-          changed = true;
+          it.notified = true; changed = true;
           showKashishToast('⏰ ' + it.text);
           playNotifSound();
           if('Notification' in window && Notification.permission==='granted'){
             try{ new Notification('Kashish reminder', {body: it.text}); }catch(e){}
-          }
-          if(it.recurYearly){
-            // Birthday-style reminder: push the due date forward one year
-            // instead of marking it done, so it keeps coming back.
-            const next = new Date(d);
-            next.setFullYear(next.getFullYear()+1);
-            it.due = next.toISOString().slice(0,16);
-            it.notified = false;
-          } else {
-            it.notified = true;
           }
         }
       }
@@ -5753,81 +5497,6 @@ function startReminderChecker(){
   }, 30000);
 }
 startReminderChecker();
-
-/* ---------------- vCard (.vcf) contact import → birthday reminders ----------------
-   Privacy note: this never touches a device contacts API or any server — the
-   person exports a .vcf file from their own Contacts app and picks it here.
-   Only NAME + BIRTHDAY are read out of it; nothing is uploaded anywhere. */
-function parseVcfBirthdays(text){
-  // vCard files separate contacts with BEGIN:VCARD / END:VCARD blocks, and
-  // wrap long lines with a leading space/tab on the continuation line —
-  // unfold those first so a single field isn't split across lines.
-  const unfolded = text.replace(/\r\n/g,'\n').replace(/\n[ \t]/g,'');
-  const cards = unfolded.split(/BEGIN:VCARD/i).slice(1);
-  const out = [];
-  cards.forEach(block=>{
-    const nameMatch = block.match(/^FN(?:;[^:\n]*)?:(.*)$/im);
-    const bdayMatch = block.match(/^BDAY(?:;[^:\n]*)?:(.*)$/im);
-    if(!nameMatch || !bdayMatch) return;
-    const name = nameMatch[1].trim();
-    let raw = bdayMatch[1].trim();
-    // Common formats: YYYY-MM-DD, YYYYMMDD, --MM-DD (no birth year given)
-    let m, month, day;
-    if((m = raw.match(/^--(\d{2})-?(\d{2})$/))){ month=m[1]; day=m[2]; }
-    else if((m = raw.match(/^(\d{4})-?(\d{2})-?(\d{2})/))){ month=m[2]; day=m[3]; }
-    else return;
-    if(!name || !month || !day) return;
-    out.push({ name, month:parseInt(month,10), day:parseInt(day,10) });
-  });
-  return out;
-}
-function nextBirthdayDue(month, day){
-  const now = new Date();
-  let year = now.getFullYear();
-  let d = new Date(year, month-1, day, 9, 0, 0);
-  if(d < now) d = new Date(year+1, month-1, day, 9, 0, 0);
-  const pad = n=>String(n).padStart(2,'0');
-  return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())+'T09:00';
-}
-function handleVcfImport(input){
-  const file = input.files && input.files[0];
-  if(!file) return;
-  const statusEl = document.getElementById('vcf-import-status');
-  const reader = new FileReader();
-  reader.onload = ()=>{
-    let birthdays = [];
-    try{ birthdays = parseVcfBirthdays(String(reader.result || '')); }catch(e){ birthdays = []; }
-    input.value = '';
-    if(!birthdays.length){
-      if(statusEl){ statusEl.textContent = 'No birthdays found in that file — some phones only export birthdays if you enable it in the export options.'; statusEl.classList.remove('hidden'); }
-      return;
-    }
-    const list = loadTaskList('reminders');
-    let added = 0, skipped = 0;
-    birthdays.forEach(b=>{
-      const already = list.some(it=> it.recurYearly && it.contactName===b.name);
-      if(already){ skipped++; return; }
-      list.push({
-        id: Date.now()+'-'+Math.random().toString(36).slice(2,7),
-        text: '🎂 ' + b.name + "'s birthday",
-        done:false, notified:false,
-        due: nextBirthdayDue(b.month, b.day),
-        recurYearly:true,
-        contactName:b.name
-      });
-      added++;
-    });
-    list.sort((a,b)=> (a.due||'').localeCompare(b.due||''));
-    persistTaskList('reminders', list);
-    renderTaskList('reminders');
-    triggerHaptic();
-    if(statusEl){
-      statusEl.textContent = added + ' birthday reminder' + (added===1?'':'s') + ' added' + (skipped ? (', ' + skipped + ' already added earlier') : '') + '.';
-      statusEl.classList.remove('hidden');
-    }
-  };
-  reader.readAsText(file);
-}
 
 function buildSystemPrompt(){
   const who = firstName()
