@@ -2527,12 +2527,14 @@ auth.onAuthStateChanged(async (user)=>{
       }
     }catch(e){}
     userCtx={ uid:user.uid, name: name||user.email||null, handle, photoBase64 };
+    await loadMemoriesFromFirebase();
     await loadSettings();
     authScreen.classList.add('hidden');
     app.classList.remove('auth-locked');
     renderHome();
   }else{
     userCtx=null;
+    memoriesCache = null;
     appSettings = {...SETTINGS_DEFAULTS};
     applySettings();
     authGoLanding();
@@ -5222,12 +5224,39 @@ async function lookupPublicPost(pulseId){
 function memoryStorageKey(){
   return 'kashishMemory_' + ((userCtx && userCtx.uid) || 'guest');
 }
-function loadMemories(){
+// Memories now live in Firebase (users/{uid}/memories) so the same account
+// sees the same "what Kashish has learned" list from any browser/device —
+// not just the one where a fact was first mentioned. A local in-memory
+// cache keeps every existing call site (which reads/writes synchronously)
+// working unchanged; writes fire off to Firebase in the background, same
+// pattern as saveSettings(). Guests (not signed in) still fall back to
+// localStorage since there's no account to sync against.
+let memoriesCache = null;
+async function loadMemoriesFromFirebase(){
+  if(!userCtx || !userCtx.uid){ memoriesCache = loadMemoriesLocal(); return; }
+  try{
+    const snap = await db.ref('users/'+userCtx.uid+'/memories').once('value');
+    memoriesCache = snap.exists() ? snap.val() : [];
+  }catch(e){
+    console.warn('[KASHISH] loading memories from Firebase failed, using local copy:', e);
+    memoriesCache = loadMemoriesLocal();
+  }
+}
+function loadMemoriesLocal(){
   try{ return JSON.parse(localStorage.getItem(memoryStorageKey())||'[]'); }
   catch(e){ return []; }
 }
+function loadMemories(){
+  // Cache not ready yet (e.g. called before auth settles) — safe empty list.
+  return memoriesCache || [];
+}
 function persistMemories(mems){
-  try{ localStorage.setItem(memoryStorageKey(), JSON.stringify(mems)); }catch(e){}
+  memoriesCache = mems;
+  if(userCtx && userCtx.uid){
+    db.ref('users/'+userCtx.uid+'/memories').set(mems).catch(e=>console.warn('[KASHISH] saving memories to Firebase failed:', e));
+  } else {
+    try{ localStorage.setItem(memoryStorageKey(), JSON.stringify(mems)); }catch(e){}
+  }
 }
 function saveMemory(fact){
   if(!fact || !fact.trim()) return;
