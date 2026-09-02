@@ -3,202 +3,140 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Kashish Codex — talk to her, anywhere</title>
+<title>Kashish Codex</title>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Yellowtail&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/@phosphor-icons/web"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 :root{
-  --bg:#0E0E10; --panel:#151517; --ink:#F5F5F6; --ink-soft:#9A9AA4;
-  --accent:#4FA8FF; --accent-deep:#1975CE;
-  --border:rgba(255,255,255,.08);
+  --bg:#F2F2F0; --panel:#FFFFFF; --ink:#111114; --ink-soft:#8A8A90;
+  --border:#E4E4E1; --dark:#12121A;
 }
-html{scroll-behavior:smooth;}
-body{background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,sans-serif;line-height:1.5;}
+body{background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,sans-serif;}
 img{max-width:100%;display:block;}
-a{color:inherit;}
-.wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+a{color:inherit;text-decoration:none;}
+.wrap{max-width:1160px;margin:32px auto;background:var(--panel);border-radius:26px;overflow:hidden;box-shadow:0 40px 80px -50px rgba(0,0,0,.25);}
 
 /* ---------- nav ---------- */
-.nav{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;position:sticky;top:0;z-index:20;background:rgba(14,14,16,.75);backdrop-filter:blur(16px) saturate(160%);border-bottom:1px solid var(--border);}
-.nav-logo{font-family:'Yellowtail',cursive;font-size:30px;color:#fff;}
-.nav-cta{background:#fff;color:#0E0E10;font-weight:800;font-size:14px;padding:9px 20px;border-radius:999px;text-decoration:none;}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:26px 40px 0;flex-wrap:wrap;gap:16px;}
+.logo{font-family:'Yellowtail',cursive;font-size:26px;}
+.navlinks{display:flex;gap:40px;}
+.navlinks .col{display:flex;flex-direction:column;gap:10px;font-size:13.5px;}
+.navlinks .col a:first-child{color:var(--ink);font-weight:700;}
+.navlinks .col a:not(:first-child){color:var(--ink-soft);}
+.menu-btn{display:flex;align-items:center;gap:6px;border:1px solid var(--border);border-radius:999px;padding:9px 16px;font-size:13px;font-weight:700;}
 
 /* ---------- hero ---------- */
-.hero{position:relative;padding:88px 24px 64px;text-align:center;overflow:hidden;}
-.hero::before{content:'';position:absolute;inset:-20% -10% auto -10%;height:520px;background:radial-gradient(ellipse at 50% 20%,rgba(79,168,255,.35),transparent 65%);pointer-events:none;}
-.hero-eyebrow{position:relative;font-size:14px;color:var(--ink-soft);font-weight:700;}
-.hero h1{position:relative;font-family:'Yellowtail',cursive;font-size:clamp(56px,10vw,96px);color:#fff;line-height:1;margin:10px 0 6px;}
-.hero h2{position:relative;font-size:clamp(24px,4.5vw,38px);font-weight:800;max-width:720px;margin:0 auto 18px;letter-spacing:-.01em;}
-.hero p{position:relative;color:var(--ink-soft);font-size:16.5px;max-width:520px;margin:0 auto 30px;}
-.hero-ctas{position:relative;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
-.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:999px;font-weight:800;font-size:14.5px;text-decoration:none;}
-.btn-primary{background:var(--accent-deep);color:#fff;}
-.btn-ghost{background:rgba(255,255,255,.06);color:#fff;border:1px solid var(--border);}
+.hero{position:relative;padding:40px 40px 56px;}
+.hero .eyebrow{font-size:14px;color:var(--ink-soft);margin-bottom:4px;}
+.hero-row{display:flex;align-items:flex-end;justify-content:space-between;gap:30px;flex-wrap:wrap;}
+.hero h1{font-size:clamp(32px,5vw,52px);font-weight:800;line-height:1.06;letter-spacing:-.01em;max-width:680px;}
+.hero-side{display:flex;align-items:center;gap:22px;flex-wrap:wrap;}
+.pill-btn{background:var(--dark);color:#fff;border-radius:999px;padding:14px 26px;font-size:12.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;}
+.hero-sub{font-size:14px;color:var(--ink-soft);max-width:190px;}
+.hero-sub b{color:var(--ink);font-weight:800;}
+.deco-star{position:absolute;color:#D8D8D4;font-size:22px;}
+.deco-star.s1{top:38px;left:230px;}
+.deco-star.s2{top:100px;right:210px;}
+.deco-arc{position:absolute;top:20px;right:60px;width:120px;height:130px;border:1px solid #D8D8D4;border-radius:0 100% 0 0;border-left:none;border-bottom:none;}
 
-/* ---------- feature rows ---------- */
-.feature{padding:76px 24px;border-top:1px solid var(--border);}
-.feature .wrap{display:grid;grid-template-columns:1fr;gap:36px;align-items:center;}
-@media(min-width:820px){ .feature .wrap{grid-template-columns:1fr 1fr;gap:56px;} .feature.reverse .wrap>*:first-child{order:2;} }
-.feature h3{font-size:clamp(26px,3.6vw,32px);font-weight:800;letter-spacing:-.01em;margin-bottom:14px;}
-.feature p{color:var(--ink-soft);font-size:15.5px;max-width:44ch;}
-.mock{background:linear-gradient(160deg,#1a1a1d,#0f0f11);border:1px solid var(--border);border-radius:22px;padding:22px;box-shadow:0 30px 60px -30px rgba(0,0,0,.6);}
+/* ---------- grid ---------- */
+.grid{display:grid;grid-template-columns:1fr 1fr 1.3fr;gap:2px;background:var(--border);}
+@media(max-width:820px){ .grid{grid-template-columns:1fr;} }
+.panel{position:relative;min-height:340px;padding:20px;display:flex;flex-direction:column;justify-content:flex-end;overflow:hidden;}
+.badge{position:absolute;top:16px;left:16px;background:rgba(255,255,255,.85);color:var(--ink);font-size:11px;font-weight:800;padding:4px 10px;border-radius:999px;z-index:2;}
 
-/* mock: chat bubble */
-.mock-chat .row{display:flex;margin-bottom:10px;}
-.mock-chat .row.user{justify-content:flex-end;}
-.bubble{max-width:78%;padding:10px 15px;border-radius:17px;font-size:13.5px;}
-.bubble.user{background:#2b2b30;color:#fff;border-bottom-right-radius:5px;}
-.bubble.bot{background:#232326;color:#e9e9ec;border-bottom-left-radius:5px;}
+/* panel 1: photo-style mentors card */
+.panel-photo{background:linear-gradient(155deg,#e9e4dc,#cfd7d6 60%,#a9b7bd);}
+.avatars{display:flex;margin-bottom:10px;}
+.avatars span{width:30px;height:30px;border-radius:50%;border:2px solid #fff;background:#3a3a40;margin-left:-8px;}
+.avatars span:first-child{margin-left:0;}
+.panel-photo .cap{color:#fff;font-weight:700;font-size:15px;text-shadow:0 2px 8px rgba(0,0,0,.25);}
+.mini-btn{display:inline-flex;align-items:center;gap:6px;margin-top:10px;background:rgba(255,255,255,.9);border-radius:999px;padding:8px 14px;font-size:11.5px;font-weight:800;color:var(--ink);width:fit-content;}
 
-/* mock: gcard grid */
-.mock-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
-.mgcard{background:linear-gradient(150deg,#232326,#1a1a1c);border:1px solid var(--border);border-radius:16px;padding:13px;display:flex;flex-direction:column;justify-content:space-between;min-height:78px;}
-.mgcard i{color:var(--accent);font-size:17px;}
-.mgcard span{font-size:12.5px;font-weight:700;margin-top:8px;}
+/* panel 2: feature list card */
+.panel-list{background:linear-gradient(165deg,#FF8A4C,#FF3D6E 55%,#C6206B);color:#fff;justify-content:flex-start;padding-top:56px;}
+.panel-list .row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid rgba(255,255,255,.25);font-weight:700;font-size:14.5px;}
+.panel-list .row:last-child{border:none;}
 
-/* mock: weather card */
-.mock-weather{background:linear-gradient(155deg,#182233,#12161f);border:1px solid var(--border);border-radius:16px;padding:16px 18px;}
-.mock-weather .top{display:flex;justify-content:space-between;align-items:center;}
-.mock-weather .place{font-size:13px;font-weight:800;}
-.mock-weather .temp{font-size:30px;font-weight:800;margin-top:6px;}
-.mock-weather .grid{display:flex;gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11.5px;color:var(--ink-soft);}
-.mock-weather .grid b{display:block;color:#fff;font-size:13px;}
+/* panel 3: gradient stat card */
+.panel-stat{background:
+  repeating-linear-gradient(100deg,#7B5CFF 0 3px,#9E6BFF 3px 6px),
+  linear-gradient(120deg,#FF7AC6 0%,#8B5CF6 45%,#4F7CFF 100%);
+  background-blend-mode:overlay,normal;
+  color:#fff;}
+.panel-stat .stat{font-size:clamp(34px,5vw,52px);font-weight:800;}
+.panel-stat .desc{font-size:13px;max-width:220px;margin-top:6px;opacity:.9;}
+.panel-stat .arrow{position:absolute;bottom:18px;right:20px;font-size:20px;opacity:.85;}
 
-/* mock: reminders list */
-.mock-list .item{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;}
-.mock-list .item:last-child{border:none;}
-.mock-list .item .t{color:var(--ink-soft);font-size:11.5px;}
-
-/* ---------- pricing ---------- */
-.pricing{padding:80px 24px;border-top:1px solid var(--border);text-align:center;}
-.pricing h2{font-size:clamp(28px,4.5vw,36px);font-weight:800;margin-bottom:44px;}
-.plans{display:grid;gap:16px;grid-template-columns:1fr;max-width:720px;margin:0 auto;text-align:left;}
-@media(min-width:640px){ .plans{grid-template-columns:1fr 1fr;} }
-.plan{border:1px solid var(--border);border-radius:20px;padding:28px;background:var(--panel);}
-.plan.pro{border-color:var(--accent-deep);background:linear-gradient(160deg,#182233,#101014);}
-.plan h4{font-size:19px;font-weight:800;}
-.plan .desc{color:var(--ink-soft);font-size:13.5px;margin:6px 0 22px;}
-.plan .price{font-size:34px;font-weight:800;}
-.plan .price span{font-size:13px;color:var(--ink-soft);font-weight:600;}
-.plan .btn{width:100%;justify-content:center;margin-top:20px;}
-
-/* ---------- footer ---------- */
-footer{padding:40px 24px 50px;border-top:1px solid var(--border);text-align:center;color:var(--ink-soft);font-size:12.5px;}
-footer .nav-logo{margin-bottom:10px;font-size:24px;}
+footer{max-width:1160px;margin:0 auto 60px;padding:0 40px;color:var(--ink-soft);font-size:12.5px;display:flex;justify-content:space-between;align-items:center;}
+.footer-logo{font-family:'Yellowtail',cursive;font-size:20px;color:var(--ink);}
 </style>
 </head>
 <body>
 
-<nav class="nav">
-  <div class="nav-logo">Kashish</div>
-  <a class="nav-cta" href="#">Open Kashish</a>
-</nav>
-
-<section class="hero">
-  <div class="hero-eyebrow">KASHISH CODEX</div>
-  <h1>Kashish</h1>
-  <h2>The companion that actually keeps up with your day</h2>
-  <p>Chat, talk out loud, or just vent — Kashish remembers what matters, checks the real world when you need facts, and never makes you repeat yourself.</p>
-  <div class="hero-ctas">
-    <a class="btn btn-primary" href="#"><i class="ph-bold ph-chat-circle-text"></i> Start chatting</a>
-    <a class="btn btn-ghost" href="#pricing">See Kashish Pro</a>
-  </div>
-</section>
-
-<section class="feature">
-  <div class="wrap">
-    <div>
-      <h3>One tap into anything you need</h3>
-      <p>Chat, Voice, Just Chat, AI Create — the home screen puts every way of reaching Kashish one tap away, so you never have to dig through menus mid-thought.</p>
-    </div>
-    <div class="mock">
-      <div class="mock-grid">
-        <div class="mgcard" style="grid-row:span 2;"><i class="ph ph-chat-circle-text"></i><span>Chat with Kashish</span></div>
-        <div class="mgcard"><i class="ph ph-waveform"></i><span>Voice Chat</span></div>
-        <div class="mgcard"><i class="ph ph-sparkle"></i><span>Just Chat</span></div>
+<div class="wrap">
+  <nav class="nav">
+    <div class="logo">Kashish</div>
+    <div class="navlinks">
+      <div class="col">
+        <a href="#">Home page</a>
+        <a href="#">Codex</a>
+        <a href="#">Pricing plan</a>
+        <a href="#">Changelog</a>
+      </div>
+      <div class="col">
+        <a href="#">About us</a>
+        <a href="#">Features</a>
+        <a href="#">Skills · 2026</a>
+        <a href="#">Careers</a>
       </div>
     </div>
-  </div>
-</section>
+    <button class="menu-btn">Menu <i class="ph-bold ph-caret-down"></i></button>
+  </nav>
 
-<section class="feature reverse">
-  <div class="wrap">
-    <div class="mock mock-chat">
-      <div class="row"><div class="bubble user">Delhi ka mausam kaisa hai abhi?</div></div>
-      <div class="row"><div class="bubble bot">Ek sec, dekhti hoon live weather 🌤️</div></div>
-      <div class="mock-weather" style="margin-top:6px;">
-        <div class="top"><div class="place">New Delhi</div><div>☁️</div></div>
-        <div class="temp">31°</div>
-        <div class="grid">
-          <div>Feels like<b>34°</b></div>
-          <div>High<b>33°</b></div>
-          <div>Low<b>26°</b></div>
-        </div>
+  <section class="hero">
+    <div class="deco-star s1">✳</div>
+    <div class="deco-star s2">✳</div>
+    <div class="deco-arc"></div>
+    <div class="eyebrow">Ship faster with</div>
+    <div class="hero-row">
+      <h1>Real Code Changes with the Ultimate AI-Powered Companion</h1>
+      <div class="hero-side">
+        <a class="pill-btn" href="#">Start Building</a>
+        <div class="hero-sub">The next generation <b>copilot</b> for developers</div>
       </div>
     </div>
-    <div>
-      <h3>Talks about what's happening right now</h3>
-      <p>Weather, live prices, quick facts — Kashish pulls real, current data into the conversation instead of guessing, so the answer is actually useful.</p>
-    </div>
-  </div>
-</section>
+  </section>
 
-<section class="feature">
-  <div class="wrap">
-    <div>
-      <h3>Picks up where you left off</h3>
-      <p>No "remember this" needed. Kashish quietly notices the things you mention — your work, your city, your likes — and brings them back naturally later.</p>
+  <div class="grid">
+    <div class="panel panel-photo">
+      <span class="badge">01</span>
+      <div class="avatars"><span></span><span></span><span></span></div>
+      <div class="cap">Learn from real diffs</div>
+      <a class="mini-btn" href="#">Start Learning <i class="ph-bold ph-arrow-down-right"></i></a>
     </div>
-    <div class="mock">
-      <div class="mock-list">
-        <div class="item"><div>Prefers replies in Hinglish<div class="t">Learned from chat</div></div><i class="ph ph-check-circle" style="color:var(--accent)"></i></div>
-        <div class="item"><div>Works in product design<div class="t">Learned from chat</div></div><i class="ph ph-check-circle" style="color:var(--accent)"></i></div>
-        <div class="item"><div>Lives in Delhi<div class="t">Learned from chat</div></div><i class="ph ph-check-circle" style="color:var(--accent)"></i></div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<section class="feature reverse">
-  <div class="wrap">
-    <div class="mock">
-      <div class="mock-list">
-        <div class="item"><div>Reminder: Call mom<div class="t">Today, 6:00 PM</div></div><i class="ph ph-bell" style="color:var(--accent)"></i></div>
-        <div class="item"><div>Notification while you're away<div class="t">Kashish replied 2m ago</div></div><i class="ph ph-chat-dots" style="color:var(--accent)"></i></div>
-        <div class="item"><div>Hands-free voice mode<div class="t">Keeps listening after you talk</div></div><i class="ph ph-microphone" style="color:var(--accent)"></i></div>
-      </div>
+    <div class="panel panel-list">
+      <span class="badge" style="background:rgba(0,0,0,.25);color:#fff;">02</span>
+      <div class="row">Live Preview <i class="ph-bold ph-arrow-down-right"></i></div>
+      <div class="row">Multi-file Edits <i class="ph-bold ph-arrow-down-right"></i></div>
+      <div class="row">Instant Undo <i class="ph-bold ph-arrow-down-right"></i></div>
+      <div class="row">Compare Diffs <i class="ph-bold ph-arrow-down-right"></i></div>
     </div>
-    <div>
-      <h3>Doesn't disappear when you close the app</h3>
-      <p>Reminders, notifications, and hands-free voice mode mean Kashish stays part of your day, not just something you open when you remember to.</p>
-    </div>
-  </div>
-</section>
 
-<section class="pricing" id="pricing">
-  <div class="wrap">
-    <h2>Choose how you want to talk to Kashish</h2>
-    <div class="plans">
-      <div class="plan">
-        <h4>Free</h4>
-        <div class="desc">Everyday chat, voice, and reminders</div>
-        <div class="price">₹0</div>
-        <a class="btn btn-ghost" href="#">Get started</a>
-      </div>
-      <div class="plan pro">
-        <h4>Kashish Pro</h4>
-        <div class="desc">Faster replies, more voice minutes, deeper memory</div>
-        <div class="price">₹299 <span>/ month</span></div>
-        <a class="btn btn-primary" href="#">Go Pro</a>
-      </div>
+    <div class="panel panel-stat">
+      <span class="badge" style="background:rgba(0,0,0,.25);color:#fff;">03</span>
+      <div class="stat">+20K</div>
+      <div class="desc">Pull requests shipped by Kashish Codex this week alone.</div>
+      <div class="arrow">↘</div>
     </div>
   </div>
-</section>
+</div>
 
 <footer>
-  <div class="nav-logo">Kashish</div>
-  Kashish is a product by Nexor Sparks.
+  <div class="footer-logo">Kashish</div>
+  <div>Kashish is a product by Nexor Sparks.</div>
 </footer>
 
 </body>
