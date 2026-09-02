@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kashish Codex — talk to her, anywhere</title>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Yellowtail&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --bg:#0E0E10; --panel:#151517; --ink:#F5F5F6; --ink-soft:#9A9AA4;
+  --accent:#4FA8FF; --accent-deep:#1975CE;
+  --border:rgba(255,255,255,.08);
+}
+html{scroll-behavior:smooth;}
+body{background:var(--bg);color:var(--ink);font-family:'Manrope',system-ui,sans-serif;line-height:1.5;}
+img{max-width:100%;display:block;}
+a{color:inherit;}
+.wrap{max-width:1080px;margin:0 auto;padding:0 24px;}
+
+/* ---------- nav ---------- */
+.nav{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;position:sticky;top:0;z-index:20;background:rgba(14,14,16,.75);backdrop-filter:blur(16px) saturate(160%);border-bottom:1px solid var(--border);}
+.nav-logo{font-family:'Yellowtail',cursive;font-size:30px;color:#fff;}
+.nav-cta{background:#fff;color:#0E0E10;font-weight:800;font-size:14px;padding:9px 20px;border-radius:999px;text-decoration:none;}
+
+/* ---------- hero ---------- */
+.hero{position:relative;padding:88px 24px 64px;text-align:center;overflow:hidden;}
+.hero::before{content:'';position:absolute;inset:-20% -10% auto -10%;height:520px;background:radial-gradient(ellipse at 50% 20%,rgba(79,168,255,.35),transparent 65%);pointer-events:none;}
+.hero-eyebrow{position:relative;font-size:14px;color:var(--ink-soft);font-weight:700;}
+.hero h1{position:relative;font-family:'Yellowtail',cursive;font-size:clamp(56px,10vw,96px);color:#fff;line-height:1;margin:10px 0 6px;}
+.hero h2{position:relative;font-size:clamp(24px,4.5vw,38px);font-weight:800;max-width:720px;margin:0 auto 18px;letter-spacing:-.01em;}
+.hero p{position:relative;color:var(--ink-soft);font-size:16.5px;max-width:520px;margin:0 auto 30px;}
+.hero-ctas{position:relative;display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 26px;border-radius:999px;font-weight:800;font-size:14.5px;text-decoration:none;}
+.btn-primary{background:var(--accent-deep);color:#fff;}
+.btn-ghost{background:rgba(255,255,255,.06);color:#fff;border:1px solid var(--border);}
+
+/* ---------- feature rows ---------- */
+.feature{padding:76px 24px;border-top:1px solid var(--border);}
+.feature .wrap{display:grid;grid-template-columns:1fr;gap:36px;align-items:center;}
+@media(min-width:820px){ .feature .wrap{grid-template-columns:1fr 1fr;gap:56px;} .feature.reverse .wrap>*:first-child{order:2;} }
+.feature h3{font-size:clamp(26px,3.6vw,32px);font-weight:800;letter-spacing:-.01em;margin-bottom:14px;}
+.feature p{color:var(--ink-soft);font-size:15.5px;max-width:44ch;}
+.mock{background:linear-gradient(160deg,#1a1a1d,#0f0f11);border:1px solid var(--border);border-radius:22px;padding:22px;box-shadow:0 30px 60px -30px rgba(0,0,0,.6);}
+
+/* mock: chat bubble */
+.mock-chat .row{display:flex;margin-bottom:10px;}
+.mock-chat .row.user{justify-content:flex-end;}
+.bubble{max-width:78%;padding:10px 15px;border-radius:17px;font-size:13.5px;}
+.bubble.user{background:#2b2b30;color:#fff;border-bottom-right-radius:5px;}
+.bubble.bot{background:#232326;color:#e9e9ec;border-bottom-left-radius:5px;}
+
+/* mock: gcard grid */
+.mock-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.mgcard{background:linear-gradient(150deg,#232326,#1a1a1c);border:1px solid var(--border);border-radius:16px;padding:13px;display:flex;flex-direction:column;justify-content:space-between;min-height:78px;}
+.mgcard i{color:var(--accent);font-size:17px;}
+.mgcard span{font-size:12.5px;font-weight:700;margin-top:8px;}
+
+/* mock: weather card */
+.mock-weather{background:linear-gradient(155deg,#182233,#12161f);border:1px solid var(--border);border-radius:16px;padding:16px 18px;}
+.mock-weather .top{display:flex;justify-content:space-between;align-items:center;}
+.mock-weather .place{font-size:13px;font-weight:800;}
+.mock-weather .temp{font-size:30px;font-weight:800;margin-top:6px;}
+.mock-weather .grid{display:flex;gap:16px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border);font-size:11.5px;color:var(--ink-soft);}
+.mock-weather .grid b{display:block;color:#fff;font-size:13px;}
+
+/* mock: reminders list */
+.mock-list .item{display:flex;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.mock-list .item:last-child{border:none;}
+.mock-list .item .t{color:var(--ink-soft);font-size:11.5px;}
+
+/* ---------- pricing ---------- */
+.pricing{padding:80px 24px;border-top:1px solid var(--border);text-align:center;}
+.pricing h2{font-size:clamp(28px,4.5vw,36px);font-weight:800;margin-bottom:44px;}
+.plans{display:grid;gap:16px;grid-template-columns:1fr;max-width:720px;margin:0 auto;text-align:left;}
+@media(min-width:640px){ .plans{grid-template-columns:1fr 1fr;} }
+.plan{border:1px solid var(--border);border-radius:20px;padding:28px;background:var(--panel);}
+.plan.pro{border-color:var(--accent-deep);background:linear-gradient(160deg,#182233,#101014);}
+.plan h4{font-size:19px;font-weight:800;}
+.plan .desc{color:var(--ink-soft);font-size:13.5px;margin:6px 0 22px;}
+.plan .price{font-size:34px;font-weight:800;}
+.plan .price span{font-size:13px;color:var(--ink-soft);font-weight:600;}
+.plan .btn{width:100%;justify-content:center;margin-top:20px;}
+
+/* ---------- footer ---------- */
+footer{padding:40px 24px 50px;border-top:1px solid var(--border);text-align:center;color:var(--ink-soft);font-size:12.5px;}
+footer .nav-logo{margin-bottom:10px;font-size:24px;}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-logo">Kashish</div>
+  <a class="nav-cta" href="#">Open Kashish</a>
+</nav>
+
+<section class="hero">
+  <div class="hero-eyebrow">KASHISH CODEX</div>
+  <h1>Kashish</h1>
+  <h2>The companion that actually keeps up with your day</h2>
+  <p>Chat, talk out loud, or just vent — Kashish remembers what matters, checks the real world when you need facts, and never makes you repeat yourself.</p>
+  <div class="hero-ctas">
+    <a class="btn btn-primary" href="#"><i class="ph-bold ph-chat-circle-text"></i> Start chatting</a>
+    <a class="btn btn-ghost" href="#pricing">See Kashish Pro</a>
+  </div>
+</section>
+
+<section class="feature">
+  <div class="wrap">
+    <div>
+      <h3>One tap into anything you need</h3>
+      <p>Chat, Voice, Just Chat, AI Create — the home screen puts every way of reaching Kashish one tap away, so you never have to dig through menus mid-thought.</p>
+    </div>
+    <div class="mock">
+      <div class="mock-grid">
+        <div class="mgcard" style="grid-row:span 2;"><i class="ph ph-chat-circle-text"></i><span>Chat with Kashish</span></div>
+        <div class="mgcard"><i class="ph ph-waveform"></i><span>Voice Chat</span></div>
+        <div class="mgcard"><i class="ph ph-sparkle"></i><span>Just Chat</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="feature reverse">
+  <div class="wrap">
+    <div class="mock mock-chat">
+      <div class="row"><div class="bubble user">Delhi ka mausam kaisa hai abhi?</div></div>
+      <div class="row"><div class="bubble bot">Ek sec, dekhti hoon live weather 🌤️</div></div>
+      <div class="mock-weather" style="margin-top:6px;">
+        <div class="top"><div class="place">New Delhi</div><div>☁️</div></div>
+        <div class="temp">31°</div>
+        <div class="grid">
+          <div>Feels like<b>34°</b></div>
+          <div>High<b>33°</b></div>
+          <div>Low<b>26°</b></div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <h3>Talks about what's happening right now</h3>
+      <p>Weather, live prices, quick facts — Kashish pulls real, current data into the conversation instead of guessing, so the answer is actually useful.</p>
+    </div>
+  </div>
+</section>
+
+<section class="feature">
+  <div class="wrap">
+    <div>
+      <h3>Picks up where you left off</h3>
+      <p>No "remember this" needed. Kashish quietly notices the things you mention — your work, your city, your likes — and brings them back naturally later.</p>
+    </div>
+    <div class="mock">
+      <div class="mock-list">
+        <div class="item"><div>Prefers replies in Hinglish<div class="t">Learned from chat</div></div><i class="ph ph-check-circle" style="color:var(--accent)"></i></div>
+        <div class="item"><div>Works in product design<div class="t">Learned from chat</div></div><i class="ph ph-check-circle" style="color:var(--accent)"></i></div>
+        <div class="item"><div>Lives in Delhi<div class="t">Learned from chat</div></div><i class="ph ph-check-circle" style="color:var(--accent)"></i></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="feature reverse">
+  <div class="wrap">
+    <div class="mock">
+      <div class="mock-list">
+        <div class="item"><div>Reminder: Call mom<div class="t">Today, 6:00 PM</div></div><i class="ph ph-bell" style="color:var(--accent)"></i></div>
+        <div class="item"><div>Notification while you're away<div class="t">Kashish replied 2m ago</div></div><i class="ph ph-chat-dots" style="color:var(--accent)"></i></div>
+        <div class="item"><div>Hands-free voice mode<div class="t">Keeps listening after you talk</div></div><i class="ph ph-microphone" style="color:var(--accent)"></i></div>
+      </div>
+    </div>
+    <div>
+      <h3>Doesn't disappear when you close the app</h3>
+      <p>Reminders, notifications, and hands-free voice mode mean Kashish stays part of your day, not just something you open when you remember to.</p>
+    </div>
+  </div>
+</section>
+
+<section class="pricing" id="pricing">
+  <div class="wrap">
+    <h2>Choose how you want to talk to Kashish</h2>
+    <div class="plans">
+      <div class="plan">
+        <h4>Free</h4>
+        <div class="desc">Everyday chat, voice, and reminders</div>
+        <div class="price">₹0</div>
+        <a class="btn btn-ghost" href="#">Get started</a>
+      </div>
+      <div class="plan pro">
+        <h4>Kashish Pro</h4>
+        <div class="desc">Faster replies, more voice minutes, deeper memory</div>
+        <div class="price">₹299 <span>/ month</span></div>
+        <a class="btn btn-primary" href="#">Go Pro</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="nav-logo">Kashish</div>
+  Kashish is a product by Nexor Sparks.
+</footer>
+
+</body>
+</html>
