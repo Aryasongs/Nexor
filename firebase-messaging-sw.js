@@ -13,9 +13,11 @@ importScripts('https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js')
 firebase.initializeApp({
   apiKey: "AIzaSyC30TcmMVhP_8HdFYS1WufRiZwSDYNMTF0",
   authDomain: "pulse2-92372.firebaseapp.com",
+  databaseURL: "https://pulse2-92372-default-rtdb.firebaseio.com",
   projectId: "pulse2-92372",
-  messagingSenderId: "REPLACE_WITH_YOUR_SENDER_ID",
-  appId: "REPLACE_WITH_YOUR_APP_ID",
+  storageBucket: "pulse2-92372.firebasestorage.app",
+  messagingSenderId: "276235725177",
+  appId: "1:276235725177:web:0f4e0789fae80a435927a8",
 });
 
 const messaging = firebase.messaging();
