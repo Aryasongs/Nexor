@@ -6677,6 +6677,48 @@ function watermarkDataUrl(dataUrl){
     img.src=dataUrl;
   });
 }
+/* ---- Nexor special-animation marker ----
+   Embeds a tiny JSON marker directly into the JPEG bytes as a standard
+   JPEG "COM" (comment) segment (marker 0xFFFE), inserted right after the
+   SOI header. This is a real, spec-legal JPEG segment — every normal image
+   viewer/decoder just ignores it, so the image displays completely
+   normally everywhere. Nexor (or any tool that reads raw bytes) can look
+   for this segment when a Kashish image is uploaded and trigger a special
+   animation instead of guessing off filenames or requiring the user to
+   tag anything. canvas.toDataURL() strips this kind of metadata, which is
+   exactly why it has to be re-inserted AFTER watermarking, not before.
+   Format written: {"app":"kashish","nexorAnimation":"ai_spark","v":1,"createdAt":<ms>} */
+function embedNexorAnimationMarker(dataUrl, meta){
+  return new Promise((resolve)=>{
+    try{
+      const commaIdx = dataUrl.indexOf(',');
+      if(commaIdx<0){ resolve(dataUrl); return; }
+      const headerPart = dataUrl.slice(0, commaIdx+1);
+      if(!/^data:image\/jpeg/i.test(headerPart)){ resolve(dataUrl); return; } // COM segments are a JPEG-only concept
+      const binary = atob(dataUrl.slice(commaIdx+1));
+      const bytes = new Uint8Array(binary.length);
+      for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+      if(bytes.length<2 || bytes[0]!==0xFF || bytes[1]!==0xD8){ resolve(dataUrl); return; } // not a valid JPEG (SOI)
+
+      const commentBytes = new TextEncoder().encode(JSON.stringify(meta));
+      const segLen = commentBytes.length + 2; // JPEG segment length field counts itself, not the 2 marker bytes
+      if(segLen > 0xFFFF){ resolve(dataUrl); return; } // marker too big to fit a single COM segment, skip silently
+
+      const seg = new Uint8Array(4 + commentBytes.length);
+      seg[0]=0xFF; seg[1]=0xFE;                 // COM marker
+      seg[2]=(segLen>>8)&0xFF; seg[3]=segLen&0xFF;
+      seg.set(commentBytes, 4);
+
+      const out = new Uint8Array(2 + seg.length + (bytes.length-2));
+      out[0]=0xFF; out[1]=0xD8;                 // SOI
+      out.set(seg, 2);
+      out.set(bytes.subarray(2), 2+seg.length); // rest of the original JPEG, unchanged
+
+      let outBinary=''; for(let i=0;i<out.length;i++) outBinary += String.fromCharCode(out[i]);
+      resolve(headerPart + btoa(outBinary));
+    }catch(e){ resolve(dataUrl); }
+  });
+}
 async function generateKashishImage(prompt){
   const ctrl=new AbortController();
   const timeoutId=setTimeout(()=>ctrl.abort(), 25000);
@@ -6691,7 +6733,13 @@ async function generateKashishImage(prompt){
     const reader=new FileReader();
     reader.onload=()=>resolve(reader.result); reader.onerror=reject; reader.readAsDataURL(blob);
   });
-  return await watermarkDataUrl(dataUrl);
+  const watermarked = await watermarkDataUrl(dataUrl);
+  return await embedNexorAnimationMarker(watermarked, {
+    app: 'kashish',
+    nexorAnimation: 'ai_spark', // change this string if you want a different Nexor-side animation per case
+    v: 1,
+    createdAt: Date.now(),
+  });
 }
 async function handleImageGenRequest(prompt){
   const sess=getSession(currentSessionId); if(!sess) return;
