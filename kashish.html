@@ -2758,13 +2758,18 @@ auth.onAuthStateChanged(async (user)=>{
     }catch(e){}
     userCtx={ uid:user.uid, name: name||user.email||null, handle, photoBase64 };
     await loadMemoriesFromFirebase();
+    await loadTaskListsFromFirebase();
     await loadSettings();
     authScreen.classList.add('hidden');
     app.classList.remove('auth-locked');
     renderHome();
+    // Refresh any task/reminder screen that's already open (e.g. rejoining
+    // a session) now that the Firebase-backed caches are populated.
+    ['bucket','tasks','reminders'].forEach(renderTaskList);
   }else{
     userCtx=null;
     memoriesCache = null;
+    taskListCaches = { bucket:null, tasks:null, reminders:null };
     appSettings = {...SETTINGS_DEFAULTS};
     applySettings();
     authGoLanding();
@@ -5789,18 +5794,59 @@ function extractPassiveFact(text){
 }
 
 /* ---------------- bucket list / daily tasks / reminders ---------------- */
-// Same lightweight per-account localStorage pattern as memories above.
+// Same pattern as memories: synced to Firebase (users/{uid}/<path>) so the
+// same account sees the same lists from any browser/device, with an
+// in-memory cache so every existing call site (which reads/writes
+// synchronously) keeps working unchanged. Local storage is only a fallback
+// for the brief window before auth settles / if not signed in — it used to
+// be the *only* store, which silently dropped data whenever localStorage
+// was blocked (Safari private mode, some WebViews, storage full, etc.)
+// since the old persistTaskList() swallowed the write error and the next
+// render just re-read the same (unchanged) empty list.
 // type is one of: 'bucket' (bucket list), 'tasks' (daily tasks, auto-reset
 // each day), 'reminders' (has an optional due datetime + one-shot notify).
+const TASK_FIREBASE_PATH = { bucket:'bucketList', tasks:'dailyTasks', reminders:'reminders' };
+let taskListCaches = { bucket:null, tasks:null, reminders:null };
 function taskStorageKey(type){
   return 'kashish' + type.charAt(0).toUpperCase() + type.slice(1) + '_' + ((userCtx && userCtx.uid) || 'guest');
 }
-function loadTaskList(type){
+function loadTaskListLocal(type){
   try{ return JSON.parse(localStorage.getItem(taskStorageKey(type)) || '[]'); }
   catch(e){ return []; }
 }
+// Call once auth settles (see onAuthStateChanged) to populate all three
+// caches before any screen tries to render them.
+async function loadTaskListsFromFirebase(){
+  const types = Object.keys(TASK_FIREBASE_PATH);
+  if(!userCtx || !userCtx.uid){
+    types.forEach(t => taskListCaches[t] = loadTaskListLocal(t));
+    return;
+  }
+  await Promise.all(types.map(async (t)=>{
+    try{
+      const snap = await db.ref('users/'+userCtx.uid+'/'+TASK_FIREBASE_PATH[t]).once('value');
+      taskListCaches[t] = snap.exists() ? snap.val() : [];
+    }catch(e){
+      console.warn('[KASHISH] loading '+t+' from Firebase failed, using local copy:', e);
+      taskListCaches[t] = loadTaskListLocal(t);
+    }
+  }));
+}
+function loadTaskList(type){
+  // Cache not ready yet (e.g. called before auth settles) — safe empty list.
+  return taskListCaches[type] || [];
+}
 function persistTaskList(type, arr){
-  try{ localStorage.setItem(taskStorageKey(type), JSON.stringify(arr)); }catch(e){}
+  taskListCaches[type] = arr;
+  if(userCtx && userCtx.uid){
+    db.ref('users/'+userCtx.uid+'/'+TASK_FIREBASE_PATH[type]).set(arr)
+      .catch(e=>{
+        console.warn('[KASHISH] saving '+type+' to Firebase failed, falling back to local:', e);
+        try{ localStorage.setItem(taskStorageKey(type), JSON.stringify(arr)); }catch(e2){}
+      });
+  } else {
+    try{ localStorage.setItem(taskStorageKey(type), JSON.stringify(arr)); }catch(e){}
+  }
 }
 function taskInputIds(type){
   if(type==='bucket') return {text:'bucket-new-input'};
