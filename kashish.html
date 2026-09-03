@@ -147,6 +147,11 @@ html[data-theme="dark"] .model-sheet-effort-row{background:linear-gradient(150de
 .effort-toggle button.active{background:var(--accent);color:#fff;}
 .nav-pill{display:flex;align-items:center;gap:24px;background:linear-gradient(160deg,#ffffff,#f7f7f9);border:1px solid var(--border);border-radius:999px;padding:13px 24px;box-shadow:0 6px 16px -10px rgba(20,20,22,.2),0 1px 0 rgba(255,255,255,.85) inset;}
 .nav-pill button{color:#B7B7BD;font-size:19px;}
+.bell-btn{position:relative;}
+.notif-dot{position:absolute;top:-2px;right:-2px;width:9px;height:9px;border-radius:50%;background:#E0483E;border:2px solid #fff;}
+html[data-theme="dark"] .notif-dot{border-color:#151517;}
+.notif-row-icon{width:34px;height:34px;border-radius:11px;background:linear-gradient(155deg,#ffe6e4,#ffd2ce);display:flex;align-items:center;justify-content:center;font-size:15px;color:#E0483E;flex-shrink:0;margin-right:2px;}
+.notif-unread-pip{width:8px;height:8px;border-radius:50%;background:var(--accent,#4FA8FF);flex-shrink:0;align-self:center;}
 .nav-plus{position:relative;overflow:hidden;width:50px;height:50px;border-radius:50%;background:linear-gradient(160deg,#2b2b30 0%,var(--black) 55%,#0d0d0f 100%);color:#fff;display:flex;align-items:center;justify-content:center;font-size:21px;flex-shrink:0;box-shadow:0 8px 18px -8px rgba(20,20,22,.55),0 1px 0 rgba(255,255,255,.15) inset;}
 .nav-plus::before{content:'';position:absolute;top:2px;left:8px;right:8px;height:40%;border-radius:999px;background:linear-gradient(180deg,rgba(255,255,255,.4),rgba(255,255,255,0));pointer-events:none;}
 .nav-plus:active{opacity:.85;}
@@ -481,6 +486,13 @@ html[data-theme="dark"] .person-card.featured .pc-note{color:#c98a9c;}
 .msg-actions button.active{color:var(--accent);}
 .msg-actions button:active{opacity:.6;}
 .msg-actions .divider{width:1px;height:14px;background:var(--border);}
+.msg-actions.user-actions{align-self:flex-end;margin:2px 4px 6px;}
+.msg-edit-box{width:100%;}
+.msg-edit-box textarea{width:100%;box-sizing:border-box;background:linear-gradient(160deg,#2b2b30 0%,var(--black) 55%,#0d0d0f 100%);color:#fff;border:1px solid rgba(255,255,255,.14);border-radius:19px;padding:11px 16px;font-size:14px;line-height:1.55;font-family:inherit;font-weight:600;resize:none;min-height:44px;}
+.msg-edit-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:6px;}
+.msg-edit-actions button{font-size:12.5px;font-weight:700;padding:7px 14px;border-radius:999px;}
+.msg-edit-actions .edit-cancel{background:var(--bubble-bot);color:var(--ink);}
+.msg-edit-actions .edit-save{background:var(--accent,#4FA8FF);color:#fff;}
 .msg-more-menu{position:fixed;z-index:60;background:var(--card);border:1px solid var(--border);border-radius:14px;box-shadow:0 12px 30px -10px rgba(20,20,22,.35);min-width:170px;overflow:hidden;}
 .msg-more-menu button{display:flex;align-items:center;gap:9px;width:100%;padding:12px 14px;font-size:13.5px;font-weight:600;color:var(--ink);text-align:left;}
 .msg-more-menu button:active{background:var(--bubble-bot);}
@@ -951,7 +963,7 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
     <div class="home-bottom">
       <div class="nav-pill">
         <button onclick="openVoicePanel()" title="Voice"><i class="ph ph-microphone"></i></button>
-        <button onclick="pingBell()" title="Notifications"><i class="ph ph-bell"></i></button>
+        <button class="bell-btn" onclick="openNotificationCenter()" title="Notifications"><i class="ph ph-bell"></i><span class="notif-dot hidden" id="notif-unread-dot"></span></button>
         <button onclick="goChat()" title="History"><i class="ph ph-clock-counter-clockwise"></i></button>
       </div>
       <button class="nav-plus" onclick="startNewChat()" title="New chat"><i class="ph-bold ph-plus"></i></button>
@@ -1627,6 +1639,22 @@ html[data-theme="dark"] .ci-textarea{background:linear-gradient(160deg,#1E1E21,#
       <div class="settings-section" style="margin-top:16px;">
         <div class="settings-list" id="reminders-list-items"></div>
         <div class="recent-empty hidden" id="reminders-list-empty">No reminders yet — add one above and Kashish will nudge you when it's time.</div>
+      </div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ============ NOTIFICATIONS ============ -->
+  <div class="screen hidden" id="screen-notifications">
+    <div class="chat-topbar">
+      <button class="circle-btn" onclick="showScreen('screen-home')"><i class="ph-bold ph-arrow-left"></i></button>
+      <div class="chat-title">Notifications</div>
+      <button class="circle-btn" onclick="clearAllNotifications()" title="Clear all"><i class="ph-bold ph-trash"></i></button>
+    </div>
+    <div class="settings-scroll">
+      <div class="settings-section" style="margin-top:8px;">
+        <div class="settings-list" id="notif-center-items"></div>
+        <div class="recent-empty hidden" id="notif-center-empty">No notifications yet — reminders and nudges from Kashish will show up here.</div>
       </div>
     </div>
     <div class="home-indicator"></div>
@@ -3065,6 +3093,60 @@ function deleteMessage(m){
   renderChat();
   showKashishToast('Message deleted');
 }
+/* ---------------- edit user message ---------------- */
+// Swaps the bubble's text for an inline textarea (pre-filled with what was
+// sent) so the user can fix a typo or change their question in place,
+// instead of scrolling up to retype it from scratch.
+function startEditUserMessage(m, row, bubbleEl){
+  if(document.querySelector('.msg-edit-box')) return; // only one edit open at a time
+  const textSpan = [...bubbleEl.children].find(c=>!c.classList || (!c.classList.contains('ai-badge') && !c.classList.contains('gen-image-wrap')));
+  const originalDisplay = row.style.display;
+  const box=document.createElement('div'); box.className='msg-edit-box';
+  const ta=document.createElement('textarea'); ta.value = m.text;
+  ta.oninput=()=>{ ta.style.height='auto'; ta.style.height=ta.scrollHeight+'px'; };
+  box.appendChild(ta);
+  const actions=document.createElement('div'); actions.className='msg-edit-actions';
+  const cancelBtn=document.createElement('button'); cancelBtn.className='edit-cancel'; cancelBtn.textContent='Cancel';
+  const saveBtn=document.createElement('button'); saveBtn.className='edit-save'; saveBtn.textContent='Save & submit';
+  cancelBtn.onclick=()=>renderChat();
+  saveBtn.onclick=()=>{
+    const newText = ta.value.trim();
+    if(!newText) return;
+    submitEditedUserMessage(m, newText);
+  };
+  actions.appendChild(cancelBtn); actions.appendChild(saveBtn);
+  box.appendChild(actions);
+  row.innerHTML=''; row.appendChild(box);
+  ta.focus(); ta.setSelectionRange(ta.value.length, ta.value.length);
+  ta.style.height='auto'; ta.style.height=ta.scrollHeight+'px';
+}
+// Updates the message in place, drops everything that came after it
+// (since that reply no longer matches what was actually asked), and gets
+// a fresh response from Kashish — same mechanics as regenerateMessage.
+async function submitEditedUserMessage(m, newText){
+  const sess = getSession(currentSessionId);
+  if(!sess) return;
+  const idx = sess.messages.indexOf(m);
+  if(idx===-1) return;
+  m.text = newText;
+  sess.messages.splice(idx+1);
+  sess.preview = truncate(newText, 60);
+  sess.updatedAt = Date.now();
+  upsertSession(sess); renderChat();
+  addTyping();
+  const originalImage = m.imageDataUrl || null;
+  const historyForModel = sess.messages.slice(0, idx+1)
+    .map(mm=> mm.role==='user' ? {role:'user', text:mm.text} : {role:'model', text:mm.text});
+  try{
+    const result = await kashishReply(historyForModel, null, null, undefined, originalImage);
+    chargeCredits(result.reply);
+    removeTyping();
+    pushBotMessage(result.reply, result.quickReplies);
+  }catch(e){
+    removeTyping();
+    sendLocal();
+  }
+}
 /* ---------------- "..." more menu ---------------- */
 function closeMsgMoreMenu(){
   document.querySelectorAll('.msg-more-menu,.msg-more-backdrop').forEach(el=>el.remove());
@@ -3123,7 +3205,7 @@ function buildMsgActions(m){
 }
 
 function toggleHomeMenu(){ /* reserved for future settings */ }
-function pingBell(){ /* no unread notifications right now */ }
+function openNotificationCenter(){ showScreen('screen-notifications'); }
 function surpriseMe(){
   const openers = [
     'Tell me something completely random and fun!',
@@ -3144,11 +3226,12 @@ function startAiCreate(){
 
 /* ---------------- navigation ---------------- */
 function showScreen(id){
-  ['screen-home','screen-chat','screen-voice','screen-profile','screen-legal-doc','screen-settings','screen-settings-general','screen-settings-language','screen-settings-notifications','screen-settings-voice','screen-settings-movies','screen-settings-hotels','screen-settings-personalization','screen-settings-memory','screen-settings-data-controls','screen-bucket-list','screen-daily-tasks','screen-reminders','screen-upgrade'].forEach(s=>document.getElementById(s).classList.toggle('hidden', s!==id));
+  ['screen-home','screen-chat','screen-voice','screen-profile','screen-legal-doc','screen-settings','screen-settings-general','screen-settings-language','screen-settings-notifications','screen-settings-voice','screen-settings-movies','screen-settings-hotels','screen-settings-personalization','screen-settings-memory','screen-settings-data-controls','screen-bucket-list','screen-daily-tasks','screen-reminders','screen-notifications','screen-upgrade'].forEach(s=>document.getElementById(s).classList.toggle('hidden', s!==id));
   if(id.indexOf('screen-settings')===0) renderSettingsUI();
   if(id==='screen-bucket-list') renderTaskList('bucket');
   if(id==='screen-daily-tasks') renderTaskList('tasks');
   if(id==='screen-reminders') renderTaskList('reminders');
+  if(id==='screen-notifications') renderNotificationCenter();
 }
 function goHome(){ renderHome(); showScreen('screen-home'); }
 // Opens a specific past chat by id — used by both the "Recent Chat" list
@@ -3281,6 +3364,17 @@ function renderChat(){
     // feedback, share, and a "more" menu (regenerate / delete).
     if(m.role!=='user' && m.text && !m.genPending){
       scroll.appendChild(buildMsgActions(m));
+    }
+    // Small edit action under the user's own messages — lets them fix a
+    // typo or change what they asked without retyping the whole thing;
+    // saving truncates everything after it and gets a fresh reply, same
+    // as ChatGPT/Claude's "edit message" behaviour.
+    if(m.role==='user' && m.text && !m.genPending){
+      const editWrap=document.createElement('div'); editWrap.className='msg-actions user-actions';
+      const editBtn=document.createElement('button'); editBtn.innerHTML='<i class="ph ph-pencil-simple"></i>';
+      editBtn.onclick=()=>startEditUserMessage(m, row, b);
+      editWrap.appendChild(editBtn);
+      scroll.appendChild(editWrap);
     }
     if(m.playEmbed){
       const pe = m.playEmbed;
@@ -5725,6 +5819,12 @@ function addTaskItem(type){
     item.due = (dtInput && dtInput.value) ? dtInput.value : '';
     item.notified = false;
     if(dtInput) dtInput.value = '';
+    // Ask for OS notification permission right when it's actually needed
+    // (setting a reminder) rather than silently on page load, where it's
+    // easy to miss or dismiss without realizing what it was for.
+    if(item.due && 'Notification' in window && Notification.permission==='default'){
+      Notification.requestPermission().catch(()=>{});
+    }
   }
   const list = loadTaskList(type);
   list.push(item);
@@ -5807,33 +5907,126 @@ function maybeResetDailyTasks(){
   }
   try{ localStorage.setItem(key, todayStr()); }catch(e){}
 }
+/* ---------------- notification center ---------------- */
+// A persisted log of things Kashish has already told the user about while
+// they were away (reminders firing, etc.) — separate from the OS-level
+// Notification popup, so there's always somewhere in-app to look back and
+// see "what did I miss", with an unread badge on the bell icon.
+function notifStorageKey(){ return 'kashishNotifLog_' + ((userCtx && userCtx.uid) || 'guest'); }
+function loadNotifLog(){
+  try{ return JSON.parse(localStorage.getItem(notifStorageKey()) || '[]'); }
+  catch(e){ return []; }
+}
+function persistNotifLog(arr){
+  try{ localStorage.setItem(notifStorageKey(), JSON.stringify(arr.slice(-100))); }catch(e){}
+}
+function addNotifLogEntry(title, body, icon){
+  const log = loadNotifLog();
+  log.push({ id: Date.now()+'-'+Math.random().toString(36).slice(2,7), title, body, icon: icon||'ph-bell', ts: Date.now(), read: false });
+  persistNotifLog(log);
+  updateNotifBadge();
+}
+function updateNotifBadge(){
+  const dot = document.getElementById('notif-unread-dot');
+  if(!dot) return;
+  const hasUnread = loadNotifLog().some(n=>!n.read);
+  dot.classList.toggle('hidden', !hasUnread);
+}
+function renderNotificationCenter(){
+  const log = loadNotifLog().slice().reverse();
+  const container = document.getElementById('notif-center-items');
+  const empty = document.getElementById('notif-center-empty');
+  if(!container) return;
+  container.innerHTML = '';
+  if(!log.length){ empty && empty.classList.remove('hidden'); return; }
+  empty && empty.classList.add('hidden');
+  log.forEach(n=>{
+    const row = document.createElement('div'); row.className = 'settings-row';
+    const icon = document.createElement('div'); icon.className = 'notif-row-icon'; icon.innerHTML = `<i class="ph-fill ${n.icon||'ph-bell'}"></i>`;
+    row.appendChild(icon);
+    const body = document.createElement('div'); body.className = 'body';
+    const lbl = document.createElement('div'); lbl.className = 'lbl';
+    lbl.style.fontWeight = '600'; lbl.style.fontSize = '13.5px';
+    lbl.textContent = n.title;
+    const sub = document.createElement('div'); sub.className = 'sub'; sub.textContent = n.body + ' · ' + timeAgoShort(n.ts);
+    body.appendChild(lbl); body.appendChild(sub);
+    row.appendChild(body);
+    if(!n.read){ const badge=document.createElement('div'); badge.className='notif-unread-pip'; row.appendChild(badge); }
+    row.onclick=()=>{ n.read = true; const log2 = loadNotifLog(); const it = log2.find(x=>x.id===n.id); if(it) it.read=true; persistNotifLog(log2); renderNotificationCenter(); updateNotifBadge(); };
+    container.appendChild(row);
+  });
+}
+function clearAllNotifications(){
+  persistNotifLog([]);
+  renderNotificationCenter();
+  updateNotifBadge();
+}
+function timeAgoShort(ts){
+  const diff = Math.max(0, Date.now() - ts);
+  const mins = Math.floor(diff/60000);
+  if(mins < 1) return 'just now';
+  if(mins < 60) return mins+'m ago';
+  const hrs = Math.floor(mins/60);
+  if(hrs < 24) return hrs+'h ago';
+  return Math.floor(hrs/24)+'d ago';
+}
 let reminderCheckTimer = null;
-function startReminderChecker(){
-  clearInterval(reminderCheckTimer);
-  reminderCheckTimer = setInterval(()=>{
-    const list = loadTaskList('reminders');
-    const now = new Date();
-    let changed = false;
-    list.forEach(it=>{
-      if(!it.notified && it.due){
-        const d = new Date(it.due);
-        if(!isNaN(d.getTime()) && d <= now){
-          it.notified = true; changed = true;
-          showKashishToast('⏰ ' + it.text);
-          playNotifSound();
-          if('Notification' in window && Notification.permission==='granted'){
-            try{ new Notification('Kashish reminder', {body: it.text}); }catch(e){}
-          }
+// Pushes the reminder into whichever chat session is most recent (or a
+// fresh one if there's none yet) so it shows up as an actual message from
+// Kashish next time the user opens the app — not just a silent system
+// toast that's easy to miss.
+function deliverReminderAsChatMessage(text){
+  let sess = sessions.find(s=>s.id===currentSessionId) || sessions[0];
+  if(!sess){ startSessionSilently(); sess = getSession(currentSessionId); }
+  if(!sess) return;
+  const ts = Date.now();
+  const msgText = `⏰ Reminder: ${text}`;
+  sess.messages.push({role:'model', text: msgText, ts});
+  sess.preview = truncate(msgText, 60);
+  sess.updatedAt = ts;
+  upsertSession(sess);
+  if(currentSessionId===sess.id && document.getElementById('screen-chat') && !document.getElementById('screen-chat').classList.contains('hidden')){
+    animateNextBotMessageTs = ts;
+    renderChat();
+  }
+}
+function checkDueReminders(){
+  const list = loadTaskList('reminders');
+  const now = new Date();
+  let changed = false;
+  list.forEach(it=>{
+    if(!it.notified && it.due){
+      const d = new Date(it.due);
+      if(!isNaN(d.getTime()) && d <= now){
+        it.notified = true; changed = true;
+        showKashishToast('⏰ ' + it.text);
+        playNotifSound();
+        addNotifLogEntry('Reminder', it.text, 'ph-alarm');
+        deliverReminderAsChatMessage(it.text);
+        if('Notification' in window && Notification.permission==='granted'){
+          try{ new Notification('Kashish reminder', {body: it.text}); }catch(e){}
         }
       }
-    });
-    if(changed){
-      persistTaskList('reminders', list);
-      if(document.getElementById('reminders-list-items')) renderTaskList('reminders');
     }
-  }, 30000);
+  });
+  if(changed){
+    persistTaskList('reminders', list);
+    if(document.getElementById('reminders-list-items')) renderTaskList('reminders');
+  }
 }
+function startReminderChecker(){
+  clearInterval(reminderCheckTimer);
+  checkDueReminders(); // catch up immediately in case reminders came due while the app was closed/backgrounded
+  reminderCheckTimer = setInterval(checkDueReminders, 30000);
+}
+// Browsers throttle (or fully pause) setInterval in a hidden/background
+// tab, so a reminder's exact-time notification can slip — re-checking the
+// moment the tab becomes visible again catches anything that was missed
+// instead of waiting up to 30s (or leaving it unnoticed until the next
+// manual reopen).
+document.addEventListener('visibilitychange', ()=>{ if(!document.hidden) checkDueReminders(); });
 startReminderChecker();
+updateNotifBadge();
 
 function currentDateTimeContext(){
   const now = new Date();
