@@ -1,0 +1,15 @@
+name = "kashish-reminder-pusher"
+main = "src/index.js"
+compatibility_date = "2024-11-01"
+
+# Runs every minute. Cloudflare's minimum cron granularity is 1 minute,
+# which combined with the in-app 30s check gives reminders that fire
+# within ~1 minute of their due time whether the app is open or closed.
+[triggers]
+crons = ["* * * * *"]
+
+# Secrets (NOT set here — set them with `wrangler secret put <NAME>`):
+#   FIREBASE_DB_URL
+#   FIREBASE_DB_SECRET
+#   FCM_SERVICE_ACCOUNT
+#   FCM_PROJECT_ID
