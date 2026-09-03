@@ -14,6 +14,11 @@
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<!-- Firebase Messaging — lets a Cloudflare Worker (running on a cron
+     schedule server-side) push a reminder notification even when this tab
+     / the whole app is closed. See /firebase-messaging-sw.js and the
+     cloudflare-worker/ folder shipped alongside this file. -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-messaging.js"></script>
 <!-- jsPDF — used to turn plain text/chat content into a downloadable PDF
      on request ("isko pdf bana do" / "export as pdf"), fully client-side. -->
 <script src="https://unpkg.com/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
@@ -1772,10 +1777,17 @@ const firebaseConfig = {
   apiKey:"AIzaSyC30TcmMVhP_8HdFYS1WufRiZwSDYNMTF0",
   authDomain:"pulse2-92372.firebaseapp.com",
   projectId:"pulse2-92372",
+  // Needed for push notifications (FCM). Get these from Firebase console →
+  // Project settings → General → "Your apps" (Web app) → SDK config.
+  messagingSenderId:"REPLACE_WITH_YOUR_SENDER_ID",
+  appId:"REPLACE_WITH_YOUR_APP_ID",
 };
 firebase.initializeApp(firebaseConfig);
 const auth = firebase.auth();
 const db = firebase.database();
+// VAPID "Web Push certificate" key — Firebase console → Project settings →
+// Cloud Messaging → Web configuration → Web Push certificates → generate.
+const FCM_VAPID_KEY = "REPLACE_WITH_YOUR_VAPID_KEY";
 
 let userCtx = null; // {name, uid} of the signed-in account, once known
 function firstName(){ return userCtx && userCtx.name ? userCtx.name.split(' ')[0] : null; }
@@ -2766,6 +2778,9 @@ auth.onAuthStateChanged(async (user)=>{
     // Refresh any task/reminder screen that's already open (e.g. rejoining
     // a session) now that the Firebase-backed caches are populated.
     ['bucket','tasks','reminders'].forEach(renderTaskList);
+    // Re-register (or refresh) the push token if permission was already
+    // granted in an earlier session — silent no-op if not granted yet.
+    registerPushForReminders();
   }else{
     userCtx=null;
     memoriesCache = null;
@@ -5848,6 +5863,42 @@ function persistTaskList(type, arr){
     try{ localStorage.setItem(taskStorageKey(type), JSON.stringify(arr)); }catch(e){}
   }
 }
+
+/* ---- reminder push notifications (Cloudflare Worker + FCM) ----
+   The in-app 30s timer (checkDueReminders below) only fires while this tab
+   is open. To also notify when the app/tab is fully closed, every reminder
+   with a due date is mirrored into a flat top-level `pendingReminders/{id}`
+   node. A Cloudflare Worker (see /cloudflare-worker) runs on a cron
+   schedule, finds entries whose due time has passed, sends a real push via
+   Firebase Cloud Messaging, then deletes the entry. This mirror is written
+   IN ADDITION to the normal per-user reminders list — the reminders screen
+   itself always reads/writes that list as before. */
+function pendingReminderRef(id){ return db.ref('pendingReminders/'+id); }
+function mirrorPendingReminder(item){
+  if(!userCtx || !userCtx.uid || !item.due) return;
+  const dueMs = new Date(item.due).getTime();
+  if(isNaN(dueMs)) return;
+  pendingReminderRef(item.id).set({ uid:userCtx.uid, text:item.text, due:dueMs })
+    .catch(e=>console.warn('[KASHISH] mirroring reminder for push failed:', e));
+}
+function unmirrorPendingReminder(id){
+  if(!userCtx || !userCtx.uid) return;
+  pendingReminderRef(id).remove().catch(()=>{});
+}
+// Gets (or refreshes) this browser's FCM token and saves it on the account
+// so the Worker knows where to deliver the push. Call after login and
+// whenever notification permission is freshly granted.
+async function registerPushForReminders(){
+  if(!userCtx || !userCtx.uid) return;
+  if(!('serviceWorker' in navigator) || !firebase.messaging || !firebase.messaging.isSupported()) return;
+  if(Notification.permission !== 'granted') return;
+  try{
+    const reg = await navigator.serviceWorker.register('/firebase-messaging-sw.js');
+    const messaging = firebase.messaging();
+    const token = await messaging.getToken({ vapidKey: FCM_VAPID_KEY, serviceWorkerRegistration: reg });
+    if(token) await db.ref('users/'+userCtx.uid+'/fcmToken').set(token);
+  }catch(e){ console.warn('[KASHISH] FCM token registration failed:', e); }
+}
 function taskInputIds(type){
   if(type==='bucket') return {text:'bucket-new-input'};
   if(type==='tasks') return {text:'daily-new-input'};
@@ -5869,13 +5920,16 @@ function addTaskItem(type){
     // (setting a reminder) rather than silently on page load, where it's
     // easy to miss or dismiss without realizing what it was for.
     if(item.due && 'Notification' in window && Notification.permission==='default'){
-      Notification.requestPermission().catch(()=>{});
+      Notification.requestPermission().then(perm=>{
+        if(perm==='granted') registerPushForReminders();
+      }).catch(()=>{});
     }
   }
   const list = loadTaskList(type);
   list.push(item);
   if(type==='reminders') list.sort((a,b)=> (a.due||'').localeCompare(b.due||''));
   persistTaskList(type, list);
+  if(type==='reminders' && item.due) mirrorPendingReminder(item);
   input.value = '';
   renderTaskList(type);
   triggerHaptic();
@@ -5886,12 +5940,15 @@ function toggleTaskItem(type, id){
   if(!it) return;
   it.done = !it.done;
   persistTaskList(type, list);
+  // Marked done by hand — no need for the Worker to still push it later.
+  if(type==='reminders' && it.done) unmirrorPendingReminder(id);
   renderTaskList(type);
   triggerHaptic();
 }
 function deleteTaskItem(type, id){
   const list = loadTaskList(type).filter(x=>x.id!==id);
   persistTaskList(type, list);
+  if(type==='reminders') unmirrorPendingReminder(id);
   renderTaskList(type);
 }
 function fmtReminderDue(due){
@@ -6049,6 +6106,7 @@ function checkDueReminders(){
         playNotifSound();
         addNotifLogEntry('Reminder', it.text, 'ph-alarm');
         deliverReminderAsChatMessage(it.text);
+        unmirrorPendingReminder(it.id); // fired in-app — Worker doesn't need to push it too
         if('Notification' in window && Notification.permission==='granted'){
           try{ new Notification('Kashish reminder', {body: it.text}); }catch(e){}
         }
