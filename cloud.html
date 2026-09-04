@@ -1414,10 +1414,25 @@
         // List rows never decrypt eagerly — encrypted files only render a type icon here.
         // Real previews happen on demand (openFileDetail / downloadFile) where the user has
         // explicitly asked to see the content, and the decrypted bytes are discarded right after.
+        function getFileIconColors(type, name) {
+            type = type || '';
+            const ext = (name || '').split('.').pop().toLowerCase();
+            if (type.startsWith('image/')) return { bg: '#FFE4D6', fg: '#FF7A45' };
+            if (type.startsWith('video/')) return { bg: '#DCEBFF', fg: '#3B82F6' };
+            if (type.startsWith('audio/')) return { bg: '#F1E4FF', fg: '#9B5CFF' };
+            if (type === 'application/pdf' || ext === 'pdf') return { bg: '#FFDEDE', fg: '#F03E3E' };
+            if (['doc', 'docx'].includes(ext)) return { bg: '#DCE9FF', fg: '#3B6EF6' };
+            if (['xls', 'xlsx', 'csv'].includes(ext)) return { bg: '#DBF6E4', fg: '#20B25E' };
+            if (['zip', 'rar', '7z'].includes(ext)) return { bg: '#FFF3CF', fg: '#E5A400' };
+            if (['ppt', 'pptx'].includes(ext)) return { bg: '#FFE1EC', fg: '#F0559C' };
+            return { bg: 'var(--primary-soft)', fg: 'var(--primary)' };
+        }
+
         function buildThumbHTML(data, sizePx) {
             sizePx = sizePx || 40;
             const iconClass = getFileIconClass(data.type, data.name);
-            return `<div style="width:${sizePx}px; height:${sizePx}px; background:var(--bg-color); border-radius:8px; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i class="${iconClass}" style="color:var(--primary); font-size:${Math.round(sizePx * 0.6)}px;"></i></div>`;
+            const c = getFileIconColors(data.type, data.name);
+            return `<div style="width:${sizePx}px; height:${sizePx}px; background:${c.bg}; border-radius:12px; display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i class="${iconClass}" style="color:${c.fg}; font-size:${Math.round(sizePx * 0.55)}px;"></i></div>`;
         }
 
         // Decrypts the file's data on demand and returns an object-URL valid for this tab only.
