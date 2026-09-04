@@ -17,20 +17,21 @@
     <style>
         /* --- CSS Variables & Theming --- */
         :root {
-            --bg-color: #f5f5f7;
-            --text-main: #1d1d1f;
-            --text-muted: #86868b;
+            --bg-color: #F4F1FB;
+            --text-main: #221C35;
+            --text-muted: #8A84A3;
             --glass-bg: rgba(255, 255, 255, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.5);
+            --glass-border: rgba(120, 100, 200, 0.14);
             --card-bg: #ffffff;
-            --primary: #0071e3;
-            --primary-hover: #005cbf;
+            --primary: #6D4DF2;
+            --primary-hover: #5A3BDB;
+            --primary-soft: #EFEAFD;
             --danger: #ff3b30;
             --success: #34c759;
             --warning: #ff9f0a;
             --sidebar-width: 280px;
             --radius: 16px;
-            --shadow: 0 8px 30px rgba(0,0,0,0.08);
+            --shadow: 0 8px 30px rgba(90, 60, 200, 0.08);
             --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
@@ -41,7 +42,8 @@
             --glass-bg: rgba(28, 28, 30, 0.85);
             --glass-border: rgba(255, 255, 255, 0.1);
             --card-bg: #1c1c1e;
-            --primary: #0a84ff;
+            --primary: #8f7bff;
+            --primary-soft: rgba(143,123,255,0.16);
             --shadow: 0 8px 30px rgba(0,0,0,0.6);
         }
 
@@ -104,7 +106,7 @@
         .nav-links { list-style: none; flex-grow: 1; margin-top: 30px; overflow-y: auto; }
         .nav-links li { padding: 14px 18px; margin-bottom: 8px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 14px; font-weight: 600; color: var(--text-muted); transition: var(--transition); justify-content: space-between; }
         .nav-links li .nav-label { display: flex; align-items: center; gap: 14px; }
-        .nav-links li:hover, .nav-links li.active { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(0, 113, 227, 0.3); }
+        .nav-links li:hover, .nav-links li.active { background: var(--primary); color: white; box-shadow: 0 4px 15px rgba(109, 77, 242, 0.3); }
         .nav-badge { background: rgba(0,0,0,0.1); color: inherit; font-size: 11px; padding: 2px 8px; border-radius: 99px; font-weight: 700; }
 
         .storage-box { background: var(--card-bg); padding: 20px; border-radius: 16px; margin-bottom: 20px; border: 1px solid var(--glass-border); text-align: center; }
@@ -129,7 +131,7 @@
         .folder-bar { display: flex; gap: 10px; flex-wrap: wrap; margin-bottom: 20px; }
         .folder-chip { padding: 8px 16px; border-radius: 99px; background: var(--card-bg); border: 1px solid var(--glass-border); font-size: 13px; font-weight: 600; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 6px; box-shadow: var(--shadow); }
         .folder-chip.active { background: var(--primary); color: white; border-color: var(--primary); }
-        .tag-pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 99px; background: rgba(0,113,227,0.1); color: var(--primary); margin-right: 4px; margin-top: 4px; }
+        .tag-pill { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 99px; background: rgba(109,77,242,0.12); color: var(--primary); margin-right: 4px; margin-top: 4px; }
         .dark-mode .tag-pill { background: rgba(10,132,255,0.18); }
 
         /* Responsive Tables Wrapper */
@@ -157,8 +159,8 @@
         .form-group label { display: block; margin-bottom: 5px; font-size: 14px; color: var(--text-muted); }
 
         /* Dropzone */
-        .dropzone { border: 2px dashed var(--primary); border-radius: var(--radius); padding: 40px 20px; text-align: center; background: rgba(0, 113, 227, 0.03); color: var(--primary); cursor: pointer; transition: 0.3s; margin-bottom: 20px; }
-        .dropzone:hover, .dropzone.drag-over { background: rgba(0, 113, 227, 0.08); }
+        .dropzone { border: 2px dashed var(--primary); border-radius: var(--radius); padding: 40px 20px; text-align: center; background: var(--primary-soft); color: var(--primary); cursor: pointer; transition: 0.3s; margin-bottom: 20px; }
+        .dropzone:hover, .dropzone.drag-over { background: rgba(109, 77, 242, 0.12); }
         .dropzone input { display: none; }
 
         .upload-progress-wrap { margin-bottom: 20px; }
@@ -339,45 +341,50 @@
         .mobile-app-header, .mobile-quick-card, .kashish-ai-card, .mobile-bottom-nav, .kashish-fab { display: none; }
 
         @media (max-width: 768px) {
+            body:not(.dark-mode) { background: linear-gradient(180deg, #F1EEFB 0%, #F6F3FD 40%, #F4F1FB 100%); }
             .content-area { padding-bottom: 110px; }
 
             .mobile-app-header { display: flex; align-items: center; justify-content: space-between; padding: 4px 2px 18px; }
             .mobile-app-header .greet-left { display: flex; align-items: center; gap: 12px; }
-            .mobile-app-header .greet-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #7c5cff); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; flex-shrink: 0; }
+            .mobile-app-header .greet-avatar { width: 44px; height: 44px; border-radius: 50%; background: linear-gradient(135deg, var(--primary), #a389ff); color: #fff; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 16px; flex-shrink: 0; overflow: hidden; }
+            .mobile-app-header .greet-avatar img { width: 100%; height: 100%; object-fit: cover; }
             .mobile-app-header .greet-hi { font-size: 20px; font-weight: 700; color: var(--text-main); }
             .mobile-app-header .greet-sub { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
             .mobile-app-header .greet-bell { width: 42px; height: 42px; border-radius: 50%; background: var(--card-bg); box-shadow: var(--shadow); display: flex; align-items: center; justify-content: center; font-size: 18px; position: relative; flex-shrink: 0; }
             .mobile-app-header .greet-bell .dot { position: absolute; top: 9px; right: 10px; width: 8px; height: 8px; border-radius: 50%; background: var(--danger); border: 2px solid var(--card-bg); }
 
+            .mobile-hero-title { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; margin: 4px 0 16px; color: var(--text-main); }
+
             .mobile-search-bar { display: flex; align-items: center; gap: 10px; background: var(--card-bg); box-shadow: var(--shadow); border: 1px solid var(--glass-border); border-radius: 99px; padding: 13px 18px; margin-bottom: 18px; }
             .mobile-search-bar input { border: none; padding: 0; background: transparent; font-size: 15px; }
             .mobile-search-bar .filt { width: 26px; height: 26px; display:flex; align-items:center; justify-content:center; color: var(--text-muted); flex-shrink:0; }
 
-            .mobile-quick-card { display: block; border-radius: 24px; padding: 20px 18px 16px; margin-bottom: 16px; background: linear-gradient(160deg, #E4D9FB, #CFC0F7); box-shadow: 0 10px 26px -8px rgba(124, 92, 255, 0.35); }
+            .mobile-quick-card { display: block; border-radius: 24px; padding: 20px 18px 18px; margin-bottom: 14px; background: linear-gradient(150deg, #8C6DF7 0%, #6D4DF2 60%, #5B3BE0 100%); box-shadow: 0 14px 30px -10px rgba(109, 77, 242, 0.45); }
             body.dark-mode .mobile-quick-card { background: linear-gradient(160deg, #2c2440, #1f1a30); }
-            .mobile-quick-card .qc-title { font-weight: 700; font-size: 15px; color: #2b1a55; display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
-            body.dark-mode .mobile-quick-card .qc-title { color: #ece5ff; }
+            .mobile-quick-card .qc-title { font-weight: 700; font-size: 15px; color: #fff; display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 14px; }
+            .mobile-quick-card .qc-title span { display:flex; align-items:center; gap:8px; }
             .mobile-quick-card .qc-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
-            .mobile-quick-card .qc-tile { background: rgba(255,255,255,0.65); border-radius: 16px; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
-            body.dark-mode .mobile-quick-card .qc-tile { background: rgba(255,255,255,0.08); }
-            .mobile-quick-card .qc-tile i { font-size: 20px; }
-            .mobile-quick-card .qc-tile span { font-size: 10.5px; font-weight: 600; color: #2b1a55; text-align: center; line-height: 1.2; }
-            body.dark-mode .mobile-quick-card .qc-tile span { color: #ece5ff; }
+            .mobile-quick-card .qc-tile { background: rgba(255,255,255,0.16); border-radius: 16px; padding: 12px 6px; display: flex; flex-direction: column; align-items: center; gap: 6px; cursor: pointer; }
+            .mobile-quick-card .qc-tile i { font-size: 20px; color: #fff; }
+            .mobile-quick-card .qc-tile span.qc-label { font-size: 10.5px; font-weight: 700; color: #fff; text-align: center; line-height: 1.2; }
+            .mobile-quick-card .qc-tile span.qc-meta { font-size: 9px; font-weight: 500; color: rgba(255,255,255,0.75); text-align: center; }
+            .mobile-quick-stat { text-align: center; background: var(--card-bg); box-shadow: var(--shadow); border: 1px solid var(--glass-border); border-radius: 99px; padding: 9px 14px; font-size: 12px; font-weight: 600; color: var(--text-muted); margin: -8px auto 18px; width: fit-content; position: relative; z-index: 2; }
+            .mobile-quick-stat b { color: var(--text-main); }
 
-            .kashish-ai-card { display: flex; align-items: center; gap: 14px; border-radius: 22px; padding: 16px 18px; margin-bottom: 20px; background: linear-gradient(135deg, #FFE9A8, #FFD873); box-shadow: 0 10px 26px -10px rgba(230, 170, 20, 0.4); cursor: pointer; }
-            body.dark-mode .kashish-ai-card { background: linear-gradient(135deg, #4a3c18, #3a2f13); }
+            .kashish-ai-card { display: flex; align-items: center; gap: 14px; border-radius: 22px; padding: 18px; margin-bottom: 20px; background: linear-gradient(160deg, #EFEAFD, #E3DBFB); box-shadow: 0 10px 26px -12px rgba(109, 77, 242, 0.3); cursor: pointer; position: relative; overflow: hidden; }
+            body.dark-mode .kashish-ai-card { background: linear-gradient(135deg, #2c2440, #1f1a30); }
             .kashish-ai-card .ka-icon { width: 46px; height: 46px; border-radius: 50%; background: #111114; color: #fff; display:flex; align-items:center; justify-content:center; font-size: 20px; flex-shrink: 0; }
             .kashish-ai-card .ka-body { flex-grow: 1; }
-            .kashish-ai-card .ka-title { font-weight: 700; font-size: 14.5px; color: #3a2c04; }
-            body.dark-mode .kashish-ai-card .ka-title { color: #ffe9a8; }
-            .kashish-ai-card .ka-sub { font-size: 11.5px; color: #6b551a; margin-top: 2px; }
-            body.dark-mode .kashish-ai-card .ka-sub { color: #d8c47f; }
-            .kashish-ai-card .ka-arrow { width: 32px; height: 32px; border-radius: 50%; background: rgba(0,0,0,0.08); display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+            .kashish-ai-card .ka-title { font-weight: 700; font-size: 14.5px; color: #2b1a55; }
+            body.dark-mode .kashish-ai-card .ka-title { color: #ece5ff; }
+            .kashish-ai-card .ka-sub { font-size: 11.5px; color: #6d5fa3; margin-top: 2px; }
+            body.dark-mode .kashish-ai-card .ka-sub { color: #b7a9e0; }
+            .kashish-ai-card .ka-arrow { width: 34px; height: 34px; border-radius: 50%; background: #111114; color:#fff; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
 
             /* Floating bottom nav — matches reference: pill-shaped, dark, 5 icons */
-            .mobile-bottom-nav { display: flex; position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 900; background: #111114; border-radius: 99px; padding: 8px; gap: 4px; align-items: center; box-shadow: 0 14px 34px -8px rgba(0,0,0,0.45); }
+            .mobile-bottom-nav { display: flex; position: fixed; left: 50%; bottom: calc(16px + env(safe-area-inset-bottom)); transform: translateX(-50%); z-index: 900; background: #14121B; border-radius: 99px; padding: 8px; gap: 4px; align-items: center; box-shadow: 0 14px 34px -8px rgba(0,0,0,0.45); }
             .mobile-bottom-nav .mbn-item { width: 46px; height: 46px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.55); font-size: 20px; position: relative; }
-            .mobile-bottom-nav .mbn-item.active { color: #fff; }
+            .mobile-bottom-nav .mbn-item.active { color: #14121B; background: #fff; }
             .mobile-bottom-nav .mbn-item .mbn-dot { position: absolute; top: 6px; right: 8px; width: 8px; height: 8px; border-radius: 50%; background: var(--danger); border: 2px solid #111114; display: none; }
             .mobile-bottom-nav .mbn-item.has-dot .mbn-dot { display: block; }
             .mobile-bottom-nav .mbn-plus { width: 48px; height: 48px; border-radius: 50%; background: var(--primary); color: #fff; display: flex; align-items: center; justify-content: center; font-size: 22px; }
@@ -555,6 +562,8 @@
                         <div class="greet-bell" onclick="switchView('my-reminders')"><i class="ph ph-bell"></i><span class="dot hidden" id="mh-bell-dot"></span></div>
                     </div>
 
+                    <div class="mobile-hero-title">Save With Nexor</div>
+
                     <div class="mobile-search-bar" onclick="switchView('my-files')">
                         <i class="ph ph-magnifying-glass" style="color: var(--text-muted);"></i>
                         <input type="text" placeholder="Search files" readonly>
@@ -562,20 +571,21 @@
                     </div>
 
                     <div class="mobile-quick-card">
-                        <div class="qc-title"><i class="ph-fill ph-squares-four"></i> Your Vault</div>
+                        <div class="qc-title"><span><i class="ph-fill ph-squares-four"></i> Recent Files &amp; Folders</span> <i class="ph ph-list" style="color:#fff; opacity:.85;"></i></div>
                         <div class="qc-grid">
-                            <div class="qc-tile" onclick="switchView('my-files')"><i class="ph-fill ph-folder"></i><span>Files</span></div>
-                            <div class="qc-tile" onclick="switchView('my-notes')"><i class="ph-fill ph-notebook"></i><span>Notes</span></div>
-                            <div class="qc-tile" onclick="switchView('my-contacts')"><i class="ph-fill ph-address-book"></i><span>Contacts</span></div>
-                            <div class="qc-tile" onclick="switchView('my-keychain')"><i class="ph-fill ph-key"></i><span>Passwords</span></div>
+                            <div class="qc-tile" onclick="switchView('my-files')"><i class="ph-fill ph-folder"></i><span class="qc-label">Files</span><span class="qc-meta" id="qc-files-count">--</span></div>
+                            <div class="qc-tile" onclick="switchView('my-notes')"><i class="ph-fill ph-notebook"></i><span class="qc-label">Notes</span><span class="qc-meta" id="qc-notes-count">--</span></div>
+                            <div class="qc-tile" onclick="switchView('my-contacts')"><i class="ph-fill ph-address-book"></i><span class="qc-label">Contacts</span><span class="qc-meta" id="qc-contacts-count">--</span></div>
+                            <div class="qc-tile" onclick="switchView('my-keychain')"><i class="ph-fill ph-key"></i><span class="qc-label">Passwords</span><span class="qc-meta" id="qc-keychain-count">--</span></div>
                         </div>
                     </div>
+                    <div class="mobile-quick-stat" id="mobile-quick-stat"><b id="qc-total-files">0</b> Files &nbsp;•&nbsp; <b id="qc-total-folders">0</b> Folders</div>
 
                     <div class="kashish-ai-card" onclick="openKashishPanel()">
                         <div class="ka-icon"><i class="ph-fill ph-sparkle"></i></div>
                         <div class="ka-body">
                             <div class="ka-title">Ask Kashish AI</div>
-                            <div class="ka-sub">Find files, get storage tips & quick actions</div>
+                            <div class="ka-sub">Find files, get storage tips &amp; quick actions</div>
                         </div>
                         <div class="ka-arrow"><i class="ph ph-arrow-right"></i></div>
                     </div>
@@ -1676,6 +1686,7 @@
             fillBar.style.background = pct > 90 ? 'var(--danger)' : 'var(--primary)';
             const mhSub = document.getElementById('mh-storage-sub');
             if (mhSub) mhSub.innerText = `Storage used: ${Math.min(pct, 100).toFixed(0)}%`;
+            updateQuickCardStats();
             if (pct >= 100) {
                 fillBar.style.background = 'var(--danger)';
                 document.getElementById('storage-text').innerHTML =
@@ -1683,6 +1694,17 @@
                     <span style="color:red;font-weight:bold;">Storage Full</span>`;
             }
             renderStorageBreakdown();
+        }
+
+        // Updates the purple "Recent Files & Folders" quick-card counts on the mobile home screen.
+        function updateQuickCardStats() {
+            const setTxt = (id, val) => { const el = document.getElementById(id); if (el) el.innerText = val; };
+            setTxt('qc-files-count', globalFiles.length + (globalFiles.length === 1 ? ' file' : ' files'));
+            setTxt('qc-notes-count', globalNotesCount + (globalNotesCount === 1 ? ' note' : ' notes'));
+            setTxt('qc-contacts-count', globalContactsCount + (globalContactsCount === 1 ? ' contact' : ' contacts'));
+            setTxt('qc-keychain-count', globalKeychain.length + (globalKeychain.length === 1 ? ' saved' : ' saved'));
+            setTxt('qc-total-files', globalFiles.length);
+            setTxt('qc-total-folders', globalFolders.length);
         }
 
         function applyFileFilter() {
@@ -1961,6 +1983,7 @@
                 applyFileFilter();
                 populateFolderSelect();
                 renderStorageBreakdown();
+                updateQuickCardStats();
             }));
 
             // --- Connections: fully on Realtime Database.
@@ -2027,6 +2050,7 @@
                 document.getElementById('notes-list').innerHTML = rendered.join('');
                 document.getElementById('notes-empty-state').classList.toggle('hidden', snap.size > 0);
                 renderStorageBreakdown();
+                updateQuickCardStats();
             }));
 
             activeListenerUnsubs.push(db.collection('users').doc(currentUser.uid).collection('contacts').onSnapshot(snap => {
@@ -2038,6 +2062,7 @@
                 });
                 document.getElementById('contacts-list').innerHTML = html;
                 renderStorageBreakdown();
+                updateQuickCardStats();
             }));
 
             activeListenerUnsubs.push(db.collection('users').doc(currentUser.uid).collection('keychain').onSnapshot(snap => {
@@ -2054,6 +2079,7 @@
                 });
                 document.getElementById('keychain-list').innerHTML = html;
                 renderStorageBreakdown();
+                updateQuickCardStats();
             }));
 
             activeListenerUnsubs.push(db.collection('users').doc(currentUser.uid).collection('reminders').onSnapshot(snap => {
