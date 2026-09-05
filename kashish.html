@@ -104,47 +104,10 @@ img{display:block;max-width:100%;}
 
 .recent-list{position:relative;overflow:hidden;background:linear-gradient(150deg,#ffffff 0%,#f4f5f7 50%,#eaecef 100%);border:1px solid rgba(255,255,255,.9);border-radius:18px;margin:0 20px 18px;box-shadow:0 16px 30px -18px rgba(20,20,22,.28),0 2px 0 rgba(255,255,255,1) inset;}
 
-/* ---------- Janmashtami one-day Krishna effect (4 Sep 2026 only) ---------- */
-/* Hand-drawn SVG feather / diya / lotus — falling + swaying, not emoji. */
-#janmashtami-fx{position:absolute;inset:0;pointer-events:none;overflow:hidden;z-index:1;}
-#janmashtami-fx .jf-item{position:absolute;top:0;left:0;opacity:0;animation-timing-function:linear;animation-iteration-count:infinite;filter:drop-shadow(0 4px 7px rgba(20,20,22,.22));}
-#janmashtami-fx .jf-feather,#janmashtami-fx .jf-lotus{animation-name:jfFallSpin;}
-#janmashtami-fx .jf-diya{animation-name:jfFallBob;}
-.jf-flame{transform-origin:30px 22px;animation:jfFlicker 1s ease-in-out infinite alternate;}
-@keyframes jfFlicker{0%{transform:scaleY(1) scaleX(1) rotate(-3deg);}50%{transform:scaleY(1.14) scaleX(.9) rotate(3deg);}100%{transform:scaleY(.94) scaleX(1.06) rotate(-1deg);}}
-@keyframes jfFallSpin{
-  0%{transform:translate3d(0,-12%,0) rotate(-10deg);opacity:0;}
-  8%{opacity:.95;}
-  50%{transform:translate3d(var(--drift,16px),58vh,0) rotate(165deg);}
-  94%{opacity:.9;}
-  100%{transform:translate3d(calc(var(--drift,16px) * -1),122vh,0) rotate(350deg);opacity:0;}
-}
-@keyframes jfFallBob{
-  0%{transform:translate3d(0,-12%,0) rotate(-5deg);opacity:0;}
-  8%{opacity:.95;}
-  50%{transform:translate3d(var(--drift,10px),58vh,0) rotate(5deg);}
-  94%{opacity:.9;}
-  100%{transform:translate3d(calc(var(--drift,10px) * -1),122vh,0) rotate(-5deg);opacity:0;}
-}
-
 .greeting{position:relative;}
-.jf-glow{position:absolute;top:-30px;left:36px;width:220px;height:220px;border-radius:50%;background:radial-gradient(circle,rgba(120,90,255,.28) 0%,rgba(120,90,255,0) 72%);filter:blur(2px);animation:jfGlowPulse 4.2s ease-in-out infinite;pointer-events:none;z-index:0;}
-@keyframes jfGlowPulse{0%,100%{opacity:.45;transform:scale(.9);}50%{opacity:.9;transform:scale(1.08);}}
+.iris-scan-ring{width:52px;height:52px;border-radius:50%;border:3px solid rgba(255,255,255,.28);border-top-color:#fff;animation:irisSpin .85s linear infinite;}
+@keyframes irisSpin{to{transform:rotate(360deg);}}
 
-.janmashtami-banner{position:relative;overflow:visible;margin:2px 20px 0;display:flex;align-items:center;gap:10px;padding:10px 16px;border-radius:16px;background:linear-gradient(135deg,#EAF1FF 0%,#DCEBFF 45%,#FFF2D4 100%);border:1px solid rgba(120,90,20,.12);box-shadow:0 10px 20px -14px rgba(40,60,120,.4),0 1px 0 rgba(255,255,255,.8) inset;animation:jfBannerIn .5s ease;}
-.janmashtami-banner .jb-icon{width:26px;height:26px;flex-shrink:0;}
-.janmashtami-banner .jb-icon svg{width:100%;height:100%;display:block;}
-.janmashtami-banner .jb-txt{font-family:'Yellowtail',cursive;font-size:20px;line-height:1;background:linear-gradient(90deg,#8a5a1e 0%,#f4d374 25%,#8a5a1e 50%,#f4d374 75%,#8a5a1e 100%);background-size:220% auto;-webkit-background-clip:text;background-clip:text;color:transparent;animation:jfShimmer 3s linear infinite;}
-@keyframes jfShimmer{0%{background-position:0% center;}100%{background-position:220% center;}}
-@keyframes jfBannerIn{from{opacity:0;transform:translateY(-6px);}to{opacity:1;transform:translateY(0);}}
-.jb-spark{position:absolute;width:13px;height:13px;animation:jfTwinkle 1.9s ease-in-out infinite;}
-.jb-spark svg{width:100%;height:100%;display:block;}
-.jb-spark.s1{top:-6px;left:18px;animation-delay:0s;}
-.jb-spark.s2{top:-2px;right:14px;animation-delay:.6s;}
-.jb-spark.s3{bottom:-6px;left:50%;animation-delay:1.2s;}
-@keyframes jfTwinkle{0%,100%{opacity:.12;transform:scale(.55) rotate(0deg);}50%{opacity:1;transform:scale(1.15) rotate(25deg);}}
-html[data-theme="dark"] .janmashtami-banner{background:linear-gradient(135deg,#1B2A45 0%,#1E2740 45%,#2E2818 100%);border-color:rgba(255,214,90,.18);}
-html[data-theme="dark"] .janmashtami-banner .jb-txt{background:linear-gradient(90deg,#B98A3A 0%,#FFE9A8 25%,#B98A3A 50%,#FFE9A8 75%,#B98A3A 100%);background-size:220% auto;-webkit-background-clip:text;background-clip:text;}
 .recent-item{position:relative;padding:13px 16px;border-bottom:1px solid var(--border);display:block;width:100%;text-align:left;}
 .recent-item:last-child{border-bottom:none;}
 .recent-item .t{font-weight:800;font-size:14px;color:var(--ink);margin-bottom:3px;}
@@ -995,7 +958,6 @@ html[data-theme="dark"] .stock-card .sc-grid{border-top-color:rgba(255,255,255,.
 
   <!-- ============ HOME ============ -->
   <div class="screen" id="screen-home">
-    <div id="janmashtami-fx" class="hidden"></div>
     <div class="topbar-home">
       <div style="display:flex;align-items:center;gap:8px;min-width:0;">
         <button class="pill-select" onclick="toggleHomeMenu()">Kashish <i class="ph-bold ph-caret-down"></i></button>
@@ -1009,7 +971,6 @@ html[data-theme="dark"] .stock-card .sc-grid{border-top-color:rgba(255,255,255,.
       </div>
     </div>
     <div class="home-scroll">
-      <div id="janmashtami-banner"></div>
       <div class="greeting">
         <div class="hi" id="greet-hi">Hello there,</div>
         <div class="q">How can I help you today?</div>
@@ -1031,6 +992,10 @@ html[data-theme="dark"] .stock-card .sc-grid{border-top-color:rgba(255,255,255,.
         <button class="gcard" onclick="startAiCreate()">
           <div class="top-row"><div class="ic"><i class="ph ph-magic-wand"></i></div><span class="go"><i class="ph-bold ph-arrow-up-right"></i></span></div>
           <div class="lbl">AI Create</div>
+        </button>
+        <button class="gcard" onclick="openIris()">
+          <div class="top-row"><div class="ic"><i class="ph ph-eye"></i></div><span class="go"><i class="ph-bold ph-arrow-up-right"></i></span></div>
+          <div class="lbl">Kashish IRIS</div>
         </button>
       </div>
 
@@ -1808,6 +1773,57 @@ html[data-theme="dark"] .stock-card .sc-grid{border-top-color:rgba(255,255,255,.
 
       <button class="task-add-btn" style="width:100%;border-radius:16px;height:52px;margin-top:22px;font-weight:800;font-size:15px;" onclick="attemptUpgradePurchase()">Upgrade for $11.5/mo</button>
       <div id="upgrade-error-sub" style="font-size:12px;color:var(--ink-soft);margin-top:12px;line-height:1.5;">Auto-renews monthly. Cancel anytime.</div>
+    </div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <!-- ============ KASHISH IRIS (AI vision) ============ -->
+  <div class="screen hidden" id="screen-iris">
+    <div class="chat-topbar">
+      <button class="circle-btn" onclick="showScreen('screen-home')"><i class="ph-bold ph-arrow-left"></i></button>
+      <div class="chat-title">Kashish IRIS</div>
+      <span style="width:38px"></span>
+    </div>
+    <div class="settings-scroll" style="text-align:center;">
+
+      <div style="font-size:38px;color:var(--accent);margin:4px 0 4px;"><i class="ph-fill ph-eye"></i></div>
+      <div style="font-size:22px;font-weight:800;color:var(--ink);margin-bottom:4px;">Kashish IRIS</div>
+      <div style="font-size:13px;color:var(--ink-soft);margin-bottom:18px;letter-spacing:.02em;">SEE MORE. KNOW MORE. DO MORE.</div>
+
+      <div id="iris-preview-box" style="position:relative;width:100%;aspect-ratio:1/1;max-height:340px;border-radius:22px;overflow:hidden;background:linear-gradient(150deg,#ffffff 0%,#f2f3f5 45%,#e6e8ec 100%);border:1px solid rgba(255,255,255,.9);box-shadow:0 20px 36px -16px rgba(20,20,22,.28),0 2px 0 rgba(255,255,255,1) inset;display:flex;align-items:center;justify-content:center;">
+        <div id="iris-placeholder" style="color:var(--ink-soft);display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <i class="ph ph-camera" style="font-size:40px;"></i>
+          <span style="font-size:13px;font-weight:600;max-width:220px;line-height:1.4;">Point Kashish IRIS at anything to identify it</span>
+        </div>
+        <img id="iris-image" class="hidden" style="width:100%;height:100%;object-fit:cover;">
+        <div id="iris-loading" class="hidden" style="position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;background:rgba(20,20,22,.42);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);">
+          <div class="iris-scan-ring"></div>
+          <span style="font-size:13px;font-weight:700;color:#fff;">IRIS is looking…</span>
+        </div>
+      </div>
+
+      <div id="iris-actions" style="display:flex;gap:10px;margin-top:16px;">
+        <button class="task-add-btn" style="flex:1;border-radius:16px;height:50px;font-weight:800;font-size:14px;display:flex;align-items:center;justify-content:center;gap:8px;" onclick="document.getElementById('iris-camera-input').click()"><i class="ph-bold ph-camera"></i> Scan</button>
+        <button class="task-add-btn" style="flex:1;border-radius:16px;height:50px;font-weight:800;font-size:14px;background:var(--card-2,#eee);color:var(--ink);display:flex;align-items:center;justify-content:center;gap:8px;" onclick="document.getElementById('iris-image-input').click()"><i class="ph-bold ph-image"></i> Upload</button>
+      </div>
+      <input type="file" id="iris-camera-input" accept="image/*" capture="environment" class="hidden" onchange="irisPick(event)">
+      <input type="file" id="iris-image-input" accept="image/*" class="hidden" onchange="irisPick(event)">
+
+      <div id="iris-result" class="hidden" style="text-align:left;margin-top:18px;">
+        <div style="font-size:12px;font-weight:800;color:var(--ink-soft);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;">What IRIS sees</div>
+        <div id="iris-result-text" class="recent-list" style="padding:14px 16px;font-size:14.5px;line-height:1.55;color:var(--ink);white-space:pre-wrap;"></div>
+        <div style="display:flex;gap:10px;margin-top:12px;">
+          <button class="task-add-btn" style="flex:1;border-radius:16px;height:48px;font-weight:800;font-size:13.5px;background:var(--card-2,#eee);color:var(--ink);" onclick="resetIrisState()">Scan again</button>
+          <button class="task-add-btn" style="flex:1;border-radius:16px;height:48px;font-weight:800;font-size:13.5px;" onclick="irisAskMore()">Ask Kashish more</button>
+        </div>
+      </div>
+
+      <div style="display:flex;justify-content:center;gap:22px;margin-top:26px;padding-top:18px;border-top:1px solid var(--border);">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--ink-soft);"><i class="ph ph-camera" style="font-size:20px;"></i><span style="font-size:10.5px;font-weight:700;">CAPTURE LIFE</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--ink-soft);"><i class="ph ph-waveform" style="font-size:20px;"></i><span style="font-size:10.5px;font-weight:700;">AI ASSISTANT</span></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:6px;color:var(--ink-soft);"><i class="ph ph-info" style="font-size:20px;"></i><span style="font-size:10.5px;font-weight:700;">INSTANT INFO</span></div>
+      </div>
+      <div style="font-size:11.5px;color:var(--ink-soft);margin-top:14px;line-height:1.5;">Kashish IRIS is the vision feature built into Kashish AI — the same intelligence that powers Kashish AI smart glasses.</div>
     </div>
     <div class="home-indicator"></div>
   </div>
@@ -2904,137 +2920,11 @@ function upsertSession(sess){
 }
 function truncate(t,n){ t=(t||'').trim(); return t.length>n ? t.slice(0,n-1)+'…' : t; }
 
-/* ---------------- Janmashtami (4 Sep 2026) — one-day-only Krishna effect ---------------- */
-// Hand-drawn SVG peacock feather / diya (with flickering flame) / lotus,
-// falling and swaying across the home screen, plus a shimmering "Radhe
-// Radhe" banner with twinkling sparkles. Gated to this exact date so it
-// disappears on its own tomorrow — no manual cleanup needed.
-function isJanmashtamiToday(){
-  const d = new Date();
-  return d.getFullYear()===2026 && d.getMonth()===8 && d.getDate()===4;
-}
-const JF_SVG_DEFS = `
-<svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
-<defs>
-  <linearGradient id="jfFeatherOuter" x1="0" y1="0" x2="1" y2="1">
-    <stop offset="0%" stop-color="#1E824C"/><stop offset="45%" stop-color="#1975CE"/><stop offset="100%" stop-color="#0B3D91"/>
-  </linearGradient>
-  <linearGradient id="jfFeatherGold" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0%" stop-color="#FFE59A"/><stop offset="100%" stop-color="#D6A93B"/>
-  </linearGradient>
-  <radialGradient id="jfFeatherEye" cx="35%" cy="30%" r="75%">
-    <stop offset="0%" stop-color="#7B4FE0"/><stop offset="55%" stop-color="#2C1466"/><stop offset="100%" stop-color="#160B33"/>
-  </radialGradient>
-  <linearGradient id="jfDiyaBody" x1="0" y1="0" x2="0" y2="1">
-    <stop offset="0%" stop-color="#F3C969"/><stop offset="100%" stop-color="#B9782E"/>
-  </linearGradient>
-  <radialGradient id="jfFlame" cx="50%" cy="30%" r="70%">
-    <stop offset="0%" stop-color="#FFF6D0"/><stop offset="45%" stop-color="#FFB13B"/><stop offset="100%" stop-color="#E9631A"/>
-  </radialGradient>
-  <radialGradient id="jfLotus" cx="50%" cy="35%" r="75%">
-    <stop offset="0%" stop-color="#FFF0F5"/><stop offset="60%" stop-color="#FFB6D0"/><stop offset="100%" stop-color="#E8628F"/>
-  </radialGradient>
-</defs>
-<symbol id="jf-feather" viewBox="0 0 60 150">
-  <path d="M30 150 L30 55" stroke="#3C6E3B" stroke-width="2.4" fill="none" stroke-linecap="round"/>
-  <path d="M30 130 C10 118 6 95 14 78" stroke="#3C6E3B" stroke-width="1.2" fill="none" opacity=".55" stroke-linecap="round"/>
-  <path d="M30 130 C50 118 54 95 46 78" stroke="#3C6E3B" stroke-width="1.2" fill="none" opacity=".55" stroke-linecap="round"/>
-  <path d="M30 110 C14 100 9 82 17 66" stroke="#2D8F5E" stroke-width="1.1" fill="none" opacity=".5" stroke-linecap="round"/>
-  <path d="M30 110 C46 100 51 82 43 66" stroke="#2D8F5E" stroke-width="1.1" fill="none" opacity=".5" stroke-linecap="round"/>
-  <ellipse cx="30" cy="34" rx="24" ry="32" fill="url(#jfFeatherOuter)"/>
-  <ellipse cx="30" cy="34" rx="16" ry="22" fill="url(#jfFeatherGold)"/>
-  <ellipse cx="30" cy="34" rx="8.5" ry="13" fill="url(#jfFeatherEye)"/>
-  <ellipse cx="27" cy="27" rx="2.6" ry="3.6" fill="#fff" opacity=".65"/>
-</symbol>
-<symbol id="jf-diya" viewBox="0 0 60 60">
-  <path d="M8 40 Q30 58 52 40 Q46 30 30 30 Q14 30 8 40Z" fill="url(#jfDiyaBody)"/>
-  <ellipse cx="30" cy="40" rx="4" ry="1.6" fill="#7A4A18" opacity=".5"/>
-  <g class="jf-flame"><path d="M30 30 C24 22 26 13 30 8 C34 13 36 22 30 30Z" fill="url(#jfFlame)"/></g>
-</symbol>
-<symbol id="jf-lotus" viewBox="0 0 60 60">
-  <g fill="url(#jfLotus)">
-    <path d="M30 30 C22 20 14 22 12 30 C14 38 22 40 30 30Z"/>
-    <path d="M30 30 C38 20 46 22 48 30 C46 38 38 40 30 30Z"/>
-    <path d="M30 30 C24 20 26 10 30 6 C34 10 36 20 30 30Z"/>
-    <path d="M30 30 C22 32 16 38 20 46 C28 48 32 40 30 30Z"/>
-    <path d="M30 30 C38 32 44 38 40 46 C32 48 28 40 30 30Z"/>
-  </g>
-  <circle cx="30" cy="30" r="4.5" fill="#F2B23B"/>
-</symbol>
-<symbol id="jf-spark" viewBox="0 0 20 20">
-  <path d="M10 0 L12 8 L20 10 L12 12 L10 20 L8 12 L0 10 L8 8 Z" fill="#FFD65A"/>
-</symbol>
-</svg>`;
-const JF_KINDS = [
-  {name:'feather', vb:'0 0 60 150', w:20, h:50},
-  {name:'diya',    vb:'0 0 60 60',  w:22, h:22},
-  {name:'lotus',   vb:'0 0 60 60',  w:20, h:20}
-];
-function applyJanmashtamiEffect(){
-  const fx = document.getElementById('janmashtami-fx');
-  const bannerSlot = document.getElementById('janmashtami-banner');
-  if(!fx || !bannerSlot) return;
-  if(!isJanmashtamiToday()){
-    fx.classList.add('hidden'); fx.innerHTML=''; delete fx.dataset.filled;
-    bannerSlot.innerHTML=''; delete bannerSlot.dataset.filled;
-    return;
-  }
-  fx.classList.remove('hidden');
-  if(!fx.dataset.filled){
-    fx.dataset.filled='1';
-    if(!document.getElementById('jf-svg-defs')){
-      const wrap = document.createElement('div');
-      wrap.id='jf-svg-defs'; wrap.innerHTML = JF_SVG_DEFS;
-      document.body.appendChild(wrap);
-    }
-    const count=11;
-    for(let i=0;i<count;i++){
-      const kind = JF_KINDS[i%JF_KINDS.length];
-      const sizeMul = 0.85 + Math.random()*0.55;
-      const left = (Math.random()*88+4).toFixed(1)+'%';
-      const dur = (11+Math.random()*8).toFixed(1)+'s';
-      const delay = '-'+(Math.random()*12).toFixed(1)+'s';
-      const drift = (Math.random()*32-16).toFixed(0)+'px';
-      const svg = document.createElementNS('http://www.w3.org/2000/svg','svg');
-      svg.setAttribute('viewBox', kind.vb);
-      svg.setAttribute('class','jf-item jf-'+kind.name);
-      svg.style.width=(kind.w*sizeMul).toFixed(0)+'px';
-      svg.style.height=(kind.h*sizeMul).toFixed(0)+'px';
-      svg.style.left=left;
-      svg.style.animationDuration=dur;
-      svg.style.animationDelay=delay;
-      svg.style.setProperty('--drift', drift);
-      const use = document.createElementNS('http://www.w3.org/2000/svg','use');
-      use.setAttribute('href','#jf-'+kind.name);
-      svg.appendChild(use);
-      fx.appendChild(svg);
-    }
-  }
-  if(!bannerSlot.dataset.filled){
-    bannerSlot.dataset.filled='1';
-    bannerSlot.innerHTML =
-      '<div class="janmashtami-banner">'+
-        '<span class="jb-spark s1"><svg viewBox="0 0 20 20"><use href="#jf-spark"></use></svg></span>'+
-        '<span class="jb-spark s2"><svg viewBox="0 0 20 20"><use href="#jf-spark"></use></svg></span>'+
-        '<span class="jb-spark s3"><svg viewBox="0 0 20 20"><use href="#jf-spark"></use></svg></span>'+
-        '<span class="jb-icon"><svg viewBox="0 0 60 150"><use href="#jf-feather"></use></svg></span>'+
-        '<span class="jb-txt">Radhe Radhe! Happy Janmashtami</span>'+
-      '</div>';
-    const greet = document.querySelector('.greeting');
-    if(greet && !document.getElementById('jf-glow')){
-      const glow = document.createElement('div');
-      glow.id='jf-glow'; glow.className='jf-glow';
-      greet.insertBefore(glow, greet.firstChild);
-    }
-  }
-}
-
 /* ---------------- HOME rendering ---------------- */
 function renderHome(){
   const n = firstName();
   document.getElementById('greet-hi').textContent = n ? `Hello ${n},` : 'Hello there,';
   applyAvatar(document.getElementById('home-avatar'));
-  applyJanmashtamiEffect();
   const list = document.getElementById('recent-list');
   list.innerHTML='';
   const recent = sessions.filter(s=>s.messages.length).slice(0,5);
@@ -4209,6 +4099,87 @@ function insertEmoji(){
   input.value += '🙂'; updateSendBtn(); input.focus();
 }
 
+/* ---------------- Kashish IRIS (AI vision scanner) ---------------- */
+// IRIS is the vision feature behind Kashish AI's smart glasses story: point
+// a camera (or upload a photo) at anything and Kashish looks at it and
+// explains what it is, in the same way the glasses would narrate it aloud.
+let irisImageDataUrl = null;
+let irisLastReply = null;
+function openIris(){
+  resetIrisState();
+  showScreen('screen-iris');
+}
+function resetIrisState(){
+  irisImageDataUrl = null;
+  irisLastReply = null;
+  const ph = document.getElementById('iris-placeholder');
+  const img = document.getElementById('iris-image');
+  const loading = document.getElementById('iris-loading');
+  const result = document.getElementById('iris-result');
+  const actions = document.getElementById('iris-actions');
+  if(ph) ph.classList.remove('hidden');
+  if(img){ img.classList.add('hidden'); img.src=''; }
+  if(loading) loading.classList.add('hidden');
+  if(result) result.classList.add('hidden');
+  if(actions) actions.style.display='flex';
+  const ci=document.getElementById('iris-camera-input'); if(ci) ci.value='';
+  const ii=document.getElementById('iris-image-input'); if(ii) ii.value='';
+}
+function irisPick(evt){
+  const file = evt.target.files && evt.target.files[0];
+  if(!file || !file.type.startsWith('image/')){ evt.target.value=''; return; }
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    const img = new Image();
+    img.onload = ()=>{
+      const maxDim=1280; let {width,height}=img;
+      if(width>maxDim || height>maxDim){ const scale=maxDim/Math.max(width,height); width=Math.round(width*scale); height=Math.round(height*scale); }
+      const canvas=document.createElement('canvas'); canvas.width=width; canvas.height=height;
+      canvas.getContext('2d').drawImage(img,0,0,width,height);
+      irisImageDataUrl = canvas.toDataURL('image/jpeg',0.85);
+      const irisImg = document.getElementById('iris-image');
+      document.getElementById('iris-placeholder').classList.add('hidden');
+      irisImg.src = irisImageDataUrl;
+      irisImg.classList.remove('hidden');
+      runIrisScan();
+    };
+    img.src = reader.result;
+  };
+  reader.readAsDataURL(file);
+}
+async function runIrisScan(){
+  const loading = document.getElementById('iris-loading');
+  const result = document.getElementById('iris-result');
+  result.classList.add('hidden');
+  loading.classList.remove('hidden');
+  const prompt = "You are Kashish IRIS, the always-on vision feature of Kashish AI smart glasses. Look closely at this photo and identify the main subject (object, place, plant, animal, food, text, product, landmark — whatever it is). In 3-5 short sentences, say what it is and give genuinely useful info about it (what it's used for, an interesting fact, or a practical tip). Be direct and confident, no hedging, no markdown, plain conversational text only.";
+  try{
+    const result_ = await kashishReply([{role:'user', text: prompt}], null, null, 500, irisImageDataUrl);
+    irisLastReply = result_.reply;
+    document.getElementById('iris-result-text').textContent = result_.reply;
+  }catch(e){
+    irisLastReply = "IRIS couldn't get a clear read on that one — try again with better light, or move a little closer.";
+    document.getElementById('iris-result-text').textContent = irisLastReply;
+  }
+  loading.classList.add('hidden');
+  result.classList.remove('hidden');
+}
+// Hands the scanned photo + IRIS's read on it straight into a real chat, so
+// the user can keep asking follow-up questions about the same object.
+function irisAskMore(){
+  if(!irisImageDataUrl || !irisLastReply) return;
+  const s = newSessionObj();
+  sessions.unshift(s);
+  currentSessionId = s.id;
+  s.messages.push({role:'user', text:'What is this?', imageDataUrl: irisImageDataUrl, ts: Date.now()});
+  s.messages.push({role:'model', text: irisLastReply, ts: Date.now()+1});
+  s.preview = truncate(irisLastReply, 60);
+  s.updatedAt = Date.now();
+  upsertSession(s);
+  renderChat();
+  showScreen('screen-chat');
+  setTimeout(()=>document.getElementById('chat-input')?.focus(),150);
+}
 /* ---------------- image attach ---------------- */
 function onImagePicked(evt){
   const file = evt.target.files && evt.target.files[0];
