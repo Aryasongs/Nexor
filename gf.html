@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scratch Karo 💕</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #ffdde1, #ee9ca7);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    overflow: hidden;
+    padding: 20px;
+  }
+
+  h1 {
+    color: #7a1f3d;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+    text-align: center;
+    text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+  }
+
+  .card-wrapper {
+    position: relative;
+    width: 320px;
+    height: 320px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .reveal-text {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 25px;
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: #b5174e;
+    background: linear-gradient(135deg, #fff0f3, #ffe3ea);
+  }
+
+  canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    border-radius: 20px;
+    cursor: pointer;
+  }
+
+  .hint {
+    margin-top: 20px;
+    color: #7a1f3d;
+    font-size: 0.9rem;
+    opacity: 0.8;
+    text-align: center;
+  }
+
+  .reset-btn {
+    margin-top: 15px;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 20px;
+    background: #b5174e;
+    color: white;
+    font-size: 0.9rem;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  }
+
+  .reset-btn:hover {
+    background: #7a1f3d;
+  }
+</style>
+</head>
+<body>
+
+  <h1>Scratch karke dekho... 👀✨</h1>
+
+  <div class="card-wrapper">
+    <div class="reveal-text" id="revealText">
+      photo nahi aai aapki abhi tak meri jaan 🫣
+    </div>
+    <canvas id="scratchCanvas" width="320" height="320"></canvas>
+  </div>
+
+  <p class="hint">Ungli ya mouse se scratch karo card ko 💖</p>
+  <button class="reset-btn" onclick="resetCard()">Dubara Try Karo</button>
+
+<script>
+  const canvas = document.getElementById('scratchCanvas');
+  const ctx = canvas.getContext('2d');
+
+  function drawScratchLayer() {
+    // Background gradient for the scratch layer
+    const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+    gradient.addColorStop(0, '#c0c0c0');
+    gradient.addColorStop(1, '#e0e0e0');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = '#7a1f3d';
+    ctx.font = 'bold 22px Segoe UI, sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('🎁 Scratch Me 🎁', canvas.width / 2, canvas.height / 2);
+  }
+
+  drawScratchLayer();
+
+  let isDrawing = false;
+  let scratchedPixels = 0;
+  const totalPixels = canvas.width * canvas.height;
+
+  function getPos(e) {
+    const rect = canvas.getBoundingClientRect();
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    return {
+      x: (clientX - rect.left) * (canvas.width / rect.width),
+      y: (clientY - rect.top) * (canvas.height / rect.height)
+    };
+  }
+
+  function scratch(e) {
+    const pos = getPos(e);
+    ctx.globalCompositeOperation = 'destination-out';
+    ctx.beginPath();
+    ctx.arc(pos.x, pos.y, 25, 0, Math.PI * 2);
+    ctx.fill();
+    checkReveal();
+  }
+
+  function checkReveal() {
+    // Sample every 10th pixel for performance
+    const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+    let transparent = 0;
+    let sampleCount = 0;
+    for (let i = 3; i < imageData.length; i += 40) {
+      sampleCount++;
+      if (imageData[i] === 0) transparent++;
+    }
+    const percent = (transparent / sampleCount) * 100;
+    if (percent > 55) {
+      revealAll();
+    }
+  }
+
+  function revealAll() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+  }
+
+  canvas.addEventListener('mousedown', (e) => { isDrawing = true; scratch(e); });
+  canvas.addEventListener('mousemove', (e) => { if (isDrawing) scratch(e); });
+  canvas.addEventListener('mouseup', () => { isDrawing = false; });
+  canvas.addEventListener('mouseleave', () => { isDrawing = false; });
+
+  canvas.addEventListener('touchstart', (e) => { isDrawing = true; scratch(e); e.preventDefault(); }, {passive:false});
+  canvas.addEventListener('touchmove', (e) => { if (isDrawing) scratch(e); e.preventDefault(); }, {passive:false});
+  canvas.addEventListener('touchend', () => { isDrawing = false; });
+
+  function resetCard() {
+    drawScratchLayer();
+  }
+</script>
+
+</body>
+</html>
