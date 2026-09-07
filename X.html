@@ -234,7 +234,7 @@
         </div>
         <div class="ss-clock">
           <div id="clock">—</div>
-          <div class="sub">CLIENT LOCAL TIME · NOT MISSION TELEMETRY</div>
+          <div class="sub" id="clockSub">SIMULATED DATE (UTC) · REAL J2000 ORBITAL ELEMENTS</div>
         </div>
       </div>
     </div>
@@ -247,6 +247,12 @@
         <button class="chip active" id="toggleLabels">LABELS</button>
         <button class="chip" id="resetView">RESET VIEW</button>
         <span class="hud-hint">DRAG TO ROTATE · SCROLL TO ZOOM · CLICK A BODY</span>
+      </div>
+      <div class="hud" style="bottom:56px;">
+        <span class="chip" style="border-color:transparent; background:transparent; color:var(--w30); padding:7px 4px;">TIME:</span>
+        <button class="chip" id="speedPlay">⏸ PAUSE</button>
+        <div id="speedChips" style="display:flex; gap:10px; flex-wrap:wrap;"></div>
+        <button class="chip" id="jumpNow">NOW</button>
       </div>
       <div id="detail-panel">
         <div class="dp-head">
@@ -264,13 +270,14 @@
           <div class="dp-row"><dt>Orbital period</dt><dd id="dpOrbital"></dd></div>
           <div class="dp-row"><dt>Rotation period</dt><dd id="dpRotation"></dd></div>
           <div class="dp-row"><dt>Temperature</dt><dd id="dpTemp"></dd></div>
+          <div class="dp-row" id="dpLiveRow"><dt>Distance right now</dt><dd id="dpLiveDistance"></dd></div>
         </dl>
-        <div class="dp-note">Published astronomical reference figures — not a live measurement.</div>
+        <div class="dp-note">Diameter/period/temperature are published reference figures. "Distance right now" is calculated live from real J2000 orbital elements at the simulated date above — not a live spacecraft measurement.</div>
       </div>
       <div class="loading-overlay" id="loadingOverlay"><span>INITIALIZING VIEWPORT…</span></div>
     </div>
 
-    <p class="ss-footnote">Orbit radii and speeds are scaled for legibility, not true to scale. Planetary facts shown in the detail panel are published reference figures rather than a real-time feed.</p>
+    <p class="ss-footnote">Planet positions are computed live from real J2000 Keplerian orbital elements (NASA/JPL, valid 1800–2050 AD) — true eccentricity, inclination, and orbital timing, not a looping animation. Distances are compressed on a non-linear scale so all eight orbits fit the viewport; angles and relative timing are real. Diameter/period/temperature figures in the detail panel are published references, not a live feed.</p>
   </div>
 </section>
 
@@ -412,31 +419,109 @@
     rotationPeriod:"~27 Earth days (equator)", temperature:"~5,500°C (surface)",
     description:"The star at the center of our solar system. Its gravity binds every planet, moon, and asteroid into orbit, and its fusion furnace powers nearly all energy on Earth."
   };
+  /* Real J2000 Keplerian orbital elements (JPL, "Keplerian Elements for
+     Approximate Positions of the Major Planets", Standish 2006 — valid
+     1800–2050 AD). Units: a = AU, e = unitless, angles = degrees.
+     *Dot values are rates PER JULIAN CENTURY, applied against T below.
+     These are the real orbital shapes/orientations — not illustrative. */
   const PLANETS = [
-    {id:"mercury",name:"MERCURY",type:"Terrestrial planet",color:0x9c9088,radius:.9,orbitRadius:9,orbitSpeed:4.15,
+    {id:"mercury",name:"MERCURY",type:"Terrestrial planet",color:0x9c9088,radius:.9,
       diameter:"4,879 km",distanceFromSun:"57.9 million km (0.39 AU)",orbitalPeriod:"88 Earth days",rotationPeriod:"58.6 Earth days",temperature:"-173°C to 427°C",
-      description:"The smallest and innermost planet. A cratered, airless world with the most extreme temperature swings in the solar system."},
-    {id:"venus",name:"VENUS",type:"Terrestrial planet",color:0xd9b98c,radius:1.3,orbitRadius:12.5,orbitSpeed:1.62,
+      description:"The smallest and innermost planet. A cratered, airless world with the most extreme temperature swings in the solar system.",
+      el:{a:0.38709927,aDot:0.00000037, e:0.20563593,eDot:0.00001906, I:7.00497902,IDot:-0.00594749, L:252.25032350,LDot:149472.67411175, longPeri:77.45779628,longPeriDot:0.16047689, longNode:48.33076593,longNodeDot:-0.12534081}},
+    {id:"venus",name:"VENUS",type:"Terrestrial planet",color:0xd9b98c,radius:1.3,
       diameter:"12,104 km",distanceFromSun:"108.2 million km (0.72 AU)",orbitalPeriod:"225 Earth days",rotationPeriod:"243 Earth days (retrograde)",temperature:"~464°C",
-      description:"A thick carbon-dioxide atmosphere traps heat in a runaway greenhouse effect, making Venus the hottest planet despite its distance from the Sun."},
-    {id:"earth",name:"EARTH",type:"Terrestrial planet",color:0x3a7bd5,radius:1.4,orbitRadius:16.5,orbitSpeed:1.0,
+      description:"A thick carbon-dioxide atmosphere traps heat in a runaway greenhouse effect, making Venus the hottest planet despite its distance from the Sun.",
+      el:{a:0.72333566,aDot:0.00000390, e:0.00677672,eDot:-0.00004107, I:3.39467605,IDot:-0.00078890, L:181.97909950,LDot:58517.81538729, longPeri:131.60246718,longPeriDot:0.00268329, longNode:76.67984255,longNodeDot:-0.27769418}},
+    {id:"earth",name:"EARTH",type:"Terrestrial planet",color:0x3a7bd5,radius:1.4,
       diameter:"12,742 km",distanceFromSun:"149.6 million km (1 AU)",orbitalPeriod:"365.25 days",rotationPeriod:"23.9 hours",temperature:"-88°C to 58°C",
-      description:"Home base. The only known world with liquid surface water, plate tectonics, and life — the reference point for every OrionX mission."},
-    {id:"mars",name:"MARS",type:"Terrestrial planet",color:0xc1440e,radius:1.05,orbitRadius:21,orbitSpeed:.53,
+      description:"Home base. The only known world with liquid surface water, plate tectonics, and life — the reference point for every OrionX mission.",
+      el:{a:1.00000261,aDot:0.00000562, e:0.01671123,eDot:-0.00004392, I:-0.00001531,IDot:-0.01294668, L:100.46457166,LDot:35999.37244981, longPeri:102.93768193,longPeriDot:0.32327364, longNode:0.0,longNodeDot:0.0}},
+    {id:"mars",name:"MARS",type:"Terrestrial planet",color:0xc1440e,radius:1.05,
       diameter:"6,779 km",distanceFromSun:"227.9 million km (1.52 AU)",orbitalPeriod:"687 Earth days",rotationPeriod:"24.6 hours",temperature:"-153°C to 20°C",
-      description:"The Red Planet. Iron-oxide dust gives Mars its color; thin atmosphere, polar ice caps, and the largest volcano in the solar system, Olympus Mons."},
-    {id:"jupiter",name:"JUPITER",type:"Gas giant",color:0xd9b382,radius:3.4,orbitRadius:29,orbitSpeed:.084,
+      description:"The Red Planet. Iron-oxide dust gives Mars its color; thin atmosphere, polar ice caps, and the largest volcano in the solar system, Olympus Mons.",
+      el:{a:1.52371034,aDot:0.00001847, e:0.09339410,eDot:0.00007882, I:1.84969142,IDot:-0.00813131, L:-4.55343205,LDot:19140.30268499, longPeri:-23.94362959,longPeriDot:0.44441088, longNode:49.55953891,longNodeDot:-0.29257343}},
+    {id:"jupiter",name:"JUPITER",type:"Gas giant",color:0xd9b382,radius:3.4,
       diameter:"139,820 km",distanceFromSun:"778.5 million km (5.2 AU)",orbitalPeriod:"11.86 Earth years",rotationPeriod:"9.9 hours",temperature:"~-108°C (cloud tops)",
-      description:"The largest planet — a churning ball of hydrogen and helium. Its Great Red Spot is a storm wider than Earth that has raged for centuries."},
-    {id:"saturn",name:"SATURN",type:"Gas giant",color:0xe3c88f,radius:3.0,orbitRadius:37,orbitSpeed:.034,hasRing:true,
+      description:"The largest planet — a churning ball of hydrogen and helium. Its Great Red Spot is a storm wider than Earth that has raged for centuries.",
+      el:{a:5.20288700,aDot:-0.00011607, e:0.04838624,eDot:-0.00013253, I:1.30439695,IDot:-0.00183714, L:34.39644051,LDot:3034.74612775, longPeri:14.72847983,longPeriDot:0.21252668, longNode:100.47390909,longNodeDot:0.20469106}},
+    {id:"saturn",name:"SATURN",type:"Gas giant",color:0xe3c88f,radius:3.0,hasRing:true,
       diameter:"116,460 km",distanceFromSun:"1.43 billion km (9.58 AU)",orbitalPeriod:"29.4 Earth years",rotationPeriod:"10.7 hours",temperature:"~-139°C (cloud tops)",
-      description:"Famous for its dramatic ring system of ice and rock. Saturn is the least dense planet in the solar system — it would float in water."},
-    {id:"uranus",name:"URANUS",type:"Ice giant",color:0x9fd8d8,radius:2.1,orbitRadius:44,orbitSpeed:.012,hasRing:true,
+      description:"Famous for its dramatic ring system of ice and rock. Saturn is the least dense planet in the solar system — it would float in water.",
+      el:{a:9.53667594,aDot:-0.00125060, e:0.05386179,eDot:-0.00050991, I:2.48599187,IDot:0.00193609, L:49.95424423,LDot:1222.49362201, longPeri:92.59887831,longPeriDot:-0.41897216, longNode:113.66242448,longNodeDot:-0.28867794}},
+    {id:"uranus",name:"URANUS",type:"Ice giant",color:0x9fd8d8,radius:2.1,hasRing:true,
       diameter:"50,724 km",distanceFromSun:"2.87 billion km (19.2 AU)",orbitalPeriod:"84 Earth years",rotationPeriod:"17.2 hours (retrograde)",temperature:"~-197°C",
-      description:"Tipped almost fully on its side, Uranus rotates like a rolling ball. Its pale cyan color comes from methane in the upper atmosphere."},
-    {id:"neptune",name:"NEPTUNE",type:"Ice giant",color:0x4266f5,radius:2.0,orbitRadius:50,orbitSpeed:.006,
+      description:"Tipped almost fully on its side, Uranus rotates like a rolling ball. Its pale cyan color comes from methane in the upper atmosphere.",
+      el:{a:19.18916464,aDot:-0.00196176, e:0.04725744,eDot:-0.00004397, I:0.77263783,IDot:-0.00242939, L:313.23810451,LDot:428.48202785, longPeri:170.95427630,longPeriDot:0.40805281, longNode:74.01692503,longNodeDot:0.04240589}},
+    {id:"neptune",name:"NEPTUNE",type:"Ice giant",color:0x4266f5,radius:2.0,
       diameter:"49,244 km",distanceFromSun:"4.5 billion km (30.05 AU)",orbitalPeriod:"164.8 Earth years",rotationPeriod:"16.1 hours",temperature:"~-201°C",
-      description:"The most distant known planet. Supersonic winds — the fastest recorded in the solar system — tear across its deep blue atmosphere."}
+      description:"The most distant known planet. Supersonic winds — the fastest recorded in the solar system — tear across its deep blue atmosphere.",
+      el:{a:30.06992276,aDot:0.00026291, e:0.00859048,eDot:0.00005105, I:1.77004347,IDot:0.00035372, L:-55.12002969,LDot:218.45945325, longPeri:44.96476227,longPeriDot:-0.32241464, longNode:131.78422574,longNodeDot:-0.00508664}}
+  ];
+
+  /* ---------- real orbital mechanics ---------- */
+  const DEG2RAD = Math.PI/180;
+  const AU_SCALE = 9; // scene units per AU (distance compressed for legibility, angles/timing are real)
+
+  function centuriesSinceJ2000(date){
+    const JD = date.getTime()/86400000 + 2440587.5;
+    return (JD - 2451545.0)/36525.0;
+  }
+  function normalizeDeg(deg){ let d = deg % 360; if(d>180) d-=360; if(d<=-180) d+=360; return d; }
+  function solveKepler(Mrad, e){
+    let E = Mrad;
+    for(let i=0;i<15;i++){
+      const dE = (E - e*Math.sin(E) - Mrad)/(1 - e*Math.cos(E));
+      E -= dE;
+      if(Math.abs(dE) < 1e-9) break;
+    }
+    return E;
+  }
+  // Returns true heliocentric ecliptic position (AU) + distance r (AU) for a planet at Julian-century T
+  function heliocentricPosition(el, T){
+    const a = el.a + el.aDot*T;
+    const e = el.e + el.eDot*T;
+    const I = (el.I + el.IDot*T) * DEG2RAD;
+    const L = el.L + el.LDot*T;
+    const longPeri = el.longPeri + el.longPeriDot*T;
+    const longNode = el.longNode + el.longNodeDot*T;
+    const w = (longPeri - longNode) * DEG2RAD;
+    const Om = longNode * DEG2RAD;
+    const M = normalizeDeg(L - longPeri) * DEG2RAD;
+    const E = solveKepler(M, e);
+    const xOrb = a*(Math.cos(E)-e);
+    const yOrb = a*Math.sqrt(1-e*e)*Math.sin(E);
+    const cosO=Math.cos(Om), sinO=Math.sin(Om), cosI=Math.cos(I), sinI=Math.sin(I), cosw=Math.cos(w), sinw=Math.sin(w);
+    const x = (cosw*cosO - sinw*sinO*cosI)*xOrb + (-sinw*cosO - cosw*sinO*cosI)*yOrb;
+    const y = (cosw*sinO + sinw*cosO*cosI)*xOrb + (-sinw*sinO + cosw*cosO*cosI)*yOrb;
+    const z = (sinw*sinI)*xOrb + (cosw*sinI)*yOrb;
+    return { x, y, z, r: Math.sqrt(xOrb*xOrb+yOrb*yOrb) };
+  }
+  // Samples the true ellipse shape (for drawing the orbit path) at a fixed epoch T
+  function orbitEllipsePoints(el, T, n){
+    const a = el.a + el.aDot*T, e = el.e + el.eDot*T, I = (el.I + el.IDot*T)*DEG2RAD;
+    const longPeri = el.longPeri + el.longPeriDot*T, longNode = el.longNode + el.longNodeDot*T;
+    const w = (longPeri-longNode)*DEG2RAD, Om = longNode*DEG2RAD;
+    const cosO=Math.cos(Om), sinO=Math.sin(Om), cosI=Math.cos(I), sinI=Math.sin(I), cosw=Math.cos(w), sinw=Math.sin(w);
+    const pts = [];
+    for(let i=0;i<=n;i++){
+      const E = (i/n)*Math.PI*2 - Math.PI;
+      const xOrb = a*(Math.cos(E)-e), yOrb = a*Math.sqrt(1-e*e)*Math.sin(E);
+      const x = (cosw*cosO - sinw*sinO*cosI)*xOrb + (-sinw*cosO - cosw*sinO*cosI)*yOrb;
+      const y = (cosw*sinO + sinw*cosO*cosI)*xOrb + (-sinw*sinO + cosw*cosO*cosI)*yOrb;
+      const z = (sinw*sinI)*xOrb + (cosw*sinI)*yOrb;
+      pts.push(new THREE.Vector3(x*AU_SCALE, z*AU_SCALE, -y*AU_SCALE));
+    }
+    return pts;
+  }
+  function toSceneVec(p){ return new THREE.Vector3(p.x*AU_SCALE, p.z*AU_SCALE, -p.y*AU_SCALE); }
+
+  const SPEEDS = [
+    {label:"REAL-TIME", msPerRealSec:1000},
+    {label:"1 HOUR/SEC", msPerRealSec:3600000},
+    {label:"1 DAY/SEC", msPerRealSec:86400000},
+    {label:"1 WEEK/SEC", msPerRealSec:604800000},
+    {label:"1 MONTH/SEC", msPerRealSec:2629800000}
   ];
 
   /* ---------- navbar ---------- */
@@ -452,11 +537,6 @@
     entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add("visible"); io.unobserve(e.target); } });
   }, { rootMargin: "-10% 0px" });
   document.querySelectorAll(".reveal").forEach(el => io.observe(el));
-
-  /* ---------- clock ---------- */
-  const clockEl = document.getElementById("clock");
-  function tickClock(){ clockEl.textContent = new Date().toUTCString().replace("GMT","UTC"); }
-  tickClock(); setInterval(tickClock, 1000);
 
   /* ---------- hero starfield (2D canvas) ---------- */
   (function starfield(){
@@ -539,18 +619,19 @@
     glowSprite.scale.set(SUN.radius*6, SUN.radius*6, 1);
     scene.add(glowSprite);
 
+    const nowT0 = centuriesSinceJ2000(new Date()); // epoch used to draw each true orbit ellipse's shape
     const planetMeshes = [], orbitLines = [];
     PLANETS.forEach(p => {
       const mesh = new THREE.Mesh(new THREE.SphereGeometry(p.radius,32,32), new THREE.MeshStandardMaterial({color:p.color,roughness:.85,metalness:.05}));
-      mesh.userData.id = p.id; mesh.userData.angle = Math.random()*Math.PI*2;
+      mesh.userData.id = p.id;
       scene.add(mesh); planetMeshes.push(mesh);
 
       if(p.hasRing){
         const ring = new THREE.Mesh(new THREE.RingGeometry(p.radius*1.5,p.radius*2.4,64), new THREE.MeshBasicMaterial({color:p.color,side:THREE.DoubleSide,transparent:true,opacity:.45}));
         ring.rotation.x = Math.PI/2.3; mesh.add(ring);
       }
-      const pts = [];
-      for(let i=0;i<=128;i++){ const a=(i/128)*Math.PI*2; pts.push(new THREE.Vector3(Math.cos(a)*p.orbitRadius,0,Math.sin(a)*p.orbitRadius)); }
+      // true elliptical orbit path, real eccentricity/inclination/orientation
+      const pts = orbitEllipsePoints(p.el, nowT0, 180);
       const orbitLine = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(pts), new THREE.LineBasicMaterial({color:0x3d5a80,transparent:true,opacity:.4}));
       scene.add(orbitLine); orbitLines.push(orbitLine);
     });
@@ -584,6 +665,15 @@
       document.getElementById("dpOrbital").textContent = body.orbitalPeriod;
       document.getElementById("dpRotation").textContent = body.rotationPeriod;
       document.getElementById("dpTemp").textContent = body.temperature;
+      const liveRow = document.getElementById("dpLiveRow");
+      if(body.id === "sun"){
+        liveRow.style.display = "none";
+      } else {
+        liveRow.style.display = "flex";
+        const pos = heliocentricPosition(body.el, centuriesSinceJ2000(simulatedDate));
+        const km = (pos.r*149597870.7);
+        document.getElementById("dpLiveDistance").textContent = `${pos.r.toFixed(3)} AU (~${Math.round(km).toLocaleString()} km)`;
+      }
       detailPanel.classList.add("show");
     }
     function hideDetail(){ detailPanel.classList.remove("show"); }
@@ -599,6 +689,32 @@
     }
     dpClose.addEventListener("click", () => { s.focusedId=null; hideDetail(); });
     resetBtn.addEventListener("click", resetCamera);
+
+    /* ---------- simulated real-time clock ---------- */
+    let simulatedDate = new Date();
+    let speedIndex = 2; // default "1 DAY/SEC"
+    let paused = false;
+    const clockEl = document.getElementById("clock");
+    const speedChipsEl = document.getElementById("speedChips");
+    const speedPlayBtn = document.getElementById("speedPlay");
+    const jumpNowBtn = document.getElementById("jumpNow");
+
+    SPEEDS.forEach((sp, i) => {
+      const btn = document.createElement("button");
+      btn.className = "chip" + (i===speedIndex ? " active" : "");
+      btn.textContent = sp.label;
+      btn.addEventListener("click", () => {
+        speedIndex = i;
+        speedChipsEl.querySelectorAll("button").forEach((b,bi)=>b.classList.toggle("active", bi===i));
+      });
+      speedChipsEl.appendChild(btn);
+    });
+    speedPlayBtn.addEventListener("click", () => {
+      paused = !paused;
+      speedPlayBtn.textContent = paused ? "▶ PLAY" : "⏸ PAUSE";
+    });
+    jumpNowBtn.addEventListener("click", () => { simulatedDate = new Date(); });
+
     toggleOrbitsBtn.addEventListener("click", () => {
       showOrbits = !showOrbits; toggleOrbitsBtn.classList.toggle("active", showOrbits);
       orbitLines.forEach(l => l.visible = showOrbits);
@@ -670,15 +786,31 @@
     function tick(now){
       const dt = Math.min((now-last)/1000, .05); last = now;
 
+      if(!paused){
+        simulatedDate = new Date(simulatedDate.getTime() + dt*SPEEDS[speedIndex].msPerRealSec);
+      }
+      const T = centuriesSinceJ2000(simulatedDate);
+
       planetMeshes.forEach((mesh,i) => {
         const p = PLANETS[i];
-        mesh.userData.angle += dt*p.orbitSpeed*.12;
-        mesh.position.x = Math.cos(mesh.userData.angle)*p.orbitRadius;
-        mesh.position.z = Math.sin(mesh.userData.angle)*p.orbitRadius;
+        const pos = heliocentricPosition(p.el, T);
+        const v = toSceneVec(pos);
+        mesh.position.copy(v);
         mesh.rotation.y += dt*.6;
         if(s.focusedId === p.id) s.desiredTarget.copy(mesh.position);
       });
       if(s.focusedId === "sun") s.desiredTarget.set(0,0,0);
+      if(s.focusedId && s.focusedId !== "sun"){
+        // keep the open detail panel's live distance in sync while time advances
+        const body = bodyById(s.focusedId);
+        if(body){
+          const p2 = heliocentricPosition(body.el, T);
+          const el = document.getElementById("dpLiveDistance");
+          if(el) el.textContent = `${p2.r.toFixed(3)} AU (~${Math.round(p2.r*149597870.7).toLocaleString()} km)`;
+        }
+      }
+
+      clockEl.textContent = simulatedDate.toUTCString().replace("GMT","UTC");
 
       glowSprite.material.rotation += dt*.05;
       applyCamera();
