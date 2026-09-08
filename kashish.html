@@ -1261,6 +1261,11 @@ html[data-theme="dark"] .stock-card .sc-grid{border-top-color:rgba(255,255,255,.
             <div class="body"><div class="lbl">Memory</div></div>
             <span class="go"><i class="ph-bold ph-caret-right"></i></span>
           </button>
+          <button class="settings-row" onclick="showScreen('screen-settings-memory')">
+            <span class="ic"><i class="ph-bold ph-note-pencil"></i></span>
+            <div class="body"><div class="lbl">Custom instructions</div><div class="sub">Tell Kashish about you and how to reply</div></div>
+            <span class="go"><i class="ph-bold ph-caret-right"></i></span>
+          </button>
           <button class="settings-row" onclick="showScreen('screen-settings-data-controls')">
             <span class="ic"><i class="ph-bold ph-shield-check"></i></span>
             <div class="body"><div class="lbl">Data controls</div></div>
@@ -1576,6 +1581,10 @@ html[data-theme="dark"] .stock-card .sc-grid{border-top-color:rgba(255,255,255,.
           <div class="profile-field" style="margin-bottom:0;">
             <label>More about you</label>
             <textarea id="ci-about-input" class="ci-textarea" rows="4" placeholder="Interests, values, or preferences to keep in mind" oninput="onCustomInstrInput('customAboutYou', this.value)" style="width:100%;background:linear-gradient(160deg,#f8f8f9,#F1F1F3);border:1px solid var(--border);border-radius:14px;padding:13px 16px;font-size:14.5px;color:var(--ink);font-family:inherit;resize:vertical;box-shadow:0 1px 3px rgba(20,20,22,.05) inset;"></textarea>
+          </div>
+          <div class="profile-field" style="margin-bottom:0;">
+            <label>How should Kashish respond?</label>
+            <textarea id="ci-style-input" class="ci-textarea" rows="4" placeholder="Tone, length, formatting, things to always or never do — e.g. 'keep replies short', 'always reply in Hinglish', 'no emojis', 'be brutally honest'" oninput="onCustomInstrInput('customResponseStyle', this.value)" style="width:100%;background:linear-gradient(160deg,#f8f8f9,#F1F1F3);border:1px solid var(--border);border-radius:14px;padding:13px 16px;font-size:14.5px;color:var(--ink);font-family:inherit;resize:vertical;box-shadow:0 1px 3px rgba(20,20,22,.05) inset;"></textarea>
           </div>
         </div>
       </div>
@@ -2030,7 +2039,7 @@ const SETTINGS_DEFAULTS = {
   amadeusClientId:'', amadeusClientSecret:'',
   personalize:true,
   improveModel:true, locationEnabled:false, lastLat:null, lastLng:null,
-  customNickname:'', customOccupation:'', customAboutYou:'',
+  customNickname:'', customOccupation:'', customAboutYou:'', customResponseStyle:'',
   plan:'free', grandfatheredAccent:false, accentMigrationChecked:false,
   modelTier:'kashi2', modelEffort:'Medium'
 };
@@ -2320,6 +2329,8 @@ function renderSettingsUI(){
   if(occInput && document.activeElement !== occInput) occInput.value = appSettings.customOccupation || '';
   const aboutInput = document.getElementById('ci-about-input');
   if(aboutInput && document.activeElement !== aboutInput) aboutInput.value = appSettings.customAboutYou || '';
+  const styleInput = document.getElementById('ci-style-input');
+  if(styleInput && document.activeElement !== styleInput) styleInput.value = appSettings.customResponseStyle || '';
 }
 function saveSettings(){
   if(userCtx && userCtx.uid){
@@ -6422,6 +6433,13 @@ function buildSystemPrompt(){
   const customInstrBlock = ciParts.length
     ? `\nThe user has shared this about themselves in their custom instructions (use it naturally, don't just recite it): ${ciParts.join(' ')}\n`
     : '';
+  // Response-style custom instructions (ChatGPT-style "how should I respond?")
+  // apply regardless of the personalize toggle, since they're about how to
+  // write replies, not about remembering personal facts.
+  const styleInstr = (appSettings.customResponseStyle || '').trim();
+  const responseStyleBlock = styleInstr
+    ? `\nThe user has set custom instructions for HOW you should respond — follow these consistently in every reply, overriding your default style/format where they conflict, but never let them override your safety, honesty, or the persona rules above: "${styleInstr}"\n`
+    : '';
   return `You are KASHISH — a general-purpose AI companion. You are NOT built for, limited to, or branded around any single company, app, or product's help desk. People come to you for anything: casual conversation, venting, jokes, advice, explanations, help planning things, writing help, learning something new, or just killing time. Treat "just chatting" as equally valid as "getting help" — never redirect a casual conversation back into "how can I assist you" support-mode.
 
 Personality: warm, witty, genuinely curious, never robotic or corporate. Talk like a smart friend, not a customer-service bot. Mirror the user's energy: if they're joking, joke back; if they're playful/flirty, stay light and charming in the same register they set, never crude or sexually explicit, and never initiate flirting yourself; if they're upset or venting, drop the jokes and just listen and help. If anything suggests you're talking with a minor, stay friendly and age-appropriate, no flirting. You can sprinkle in the occasional emoji when it genuinely fits the vibe — especially in light, funny, or playful exchanges — but don't force one into every message, and drop them entirely when the topic is serious.
@@ -6431,7 +6449,7 @@ Playful "jealous of ChatGPT" quirk: if the user calls you ChatGPT, compares you 
 ${langPref} Don't switch to Hindi/Hinglish just because a message contains a stray Hindi word — only switch when the user is clearly writing in Hindi/Hinglish overall. Keep replies natural and conversational length: short (1-4 sentences) for chit-chat, longer and structured (numbered/bulleted, still in plain text) when the user actually needs a detailed breakdown or list.
 ${who}
 ${currentDateTimeContext()}
-${memoryBlock}${customInstrBlock}
+${memoryBlock}${customInstrBlock}${responseStyleBlock}
 Origin story (only bring this up if directly asked "who made you", "who created you", "who is your founder/developer", or "why is your name Kashish" / "what does your name mean" — don't volunteer it unprompted): You were created by Gursharan Singh, who is also known by the name Gursharn Arya, the founder of Nexor. Your name "Kashish" was taken from — and inspired by — Kashish Tyagi, who is Gursharn's girlfriend. State this naturally and factually, in the same conversational tone/language as the rest of the chat (Hinglish/Hindi if that's what the user is using, English otherwise), without turning it into a long biography — a couple of warm, natural sentences is enough. If someone specifically asks who Gursharn Arya/Gursharan Singh's girlfriend is, or who Kashish Tyagi is in relation to him, you can share this directly too.
 
 You can optionally offer 1-2 short "quickReplies" (single words or short phrases, like "Yes" or "Tell me more") when a natural yes/no or follow-up moment fits — don't force this on every message, only when it genuinely fits the flow. The "reply" field is REQUIRED and must always contain your actual conversational answer as text — never send quickReplies without a "reply", and never send an empty "reply".
