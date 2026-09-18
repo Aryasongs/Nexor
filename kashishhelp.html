@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Managing parental controls in Kashish AI — Kashish AI Help Center</title>
+<meta name="description" content="Kashish AI Help Center — account basics, chat & voice, family & teen safety, and legal information.">
+<link rel="icon" type="image/png" href="data:image/png;base64,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">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+:root{
+  --ink:#0D0D12; --ink-soft:#6E6E80; --ink-faint:#8F8FA3;
+  --rule:#E5E5EA; --bg:#FFFFFF; --panel:#F7F7F9;
+  --accent:#1975CE; --accent-soft:#EAF3FC;
+  --radius:10px;
+}
+html,body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;}
+a{color:inherit;text-decoration:none;}
+img{display:block;max-width:100%;}
+ul,ol{padding-left:22px;}
+.wrap{max-width:760px;margin:0 auto;padding:0 24px;}
+.wrap-wide{max-width:1040px;margin:0 auto;padding:0 24px;}
+
+/* ---------------- header ---------------- */
+.site-header{border-bottom:1px solid var(--rule);}
+.site-header-inner{max-width:1040px;margin:0 auto;padding:20px 24px;display:flex;align-items:center;justify-content:space-between;}
+.brand{display:flex;align-items:center;gap:10px;}
+.brand-logo{width:34px;height:34px;border-radius:8px;flex-shrink:0;}
+.brand-name{font-size:23px;font-weight:800;letter-spacing:-.02em;color:var(--ink);}
+.header-right{display:flex;align-items:center;gap:18px;}
+.lang-pill{display:flex;align-items:center;gap:7px;border:1px solid var(--rule);border-radius:999px;padding:8px 16px;font-size:14px;font-weight:600;color:var(--ink);background:var(--bg);}
+.lang-pill svg{width:15px;height:15px;flex-shrink:0;}
+.login-link{font-size:15px;font-weight:600;text-decoration:underline;text-underline-offset:3px;}
+
+/* ---------------- search ---------------- */
+.search-section{max-width:1040px;margin:0 auto;padding:34px 24px 0;}
+.search-bar{display:flex;align-items:center;gap:12px;padding-bottom:14px;}
+.search-bar svg{width:20px;height:20px;color:var(--ink-faint);flex-shrink:0;}
+.search-bar input{flex:1;border:none;outline:none;font-size:20px;font-family:inherit;color:var(--ink);background:transparent;}
+.search-bar input::placeholder{color:var(--ink-faint);}
+.full-rule{border:none;border-top:1px solid var(--rule);max-width:1040px;margin:0 auto;}
+
+/* ---------------- collections landing ---------------- */
+.collections{max-width:1040px;margin:0 auto;padding:40px 24px 8px;}
+.collections h2{font-size:15px;font-weight:800;text-transform:none;color:var(--ink-soft);margin-bottom:16px;letter-spacing:.01em;}
+.collection-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+@media (max-width:720px){.collection-grid{grid-template-columns:repeat(2,1fr);}}
+.collection-card{border:1px solid var(--rule);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:6px;transition:border-color .15s;}
+.collection-card:hover{border-color:var(--ink-faint);}
+.collection-card .ic{width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:var(--accent);margin-bottom:4px;}
+.collection-card .ic svg{width:22px;height:22px;}
+.collection-card .name{font-size:15px;font-weight:700;color:var(--ink);}
+.collection-card .count{font-size:12.5px;color:var(--ink-soft);font-weight:500;}
+
+/* ---------------- breadcrumb ---------------- */
+.breadcrumb{max-width:1040px;margin:0 auto;padding:32px 24px 4px;font-size:14px;color:var(--ink-soft);font-weight:500;}
+.breadcrumb a{font-weight:600;color:var(--ink-soft);}
+.breadcrumb a:hover{color:var(--ink);}
+.breadcrumb .sep{margin:0 8px;color:var(--ink-faint);}
+.breadcrumb .current{color:var(--ink-soft);}
+
+/* ---------------- article hero ---------------- */
+.article-hero{max-width:1040px;margin:0 auto;padding:10px 24px 28px;}
+.article-hero h1{font-size:40px;line-height:1.12;font-weight:800;letter-spacing:-.02em;color:var(--ink);max-width:820px;}
+.article-hero .lede{margin-top:16px;font-size:18px;line-height:1.55;color:var(--ink-soft);font-weight:500;max-width:680px;}
+.article-hero .updated{margin-top:18px;font-size:14px;color:var(--ink-faint);font-weight:500;}
+
+/* ---------------- layout: article + toc ---------------- */
+.article-layout{max-width:1040px;margin:0 auto;padding:8px 24px 80px;display:grid;grid-template-columns:1fr 220px;gap:56px;align-items:start;}
+@media (max-width:860px){.article-layout{grid-template-columns:1fr;}.toc{display:none;}}
+.toc{position:sticky;top:24px;border-left:1px solid var(--rule);padding-left:18px;}
+.toc .toc-label{font-size:12px;font-weight:800;color:var(--ink-faint);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
+.toc a{display:block;font-size:13.5px;color:var(--ink-soft);font-weight:600;padding:6px 0;line-height:1.4;}
+.toc a:hover{color:var(--ink);}
+
+article section{padding-top:34px;border-top:1px solid var(--rule);margin-top:34px;}
+article section:first-of-type{border-top:none;margin-top:0;padding-top:0;}
+article h2{font-size:24px;font-weight:800;letter-spacing:-.01em;margin-bottom:14px;scroll-margin-top:24px;}
+article h3{font-size:17px;font-weight:700;margin:22px 0 8px;scroll-margin-top:24px;}
+article p{font-size:15.5px;line-height:1.7;color:#2B2B34;margin-bottom:14px;max-width:680px;}
+article p:last-child{margin-bottom:0;}
+article ul, article ol{margin:10px 0 16px;max-width:660px;}
+article li{font-size:15.5px;line-height:1.7;color:#2B2B34;margin-bottom:8px;}
+article strong{font-weight:700;color:var(--ink);}
+.note{background:var(--panel);border:1px solid var(--rule);border-radius:var(--radius);padding:16px 18px;font-size:14.5px;line-height:1.65;color:#2B2B34;margin:16px 0;max-width:660px;}
+.note strong{display:block;font-size:13px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-soft);margin-bottom:6px;font-weight:800;}
+.honest-note{border-color:#F0D9B5;background:#FFF8ED;}
+.honest-note strong{color:#9A6B12;}
+.settings-table{width:100%;border-collapse:collapse;margin:14px 0 18px;max-width:660px;}
+.settings-table th{text-align:left;font-size:12px;text-transform:uppercase;letter-spacing:.04em;color:var(--ink-faint);font-weight:800;padding:0 12px 8px 0;border-bottom:1px solid var(--rule);}
+.settings-table td{font-size:14.5px;line-height:1.55;color:#2B2B34;padding:12px 12px 12px 0;border-bottom:1px solid var(--rule);vertical-align:top;}
+.settings-table tr:last-child td{border-bottom:none;}
+.pill{display:inline-block;font-size:11.5px;font-weight:800;padding:3px 9px;border-radius:999px;background:var(--accent-soft);color:var(--accent);white-space:nowrap;}
+.pill.off{background:#F1F1F3;color:var(--ink-soft);}
+.steps{counter-reset:step;list-style:none;padding-left:0;max-width:640px;}
+.steps li{counter-increment:step;position:relative;padding-left:34px;margin-bottom:14px;font-size:15.5px;line-height:1.65;color:#2B2B34;}
+.steps li::before{content:counter(step);position:absolute;left:0;top:1px;width:22px;height:22px;border-radius:50%;background:var(--ink);color:#fff;font-size:12px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+
+.related{border-top:1px solid var(--rule);margin-top:60px;padding-top:30px;}
+.related h2{font-size:15px;font-weight:800;color:var(--ink-soft);margin-bottom:16px;}
+.related-list a{display:block;padding:14px 0;border-bottom:1px solid var(--rule);font-size:15px;font-weight:700;color:var(--ink);}
+.related-list a .sub{display:block;font-size:13px;font-weight:500;color:var(--ink-soft);margin-top:3px;}
+
+/* ---------------- chat fab ---------------- */
+.chat-fab{position:fixed;right:22px;bottom:22px;width:52px;height:52px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 8px 24px rgba(0,0,0,.18);cursor:default;z-index:40;}
+.chat-fab svg{width:22px;height:22px;}
+
+/* ---------------- footer ---------------- */
+.site-footer{border-top:1px solid var(--rule);margin-top:40px;padding:40px 24px 60px;}
+.site-footer .wrap-wide{display:grid;grid-template-columns:1.4fr 1fr 1fr 1fr;gap:32px;}
+@media (max-width:720px){.site-footer .wrap-wide{grid-template-columns:1fr 1fr;}}
+.site-footer h4{font-size:13px;font-weight:800;color:var(--ink-soft);margin-bottom:12px;}
+.site-footer a{display:block;font-size:14px;color:var(--ink);font-weight:600;margin-bottom:10px;}
+.site-footer .brand{margin-bottom:12px;}
+.site-footer .brand-name{font-size:18px;}
+.site-footer .fine{font-size:12.5px;color:var(--ink-faint);font-weight:500;line-height:1.6;max-width:280px;}
+.legal-copy{font-size:12px;color:var(--ink-faint);margin-top:30px;padding-top:20px;border-top:1px solid var(--rule);max-width:1040px;margin-left:auto;margin-right:auto;padding-left:24px;padding-right:24px;}
+
+/* founder card */
+.founder-card{display:flex;gap:16px;align-items:flex-start;border:1px solid var(--rule);border-radius:var(--radius);padding:18px;margin:16px 0;max-width:660px;}
+.founder-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#0d4d85);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;}
+.founder-card .who{font-size:15px;font-weight:800;color:var(--ink);}
+.founder-card .role{font-size:12.5px;color:var(--ink-soft);font-weight:600;margin-top:1px;margin-bottom:8px;}
+.founder-card p{margin-bottom:0;}
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="site-header-inner">
+    <div class="brand">
+      <img class="brand-logo" src="data:image/png;base64,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" alt="Kashish AI">
+      <span class="brand-name">Kashish AI</span>
+    </div>
+    <div class="header-right">
+      <button class="lang-pill" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 4 5.7 4 9s-1.4 6.4-4 9c-2.6-2.6-4-5.7-4-9s1.4-6.4 4-9z"/></svg>
+        English
+      </button>
+      <a class="login-link" href="#">Login</a>
+    </div>
+  </div>
+</header>
+
+<div class="search-section">
+  <div class="wrap-wide" style="padding:0;">
+    <div class="search-bar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
+      <input type="text" placeholder="Search for articles..." aria-label="Search for articles">
+    </div>
+  </div>
+</div>
+<hr class="full-rule">
+
+<section class="collections" id="home">
+  <h2>Browse the Kashish AI Help Center</h2>
+  <div class="collection-grid">
+    <a class="collection-card" href="#getting-started">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2l2.4 6.6L21 11l-6.6 2.4L12 20l-2.4-6.6L3 11l6.6-2.4L12 2z"/></svg></span>
+      <span class="name">Getting started</span>
+      <span class="count">Creating an account, chatting, voice</span>
+    </a>
+    <a class="collection-card" href="#account">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></span>
+      <span class="name">Account &amp; profile</span>
+      <span class="count">Login, plans, memory, personalization</span>
+    </a>
+    <a class="collection-card" href="#parental-controls">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 2l7 3v6c0 5-3 8.6-7 11-4-2.4-7-6-7-11V5l7-3z"/></svg></span>
+      <span class="name">Family &amp; teen safety</span>
+      <span class="count">Parental controls, teen accounts</span>
+    </a>
+    <a class="collection-card" href="#legal">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M4 6h16M4 12h16M4 18h10"/></svg></span>
+      <span class="name">Legal</span>
+      <span class="count">Terms, privacy, acceptable use</span>
+    </a>
+    <a class="collection-card" href="#about">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><path d="M12 20s-7-4.4-9.5-9A5.5 5.5 0 0112 5a5.5 5.5 0 019.5 6c-2.5 4.6-9.5 9-9.5 9z"/></svg></span>
+      <span class="name">About Kashish AI</span>
+      <span class="count">Our story, the team behind it</span>
+    </a>
+    <a class="collection-card" href="#faq">
+      <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 015 .5c0 1.7-2.5 1.7-2.5 3.5M12 17h.01"/></svg></span>
+      <span class="name">FAQ</span>
+      <span class="count">Common questions, answered</span>
+    </a>
+  </div>
+</section>
+
+<nav class="breadcrumb">
+  <a href="#home">All Collections</a><span class="sep">&rsaquo;</span><a href="#parental-controls">Family &amp; teen safety</a><span class="sep">&rsaquo;</span><span class="current">Managing parental controls in Kashish AI</span>
+</nav>
+
+<div class="article-hero" id="parental-controls">
+  <h1>Managing parental controls in Kashish AI</h1>
+  <p class="lede">Learn how to link a teen account, manage parental controls, and understand exactly what protections apply today — and what they don't cover yet.</p>
+  <p class="updated">Updated: September 2026</p>
+</div>
+
+<div class="article-layout">
+  <article>
+
+    <section id="overview">
+      <h2>Overview</h2>
+      <p>Parental controls let a parent or guardian link their Kashish AI account with a teen's account, review which protections are on, and approve or decline the teen's requests to remove specific ones. Either person can unlink the accounts at any time.</p>
+      <p>Linking accounts does not give a parent or guardian access to a teen's conversations, chat history, or message content. A parent can see when a linked account was last active, but not what was said.</p>
+      <p>A teen account is created automatically: anyone who enters a date of birth under 18 during sign-up is marked as a Teen account. A small "Teen" badge appears on their profile, and a set of default protections is switched on immediately — before any family member is even linked.</p>
+    </section>
+
+    <section id="link-accounts">
+      <h2>Link your accounts</h2>
+      <p>Either the parent/guardian or the teen can start the invitation, from <strong>Settings &gt; Parental controls</strong>.</p>
+      <h3>Invite a family member</h3>
+      <ol class="steps">
+        <li>Open <strong>Settings</strong> from your profile.</li>
+        <li>Select <strong>Parental controls</strong>.</li>
+        <li>Select <strong>Invite family member</strong>.</li>
+        <li>Enter the other person's email address.</li>
+        <li>Choose whether they are <strong>your child</strong> or <strong>your parent/guardian</strong>.</li>
+        <li>Select <strong>Send</strong>.</li>
+      </ol>
+      <p>If the invite is sent to an email address that hasn't signed up yet, it's held and automatically delivered to their inbox the moment they create a Kashish AI account with that email.</p>
+      <p>The other person sees the invite under <strong>Pending invites</strong> in their own Parental controls screen, with <strong>Accept</strong> and <strong>Decline</strong> options. Once accepted, both accounts appear under <strong>Family members</strong> for each other.</p>
+      <div class="note">
+        <strong>Good to know</strong>
+        You can link with more than one family member — for example, a parent can be linked with several of their teens, and a teen can add more than one guardian if needed.
+      </div>
+    </section>
+
+    <section id="manage-controls">
+      <h2>Manage parental controls</h2>
+      <p>Once a teen account is linked, its default protections are visible from both sides in <strong>Settings &gt; Parental controls</strong>:</p>
+      <table class="settings-table">
+        <tr><th>Setting</th><th>What it does</th><th>Default</th></tr>
+        <tr><td>Mature &amp; sensitive content filter</td><td>Blocks sexual, violent, or graphic replies in chat.</td><td><span class="pill">Enabled</span></td></tr>
+        <tr><td>Romantic / flirty companion mode</td><td>Turns off flirty or romantic roleplay in replies, even if the teen initiates it.</td><td><span class="pill">Enabled</span></td></tr>
+        <tr><td>Strong language filter</td><td>Blocks profanity and strong language in replies.</td><td><span class="pill">Enabled</span></td></tr>
+        <tr><td>Late-night use reminder</td><td>A one-time gentle nudge to take a break if it's very late for the teen.</td><td><span class="pill">Enabled</span></td></tr>
+        <tr><td>Restrict content (any linked account)</td><td>A separate, parent-controlled switch that keeps every reply strictly clean — available for any linked family member, not only teens.</td><td><span class="pill off">Off</span></td></tr>
+      </table>
+      <p>The first four rows are <strong>Teen protections</strong> — they turn on automatically for every Teen account at sign-up, whether or not a parent has linked up yet. They work differently from the "Restrict content" switch below them, which a parent can turn on or off directly at any time for anyone they supervise.</p>
+    </section>
+
+    <section id="removal-requests">
+      <h2>Removing a teen protection: request &amp; approve</h2>
+      <p>Teen protections can't be switched off from inside the app by the teen themselves, and a linked parent can't switch them off with a single tap either — each one is removed only through a request that the teen sends and a parent approves:</p>
+      <ol class="steps">
+        <li>The teen opens <strong>Settings &gt; Parental controls</strong> and finds <strong>Your protections</strong>.</li>
+        <li>Next to a protection that's still on, they select <strong>Request removal</strong>. (This only works once at least one parent/guardian is linked.)</li>
+        <li>The request shows as <strong>Requested</strong> on the teen's side, and appears under that teen's name on the parent's Parental controls screen.</li>
+        <li>The parent selects <strong>Accept</strong> to turn that one protection off, or <strong>Decline</strong> to keep it on. Declining doesn't block the teen from asking again later.</li>
+      </ol>
+      <p>Each of the four Teen protections is requested and approved <strong>separately</strong> — accepting one request doesn't affect the other three. This is deliberately more restrictive than the "Restrict content" switch above, which a parent manages directly without a request step.</p>
+    </section>
+
+    <section id="sensitive-content">
+      <h2>About the sensitive-content safeguards</h2>
+      <p>The Mature &amp; sensitive content filter and Romantic/flirty companion mode work together to keep a Teen account's conversations age-appropriate: they steer Kashish AI away from sexual or romantic roleplay, graphic or violent content, and away from initiating anything flirtatious, regardless of how the conversation is going.</p>
+      <p>Turning one of these off only changes that specific safeguard — it doesn't turn a Teen account into an adult account, remove the Teen badge, or affect any other protection.</p>
+    </section>
+
+    <section id="safety-notifications">
+      <h2>Safety notifications</h2>
+      <div class="note honest-note">
+        <strong>Please read this section carefully</strong>
+        Kashish AI does not currently monitor conversations for self-harm, disordered eating, or other safety concerns, and it does not send automatic safety alerts to a linked parent or guardian. Linking accounts only shares the settings and "last active" information described on this page — nothing about what was actually said in a chat.
+      </div>
+      <p>If you're a parent or guardian worried about a teen's wellbeing, the most reliable thing you can do is talk with them directly, and involve a doctor, school counselor, or mental health professional if you're concerned. If you believe someone may be in immediate danger, contact local emergency services right away.</p>
+    </section>
+
+    <section id="unlink">
+      <h2>Unlink your accounts</h2>
+      <p>Either person can remove the link at any time from <strong>Settings &gt; Parental controls</strong>, by selecting the family member and confirming <strong>Remove this family link</strong>. This immediately ends the parent's ability to view or manage that account's settings.</p>
+      <p>Unlinking does not change a teen's existing protections — they stay exactly as they were (on, or previously removed) until a new parent/guardian is linked and future requests are approved.</p>
+    </section>
+
+    <section id="turns-18">
+      <h2>When a teen turns 18</h2>
+      <div class="note honest-note">
+        <strong>Current limitation</strong>
+        Kashish AI does not yet automatically move an account out of Teen protections when someone turns 18. The Teen badge and its default protections are set once, from the date of birth entered at sign-up, and don't change on their own afterward.
+      </div>
+      <p>If someone's Teen protections should no longer apply, the same request-and-approve flow above is the way to remove them today. Automatic age transition is something we're aware isn't built yet.</p>
+    </section>
+
+    <section id="faq">
+      <h2>FAQ</h2>
+      <h3>Can a parent read a teen's conversations?</h3>
+      <p>No. Linking accounts never shares chat content — only the protection settings on this page and a last-active timestamp.</p>
+      <h3>Can a teen unlink parental controls on their own?</h3>
+      <p>Yes. Either side can unlink at any time from Parental controls; there's no approval needed to unlink.</p>
+      <h3>Does turning off "Restrict content" affect the four Teen protections?</h3>
+      <p>No — they're independent. "Restrict content" is a separate, directly-toggled switch a parent controls for anyone they supervise; the four Teen protections can only change through a request the teen sends and the parent approves.</p>
+      <h3>Can I link with more than one parent or more than one teen?</h3>
+      <p>Yes, on both sides — there's no limit on how many family members you can link with.</p>
+    </section>
+
+    <div class="related">
+      <h2>Related articles</h2>
+      <div class="related-list">
+        <a href="#getting-started">Getting started with Kashish AI<span class="sub">Creating an account, your first chat, voice mode</span></a>
+        <a href="#account">Account &amp; profile settings<span class="sub">Memory, personalization, plans, and your profile badge</span></a>
+        <a href="#legal">Legal &amp; company information<span class="sub">Terms, Privacy Policy, Acceptable Use Policy</span></a>
+        <a href="#about">About Kashish AI<span class="sub">Our story and the team behind it</span></a>
+      </div>
+    </div>
+
+  </article>
+
+  <nav class="toc">
+    <div class="toc-label">In this article</div>
+    <a href="#overview">Overview</a>
+    <a href="#link-accounts">Link your accounts</a>
+    <a href="#manage-controls">Manage parental controls</a>
+    <a href="#removal-requests">Request &amp; approve removal</a>
+    <a href="#sensitive-content">Sensitive-content safeguards</a>
+    <a href="#safety-notifications">Safety notifications</a>
+    <a href="#unlink">Unlink your accounts</a>
+    <a href="#turns-18">When a teen turns 18</a>
+    <a href="#faq">FAQ</a>
+  </nav>
+</div>
+
+<!-- ============ GETTING STARTED ============ -->
+<div class="article-layout" id="getting-started" style="padding-top:0;">
+  <article style="width:100%;">
+    <section style="border-top:1px solid var(--rule);padding-top:34px;">
+      <h2>Getting started with Kashish AI</h2>
+      <p>Kashish AI is a general-purpose AI companion you can chat or talk with for everyday things — conversation, advice, planning, writing help, or just company. Create an account with an email, a display name, a username, a password, and your date of birth (you must be at least 13). Your date of birth is also what determines whether your account is a Teen account, described above.</p>
+      <p>Voice mode lets you talk out loud instead of typing. Image generation lets you ask for pictures inside a chat. Both are available from the chat screen once you're signed in.</p>
+    </section>
+  </article>
+</div>
+
+<!-- ============ ACCOUNT & PROFILE ============ -->
+<div class="article-layout" id="account" style="padding-top:0;">
+  <article style="width:100%;">
+    <section style="border-top:1px solid var(--rule);padding-top:34px;">
+      <h2>Account &amp; profile settings</h2>
+      <p>Your profile shows your display name, username, and photo, plus a Teen badge if your account is a Teen account. You can update your display name and photo any time from <strong>Profile</strong>.</p>
+      <p>Personalization settings let Kashish AI remember small facts you've shared across conversations, and let you set custom instructions for how it should respond. Both are optional and can be turned off from <strong>Settings &gt; Personalization</strong>.</p>
+    </section>
+  </article>
+</div>
+
+<!-- ============ LEGAL ============ -->
+<div class="article-layout" id="legal" style="padding-top:0;">
+  <article style="width:100%;">
+    <section style="border-top:1px solid var(--rule);padding-top:34px;">
+      <h2>Legal &amp; company information</h2>
+      <p>Kashish AI is built and operated by <strong>Nexor Sparks</strong>, the company behind Nexor. Three documents govern use of the app, all of which you actively agree to — via a checkbox that isn't pre-checked for you — when you create an account:</p>
+      <ul>
+        <li><strong>Consumer Terms</strong> — the agreement between you and Nexor Sparks for using Kashish AI.</li>
+        <li><strong>Acceptable Use Policy</strong> — what is and isn't allowed on the app, and what happens if it's violated (a warning, a temporary restriction, or account suspension, depending on severity).</li>
+        <li><strong>Privacy Policy</strong> — what information is collected (including your self-declared date of birth, used only to confirm you meet the minimum age requirement and to determine Teen protections), how it's used, and how it's protected.</li>
+      </ul>
+      <p>You must meet the minimum age required by the laws of your region to create an account, and must be at least 13 to sign up for Kashish AI at all. If you're under the age of majority where you live, local law may require a parent or guardian's involvement — Parental controls, described above, is how that involvement works inside the app.</p>
+      <div class="founder-card">
+        <div class="founder-avatar">NS</div>
+        <div>
+          <div class="who">Nexor Sparks</div>
+          <div class="role">Company behind Kashish AI &amp; Nexor</div>
+          <p>Founded and led by Gursharan Singh, also known professionally as Gursharn Arya.</p>
+        </div>
+      </div>
+    </section>
+  </article>
+</div>
+
+<!-- ============ ABOUT ============ -->
+<div class="article-layout" id="about" style="padding-top:0;">
+  <article style="width:100%;">
+    <section style="border-top:1px solid var(--rule);padding-top:34px;">
+      <h2>About Kashish AI</h2>
+      <p>Kashish AI was created by Gursharan Singh — also known by the name Gursharn Arya — the founder of Nexor. Kashish AI shares its account system with Nexor Sparks, the social app where people post "Pulses," follow each other, and build a following, which is why a single Kashish AI account works across both.</p>
+      <p>The name "Kashish" was taken from, and inspired by, Kashish Tyagi, who is Gursharan's girlfriend. It's a personal detail behind the product's name, shared here because people frequently ask about it — Kashish AI doesn't have any further public information about Kashish Tyagi beyond that.</p>
+    </section>
+  </article>
+</div>
+
+<div class="chat-fab" title="Contact support">
+  <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16a1 1 0 011 1v11a1 1 0 01-1 1H8l-4 4V5a1 1 0 011-1z"/></svg>
+</div>
+
+<footer class="site-footer">
+  <div class="wrap-wide">
+    <div>
+      <div class="brand"><img class="brand-logo" src="data:image/png;base64,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" alt="Kashish AI" style="width:28px;height:28px;"><span class="brand-name">Kashish AI</span></div>
+      <p class="fine">Your everyday AI companion. Chat, talk, or just hang out — built by Nexor Sparks.</p>
+    </div>
+    <div>
+      <h4>Help Center</h4>
+      <a href="#getting-started">Getting started</a>
+      <a href="#account">Account &amp; profile</a>
+      <a href="#parental-controls">Family &amp; teen safety</a>
+      <a href="#faq">FAQ</a>
+    </div>
+    <div>
+      <h4>Legal</h4>
+      <a href="#legal">Consumer Terms</a>
+      <a href="#legal">Privacy Policy</a>
+      <a href="#legal">Acceptable Use Policy</a>
+    </div>
+    <div>
+      <h4>Company</h4>
+      <a href="#about">About Kashish AI</a>
+      <a href="#legal">Nexor Sparks</a>
+    </div>
+  </div>
+  <p class="legal-copy">&copy; 2026 Nexor Sparks. Kashish AI is a product of Nexor Sparks.</p>
+</footer>
+
+</body>
+</html>
