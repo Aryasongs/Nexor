@@ -117,6 +117,10 @@ article strong{font-weight:700;color:var(--ink);}
 .site-footer .fine{font-size:12.5px;color:var(--ink-faint);font-weight:500;line-height:1.6;max-width:280px;}
 .legal-copy{font-size:12px;color:var(--ink-faint);margin-top:30px;padding-top:20px;border-top:1px solid var(--rule);max-width:1040px;margin-left:auto;margin-right:auto;padding-left:24px;padding-right:24px;}
 
+/* ---------------- page routing ---------------- */
+.page{display:none;}
+.page.active{display:block;}
+
 /* founder card */
 .founder-card{display:flex;gap:16px;align-items:flex-start;border:1px solid var(--rule);border-radius:var(--radius);padding:18px;margin:16px 0;max-width:660px;}
 .founder-avatar{width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#0d4d85);flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:18px;}
@@ -153,6 +157,7 @@ article strong{font-weight:700;color:var(--ink);}
 </div>
 <hr class="full-rule">
 
+<div class="page page-home active" id="page-home">
 <section class="collections" id="home">
   <h2>Browse the Kashish AI Help Center</h2>
   <div class="collection-grid">
@@ -218,7 +223,9 @@ article strong{font-weight:700;color:var(--ink);}
     </a>
   </div>
 </section>
+</div>
 
+<div class="page page-parental-controls" id="page-parental-controls">
 <nav class="breadcrumb">
   <a href="#home">All Collections</a><span class="sep">&rsaquo;</span><a href="#parental-controls">Family &amp; teen safety</a><span class="sep">&rsaquo;</span><span class="current">Managing parental controls in Kashish AI</span>
 </nav>
@@ -356,7 +363,9 @@ article strong{font-weight:700;color:var(--ink);}
   </nav>
 </div>
 
+</div>
 <!-- ============ GETTING STARTED (full article) ============ -->
+<div class="page page-getting-started" id="page-getting-started">
 <nav class="breadcrumb">
   <a href="#home">All Collections</a><span class="sep">&rsaquo;</span><a href="#getting-started">Getting started</a><span class="sep">&rsaquo;</span><span class="current">Getting started with Kashish AI</span>
 </nav>
@@ -442,7 +451,9 @@ article strong{font-weight:700;color:var(--ink);}
   </nav>
 </div>
 
+</div>
 <!-- ============ ACCOUNT, PROFILE & PLANS (full article) ============ -->
+<div class="page page-account" id="page-account">
 <nav class="breadcrumb">
   <a href="#home">All Collections</a><span class="sep">&rsaquo;</span><a href="#account">Account &amp; plans</a><span class="sep">&rsaquo;</span><span class="current">Account, profile &amp; plans</span>
 </nav>
@@ -518,7 +529,9 @@ article strong{font-weight:700;color:var(--ink);}
   </nav>
 </div>
 
+</div>
 <!-- ============ CHAT, VOICE & MEMORY (full article) ============ -->
+<div class="page page-chat-voice" id="page-chat-voice">
 <nav class="breadcrumb">
   <a href="#home">All Collections</a><span class="sep">&rsaquo;</span><a href="#chat-voice">Chat, voice &amp; memory</a><span class="sep">&rsaquo;</span><span class="current">Chat, voice &amp; memory</span>
 </nav>
@@ -602,7 +615,9 @@ article strong{font-weight:700;color:var(--ink);}
   </nav>
 </div>
 
+</div>
 <!-- ============ HEALTH & WELLNESS (full article) ============ -->
+<div class="page page-health" id="page-health">
 <nav class="breadcrumb">
   <a href="#home">All Collections</a><span class="sep">&rsaquo;</span><a href="#health">Health &amp; wellness</a><span class="sep">&rsaquo;</span><span class="current">Health &amp; wellness tracking</span>
 </nav>
@@ -682,7 +697,9 @@ article strong{font-weight:700;color:var(--ink);}
   </nav>
 </div>
 
+</div>
 <!-- ============ PRODUCTIVITY (full article) ============ -->
+<div class="page page-productivity" id="page-productivity">
 <nav class="breadcrumb">
   <a href="#home">All Collections</a><span class="sep">&rsaquo;</span><a href="#productivity">Productivity</a><span class="sep">&rsaquo;</span><span class="current">Productivity: reminders, tasks &amp; bucket list</span>
 </nav>
@@ -744,7 +761,9 @@ article strong{font-weight:700;color:var(--ink);}
   </nav>
 </div>
 
+</div>
 <!-- ============ DISCOVER (full article) ============ -->
+<div class="page page-discover" id="page-discover">
 <nav class="breadcrumb">
   <a href="#home">All Collections</a><span class="sep">&rsaquo;</span><a href="#discover">Discover</a><span class="sep">&rsaquo;</span><span class="current">Discover: weather, space, movies, hotels, food &amp; medicine</span>
 </nav>
@@ -816,7 +835,9 @@ article strong{font-weight:700;color:var(--ink);}
   </nav>
 </div>
 
+</div>
 <!-- ============ CODEX (full article) ============ -->
+<div class="page page-codex" id="page-codex">
 <nav class="breadcrumb">
   <a href="#home">All Collections</a><span class="sep">&rsaquo;</span><a href="#codex">Codex</a><span class="sep">&rsaquo;</span><span class="current">Codex — the built-in AI coding assistant</span>
 </nav>
@@ -878,7 +899,9 @@ article strong{font-weight:700;color:var(--ink);}
   </nav>
 </div>
 
+</div>
 <!-- ============ SETTINGS & DATA CONTROLS (full article) ============ -->
+<div class="page page-settings" id="page-settings">
 <nav class="breadcrumb">
   <a href="#home">All Collections</a><span class="sep">&rsaquo;</span><a href="#settings">Settings &amp; data</a><span class="sep">&rsaquo;</span><span class="current">Settings &amp; data controls</span>
 </nav>
@@ -961,7 +984,9 @@ article strong{font-weight:700;color:var(--ink);}
   </nav>
 </div>
 
+</div>
 <!-- ============ LEGAL (full article) ============ -->
+<div class="page page-legal" id="page-legal">
 <nav class="breadcrumb">
   <a href="#home">All Collections</a><span class="sep">&rsaquo;</span><a href="#legal">Legal</a><span class="sep">&rsaquo;</span><span class="current">Legal &amp; company information</span>
 </nav>
@@ -1028,7 +1053,9 @@ article strong{font-weight:700;color:var(--ink);}
   </nav>
 </div>
 
+</div>
 <!-- ============ ABOUT (full article) ============ -->
+<div class="page page-about" id="page-about">
 <nav class="breadcrumb">
   <a href="#home">All Collections</a><span class="sep">&rsaquo;</span><a href="#about">About Kashish AI</a><span class="sep">&rsaquo;</span><span class="current">About Kashish AI</span>
 </nav>
@@ -1088,7 +1115,9 @@ article strong{font-weight:700;color:var(--ink);}
   </nav>
 </div>
 
+</div>
 <!-- ============ FAQ (full article) ============ -->
+<div class="page page-faq" id="page-faq">
 <nav class="breadcrumb">
   <a href="#home">All Collections</a><span class="sep">&rsaquo;</span><a href="#faq">FAQ</a><span class="sep">&rsaquo;</span><span class="current">Frequently asked questions</span>
 </nav>
@@ -1165,6 +1194,7 @@ article strong{font-weight:700;color:var(--ink);}
   </nav>
 </div>
 
+</div>
 <div class="chat-fab" title="Contact support">
   <svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 4h16a1 1 0 011 1v11a1 1 0 01-1 1H8l-4 4V5a1 1 0 011-1z"/></svg>
 </div>
@@ -1203,6 +1233,107 @@ article strong{font-weight:700;color:var(--ink);}
   </div>
   <p class="legal-copy">&copy; 2026 Nexor Sparks. Kashish AI is a product of Nexor Sparks.</p>
 </footer>
+
+<script>
+(function(){
+  var PAGES = {
+    'home': {
+      title: 'Kashish AI Help Center',
+      desc: 'Kashish AI Help Center — getting started, chat & voice, personalization & memory, family & teen safety, health tracking, productivity, Discover tools, Codex, settings, plans, legal, and company information.'
+    },
+    'getting-started': {
+      title: 'Getting started with Kashish AI — Kashish AI Help Center',
+      desc: 'How to create a Kashish AI account, send your first chat, and use voice mode.'
+    },
+    'account': {
+      title: 'Account, profile & plans — Kashish AI Help Center',
+      desc: 'Your Kashish AI profile, logging in, Free vs. Pro, and how to upgrade.'
+    },
+    'chat-voice': {
+      title: 'Chat, voice & memory — Kashish AI Help Center',
+      desc: 'Choosing a model, attaching photos, voice mode, personalization, and memory in Kashish AI.'
+    },
+    'parental-controls': {
+      title: 'Managing parental controls in Kashish AI — Kashish AI Help Center',
+      desc: 'Learn how to link a teen account, manage parental controls, and understand exactly what protections apply.'
+    },
+    'health': {
+      title: 'Health & wellness tracking — Kashish AI Help Center',
+      desc: 'Steps, hydration, sleep, weight, mood, and the built-in breathing exercise in Kashish AI.'
+    },
+    'productivity': {
+      title: 'Productivity: reminders, tasks & bucket list — Kashish AI Help Center',
+      desc: 'Daily tasks, scheduled reminders, and the bucket list in Kashish AI.'
+    },
+    'discover': {
+      title: 'Discover: weather, space, movies, hotels, food & medicine — Kashish AI Help Center',
+      desc: 'Weather, space, movies, hotels, and food & medicine search tools built into Kashish AI.'
+    },
+    'codex': {
+      title: 'Codex — the built-in AI coding assistant — Kashish AI Help Center',
+      desc: 'Chat with Codex to write and preview HTML, CSS, and JavaScript live inside Kashish AI.'
+    },
+    'settings': {
+      title: 'Settings & data controls — Kashish AI Help Center',
+      desc: 'General appearance, notifications, language, typing, voice, and data controls in Kashish AI.'
+    },
+    'legal': {
+      title: 'Legal & company information — Kashish AI Help Center',
+      desc: 'The company behind Kashish AI, the policies you agree to, and age requirements.'
+    },
+    'about': {
+      title: 'About Kashish AI — Kashish AI Help Center',
+      desc: 'Our story, the founder behind Kashish AI, where the name comes from, and how to follow along.'
+    },
+    'faq': {
+      title: 'Frequently asked questions — Kashish AI Help Center',
+      desc: 'Quick answers that cut across account, chat, family, health, and privacy topics in Kashish AI.'
+    }
+  };
+
+  var descTag = document.querySelector('meta[name="description"]');
+  var pages = document.querySelectorAll('.page');
+
+  function slugFromHash(hash){
+    hash = (hash || '').replace(/^#/, '');
+    if (!hash) return { slug: 'home', sub: null };
+    if (document.getElementById('page-' + hash)) return { slug: hash, sub: null };
+    var target = document.getElementById(hash);
+    if (target) {
+      var pageEl = target.closest ? target.closest('.page') : null;
+      if (pageEl) return { slug: pageEl.id.replace('page-', ''), sub: hash };
+    }
+    return { slug: 'home', sub: null };
+  }
+
+  function route(){
+    var result = slugFromHash(location.hash);
+    var slug = result.slug;
+
+    pages.forEach(function(p){
+      if (p.id === 'page-' + slug) { p.classList.add('active'); }
+      else { p.classList.remove('active'); }
+    });
+
+    var meta = PAGES[slug] || PAGES.home;
+    document.title = meta.title;
+    if (descTag) descTag.setAttribute('content', meta.desc);
+
+    if (result.sub) {
+      requestAnimationFrame(function(){
+        var el = document.getElementById(result.sub);
+        if (el) el.scrollIntoView();
+      });
+    } else {
+      window.scrollTo(0, 0);
+    }
+  }
+
+  window.addEventListener('hashchange', route);
+  window.addEventListener('DOMContentLoaded', route);
+  route();
+})();
+</script>
 
 </body>
 </html>
